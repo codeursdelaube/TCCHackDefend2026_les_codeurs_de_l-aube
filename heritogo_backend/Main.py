@@ -101,4 +101,31 @@ class hotel(BaseModel):
     longitude: float
     prix_nuit: int
 
+@app.get("/monument", response_model=List[Monument])
+def get_Monument():
+    """ Récupère la liste complète des monuments du Togo stockés en local """
+    return BASE_MONUMENT
+
+@app.get("/hotel")
+def get_hotel_proche(
+    lat: float = Query(..., description="Latitude du monument"), 
+    long: float = Query(..., description="Longitude du monument")
+):
+    """
+    Calcule la distance entre un monument donné et tous les hôtels de la base.
+    Retourne la liste des hôtels triés du plus proche au plus lointain.
+    """
+    hotel_avec_distance = []
+
+    for h in BASE_HOTEL:
+    # Utilisation de la formule d'Haversine pour calculer la distance géographique (en km)
+        distances = calcul_de_l_haversine(lat, long, h["latitude"], h["longitude"])
+        hotel_data = h.copy()
+        hotel_data["distance_km"] = distances # Injecte la distance calculée dans les données de l'hôtel
+        hotel_avec_distance.append(hotel_data)
+
+    # Tri décroissant/croissant basé sur le champ "distance_km"
+    hotel_tries = sorted(hotel_avec_distance, key=lambda x: x["distance_km"])
+
+    return hotel_tries
 
