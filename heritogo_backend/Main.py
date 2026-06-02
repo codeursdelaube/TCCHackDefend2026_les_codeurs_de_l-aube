@@ -129,3 +129,6 @@ def get_hotel_proche(
 
     return hotel_tries
 
+@app.post("/predict", dependencies=[Depends(verifier_cle_api)])
+async def predict_monument(file: UploadFile = File(..., description="photo prise par le touriste")):
+    
