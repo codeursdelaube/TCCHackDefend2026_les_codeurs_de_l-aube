@@ -168,3 +168,10 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
             "histoire": "Histoire ou description culturelle rapide en français."
         }
         """
+
+        # 5. Appel de l'API Gemini avec le modèle multimédia léger et performant gemini-2.5-flash
+
+        response = Client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[image, prompt]
+        )
