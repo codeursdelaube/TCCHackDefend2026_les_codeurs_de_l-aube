@@ -69,3 +69,17 @@ def verifier_cle_api(api_key_recue: str = Depends(api_key_header)):
     status_code=403,
     detail="Accès interdit: Clé API invalide ou manquante"
     )
+
+# ==========================================
+# 4. CHARGEMENT DES BASES DE DONNÉES LOCALES (JSON)
+# ==========================================
+
+# Chargement en mémoire au démarrage de l'API de la liste officielle des monuments du Togo
+with open("monument.json", "r", encoding="utf-8") as fichier:
+    BASE_MONUMENT = json.load(fichier)
+
+# Chargement en mémoire de la liste des hôtels répertoriés au Togo
+with open("hotel.json", "r", encoding="utf-8") as fichier_hotel:
+    BASE_HOTEL = json.load(fichier_hotel)
+
+
