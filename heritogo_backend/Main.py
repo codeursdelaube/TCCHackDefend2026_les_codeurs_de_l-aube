@@ -33,4 +33,6 @@ settings = Settings()
 # Initialisation de l'application FastAPI
 app = FastAPI(title="heritogo_backend")
 
+# Initialisation du client de l'API Google GenAI avec la clé récupérée du .env
+Client = genai.Client(api_key=settings.gemini_api_key)
 
