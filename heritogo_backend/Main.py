@@ -162,7 +162,9 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         Agis en tant que guide expert du Togo. Analyse cette photo touristique.
         Identifie le monument ou le lieu (ex: Monument de l'Indépendance, Colombe de la Paix, Palais de Lomé, Tata Tamberma, Grand Marché).
 
-        Tu dois renvoyer TOUJOURS une histoire courte au cas où le lieu n'est pas dans notre base.
+        Tu dois renvoyer TOUJOURS une histoire qui se trouve  dans notre base.
+        
+        si tu ne reconnait pas cet histoire alors renvoie : monument non répertorier.
 
         Réponds STRICTEMENT au format JSON suivant, sans balises Markdown :
         {
