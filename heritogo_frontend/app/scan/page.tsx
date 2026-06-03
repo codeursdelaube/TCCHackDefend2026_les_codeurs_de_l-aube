@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useActionState, startTransition } from 'react'
-import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, Globe, RefreshCw } from 'lucide-react'
+import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, Globe, RefreshCw, TowerControl, Stone, Rocket } from 'lucide-react'
 import Image from 'next/image'
 
 interface PredictionResult {
@@ -198,7 +198,7 @@ export default function ScanPage() {
             {loading ? (
               <>
                 <Loader2 className="animate-spin h-5 w-5" />
-                Analyse par Gemini 1.5 Flash...
+                Analyse par IA
               </>
             ) : (
               <>
@@ -219,7 +219,8 @@ export default function ScanPage() {
                             gap-4 mb-4 pb-4 border-b border-base-content/5">
               <h2 className="text-xl md:text-2xl font-black text-base-content
                              flex items-center gap-2">
-                ✨ {result.data.monument}
+                                <Sparkles className='text-amber-500'/>
+                 {result.data.monument}
               </h2>
 
               {/* Contrôleur TTS */}
@@ -278,15 +279,7 @@ export default function ScanPage() {
                   {Number(result.data.longitude).toFixed(4)}
                 </span>
               )}
-              {result.data.source && (
-                <span className="flex items-center gap-1.5
-                                 bg-base-300 border border-base-content/10
-                                 px-3 py-1.5 rounded-full
-                                 text-base-content/70 font-semibold">
-                  <Globe size={14} className="text-info" />
-                  Source : {result.data.source}
-                </span>
-              )}
+              
             </div>
 
           </div>
