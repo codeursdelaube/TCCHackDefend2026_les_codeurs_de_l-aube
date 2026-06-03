@@ -24,7 +24,7 @@ export default function ToutPage() {
                      pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
 
       {/* Halos décoratifs */}
-      <div className="absolute top-10 left-1/4 w-100 h-100
+      <div className="absolute top-10 left-1/4 w-[400px] h-[400px]
                       bg-green-600/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-1/3 right-1/4 w-125 h-125
                       bg-amber-500/5 blur-[130px] rounded-full pointer-events-none" />
