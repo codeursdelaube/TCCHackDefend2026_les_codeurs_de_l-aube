@@ -90,6 +90,8 @@ class Monument(BaseModel):
     """ Modèle de validation pour la structure d'un Monument """
     id: int
     nom: str
+    localite: str
+    region: str
     histoire: str
     latitude: float
     longitude: float
@@ -165,7 +167,9 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         Réponds STRICTEMENT au format JSON suivant, sans balises Markdown :
         {
             "monument": "Nom officiel du lieu",
-            "histoire": "Histoire ou description culturelle rapide en français."
+            "histoire": "Histoire ou description culturelle rapide en français.",
+            "localité": "localité dans lequel le monument se trouve",
+            "region": "region dans laquelle se trouve le monument"
         }
         """
 
@@ -198,6 +202,8 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
                 donnees_finales = {
                     "monument": m["nom"],
                     "histoire": m["histoire"],
+                    "localite": m["localite"],
+                    "region": m["region"],
                     "latitude": m["latitude"],
                     "longitude": m["longitude"],
                     "source": "local_database" # Indique que la donnée vient du fichier local sûr
@@ -209,6 +215,8 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
              donnees_finales = {
                  "monument": data_touristique.get("monument", "Monument inconnu"),
                  "histoire": data_touristique.get("histoire", "Monument identifié au Togo. Description officielle en cours de rédaction"),
+                 "localite": data_touristique.get("localite", "localité dans lequel le monument se trouve"),
+                 "region": data_touristique.get("region", "region dans laquelle se trouve le monument"),
                  "latitude": data_touristique.get("latitude", 6.1311), # Coordonnées par défaut (ex: Lomé)
                  "longitude": data_touristique.get("longitude", 1.2227),
                  "source": "ai_fallback" # Indique que la donnée provient exclusivement de l'IA
