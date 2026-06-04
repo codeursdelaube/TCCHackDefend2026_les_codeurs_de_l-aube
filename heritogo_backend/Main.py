@@ -231,6 +231,16 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
 
         data_tour = data_touristique.get("nom_probable", "").lower()
 
+        # ----------------========================================
+        # BOUCLIER 3 : TEXT-BASED CACHING (Performance accrue)
+        # ----------------========================================
+
+        if data_tour in CACHE_MONUMENTS_TEXTE:
+            return {
+                "prediction_status": "success",
+                "data": CACHE_MONUMENTS_TEXTE[data_tour]
+            }
+
         donnees_finales = None
 
          # 7. Algorithme de réconciliation : Recherche si le monument trouvé par l'IA existe dans notre JSON local
@@ -254,12 +264,15 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
              donnees_finales = {
                  "monument": data_touristique.get("monument", "Monument inconnu"),
                  "histoire": data_touristique.get("histoire", "Monument identifié au Togo. Description officielle en cours de rédaction"),
-                 "localite": data_touristique.get("localite", "localité dans lequel le monument se trouve"),
-                 "region": data_touristique.get("region", "region dans laquelle se trouve le monument"),
+                 "localite": data_touristique.get("localite", "Inconnue"),
+                 "region": data_touristique.get("region", "Inconnue"),
                  "latitude": data_touristique.get("latitude", 6.1311), # Coordonnées par défaut (ex: Lomé)
                  "longitude": data_touristique.get("longitude", 1.2227),
                  "source": "ai_fallback" # Indique que la donnée provient exclusivement de l'IA
             }
+             
+        # Sauvegarde du résultat dans notre cache textuel global
+        CACHE_MONUMENTS_TEXTE[data_tour] = donnees_finales
 
         return {
                 "prediction_status": "success",
@@ -272,6 +285,9 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         # Erreur levée si Gemini renvoie du texte standard au lieu du format JSON demandé
         raise HTTPException(status_code=500, detail="Format JSON invalide gemini ne peut pas le renvoyé")
     except Exception as e:
+        error_msg = str(e)
+        if "429" in error_msg or "RessourceExhausted" in error_msg:
+            raise HTTPException(status_code=429, detail="Serveurs d'analyse saturés. Rapprochez-vous du monument pour utiliser la localisation GPS directe !")
         # Capture de toute autre erreur (problème réseau, API Key expirée, erreur Pillow...)
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'analyse avec Gemini : {str(e)}")
     
