@@ -185,23 +185,27 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
 
         # ----------------========================================
-        # BOUCLIER 2 : PROMPT SÉCURISÉ ANTI-HALLUCINATION
+        # INJECTION DE TA BASE JSON DANS LE PROMPT (GROUNDING)
         # ----------------========================================
 
-        prompt = """
-        Agis en tant que guide expert du Togo. Analyse cette photo touristique.
-        Identifie s'il s'agit d'un monument historique, d'un site touristique ou d'un édifice architectural remarquable situé au Togo.
-        
-        Règles de filtrage strictes :
-        1. Si tu as le moindre doute majeur ou si l'image ne montre aucun élément du patrimoine culturel, architectural ou historique du Togo, ne devine rien et renvoie exactement "nom_probable": "".
-        2. Réponds STRICTEMENT au format JSON brut suivant, sans balises de bloc Markdown (pas de ```json), sans texte explicatif autour :
-        {
-            "est_monument": true ou false,
-            "nom_probable": "Nom officiel du lieu ou chaine vide si inconnu",
-            "histoire": "Histoire ou description culturelle rapide en français.",
-            "localite": "localité dans laquelle le monument se trouve",
-            "region": "region dans laquelle se trouve le monument"
-        }
+        # On crée une version texte simplifiée de ton JSON pour ne pas surcharger le prompt
+
+        catalogue_officiel = [{"nom": m["nom"], "histoire": m["histoire"], "localite": m["localite"]} for m in BASE_MONUMENT]
+        catalogue_str = json.dumps(catalogue_officiel, ensure_ascii=False)
+
+        prompt = f"""
+        Tu es un expert en reconnaissance du patrimoine togolais. 
+        Ton unique mission est de vérifier si l'image correspond STRICTEMENT à l'un des monuments de cette liste officielle :
+        {catalogue_str}
+
+        RÈGLES DE SÉCURITÉ INVIOLABLES :
+        1. Compare l'image avec les noms de la liste officielle fournie.
+        2. Si l'image correspond à un monument de la liste, renvoie "est_monument": true et le "nom_probable" exact de la liste.
+        3. Si le monument visible n'est PAS dans la liste fournie, ou si l'image montre autre chose (objet, personne, lieu étranger), tu dois impérativement répondre : {{"est_monument": false, "nom_probable": ""}}.
+        4. INTERDICTION FORMELLE d'utiliser tes connaissances externes sur d'autres monuments mondiaux. Ne réponds que si c'est dans la liste.
+        5. Réponds uniquement en JSON brut, sans balises markdown.
+
+        Format : {{"est_monument": bool, "nom_probable": "nom exact du catalogue"}}
         """
 
         # 5. Appel de l'API Gemini avec le modèle multimédia léger et performant gemini-2.5-flash
@@ -229,7 +233,7 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
                 "detail": "Monument non répertorié ou non identifiable au Togo."
             }
 
-        data_tour = data_touristique.get("nom_probable", "").lower()
+        data_tour = data_touristique.get("nom_probable", "").lower().strip()
 
         # ----------------========================================
         # BOUCLIER 3 : TEXT-BASED CACHING (Performance accrue)
@@ -258,7 +262,8 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
                     "source": "local_database" # Indique que la donnée vient du fichier local sûr
                 }
                 break
-        # 8. Système de secours (Fallback) : Si non trouvé en base locale, on adopte les coordonnées génériques du Togo
+        if not donnees_finales:
+            return {"prediction_status": "unknown"}
 
         # Sauvegarde du résultat dans notre cache textuel global
         CACHE_MONUMENTS_TEXTE[data_tour] = donnees_finales
@@ -278,7 +283,7 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         if "429" in error_msg or "RessourceExhausted" in error_msg:
             raise HTTPException(status_code=429, detail="Serveurs d'analyse saturés. Rapprochez-vous du monument pour utiliser la localisation GPS directe !")
         # Capture de toute autre erreur (problème réseau, API Key expirée, erreur Pillow...)
-        raise HTTPException(status_code=500, detail=f"Erreur lors de l'analyse avec Gemini : {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'analyse : {str(e)}")
     
 
 
