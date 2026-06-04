@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useActionState, startTransition } from 'react'
-import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, Globe, RefreshCw, TowerControl, Stone, Rocket } from 'lucide-react'
+import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, Globe, RefreshCw } from 'lucide-react'
 import Image from 'next/image'
 
 interface PredictionResult {
@@ -23,6 +23,24 @@ export default function ScanPage() {
 
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
   const [selectedLang, setSelectedLang] = useState<string>('fr-FR')
+  
+  // 🆕 État pour stocker la position GPS en temps réel du touriste
+  const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null)
+
+  // 🆕 Récupération automatique du GPS au chargement de l'application
+  useEffect(() => {
+    if (typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            long: position.coords.longitude,
+          })
+        },
+        (err) => console.log("GPS indisponible ou refusé :", err.message)
+      )
+    }
+  }, [])
 
   useEffect(() => {
     return () => { window.speechSynthesis.cancel() }
@@ -33,8 +51,19 @@ export default function ScanPage() {
       try {
         const res = await fetch('/api/scan', { method: 'POST', body: formData })
         const data = await res.json()
-        if (res.ok) { setResult(data); return null }
-        else return data.error || "Une erreur est survenue lors de l'analyse."
+        
+        if (res.ok) {
+          // 🔴 LE FIX CRUCIAL : Si le backend a répondu "unknown" (ex: chaussure), on l'intercepte comme une erreur visuelle
+          if (data.prediction_status === 'unknown') {
+            setResult(null) // On nettoie un éventuel ancien résultat valide
+            return data.detail || "Ce monument ou objet n'est pas répertorié dans la base officielle HeriTogo."
+          }
+
+          setResult(data)
+          return null
+        } else {
+          return data.error || "Une erreur est survenue lors de l'analyse."
+        }
       } catch (err) {
         console.error(err)
         return "Impossible de joindre le serveur ou le service Gemini."
@@ -58,6 +87,13 @@ export default function ScanPage() {
     if (!image) return
     const formData = new FormData()
     formData.append('image', image)
+    
+    // 🆕 Si le GPS est disponible, on l'injecte pour activer le Bouclier 1 du Backend
+    if (userLocation) {
+      formData.append('lat', userLocation.lat.toString())
+      formData.append('long', userLocation.long.toString())
+    }
+
     startTransition(() => { submitScanAction(formData) })
   }
 
@@ -88,13 +124,13 @@ export default function ScanPage() {
 
   return (
     <main className="relative min-h-screen w-full bg-base-100 text-base-content
-                     pt-24 pb-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+                    pt-24 pb-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
 
       {/* Halos décoratifs */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-125 h-125
-                      bg-green-600/10 blur-[120px] rounded-full pointer-events-none" />
+                     bg-green-600/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-12 right-10 w-75 h-75
-                      bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+                     bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 max-w-2xl mx-auto flex flex-col justify-center h-full">
 
@@ -176,11 +212,11 @@ export default function ScanPage() {
           />
         </div>
 
-        {/* Erreur */}
+        {/* 🔴 Section d'affichage des erreurs (S'activera magnifiquement pour la chaussure maintenant !) */}
         {error && (
           <div className="alert alert-error mt-4 rounded-2xl
                           bg-error/10 border border-error/20
-                          text-error text-sm">
+                          text-error text-sm font-semibold p-4">
             <span>{error}</span>
           </div>
         )}
@@ -219,7 +255,7 @@ export default function ScanPage() {
                             gap-4 mb-4 pb-4 border-b border-base-content/5">
               <h2 className="text-xl md:text-2xl font-black text-base-content
                              flex items-center gap-2">
-                                <Sparkles className='text-amber-500'/>
+                <Sparkles className='text-amber-500'/>
                  {result.data.monument}
               </h2>
 
@@ -240,7 +276,7 @@ export default function ScanPage() {
                              px-2 py-1.5 outline-none cursor-pointer rounded-lg
                              hover:bg-base-content/5"
                 >
-                  <option value="fr-FR">🇫🇷 FR</option>
+                  <option value="fr-FR">🇲🇬 FR</option>
                   <option value="en-US">🇺🇸 EN</option>
                   <option value="es-ES">🇪🇸 ES</option>
                 </select>
@@ -267,7 +303,7 @@ export default function ScanPage() {
               {result.data.histoire}
             </p>
 
-            {/* Badges GPS + Source */}
+            {/* Badges GPS */}
             <div className="flex flex-wrap gap-2 mt-4 text-xs">
               {result.data.latitude && result.data.longitude && (
                 <span className="flex items-center gap-1.5
@@ -279,7 +315,6 @@ export default function ScanPage() {
                   {Number(result.data.longitude).toFixed(4)}
                 </span>
               )}
-              
             </div>
 
           </div>
