@@ -221,7 +221,15 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
 
         # Conversion de la chaîne de texte nettoyée en un dictionnaire Python
         data_touristique = json.loads(texte_brut)
-        data_tour = data_touristique.get("monument", "").lower()
+
+        # Validation immédiate de la réponse de l'IA
+        if not data_touristique.get("est_monument") or not data_touristique.get("nom_probable"):
+            return {
+                "prediction_status": "unknown",
+                "detail": "Monument non répertorié ou non identifiable au Togo."
+            }
+
+        data_tour = data_touristique.get("nom_probable", "").lower()
 
         donnees_finales = None
 
