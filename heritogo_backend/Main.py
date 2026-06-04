@@ -181,6 +181,10 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         max_size = 1024
         image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
 
+        # ----------------========================================
+        # BOUCLIER 2 : PROMPT SÉCURISÉ ANTI-HALLUCINATION
+        # ----------------========================================
+
         prompt = """
         Agis en tant que guide expert du Togo. Analyse cette photo touristique.
         Identifie s'il s'agit d'un monument historique, d'un site touristique ou d'un édifice architectural remarquable situé au Togo.
