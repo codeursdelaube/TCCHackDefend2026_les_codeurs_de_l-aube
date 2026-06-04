@@ -31,8 +31,8 @@
     "localite": "Baguida",
     "region": "Maritime",
     "histoire": "Situé à Baguida, première capitale du Togo, ce monument historique en maçonnerie et pierre commémore la signature du traité de protectorat le 5 juillet 1884 entre l'explorateur allemand Gustav Nachtigal et le chef local Mlapa III de Togoville, marquant le début officiel des relations diplomatiques et de l'ère coloniale allemande.",
-    "lat": 6.162778,
-    "lng": 1.328333
+    "latitude": 6.162778,
+    "longitude": 1.328333
 
   },
 

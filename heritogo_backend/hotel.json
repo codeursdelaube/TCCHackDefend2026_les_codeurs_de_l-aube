@@ -1,47 +1,92 @@
 [
-    
-    {
-        
-        "nom": "Hôtel 2 Février (Lomé)", 
-        "latitude": 6.1317,    
-        "longitude": 1.2169, 
-        "prix_nuit": "120 000 FCFA"
-
-    },
-
-    {
-
-        "nom": "Sarakawa Hôtel", 
-        "latitude": 6.1265, 
-        "longitude": 1.2598, 
-        "prix_nuit": "75 000 FCFA"
-
-    },
-
-    {
-
-        "nom": "Onomo Hôtel Lomé", 
-        "latitude": 6.1192, 
-        "longitude": 1.2475, 
-        "prix_nuit": "55 000 FCFA"
-
-    },
-
-    {
-
-         "nom": "Hôtel de la Paix", 
-         "latitude": 6.1241, 
-         "longitude": 1.2361, 
-         "prix_nuit": "45 000 FCFA"
-
-    },
-    
-    {
-
-         "nom": "Logis de l'Aéroport (Proche de l'Aéroport)", "latitude": 6.1620, 
-         "longitude": 1.2510, 
-         "prix_nuit": "25 000 FCFA"
-
-    }
-
+  {
+    "nom": "Hotel 2 Fevrier",
+    "latitude": 6.1319,
+    "longitude": 1.2228,
+    "prix_nuit": 140000,
+    "telephone": "+22822238600",
+    "etoiles": 5,
+    "description": "L'emblématique tour de luxe 5 étoiles de Lomé référencée sur Booking, offrant piscine extérieure, services haut de gamme et vue panoramique sur la place de la Liberté.",
+    "lieux_proches": ["monument_independance", "musee_de_lome", "grand_marche_lome", "cathedrale_lome"]
+  },
+  {
+    "nom": "Hôtel Sarakawa",
+    "latitude": 6.1381,
+    "longitude": 1.2642,
+    "prix_nuit": 75000,
+    "telephone": "+22822276590",
+    "etoiles": 4,
+    "description": "Grand hôtel de standing en bord de mer à Lomé, célèbre pour sa piscine olympique et son immense parc verdoyant, très populaire sur Booking.",
+    "lieux_proches": ["village_artisanal", "monument_independance", "musee_de_lome"]
+  },
+  {
+    "nom": "ONOMO Hotel Lomé",
+    "latitude": 6.1198,
+    "longitude": 1.2394,
+    "prix_nuit": 60000,
+    "telephone": "+22822536300",
+    "etoiles": 3,
+    "description": "Hôtel moderne, éco-responsable et très bien noté sur Booking.com, idéalement situé sur le Boulevard du Mono face à l'océan.",
+    "lieux_proches": ["cathedrale_lome", "palais_de_lome", "village_artisanal", "grand_marche_lome"]
+  },
+  {
+    "nom": "Hotel Robinson Plage",
+    "latitude": 6.1704,
+    "longitude": 1.3503,
+    "prix_nuit": 30000,
+    "telephone": "+22822274415",
+    "etoiles": 2,
+    "description": "Hôtel de plage incontournable et historique très réservé sur Booking pour son calme, situé en bordure de plage vers la zone du port de Lomé.",
+    "lieux_proches": ["statue_amitie_germano"]
+  },
+  {
+    "nom": "Hotel Petit Brussel Resort",
+    "latitude": 6.1691,
+    "longitude": 1.3325,
+    "prix_nuit": 90000,
+    "telephone": "+22890116773",
+    "etoiles": 3,
+    "description": "Complexe hôtelier haut de gamme situé en bord de mer à Baguida, affichant d'excellents scores sur les plateformes de réservation.",
+    "lieux_proches": ["statue_amitie_germano"]
+  },
+  {
+    "nom": "Hôtel Amédzépé",
+    "latitude": 6.9112,
+    "longitude": 0.6278,
+    "prix_nuit": 25000,
+    "telephone": "+22891142512",
+    "etoiles": 2,
+    "description": "Hôtel de référence absolue à Kpalimé sur Booking.com, doté d'une piscine extérieure, d'une terrasse et d'un style architectural traditionnel superbe.",
+    "lieux_proches": ["kpalime", "chateau_vial"]
+  },
+  {
+    "nom": "Hotel Ganiela",
+    "latitude": 6.9015,
+    "longitude": 0.6124,
+    "prix_nuit": 28000,
+    "telephone": "+22824410115",
+    "etoiles": 2,
+    "description": "Établissement très prisé des voyageurs sur Booking à Kpalimé, réputé pour ses extérieurs soignés et sa belle piscine.",
+    "lieux_proches": ["kpalime", "chateau_vial"]
+  },
+  {
+    "nom": "Meka Hotel",
+    "latitude": 9.5524,
+    "longitude": 1.1911,
+    "prix_nuit": 35000,
+    "telephone": "+22826610015",
+    "etoiles": 3,
+    "description": "Un des rares complexes hôteliers de la ville de Kara officiellement listé et actualisé sur Booking.com, offrant confort, climatisation et chambres deluxe avec balcon.",
+    "lieux_proches": ["koutamakou"]
+  },
+  {
+    "nom": "Hotel Colline d'Or",
+    "latitude": 9.5412,
+    "longitude": 1.1814,
+    "prix_nuit": 20000,
+    "telephone": "+22826601422",
+    "etoiles": 2,
+    "description": "Hôtel 3 étoiles localisé au quartier Sinaï à Kara, disponible sur les comparateurs d'hôtels pour son excellent rapport qualité-prix.",
+    "lieux_proches": ["koutamakou"]
+  }
 ]
