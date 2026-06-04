@@ -82,6 +82,10 @@ with open("monument.json", "r", encoding="utf-8") as fichier:
 with open("hotel.json", "r", encoding="utf-8") as fichier_hotel:
     BASE_HOTEL = json.load(fichier_hotel)
 
+# À ajouter sous le chargement de hotel.json
+with open("restaurant.json", "r", encoding="utf-8") as fichier_resto:
+    BASE_RESTO = json.load(fichier_resto)
+
 # Cache global en mémoire pour mémoriser les résultats textuels de l'IA
 CACHE_MONUMENTS_TEXTE = {}
 
@@ -104,11 +108,11 @@ class hotel(BaseModel):
     nom: str
     latitude: float
     longitude: float
-    prix_nuit: int
-    telephone: int
-    etoiles: int
-    description: str
-    lieux_proches: str
+    prix_nuit: Optional[int] = None
+    telephone: Optional[int] = None
+    etoiles: Optional[int] = None
+    description: Optional[str] = None
+    lieux_proches: List[str]
 
 class resto(BaseModel):
     id: int
@@ -129,28 +133,34 @@ def get_Monument():
     """ Récupère la liste complète des monuments du Togo stockés en local """
     return BASE_MONUMENT
 
-@app.get("/hotel")
-def get_hotel_proche(
-    lat: float = Query(..., description="Latitude du monument"), 
-    long: float = Query(..., description="Longitude du monument")
-):
+@app.get("/nearby")
+def get_points_interet_proches(lat: float, long: float):
     """
-    Calcule la distance entre un monument donné et tous les hôtels de la base.
-    Retourne la liste des hôtels triés du plus proche au plus lointain.
+    Parcourt les hôtels et les restaurants pour renvoyer tout ce qui se trouve 
+    à moins de 5 kilomètres de l'utilisateur ou du monument.
     """
-    hotel_avec_distance = []
+    decouvertes = []
 
+    # 1. Filtrage des hôtels proches
     for h in BASE_HOTEL:
-    # Utilisation de la formule d'Haversine pour calculer la distance géographique (en km)
-        distances = calcul_de_l_haversine(lat, long, h["latitude"], h["longitude"])
-        hotel_data = h.copy()
-        hotel_data["distance_km"] = distances # Injecte la distance calculée dans les données de l'hôtel
-        hotel_avec_distance.append(hotel_data)
+        dist = calcul_de_l_haversine(lat, long, h["lat"], h["lng"])
+        if dist <= 5.0: # Rayon de 5 km
+            h_data = h.copy()
+            h_data["distance_km"] = dist
+            h_data["type"] = "hotel"
+            decouvertes.append(h_data)
 
-    # Tri décroissant/croissant basé sur le champ "distance_km"
-    hotel_tries = sorted(hotel_avec_distance, key=lambda x: x["distance_km"])
+    # 2. Filtrage des restaurants proches
+    for r in BASE_RESTO:
+        dist = calcul_de_l_haversine(lat, long, r["latitude"], r["longitude"])
+        if dist <= 5.0:
+            r_data = r.copy()
+            r_data["distance_km"] = dist
+            r_data["type"] = "restaurant"
+            decouvertes.append(r_data)
 
-    return hotel_tries
+    # Tri global du plus proche au plus lointain
+    return sorted(decouvertes, key=lambda x: x["distance_km"])
 
 @app.post("/predict", dependencies=[Depends(verifier_cle_api)])
 async def predict_monument(file: UploadFile = File(..., description="photo prise par le touriste"), lat: Optional[float] = Query(None, description="Latitude actuelle du touriste"), long: Optional[float] = Query(None, description="Longitude actuelle du touriste")):
