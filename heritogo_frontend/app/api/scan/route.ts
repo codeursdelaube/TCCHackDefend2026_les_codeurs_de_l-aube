@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     // 4. Envoi de la requête au backend FastAPI
     // FIX #5 : On ne passe QUE le header 'herit' (la clé API).
     // Surtout pas de 'Content-Type' — fetch gère le boundary multipart automatiquement.
-    const apiSecretKey = process.env.API_SECRET_KEY
+    const apiSecretKey = process.env.api_secret_key
 
     if (!apiSecretKey) {
       console.error('[HériTogo] API_SECRET_KEY est manquante.')
