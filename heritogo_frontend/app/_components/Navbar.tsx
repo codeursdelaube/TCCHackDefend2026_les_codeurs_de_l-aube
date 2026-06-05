@@ -18,8 +18,8 @@ export default function Navbar() {
     { href: '/scan', label: 'Scanner', icon: ScanLine },
     { href: '/lieux', label: 'Lieux', icon: Compass },
     { href: '/cuisine', label: 'Cuisine', icon: UtensilsCrossed },
-    // 🎡 AJOUT : Lien vers la page Parc d'attraction et Zoo
-    { href: '/loisirs', label: 'Parcs& Zoos', icon: Sparkles },
+    // AJOUT : Lien vers la page Parc d'attraction et Zoo
+    { href: '/loisirs', label: 'Parcs & Zoos', icon: Sparkles },
   ]
 
   const isActive = (path: string): boolean => pathname === path

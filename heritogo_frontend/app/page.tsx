@@ -52,9 +52,9 @@ interface StatItem {
   icon: React.ReactNode
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
+/* 
    SOUS-COMPOSANTS
-───────────────────────────────────────────────────────────────────────────── */
+*/
 
 /** Compteur animé (0 → valeur finale) */
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
@@ -228,7 +228,6 @@ export default function AcceuilPage() {
       title: "Scanner Intelligent Gemini IA",
       description: "Prenez ou importez une photo d'un monument historique. Notre app transmet l'image à l'API Gemini 1.5 Flash, analyse l'élément en temps réel et vous renvoie son histoire complète.",
       icon: <Scan className="h-5 w-5 text-green-500" />,
-      badge: "Gemini 1.5 Flash",
       link: "/scan",
       step: 1,
       color: "bg-gradient-to-r from-green-500/70 to-emerald-400/70",
@@ -238,7 +237,6 @@ export default function AcceuilPage() {
       title: "Géolocalisation & Proximité",
       description: "Explorez la base de données des sites togolais. L'app utilise vos coordonnées GPS pour calculer les distances en kilomètres via la formule de Haversine.",
       icon: <Map className="h-5 w-5 text-amber-500" />,
-      badge: "Algorithme Haversine",
       link: "/lieux",
       step: 2,
       color: "bg-gradient-to-r from-amber-500/70 to-orange-400/70",
@@ -248,7 +246,6 @@ export default function AcceuilPage() {
       title: "Patrimoine Culinaire & Restos",
       description: "Découvrez l'histoire des plats traditionnels (Fufu, Ablo, Kom). Sélectionnez une spécialité pour lister les maquis et restaurants les plus proches.",
       icon: <Utensils className="h-5 w-5 text-teal-500" />,
-      badge: "FastAPI Backend",
       link: "/cuisine",
       step: 3,
       color: "bg-gradient-to-r from-teal-500/70 to-emerald-500/70",
