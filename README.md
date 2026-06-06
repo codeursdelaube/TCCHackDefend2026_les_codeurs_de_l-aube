@@ -2,7 +2,7 @@
 
 > PWA multilingue propulsée par l'IA pour découvrir le patrimoine culturel, historique et culinaire du Togo.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?logo=google)](https://ai.google.dev/)
 
@@ -111,8 +111,8 @@ TCCHackDefend2026_Heritogo/
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/VOTRE-USERNAME/TCCHackDefend2026_Heritogo.git
-cd TCCHackDefend2026_Heritogo
+git clone https://github.com/codeursdelaube/TCCHackDefend2026_les_codeurs_de_l-aube.git
+
 ```
 
 ### 2. Backend (FastAPI)
@@ -181,10 +181,10 @@ Aucune installation requise pour tester la version déployée.
 
 | Nom | Rôle | Filière |
 |---|---|---|
-| [ADOKOU Koffi Éric] | Frontend / Next.js | [Informatique] |
-| [AFANOU Kossi tété Samuel] | Backend / FastAPI /IA| [Informatique] |
-| [ALABI Mbarak] | Data  | [Informatique] |
-| [HAZOUME gérard wilfried] | Data| [Informatique] |
+| ADOKOU Koffi Éric | Frontend / Next.js | [Informatique] |
+| AFANOU Kossi tété Samuel | Backend / FastAPI /IA| [Informatique] |
+| ALABI Mbarak | Data  | [Informatique] |
+| HAZOUME gérard wilfried | Data| [Informatique] |
 
 
 ---
