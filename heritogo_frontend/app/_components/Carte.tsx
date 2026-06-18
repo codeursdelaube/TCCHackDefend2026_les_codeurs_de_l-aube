@@ -2,6 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { useTranslations } from "next-intl";
 
 // 🚨 INDISPENSABLE : Importer les styles CSS de Leaflet pour éviter que la carte soit invisible ou éclatée
 import "leaflet/dist/leaflet.css";
@@ -23,6 +24,8 @@ interface CarteProps {
 }
 
 export default function Carte({ monumentsList }: CarteProps) {
+  const tMonuments = useTranslations('Monuments');
+  
   // ✅ Demande : Centrer systématiquement et précisément la position de départ sur Lomé
   const positionCentre: [number, number] = [8.6195,  1.1518];
 
@@ -43,22 +46,25 @@ export default function Carte({ monumentsList }: CarteProps) {
         />
 
         {monumentsList &&
-          monumentsList.map((site) => (
-            <Marker
-              key={site.id}
-              position={[site.lat, site.lng]}
-              icon={iconeMonument}
-            >
-              <Popup>
-                <div className="p-1 text-slate-800">
-                  <p className="font-bold text-sm mb-0.5">{site.nom}</p>
-                  <p className="text-xs text-amber-600 font-semibold italic">
-                    {site.localite} — Région {site.région}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          monumentsList.map((site) => {
+            const siteNom = tMonuments(`${site.id}.nom`);
+            return (
+              <Marker
+                key={site.id}
+                position={[site.lat, site.lng]}
+                icon={iconeMonument}
+              >
+                <Popup>
+                  <div className="p-1 text-slate-800">
+                    <p className="font-bold text-sm mb-0.5">{siteNom}</p>
+                    <p className="text-xs text-amber-600 font-semibold italic">
+                      {site.localite} — Région {site.région}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
       </MapContainer>
     </div>
   );
