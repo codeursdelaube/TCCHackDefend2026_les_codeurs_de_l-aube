@@ -2,9 +2,26 @@
 
 import { useState } from 'react'
 import { Volume2, VolumeX } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 export default function TTSButton({ text }: { text: string }) {
   const [speaking, setSpeaking] = useState(false)
+  const locale = useLocale()
+
+  const playLabel = locale === 'en' ? "Listen to the story" 
+                  : locale === 'es' ? "Escuchar la historia" 
+                  : locale === 'zh' ? "收听历史故事" 
+                  : "Écouter l'histoire"
+
+  const stopLabel = locale === 'en' ? "Stop" 
+                  : locale === 'es' ? "Detener" 
+                  : locale === 'zh' ? "停止" 
+                  : "Arrêter"
+
+  const langCode = locale === 'en' ? 'en-US' 
+                 : locale === 'es' ? 'es-ES' 
+                 : locale === 'zh' ? 'zh-CN' 
+                 : 'fr-FR'
 
   const toggle = () => {
     if (speaking) {
@@ -13,7 +30,7 @@ export default function TTSButton({ text }: { text: string }) {
       return
     }
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'fr-FR'
+    utterance.lang = langCode
     utterance.onend = () => setSpeaking(false)
     utterance.onerror = () => setSpeaking(false)
     window.speechSynthesis.speak(utterance)
@@ -31,8 +48,8 @@ export default function TTSButton({ text }: { text: string }) {
                   }`}
     >
       {speaking
-        ? <><VolumeX size={13} className="animate-pulse" /> Arrêter</>
-        : <><Volume2 size={13} /> {"Écouter l'histoire"}</>
+        ? <><VolumeX size={13} className="animate-pulse" /> {stopLabel}</>
+        : <><Volume2 size={13} /> {playLabel}</>
       }
     </button>
   )

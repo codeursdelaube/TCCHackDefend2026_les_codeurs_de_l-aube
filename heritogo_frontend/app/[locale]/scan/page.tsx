@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useActionState, startTransition } from 'react'
-import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, RefreshCw } from 'lucide-react'
+import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, RefreshCw, Speaker } from 'lucide-react'
 import Image from 'next/image'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface PredictionResult {
   prediction_status: string;
@@ -16,18 +17,22 @@ interface PredictionResult {
 }
 
 export default function ScanPage() {
+  const t = useTranslations('Scan')
+  const locale = useLocale()
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [result, setResult] = useState<PredictionResult | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
-  const [selectedLang, setSelectedLang] = useState<string>('fr-FR')
+  const [selectedLang, setSelectedLang] = useState<string>('fr')
+  const [translatedText, setTranslatedText] = useState<Record<string, string>>({})
+  const [isTranslating, setIsTranslating] = useState<boolean>(false)
   
-  //  État pour stocker la position GPS en temps réel du touriste
+  // État pour stocker la position GPS en temps réel du touriste
   const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null)
 
-  //  Récupération automatique du GPS au chargement de l'application
+  // Récupération automatique du GPS au chargement de l'application
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -42,6 +47,14 @@ export default function ScanPage() {
     }
   }, [])
 
+  // Sync selected language with current page locale
+  useEffect(() => {
+    if (locale === 'fr') setSelectedLang('fr')
+    else if (locale === 'en') setSelectedLang('en')
+    else if (locale === 'es') setSelectedLang('es')
+    else if (locale === 'zh') setSelectedLang('zh')
+  }, [locale])
+
   useEffect(() => {
     return () => { window.speechSynthesis.cancel() }
   }, [result])
@@ -53,20 +66,22 @@ export default function ScanPage() {
         const data = await res.json()
         
         if (res.ok) {
-          // LE FIX CRUCIAL : Si le backend a répondu "unknown" (ex: chaussure), on l'intercepte comme une erreur visuelle
+          // Si le backend a répondu "unknown" (ex: chaussure), on l'intercepte
           if (data.prediction_status === 'unknown') {
             setResult(null) // On nettoie un éventuel ancien résultat valide
-            return data.detail || "Ce monument ou objet n'est pas répertorié dans la base officielle HeriTogo."
+            setTranslatedText({})
+            return data.detail || t('errors.unknown')
           }
 
           setResult(data)
+          setTranslatedText({ fr: data.data.histoire })
           return null
         } else {
-          return data.error || "Une erreur est survenue lors de l'analyse."
+          return data.error || t('errors.general')
         }
       } catch (err) {
         console.error(err)
-        return "Impossible de joindre le serveur ou le service Gemini."
+        return t('errors.server')
       }
     },
     null
@@ -78,6 +93,7 @@ export default function ScanPage() {
       setImage(file)
       setPreview(URL.createObjectURL(file))
       setResult(null)
+      setTranslatedText({})
       window.speechSynthesis.cancel()
       setIsSpeaking(false)
     }
@@ -88,13 +104,46 @@ export default function ScanPage() {
     const formData = new FormData()
     formData.append('image', image)
     
-    //  Si le GPS est disponible, on l'injecte pour activer le Bouclier 1 du Backend
+    // Si le GPS est disponible, on l'injecte pour activer le Bouclier 1 du Backend
     if (userLocation) {
       formData.append('lat', userLocation.lat.toString())
       formData.append('long', userLocation.long.toString())
     }
 
     startTransition(() => { submitScanAction(formData) })
+  }
+
+  const translateText = async (text: string, targetLang: string) => {
+    if (translatedText[targetLang]) {
+      return translatedText[targetLang]
+    }
+
+    setIsTranslating(true)
+    try {
+      const response = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+      )
+      const data = await response.json()
+      const translated = data[0].map((item: any) => item[0]).join('')
+      setTranslatedText(prev => ({ ...prev, [targetLang]: translated }))
+      return translated
+    } catch (error) {
+      console.error('Translation error:', error)
+      return text
+    } finally {
+      setIsTranslating(false)
+    }
+  }
+
+  const handleLangChange = async (lang: string) => {
+    setSelectedLang(lang)
+    if (result?.data?.histoire && !translatedText[lang] && lang !== 'fr') {
+      await translateText(result.data.histoire, lang)
+    }
+    if (isSpeaking) {
+      window.speechSynthesis.cancel()
+      setIsSpeaking(false)
+    }
   }
 
   const toggleSpeech = () => {
@@ -104,11 +153,20 @@ export default function ScanPage() {
       setIsSpeaking(false)
     } else {
       window.speechSynthesis.cancel()
-      let texteALire = `${result.data.monument}. ${result.data.histoire}`
-      if (selectedLang === 'en-US') texteALire = `Translation coming soon. Title: ${result.data.monument}`
-      else if (selectedLang === 'es-ES') texteALire = `Traducción disponible pronto. Título: ${result.data.monument}`
-      const utterance = new SpeechSynthesisUtterance(texteALire)
-      utterance.lang = selectedLang
+      
+      const currentText = selectedLang === 'fr' 
+        ? result.data.histoire 
+        : translatedText[selectedLang] || result.data.histoire
+      
+      const langMap: Record<string, string> = {
+        'fr': 'fr-FR',
+        'en': 'en-US',
+        'es': 'es-ES',
+        'zh': 'zh-CN'
+      }
+      
+      const utterance = new SpeechSynthesisUtterance(currentText)
+      utterance.lang = langMap[selectedLang]
       utterance.rate = 0.95
       utterance.onend = () => setIsSpeaking(false)
       utterance.onerror = () => setIsSpeaking(false)
@@ -118,13 +176,20 @@ export default function ScanPage() {
   }
 
   const resetScanner = () => {
-    setPreview(null); setImage(null); setResult(null)
+    setPreview(null); setImage(null); setResult(null); setTranslatedText({})
     window.speechSynthesis.cancel(); setIsSpeaking(false)
+  }
+
+  const getCurrentText = () => {
+    if (!result?.data?.histoire) return ''
+    return selectedLang === 'fr' 
+      ? result.data.histoire 
+      : translatedText[selectedLang] || result.data.histoire
   }
 
   return (
     <main className="relative min-h-screen w-full bg-base-100 text-base-content
-                    pt-24 pb-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+                    pt-20 pb-24 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
 
       {/* Halos décoratifs */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-125 h-125
@@ -138,17 +203,15 @@ export default function ScanPage() {
         <h1 className="text-3xl md:text-4xl font-black text-center mb-2
                        tracking-wide uppercase flex items-center justify-center gap-3
                        text-base-content">
-          <Sparkles className="text-amber-400 animate-pulse h-7 w-7" />
           <span>
-            Scanner{' '}
+            {t('title').split(' ')[0]}{' '}
             <span className="text-green-500">Herito</span>
             <span className="text-amber-500">go</span>
           </span>
         </h1>
 
         <p className="text-center text-sm text-base-content/50 mb-8 max-w-md mx-auto">
-          Prenez une photo ou importez un fichier pour identifier instantanément
-          les richesses culturelles et monuments du Togo.
+          {t('subtitle')}
         </p>
 
         {/* Zone upload / aperçu */}
@@ -162,7 +225,7 @@ export default function ScanPage() {
                               mb-4 border border-base-content/10 shadow-inner">
                 <Image
                   src={preview}
-                  alt="Aperçu du monument"
+                  alt={t('select_capture')}
                   fill
                   className="object-contain bg-base-300/40"
                 />
@@ -173,7 +236,7 @@ export default function ScanPage() {
                            rounded-full gap-1"
               >
                 <RefreshCw className="h-3 w-3" />
-                {" Changer d'image"}
+                {t('change_image')}
               </button>
             </div>
           ) : (
@@ -185,10 +248,10 @@ export default function ScanPage() {
               </div>
               <div>
                 <p className="font-semibold text-lg text-base-content">
-                  Sélectionnez votre capture
+                  {t('select_capture')}
                 </p>
                 <p className="text-xs text-base-content/50 mt-1 max-w-xs mx-auto">
-                  {"Compatible avec l'appareil photo en direct et les images de votre galerie."}
+                  {t('compatible_info')}
                 </p>
               </div>
               <button
@@ -198,7 +261,7 @@ export default function ScanPage() {
                            hover:scale-105 text-white font-bold transition-all shadow-lg"
               >
                 <Upload size={16} />
-                {" Ouvrir l'appareil / Galerie"}
+                {t('open_gallery')}
               </button>
             </div>
           )}
@@ -212,7 +275,7 @@ export default function ScanPage() {
           />
         </div>
 
-        {/*  Section d'affichage des erreurs (S'activera magnifiquement pour la chaussure maintenant !) */}
+        {/* Section d'affichage des erreurs */}
         {error && (
           <div className="alert alert-error mt-4 rounded-2xl
                           bg-error/10 border border-error/20
@@ -234,12 +297,12 @@ export default function ScanPage() {
             {loading ? (
               <>
                 <Loader2 className="animate-spin h-5 w-5" />
-                Analyse par IA
+                {t('analyzing')}
               </>
             ) : (
               <>
                 <Sparkles size={18} className="animate-pulse text-amber-300" />
-                Identifier le monument
+                {t('identify')}
               </>
             )}
           </button>
@@ -250,58 +313,63 @@ export default function ScanPage() {
           <div className="mt-8 p-6 bg-base-200 border border-base-content/10
                           rounded-3xl shadow-2xl animate-fade-in">
 
-            {/* En-tête résultat + TTS */}
+            {/* En-tête résultat */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between
                             gap-4 mb-4 pb-4 border-b border-base-content/5">
               <h2 className="text-xl md:text-2xl font-black text-base-content
                              flex items-center gap-2">
-                <Sparkles className='text-amber-500'/>
                  {result.data.monument}
               </h2>
-
-              {/* Contrôleur TTS */}
-              <div className="flex items-center gap-1.5 bg-base-300
-                              border border-base-content/10 p-1 rounded-xl
-                              shadow-inner self-start sm:self-auto">
-                <select
-                  value={selectedLang}
-                  onChange={(e) => {
-                    setSelectedLang(e.target.value)
-                    if (isSpeaking) {
-                      window.speechSynthesis.cancel()
-                      setIsSpeaking(false)
-                    }
-                  }}
-                  className="text-xs font-bold text-base-content bg-transparent
-                             px-2 py-1.5 outline-none cursor-pointer rounded-lg
-                             hover:bg-base-content/5"
-                >
-                  <option value="fr-FR">🇲🇬 FR</option>
-                  <option value="en-US">🇺🇸 EN</option>
-                  <option value="es-ES">🇪🇸 ES</option>
-                </select>
-
-                <button
-                  onClick={toggleSpeech}
-                  className={`p-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                    isSpeaking
-                      ? 'bg-error/20 text-error hover:bg-error/30'
-                      : 'bg-green-600 text-white hover:bg-green-500'
-                  }`}
-                  title={isSpeaking ? "Arrêter la lecture" : "Écouter l'histoire"}
-                >
-                  {isSpeaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                </button>
-              </div>
             </div>
 
-            {/* Histoire */}
-            <p className="text-base-content/70 text-sm leading-relaxed
-                          whitespace-pre-line font-medium
-                          bg-base-300 p-4 rounded-2xl
-                          border border-base-content/5 shadow-inner mb-4">
-              {result.data.histoire}
-            </p>
+            {/* Onglets de langue et TTS */}
+            <div className="flex items-center gap-2 mb-4">
+              {['fr', 'en', 'es', 'zh'].map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => handleLangChange(lang)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                    selectedLang === lang
+                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
+                      : 'bg-base-300 text-base-content/70 hover:bg-base-content/10'
+                  }`}
+                >
+                  {lang.toUpperCase()}
+                </button>
+              ))}
+              
+              {/* Bouton TTS */}
+              <button
+                onClick={toggleSpeech}
+                className={`ml-auto p-2 rounded-full transition-all duration-200 ${
+                  isSpeaking
+                    ? 'bg-amber-500 text-white animate-pulse shadow-lg shadow-amber-500/30'
+                    : 'bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20'
+                }`}
+                title={isSpeaking ? t('tts_stop') : t('tts_play')}
+              >
+                {isSpeaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+            </div>
+
+            {/* Histoire avec TTS */}
+            <div className="relative">
+              <div className="bg-base-300 p-4 rounded-2xl
+                          border border-base-content/5 shadow-inner mb-4 pr-12">
+                {isTranslating ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="animate-spin h-6 w-6 text-green-500" />
+                  </div>
+                ) : (
+                  <p className="text-base-content/70 text-sm leading-relaxed
+                                whitespace-pre-line font-medium">
+                    {getCurrentText()}
+                  </p>
+                )}
+              </div>
+
+             
+            </div>
 
             {/* Badges GPS */}
             <div className="flex flex-wrap gap-2 mt-4 text-xs">

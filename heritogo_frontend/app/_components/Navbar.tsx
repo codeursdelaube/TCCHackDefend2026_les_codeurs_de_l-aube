@@ -1,129 +1,173 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Menu, ScanLine, Compass, UtensilsCrossed, Home, Sparkles, type LucideIcon, Moon, Sun } from 'lucide-react'
+/**
+ * Navbar Component
+ * Barre de navigation principale avec :
+ * - Logo de l'application
+ * - Sélecteur de langue
+ * - Toggle thème (light/night)
+ * - Navigation inférieure
+ */
+import { Link, usePathname } from '@/i18n/navigation'
+import { useLocale, useTranslations } from 'next-intl'
+import { useState, useEffect } from 'react'
+import { ScanLine, Map, UtensilsCrossed, Home, Moon, Sun, Globe, ChevronDown, X, Settings } from 'lucide-react'
+import Image from 'next/image'
 
 interface NavLinkItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: any;
 }
 
 export default function Navbar() {
   const pathname = usePathname()
+  const locale = useLocale()
+  const t = useTranslations('Navbar')
+  const [theme, setTheme] = useState<string>('light')
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
+  // Initialiser le thème depuis le DOM
+  useEffect(() => {
+    const activeTheme = document.documentElement.getAttribute('data-theme') || 'light'
+    setTheme(activeTheme)
+  }, [])
+
+  // Gérer le changement de thème (light/night)
+  const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nextTheme = e.target.checked ? 'night' : 'light'
+    setTheme(nextTheme)
+    document.documentElement.setAttribute('data-theme', nextTheme)
+    document.cookie = `theme=${nextTheme}; path=/; max-age=31536000; SameSite=Lax`
+    localStorage.setItem('theme', nextTheme)
+  }
+
+  // Liens de navigation
   const navLinks: NavLinkItem[] = [
-    { href: '/', label: 'Accueil', icon: Home },
-    { href: '/scan', label: 'Scanner', icon: ScanLine },
-    { href: '/lieux', label: 'Lieux', icon: Compass },
-    { href: '/cuisine', label: 'Cuisine', icon: UtensilsCrossed },
-    // AJOUT : Lien vers la page Parc d'attraction et Zoo
-    { href: '/loisirs', label: 'Parcs & Zoos', icon: Sparkles },
+    { href: '/', label: t('accueil'), icon: Home },
+    { href: '/lieux', label: 'Carte', icon: Map },
+    { href: '/scan', label: t('scan'), icon: ScanLine },
+    { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
   ]
 
+  // Vérifier si le lien est actif
   const isActive = (path: string): boolean => pathname === path
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 text-white backdrop-blur-md transition-all duration-300">
-      <div className="navbar mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
-        {/* PARTIE GAUCHE : Menu Mobile & Logo */}
-        <div className="navbar-start">
-          {/* Dropdown Mobile */}
-          <div className="dropdown">
-            <button 
-              tabIndex={0} 
-              className="btn btn-ghost lg:hidden" 
-              aria-label="Ouvrir le menu"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            <ul 
-              tabIndex={0} 
-              className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-2xl bg-black/95 rounded-box w-56 border border-white/10 gap-1"
-            >
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <li key={link.href}>
-                    <Link 
-                      href={link.href}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
-                        isActive(link.href) 
-                          ? 'bg-green-600 text-white font-semibold' 
-                          : 'hover:bg-white/10 text-gray-300'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      {link.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* Logo Heritogo */}
-          <Link href="/" className="flex items-center font-black text-xl tracking-wider hover:opacity-90 transition-opacity ml-2 lg:ml-0">
-            <span className="text-green-500">Heri</span>
-            <span className="text-yellow-300">togo</span>
+    <>
+      {/* Top bar with logo and settings */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-base-100/95 backdrop-blur-sm border-b border-base-content/10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <Image src="/icons/icon-192x192.png" alt="HeriTogo" width={32} height={32} className="w-8 h-8" />
+            <span className="font-black text-xl tracking-wider">
+              <span className="text-green-600">Heri</span>
+              <span className="text-orange-500">togo</span>
+            </span>
           </Link>
+
+          {/* Settings button */}
+          <button 
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className="p-2 rounded-full hover:bg-base-content/5 transition-colors"
+            aria-label="Settings"
+            data-onboarding="settings-button"
+          >
+            <Settings className="h-5 w-5 text-base-content/70" />
+          </button>
         </div>
 
-        {/* PARTIE CENTRALE : Liens Desktop */}
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1 gap-2">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium ${
-                      isActive(link.href)
-                        ? 'bg-white text-black font-semibold shadow-md'
-                        : 'text-gray-200 hover:bg-white/10'
+        {/* Settings panel */}
+        {settingsOpen && (
+          <div className="absolute top-full right-4 mt-2 bg-base-100 border border-base-content/10 rounded-2xl shadow-xl p-4 z-50 w-64">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-bold text-base-content">{t('settings')}</span>
+              <button 
+                onClick={() => setSettingsOpen(false)}
+                className="p-1 hover:bg-base-content/5 rounded-full"
+              >
+                <X className="h-4 w-4 text-base-content/50" />
+              </button>
+            </div>
+
+            {/* Language Dropdown */}
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-base-content/60 mb-2 block">{t('language')}</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { code: 'fr', label: 'Français' },
+                  { code: 'en', label: 'English' },
+                  { code: 'es', label: 'Español' },
+                  { code: 'zh', label: '中文' }
+                ].map((lang) => (
+                  <Link
+                    key={lang.code}
+                    href={pathname}
+                    locale={lang.code}
+                    onClick={() => setSettingsOpen(false)}
+                    className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium transition-colors ${
+                      locale === lang.code
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-base-200 text-base-content/70 hover:bg-base-content/10'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
-                    {link.label}
+                    <span>{lang.label}</span>
                   </Link>
-                </li>
-              );
+                ))}
+              </div>
+            </div>
+
+            {/* Theme Toggle */}
+            <div>
+              <label className="text-xs font-semibold text-base-content/60 mb-2 block">{t('theme')}</label>
+              <label className="flex items-center justify-between cursor-pointer p-3 rounded-xl bg-base-200 hover:bg-base-content/5 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4 text-amber-500" />
+                  <span className="text-xs font-medium text-base-content/70">{t('light')}</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={theme === 'night'}
+                  onChange={handleThemeChange}
+                  className="toggle toggle-sm toggle-orange"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-base-content/70">{t('dark')}</span>
+                  <Moon className="h-4 w-4 text-slate-400" />
+                </div>
+              </label>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Bottom Navigation Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-base-content/10 rounded-t-3xl shadow-lg">
+        <div className="max-w-7xl mx-auto px-2 py-2">
+          <div className="flex items-center justify-around">
+            {navLinks.map((link) => {
+              const Icon = link.icon
+              const active = isActive(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 active:scale-95 ${
+                    active
+                      ? 'bg-orange-500 text-white'
+                      : 'text-base-content/50 hover:text-base-content/70 hover:bg-base-content/5'
+                  }`}
+                  {...(link.href === '/scan' ? { 'data-onboarding': 'scan-button' } : {})}
+                >
+                  <Icon className={`h-6 w-6 ${active ? 'text-white' : ''}`} />
+                  <span className="text-[10px] font-medium">{link.label}</span>
+                </Link>
+              )
             })}
-          </ul>
+          </div>
         </div>
-
-        {/* PARTIE DROITE : Theme Toggle + Bouton Scan */}
-        <div className="navbar-end gap-2 md:gap-4">
-
-          {/* Toggle Dark/Light */}
-          <label className="flex cursor-pointer items-center gap-1.5">
-            {/* Icône Soleil */}
-            <Sun className="h-4 w-4 text-amber-400" />
-
-            <input
-              type="checkbox"
-              value="night"
-              className="toggle toggle-sm theme-controller"
-            />
-
-            {/* Icône Lune */}
-            <Moon className="h-4 w-4 text-slate-300" />
-          </label>
-
-          {/* Bouton Scan */}
-          <Link href="/scan">
-            <button className="btn btn-primary btn-sm md:btn-md rounded-full shadow-lg border-none bg-linear-to-r from-green-500 to-emerald-600 text-white hover:scale-105 transition-transform gap-2">
-              <ScanLine className="h-4 w-4 md:h-5 md:w-5 animate-pulse" />
-              <span className="hidden sm:inline">Scanner un monument</span>
-            </button>
-          </Link>
-
-        </div>
-
-      </div>
-    </header>
+      </nav>
+    </>
   )
 }

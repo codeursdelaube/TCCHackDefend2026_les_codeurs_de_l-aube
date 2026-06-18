@@ -1,0 +1,417 @@
+{
+  "Navbar": {
+    "accueil": "Accueil",
+    "scan": "Scanner",
+    "lieux": "Lieux",
+    "cuisine": "Cuisine",
+    "loisirs": "Parcs & Zoos",
+    "scan_button": "Scanner un monument",
+    "select_lang": "Langue",
+    "settings": "Paramètres",
+    "language": "Langue",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "Accueil": {
+    "offline_banner": "Mode hors-ligne — données mises en cache disponibles",
+    "explorers": "{count}+ explorateurs",
+    "discover": "Découvrir",
+    "scroll": "Scroll",
+    "hackathon_badge": "#TCCHackDefend2026",
+    "slides": {
+      "0": {
+        "title": "Héritogo",
+        "subtitle": "Guide Touristique Intelligent",
+        "description": "Identifiez les monuments togolais en un instant grâce à Gemini IA. Pointez votre caméra, découvrez l'histoire.",
+        "buttonText": "Scanner un monument"
+      },
+      "1": {
+        "title": "Explorez",
+        "subtitle": "Les Sites du Togo",
+        "description": "Découvrez les trésors cachés du Togo. La géolocalisation affiche les lieux les plus proches en temps réel.",
+        "buttonText": "Explorer les lieux"
+      },
+      "2": {
+        "title": "Savourez",
+        "subtitle": "Le Patrimoine Culinaire",
+        "description": "Fufu, Ablo, Kom… Découvrez les saveurs authentiques du Togo et les restaurants qui les perpétuent.",
+        "buttonText": "Découvrir la cuisine"
+      }
+    },
+    "stats": {
+      "lieux": "Lieux répertoriés",
+      "regions": "Régions couvertes",
+      "explorers": "Explorateurs",
+      "rating": "Note moyenne"
+    },
+    "features_header": {
+      "tag": "Patrimoine national togolais",
+      "title": "Trois outils, <highlight>une expérience</highlight>",
+      "description": "Heritogo combine IA et géolocalisation pour une immersion complète au cœur de la culture et de la gastronomie togolaise."
+    },
+    "features": {
+      "scan_title": "Scanner Gemini IA",
+      "scan_desc": "Prenez une photo d'un monument. Gemini 2.5 Flash l'identifie, raconte son histoire et la lit à voix haute via TTS natif.",
+      "scan_tag": "IA Gemini",
+      "geo_title": "Géolocalisation & Carte",
+      "geo_desc": "Votre position GPS calcule les distances via Haversine. Les sites, restaurants et hôtels les plus proches s'affichent instantanément.",
+      "geo_tag": "Temps réel",
+      "cuisine_title": "Patrimoine Culinaire",
+      "cuisine_desc": "Fufu, Ablo, Tchakpalo… Explorez les plats emblématiques et trouvez les maquis et restaurants qui les servent près de vous.",
+      "cuisine_tag": "Gastronomie",
+      "access": "Accéder"
+    },
+    "tts_banner": {
+      "title": "Synthèse Vocale Intégrée",
+      "description": "Écoutez l'histoire des monuments directement dans votre navigateur en français ou en anglais. Aucune installation requise.",
+      "button": "Essayer"
+    },
+    "gamification": {
+      "tag": "Gamification",
+      "title": "Explorez, <highlight>débloquez des badges</highlight>",
+      "description": "Chaque lieu visité, chaque région découverte débloque une récompense. Partagez vos badges sur vos réseaux.",
+      "button": "Voir mes badges",
+      "progress_title": "Votre progression",
+      "progress_text": "3 / 8 badges",
+      "badges": {
+        "explorateur": "Explorateur",
+        "lomeen": "Loméen",
+        "enfant_mer": "Enfant de la Mer",
+        "decouvreur_nord": "Découvreur du Nord",
+        "tour_togo": "Tour du Togo",
+        "gourmet": "Gourmet Togolais"
+      }
+    },
+    "how_it_works": {
+      "tag": "Simple & rapide",
+      "title": "Comment ça marche ?",
+      "step1_title": "Ouvrez l'app",
+      "step1_desc": "Accédez à Heritogo depuis votre navigateur. Aucune installation — c'est une PWA.",
+      "step2_title": "Scannez ou explorez",
+      "step2_desc": "Photographiez un monument ou activez la géolocalisation pour découvrir les sites autour de vous.",
+      "step3_title": "Écoutez l'histoire",
+      "step3_desc": "L'IA identifie le lieu. La synthèse vocale vous en raconte l'histoire — en français ou en anglais.",
+      "start": "Commencer l'aventure",
+      "footer_info": "Gratuis · Aucune installation · Fonctionne hors-ligne"
+    }
+  },
+  "Scan": {
+    "title": "Scanner Heritogo",
+    "subtitle": "Prenez une photo ou importez un fichier pour identifier instantanément les richesses culturelles et monuments du Togo.",
+    "change_image": "Changer d'image",
+    "select_capture": "Sélectionnez votre capture",
+    "compatible_info": "Compatible avec l'appareil photo en direct et les images de votre galerie.",
+    "open_gallery": "Ouvrir l'appareil / Galerie",
+    "analyzing": "Analyse par IA",
+    "identify": "Identifier le monument",
+    "tts_stop": "Arrêter la lecture",
+    "tts_play": "Écouter l'histoire",
+    "gps_available": "GPS Disponible",
+    "errors": {
+      "unknown": "Ce monument ou objet n'est pas répertorié dans la base officielle HeriTogo.",
+      "general": "Une erreur est survenue lors de l'analyse.",
+      "server": "Impossible de joindre le serveur ou le service Gemini."
+    }
+  },
+  "Lieux": {
+    "title": "Découvrir le Togo",
+    "subtitle": "Explorez les richesses culturelles, historiques et naturelles de notre magnifique patrimoine national.",
+    "search_placeholder": "Rechercher un site touristique, une cascade...",
+    "results_for": "Résultats pour :",
+    "no_sites": "Aucun site touristique trouvé",
+    "try_other": "Essayez une autre orthographe ou un autre mot-clé.",
+    "regions": {
+      "maritime": "Maritime",
+      "plateaux": "Plateaux",
+      "kara": "Kara",
+      "centrale": "Centrale",
+      "savanes": "Savanes"
+    },
+    "discover": "Découvrir",
+    "back_to_sites": "Retour aux sites",
+    "gps_action": "S'y rendre",
+    "history_title": "Histoire & Légendes",
+    "desc_title": "Description",
+    "rating": "Note ★",
+    "visits_per_year": "Visites/an",
+    "distance": "Distance",
+    "period_tag": "1905 — Époque coloniale allemande",
+    "history_btn": "Histoire",
+    "info_btn": "Infos pratiques",
+    "hotels_nearby": "Hôtels à proximité",
+    "listen": "Écouter",
+    "stop": "Arrêter",
+    "share": "Partager",
+    "copied": "Copié !"
+  },
+  "Cuisine": {
+    "title": "Saveurs du Togo",
+    "subtitle": "Explorez la richesse de notre patrimoine culinaire. Découvrez l'histoire et les secrets des meilleurs plats traditionnels togolais.",
+    "search_placeholder": "Rechercher du fufu, ablo, une sauce...",
+    "results_for": "Résultats pour :",
+    "no_plats": "Aucun plat traditionnel trouvé",
+    "try_other": "Essayez une autre orthographe (ex: come, djenkoume) ou une catégorie.",
+    "categories": {
+      "accompagnement": "Accompagnement",
+      "plat_principal": "Plat Principal",
+      "street_food": "Street Food",
+      "sauce": "Sauce"
+    },
+    "know_more": "Savoir plus",
+    "acc_prefix": "Acc. :",
+    "back_to_cuisine": "Retour aux saveurs",
+    "cuisine_title": "Patrimoine Culinaire · Togo",
+    "find_nearby": "Trouver à proximité",
+    "origin_tradition": "Origine & Tradition",
+    "ideal_acc": "Accompagnement idéal",
+    "where_to_eat": "Où déguster ce plat",
+    "address_count": "{count} adresse{count, plural, =1 {} other {s}}",
+    "no_resto": "Aucun restaurant répertorié pour ce plat pour le moment.",
+    "other_plats": "Autres plats · {category}",
+    "sheet_title": "Fiche du plat",
+    "sheet": {
+      "name": "Nom",
+      "category": "Catégorie",
+      "origin": "Origine",
+      "acc": "Accompagnement"
+    },
+    "available_in": "Disponible dans",
+    "resto_in_lome": "restaurant{count, plural, =1 {} other {s}} à Lomé",
+    "other_restos": "+ {count} autre{count, plural, =1 {} other {s}}…",
+    "view_restos": "Voir les restaurants",
+    "navigate": "S'y rendre",
+    "page_title": "Cuisine Togolaise",
+    "page_subtitle": "Découvrez les saveurs authentiques du Togo",
+    "all": "Tous",
+    "restaurants_available": "{count} restaurant{count, plural, =1 {} other {s}} disponible{count, plural, =1 {} other {s}}",
+    "directions": "Itinéraire"
+  },
+  "Loisirs": {
+    "tag": "Distractions & Biodiversité",
+    "title": "Parcs d'Attractions & Zoos",
+    "subtitle": "Explorez les espaces récréatifs, complexes aquatiques et réserves de faune du Togo sauvage et urbain.",
+    "search_placeholder": "Rechercher un parc, un zoo (ex: lome, tatapark)...",
+    "no_parcs": "Aucun espace trouvé",
+    "try_other": "Essayez une autre recherche sans accent ou vérifiez l'orthographe.",
+    "regions": {
+      "savanes": "Région des Savanes",
+      "kara": "Région de la Kara",
+      "centrale": "Région Centrale",
+      "plateaux": "Région des Plateaux",
+      "maritime": "Région Maritime"
+    },
+    "gps_available": "GPS Disponible",
+    "rejoin": "Rejoindre"
+  },
+  "Onboarding": {
+    "scan_tooltip": "Scannez un monument pour découvrir son histoire",
+    "lang_tooltip": "Changez la langue ici",
+    "settings_tooltip": "Accédez aux paramètres",
+    "skip": "Passer",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "welcome": "Bienvenue sur HériTogo !",
+    "intro": "Découvrez comment utiliser l'application"
+  },
+  "Plats": {
+    "fufu_togolais": {
+      "nom": "Fufu (Foufou)",
+      "description": "L'incontournable de la cuisine togolaise, obtenu en pilant vigoureusement de l'igname bouillie dans un mortier.",
+      "histoire": "Véritable institution nationale, le Fufu est traditionnellement consommé en famille, particulièrement le week-end et lors des fêtes. Sa préparation demande une force physique remarquable : les morceaux d'igname chaude sont pilés à l'aide d'un grand pilon en bois jusqu'à obtenir une pâte lisse, élastique et onctueuse.",
+      "accompagnementsIdaux": "Sauce claire (pimentée), Sauce Graine (Noix de palme), Arachide ou Arbi (Tomate concentrée) accompagnée de viande de mouton, de bœuf ou de poulet."
+    },
+    "ablo_togolais": {
+      "nom": "Ablo",
+      "description": "Petits gâteaux de riz légèrement sucrés, cuits à la vapeur, à la texture douce, alvéolée et moelleuse.",
+      "histoire": "D'origine du Sud du Togo et du Bénin, l'Ablo est le roi de la street-food côtière. Sa fermentation délicate lui donne ce goût acidulé et sucré unique. Historiquement vendu par les femmes au bord des routes et dans les gares routières, il accompagne traditionnellement les pique-niques à la plage de Lomé ou Aného.",
+      "accompagnementsIdaux": "Poisson frit ou grillé, piment noir (piment noir séché pilé ou 'Yébéessé Sourou') et une salade d'oignons et tomates fraîches."
+    },
+    "kom_togolais": {
+      "nom": "Kohm",
+      "description": "Une boule de pâte de maïs fermentée, dense et légèrement aigre, enveloppée et cuite dans des feuilles de maïs.",
+      "histoire": "Aussi appelé 'Galo' ou 'Come', ce plat d'origine Ga (Ghana) l'est devenu un pilier de l'alimentation quotidienne au Togo. La technique de fermentation de la pâte de maïs sur plusieurs jours permet de conserver le plat longtemps, ce qui en faisait la nourriture idéale pour les pêcheurs de la côte maritime.",
+      "accompagnementsIdaux": "Poisson frit, piment vert écrasé frais, piment noir (Shito) et des oignons émincés."
+    },
+    "ayimolou_togolais": {
+      "nom": "Ayimolou",
+      "description": "Le riz au gras traditionnel togolais cuit ensemble avec des haricots, lui donnant sa couleur brune caractéristique.",
+      "histoire": "Plat populaire par excellence au Togo, l'Ayimolou est le petit-déjeuner favori des Loméens. Traditionnellement vendu très tôt le matin par les 'Ayimolou-tché' (vendeuses de rue), il est reconnaissable à sa couleur sombre obtenue grâce à l'ajout de tiges de sorgho ou de potasse lors de la cuisson du riz et des haricots.",
+      "accompagnementsIdaux": "Huile de friture rouge (Wagasi), piment noir en poudre, œuf bouilli, poisson frit, ou spaghettis en garniture."
+    },
+    "djenkoume_togolais": {
+      "nom": "Djinkoumé (Djenkoume)",
+      "description": "Une pâte de maïs rouge savoureuse cuite directement dans un bouillon de tomate épicé et de concentré de viande.",
+      "histoire": "Plat ancestral du peuple Éwé du Sud-Togo, le Djinkoumé se distingue des autres pâtes car la farine de maïs n'est pas cuite à l'eau claire, mais directement infusée dans le jus de cuisson d'un poulet frit bien assaisonné d'ail, d'oignon et de gingembre. C'est un plat de célébration riche en saveurs.",
+      "accompagnementsIdaux": "Poulet local ('poulet bicyclette') frit ou braisé et piment frais."
+    },
+    "gboma_dessi": {
+      "nom": "Gboma Dessi",
+      "description": "Une sauce riche et onctueuse à base de feuilles vertes flétries, mijotée avec une grande variété de viandes et de poissons fumés.",
+      "histoire": "Le mot 'Dessi' signifie sauce en Éwé, et le 'Gboma' fait référence à une variété d'épinards locaux légèrement amers. Cette sauce est le symbole de l'hospitalité togolaise : plus elle contient de variétés de protéines (crabe, peau de bœuf séchée, crevettes, poisson fumé), plus l'invité est honoré.",
+      "accompagnementsIdaux": "Idéal avec de la pâte de maïs blanche (Akoumé) ou du riz blanc."
+    },
+    "adzeme_togolais": {
+      "nom": "Adèmè (Adémé Dessi)",
+      "description": "Une sauce verte gluante et nutritive faite à base de feuilles de corète, très prisée pour sa texture unique.",
+      "histoire": "L'Adèmè est l'une des sauces les plus emblématiques du littoral togolais. La texture gluante (similaire au gombo) est obtenue en faisant bouillir les feuilles de corète avec une pincée de potasse. C'est un plat réconfortant réputé pour ses vertus digestives et sa richesse en fer.",
+      "accompagnementsIdaux": "Se consomme exclusivement avec l'Ewassa ou l'Akoumé (pâte de maïs)."
+    },
+    "koliko_togolais": {
+      "nom": "Koliko",
+      "description": "Frites d'igname croustillantes à l'extérieur et fondantes à l'intérieur, coupées en dés ou en bâtonnets.",
+      "histoire": "Le Koliko est le snack nocturne incontournable des rues de Lomé, Kara et d'Atakpamé. Les vendeuses s'installent au coin des rues dès le coucher du soleil avec de grands chaudrons d'huile bouillante. C'est le repas rapide, chaud et économique préféré des étudiants et des travailleurs du soir.",
+      "accompagnementsIdaux": "Sauce pimentée à la tomate, piment en poudre (Kankan) ou accompagnées de morceaux de dinde ou poulet frit."
+    },
+    "vebe_togolais": {
+      "nom": "Vèbè (Sauce d'Arachide)",
+      "description": "Une sauce onctueuse et veloutée à la pâte d'arachide grillée, relevée aux épices locales.",
+      "histoire": "La sauce d'arachide traverse toutes les régions du Togo, du Sud au Nord (où l'arachide est largement cultivée). Elle démontre la capacité du patrimoine culinaire togolais à lier des saveurs douces et grasses avec des piments forts pour créer un équilibre parfait.",
+      "accompagnementsIdaux": "Riz blanc, fufu d'igname, ou pâte de maïs."
+    }
+  },
+  "Monuments": {
+    "grand_marche_lome": {
+      "nom": "Grand Marché Assigamé",
+      "description": "Le célèbre grand marché de la capitale togolaise, haut lieu de commerce et carrefour culturel incontournable.",
+      "histoire": "C'est au sein du grand marché Assigamé que l'on découvre les Nana Benz, de célèbres et puissantes commerçantes de tissus imprimés qui ont marqué l'histoire économique du pays."
+    },
+    "cathedrale_lome": {
+      "nom": "Cathédrale Sacré-Cœur de Lomé",
+      "description": "Un joyau architectural de style gothique édifié au début du XXe siècle au centre de la capitale.",
+      "histoire": "Construite entre 1901 et 1902 par les missionnaires du Verbe Divin pendant la période coloniale allemande, cet édifice de style gothique est l'un des repères architecturaux et spirituels les plus importants de la capitale togolaise. Elle a été restaurée à la suite de la visite du Pape Jean-Paul II en 1985."
+    },
+    "statue_amitie_germano": {
+      "nom": "Statue de l'Amitié Germano-Togolaise",
+      "description": "Monument historique symbolisant les premiers accords diplomatiques et le traité de protectorat de 1884.",
+      "histoire": "Érigée à Baguida en commémoration de la signature du traité de protectorat du 5 juillet 1884 entre l'explorateur allemand Gustav Nachtigal et le roi Mlapa III de Togoville. Ce monument symbolise le point de départ des relations diplomatiques et historiques complexes entre le Togo et l'Allemagne."
+    },
+    "koutamakou": {
+      "nom": "Pays Batammariba (Koutamakou)",
+      "description": "Le fameux pays des Batammariba, réputé pour son architecture fortifiée unique en Afrique de l'Ouest.",
+      "histoire": "Dans cette région, les maisons sont de véritables fermes-forteresses à étages, très originales par leurs formes fortifiées dotées de terrasses. Conçues pour contenir tout ce que possède le chef de famille, elles sont regroupées en petits villages d'une dizaine d'unités correspondant à un clan."
+    },
+    "kpalime": {
+      "nom": "Kpalimé (Le Paradis Vert)",
+      "description": "Région du café et du cacao, surnommée le paradis vert du Togo pour ses paysages naturels d'exception.",
+      "histoire": "Entouré de collines aux bois épais, de plateaux verdoyants, de jungles et de vallées profondes, Kpalimé est encerclé par une nature luxuriante où se trouve le pic d'Agou (plus haut sommet du Togo). C'est également le plus important centre artisanal du pays où travaillent de nombreux sculpteurs sur bois, batikeurs, potiers et tisserands."
+    },
+    "maison_des_esclaves": {
+      "nom": "Maison des Esclaves (Woold Home)",
+      "description": "Un haut lieu de mémoire poignant situé à Agbodrafo, témoin historique du commerce négrier.",
+      "histoire": "Située à Agbodrafo, une ancienne cité portugaise reconnue comme faisant partie intégrante de la 'Côte des esclaves', la maison des esclaves (Woold Home) ainsi que le puits des enchaînés constituent les vestiges majeurs de ce passé douloureux où l'émotion reste toujours vive."
+    },
+    "monument_independance": {
+      "nom": "Monument de l'Indépendance",
+      "description": "Un des grands monuments nationaux emblématiques situé au cœur de la capitale togolaise.",
+      "histoire": "Situé à Lomé aux côtés de la place de la liberté, ce grand monument majestueux symbolise l'histoire contemporaine, l'indépendance retrouvée et la souveraineté du peuple togolais."
+    },
+    "musee_de_lome": {
+      "nom": "Musée National des Arts",
+      "description": "L'institution nationale dédiée à la préservation des arts, de l'artisanat et de la culture togolaise.",
+      "histoire": "Ce fameux musée national situé dans la capitale rassemble les plus belles collections artistiques et patrimoniales du pays, retraçant l'histoire culturelle et les traditions des différentes communautés du Togo."
+    },
+    "palais_de_lome": {
+      "nom": "Palais de Lomé",
+      "description": "Ancien palais colonial transformé en un prestigieux centre d'art et un parc botanique en bord de mer.",
+      "histoire": "Ancien Palais des Gouverneurs construit en 1905 par les colons allemands (puis occupé par les gouverneurs français), cet édifice majestueux a été entièrement rénové en 2019 pour devenir un centre d'art et de culture d'envergure internationale, entouré d'un parc botanique d'une biodiversité exceptionnelle en bordure d'océan."
+    },
+    "chateau_vial": {
+      "nom": "Château Vial",
+      "description": "Une demeure historique aux allures médiévales surplombant les forêts et vallées du mont Kloto.",
+      "histoire": "Construite dans les années 1940 par le gouverneur français d'alors sur les hauteurs verdoyantes du mont Kloto à proximité de Kpalimé, ce château aux allures médiévales sert de résidence d'État. Il offre une vue imprenable sur les vallées forestières frontalières avec le Ghana."
+    },
+    "village_artisanal": {
+      "nom": "Le Marché Artisanal de Lomé",
+      "description": "L'endroit idéal pour découvrir les créations locales et observer les artisans à l'œuvre.",
+      "histoire": "C'est l'endroit parfait pour acheter des souvenirs de valeur. Le visiteur peut y observer directement les artisans togolais en pleine création : travail du batik, sculpture sur bois, gravure ou encore techniques de tissage traditionnel."
+    },
+    "cascade_yikpa": {
+      "nom": "Cascade de Yikpa",
+      "description": "L'une des plus spectaculaires et hautes chutes d'eau du Togo, nichée dans une nature sauvage.",
+      "histoire": "Aussi appelée Douala Falls, c'est l'une des cascades les plus impressionnantes et les plus hautes du Togo. Située à l'extrême nord du plateau de Danyi, elle se déverse le long d'une falaise abrupte dans une végétation dense, marquant de manière spectaculaire la frontière naturelle avec le Ghana."
+    }
+  },
+  "Parcs": {
+    "africa_park_tata_park": {
+      "nom": "Africa Park (Tata Park)",
+      "description": "Le plus grand parc d'attractions du Togo. On y trouve des manèges motorisés et gonflables, des gyropodes, une salle de cinéma 3D, un restaurant et un bar.",
+      "tarif": "Entrée : 1000-2000 FCFA, manèges en supplément (200-500 FCFA)"
+    },
+    "amoukadi_paradis": {
+      "nom": "Amoukadi Paradis",
+      "description": "Un complexe de loisirs à Adétikopé, offrant des services variés comme des piscines.",
+      "tarif": "Piscine : 1500 FCFA / Adulte, 1000 FCFA / Enfant"
+    },
+    "espace_aere_aqualand": {
+      "nom": "Espace Aéré Aqualand",
+      "description": "Un cadre naturel et magnifique, à la fois restaurant et parc de jeux. Propose des attractions pour petits et grands (toboggan, piscine gonflable, balançoires, baby-foot).",
+      "tarif": "Entrée gratuite, consommations à la carte"
+    },
+    "espace_loisirs_nyumba": {
+      "nom": "Espace Loisirs Nyumba",
+      "description": "Un espace de loisirs pour tous les âges, proposant manèges, jeux, animations et services de restauration, dans un cadre sécurisé et divertissant.",
+      "tarif": "Entrée : 500 FCFA / personne, manèges payants"
+    },
+    "fil_o_parc": {
+      "nom": "Fil O Parc",
+      "description": "Un complexe de loisirs et de détente comprenant une aire de jeux, une piscine et un restaurant.",
+      "tarif": "Piscine : 2000 FCFA / Adulte, 1500 FCFA / Enfant"
+    },
+    "funny_park": {
+      "nom": "Funny Park",
+      "description": "Un parc d'attractions proposant une variété d'attractions, y compris une salle de jeux climatisée, un restaurant extérieur, un parc aquatique et un club de poney.",
+      "tarif": "Parc aquatique : 2000 FCFA / personne, manèges : 300-500 FCFA"
+    },
+    "ludi_park": {
+      "nom": "Ludi Park",
+      "description": "Un parc d'attractions avec un parcours de mini-golf de 12 trous et une aire de jeux.",
+      "tarif": "Entrée : 1000 FCFA, mini-golf : 2000 FCFA supplémentaire"
+    },
+    "olodge": {
+      "nom": "O'Lodge",
+      "description": "Un complexe hôtelier et un parc aquatique situé au bord du lac Togo. (Actuellement signalé comme définitivement fermé)",
+      "tarif": "Fermé – Plus de tarifs disponibles"
+    },
+    "parc_zoologique_temedja": {
+      "nom": "Parc Zoologique de Témédja (Zoo Tali N'na)",
+      "description": "Un parc animalier situé à Témédja, offrant l'opportunité de découvrir une variété d'animaux sauvages dans un environnement sécurisé et naturel.",
+      "tarif": "Entrée : 2000 FCFA (Adulte), 1000 FCFA (Enfant)"
+    },
+    "zoo_fauna_cultura": {
+      "nom": "Zoo Fauna Cultura",
+      "description": "Un mini-zoo privé et une ferme d'élevage. On peut y observer plus de 80 espèces animales.",
+      "tarif": "Entrée : 2000 FCFA / personne, visite guidée incluse"
+    },
+    "parc_evou_kpodegbe": {
+      "nom": "Parc Evou-Kpodegbe",
+      "description": "Un parc zoologique situé à proximité du Parc Zoo de Témédja.",
+      "tarif": "Entrée : 1500 FCFA / personne"
+    },
+    "o2_zoo": {
+      "nom": "O2 Zoo",
+      "description": "Un parc zoologique situé à proximité de l'université UCAO-UUT.",
+      "tarif": "Entrée gratuite (donations acceptées)"
+    },
+    "alea_park": {
+      "nom": "Aléa Park",
+      "description": "Un complexe sportif et récréatif érigé sur une superficie de 7 000 m², proposant une large gamme d'activités.",
+      "tarif": "Formule journée : 5000 FCFA (accès à toutes les activités), forfaits réduits par activité"
+    },
+    "parc_national_fazao_malfakassa": {
+      "nom": "Parc National Fazao-Malfakassa",
+      "description": "Le plus grand parc national du Togo, refuge pour environ 50 éléphants de savane, des buffles, des antilopes, des phacochères et parfois même des chimpanzés.",
+      "tarif": "Entrée : environ 5000-10000 FCFA selon nationalité (guide obligatoire)"
+    },
+    "parc_national_keran": {
+      "nom": "Parc National de la Kéran",
+      "description": "Un parc national situé dans le nord du Togo, refuge pour de nombreuses espèces d'animaux, dont des éléphants et des antilopes.",
+      "tarif": "Entrée : 5000 FCFA (résidents), 10000 FCFA (non-résidents)"
+    },
+    "parc_national_fosse_aux_lions": {
+      "nom": "Parc National de la Fosse aux Lions",
+      "description": "Le plus petit des trois parcs nationaux togolais, établi en 1954.",
+      "tarif": "Entrée : 3000 FCFA / personne"
+    }
+  }
+}

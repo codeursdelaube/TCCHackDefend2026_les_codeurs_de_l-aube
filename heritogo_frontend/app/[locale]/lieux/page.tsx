@@ -2,26 +2,40 @@
 
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { Search, MapPin, Compass, Sparkles } from 'lucide-react'
 import SitesTour from '@/app/LieuxT/site'
+import { useTranslations } from 'next-intl'
 
 export default function ToutPage() {
+  const t = useTranslations('Lieux')
+  const tMonuments = useTranslations('Monuments')
   const [searchInput, setSearchInput] = useState('')
   const [, startTransition] = useTransition()
 
   const filteredSites = SitesTour.filter((site) => {
-    if (!site?.nom) return false
-    return site.nom.toLowerCase().includes(searchInput.toLowerCase())
+    const siteNom = tMonuments(`${site.id}.nom`)
+    return siteNom.toLowerCase().includes(searchInput.toLowerCase())
   })
 
   const handleSearchChange = (value: string) => {
     startTransition(() => { setSearchInput(value) })
   }
 
+  const getRegionName = (reg: string): string => {
+    switch (reg) {
+      case 'Maritime': return t('regions.maritime')
+      case 'Plateaux': return t('regions.plateaux')
+      case 'Kara':     return t('regions.kara')
+      case 'Centrale': return t('regions.centrale')
+      case 'Savanes':  return t('regions.savanes')
+      default:         return reg
+    }
+  }
+
   return (
     <main className="relative min-h-screen w-full bg-base-100 text-base-content
-                     pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+                     pt-20 pb-24 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
 
       {/* Halos décoratifs */}
       <div className="absolute top-10 left-1/4 w-100 h-100
@@ -37,13 +51,13 @@ export default function ToutPage() {
                          sm:text-5xl uppercase flex items-center justify-center gap-3">
             <Compass className="text-green-500 h-8 w-8 animate-spin-slow" />
             <span>
-              Découvrir le{' '}
+              {t('title').split(' ')[0]} {t('title').split(' ')[1]}{' '}
               <span className="text-green-500">To</span>
               <span className="text-amber-500">go</span>
             </span>
           </h1>
           <p className="mt-3 text-base text-base-content/50 max-w-xl mx-auto">
-            {"Explorez les richesses culturelles, historiques et naturelles de notre magnifique patrimoine national."}
+            {t('subtitle')}
           </p>
         </div>
 
@@ -62,7 +76,7 @@ export default function ToutPage() {
               type="search"
               defaultValue={searchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Rechercher un site touristique, une cascade..."
+              placeholder={t('search_placeholder')}
               className="w-full bg-transparent p-3.5 pl-3 text-sm
                          text-base-content placeholder:text-base-content/30
                          outline-none"
@@ -72,7 +86,7 @@ export default function ToutPage() {
           {searchInput && (
             <p className="text-center text-xs italic text-base-content/40
                           mt-3 animate-fade-in">
-              Résultats pour :{' '}
+              {t('results_for')}{' '}
               <span className="text-green-500 font-semibold">{searchInput}</span>
             </p>
           )}
@@ -84,10 +98,10 @@ export default function ToutPage() {
                           rounded-3xl max-w-xl mx-auto">
             <Sparkles className="mx-auto h-8 w-8 text-amber-500/40 mb-3" />
             <p className="text-lg text-base-content/50 font-medium">
-              Aucun site touristique trouvé
+              {t('no_sites')}
             </p>
             <p className="text-xs text-base-content/30 mt-1">
-              Essayez une autre orthographe ou un autre mot-clé.
+              {t('try_other')}
             </p>
           </div>
         ) : (
@@ -106,7 +120,7 @@ export default function ToutPage() {
                 <figure className="relative w-full h-48 overflow-hidden bg-base-300">
                   <Image
                     src={site.image}
-                    alt={site.nom}
+                    alt={tMonuments(`${site.id}.nom`)}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     className="object-cover transition-transform duration-700
@@ -121,7 +135,7 @@ export default function ToutPage() {
                                    border-none text-white font-bold text-[10px]
                                    tracking-wider uppercase px-2.5 py-1.5
                                    rounded-full shadow-lg">
-                    {site.région}
+                    {getRegionName(site.région)}
                   </span>
                 </figure>
 
@@ -131,7 +145,7 @@ export default function ToutPage() {
                     <h2 className="text-lg font-bold text-base-content
                                    tracking-wide group-hover:text-green-500
                                    transition-colors line-clamp-1">
-                      {site.nom}
+                      {tMonuments(`${site.id}.nom`)}
                     </h2>
 
                     <p className="inline-flex items-center gap-1 text-xs
@@ -144,7 +158,7 @@ export default function ToutPage() {
 
                     <p className="text-sm text-base-content/60 line-clamp-3
                                   leading-relaxed pt-1">
-                      {site.description}
+                      {tMonuments(`${site.id}.description`)}
                     </p>
                   </div>
 
@@ -160,7 +174,7 @@ export default function ToutPage() {
                                          text-base-content/60
                                          hover:text-white transition-all
                                          duration-300 font-bold tracking-wide">
-                        Découvrir
+                        {t('discover')}
                       </button>
                     </Link>
                   </div>

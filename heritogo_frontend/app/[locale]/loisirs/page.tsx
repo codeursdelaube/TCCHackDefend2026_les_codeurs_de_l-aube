@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { Search, Sparkles, Navigation, Info, Phone, Banknote } from 'lucide-react'
-import { motion } from 'framer-motion'
 import Image from 'next/image'
-// Importation stricte du tableau ET du type de données
-import parcs, { Parc } from '../P&Z/pzo'
+import parcs, { Parc } from '@/app/P&Z/pzo'
+import { useTranslations } from 'next-intl'
+import { motion } from 'framer-motion'
 
 export default function ParcsZoosPage() {
+  const t = useTranslations('Loisirs')
+  const tParcs = useTranslations('Parcs')
   const [searchInput, setSearchInput] = useState<string>('')
 
-  //  PLUS DE "ANY" : On utilise directement le tableau typé nativement
   const rawList: Parc[] = parcs;
 
   // Fonction utilitaire pour ignorer les accents et la casse
@@ -20,24 +21,25 @@ export default function ParcsZoosPage() {
 
   // Filtrage robuste et sécurisé avec le type Parc
   const filteredParcs = rawList.filter((parc: Parc) => {
-    if (!parc?.nom) return false
+    const parcNom = tParcs(`${parc.id}.nom`)
+    const parcDescription = tParcs(`${parc.id}.description`)
     const rechercheNettoyee = normaliserTexte(searchInput)
-    const matchesNom = normaliserTexte(parc.nom).includes(rechercheNettoyee)
-    const matchesDesc = normaliserTexte(parc.description || '').includes(rechercheNettoyee)
+    const matchesNom = normaliserTexte(parcNom).includes(rechercheNettoyee)
+    const matchesDesc = normaliserTexte(parcDescription).includes(rechercheNettoyee)
     return matchesNom || matchesDesc
   })
 
   // Détermination de la région géographique selon la latitude
   const obtenirRegion = (lat: number): string => {
-    if (lat > 10) return 'Région des Savanes'
-    if (lat > 9) return 'Région de la Kara'
-    if (lat > 8) return 'Région Centrale'
-    if (lat > 6.8) return 'Région des Plateaux'
-    return 'Région Maritime'
+    if (lat > 10) return t('regions.savanes')
+    if (lat > 9) return t('regions.kara')
+    if (lat > 8) return t('regions.centrale')
+    if (lat > 6.8) return t('regions.plateaux')
+    return t('regions.maritime')
   }
 
   return (
-    <main className="min-h-screen w-full bg-base-100 text-base-content pt-24 pb-12 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
+    <main className="min-h-screen w-full bg-base-100 text-base-content pt-20 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
       {/* Arrière-plan */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-green-500/5 blur-[100px] rounded-full pointer-events-none" />
@@ -47,13 +49,13 @@ export default function ParcsZoosPage() {
         {/* En-tête */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider">
-            <Sparkles size={14} /> Distractions & Biodiversité
+            <Sparkles size={14} /> {t('tag')}
           </div>
           <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
-            {"Parcs d'Attractions & Zoos"}
+            {t('title')}
           </h1>
           <p className="text-sm text-base-content/60">
-            Explorez les espaces récréatifs, complexes aquatiques et réserves de faune du Togo sauvage et urbain.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -64,7 +66,7 @@ export default function ParcsZoosPage() {
           </div>
           <input
             type="text"
-            placeholder="Rechercher un parc, un zoo (ex: lome, tatapark)..."
+            placeholder={t('search_placeholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pl-12 pr-4 py-3.5 bg-base-200 border border-base-content/10 rounded-2xl text-sm focus:outline-hidden focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner text-base-content"
@@ -75,9 +77,9 @@ export default function ParcsZoosPage() {
         {filteredParcs.length === 0 ? (
           <div className="bg-base-200/50 rounded-3xl border border-dashed border-base-content/10 p-12 text-center max-w-md mx-auto">
             <Info className="mx-auto text-base-content/20 mb-3" size={32} />
-            <p className="text-sm font-bold text-base-content/50">Aucun espace trouvé</p>
+            <p className="text-sm font-bold text-base-content/50">{t('no_parcs')}</p>
             <p className="text-xs text-base-content/40 mt-1">
-              {"Essayez une autre recherche sans accent ou vérifiez l'orthographe."}
+              {t('try_other')}
             </p>
           </div>
         ) : (
@@ -103,7 +105,7 @@ export default function ParcsZoosPage() {
                     {parc.image ? (
                       <Image 
                         src={parc.image} 
-                        alt={parc.nom}
+                        alt={tParcs(`${parc.id}.nom`)}
                         fill
                         placeholder="blur"
                         sizes="(max-w-7xl) 33vw, 100vw"
@@ -124,20 +126,20 @@ export default function ParcsZoosPage() {
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
                       <h2 className="font-black text-lg tracking-tight leading-tight uppercase text-base-content group-hover:text-emerald-500 transition-colors">
-                        {parc.nom}
+                        {tParcs(`${parc.id}.nom`)}
                       </h2>
                       <p className="text-xs text-base-content/60 leading-relaxed line-clamp-3">
-                        {parc.description}
+                        {tParcs(`${parc.id}.description`)}
                       </p>
                     </div>
 
                     {/* Tarifs et Actions */}
                     <div className="pt-3 border-t border-base-content/5 space-y-2">
                       
-                      {parc.tarif && (
+                      {tParcs(`${parc.id}.tarif`) && (
                         <div className="flex items-start gap-1.5 text-xs text-base-content/70 bg-base-300/40 p-2 rounded-xl border border-base-content/5">
                           <Banknote size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                          <span className="leading-tight font-medium">{parc.tarif}</span>
+                          <span className="leading-tight font-medium">{tParcs(`${parc.id}.tarif`)}</span>
                         </div>
                       )}
 
@@ -152,7 +154,7 @@ export default function ParcsZoosPage() {
 
                       <div className="flex items-center justify-between gap-2 text-xs pt-1 px-0.5">
                         <span className="font-mono text-base-content/20 text-[9px] uppercase tracking-wider">
-                          GPS Disponible
+                          {t('gps_available')}
                         </span>
                         
                         <a 
@@ -161,7 +163,7 @@ export default function ParcsZoosPage() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 font-bold text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
                         >
-                          <Navigation size={13} /> Rejoindre
+                          <Navigation size={13} /> {t('rejoin')}
                         </a>
                       </div>
                     </div>

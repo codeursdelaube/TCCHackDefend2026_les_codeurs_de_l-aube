@@ -1,18 +1,19 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { notFound } from 'next/navigation'
 import {
   ArrowLeft, ChefHat, Utensils, Soup,
   ChevronRight, Flame, MapPin, Phone,
   Clock, Banknote, Star, Navigation
 } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
 import TTSButton from '@/app/_components/TTSButton'
 
 interface PageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: string }>
 }
 
 const getCategoryStyle = (categorie: string) => {
@@ -27,8 +28,20 @@ const getCategoryStyle = (categorie: string) => {
 
 export default async function PlatDetailPage({ params }: PageProps) {
   const resolvedParams = await params
+  const t = await getTranslations({ locale: resolvedParams.locale, namespace: 'Cuisine' })
+  const tPlats = await getTranslations({ locale: resolvedParams.locale, namespace: 'Plats' })
   const plat = platsTogolais.find((p) => p.id === resolvedParams.id)
   if (!plat) notFound()
+
+  const getCategoryName = (cat: string): string => {
+    switch (cat) {
+      case 'Accompagnement': return t('categories.accompagnement')
+      case 'Plat Principal': return t('categories.plat_principal')
+      case 'Street Food':    return t('categories.street_food')
+      case 'Sauce':          return t('categories.sauce')
+      default:               return cat
+    }
+  }
 
   const style = getCategoryStyle(plat.catégorie)
 
@@ -43,7 +56,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
   )
 
   return (
-    <main className="relative min-h-screen w-full bg-base-100 text-base-content overflow-x-hidden">
+    <main className="relative min-h-screen w-full bg-base-100 text-base-content overflow-x-hidden pb-24">
 
       {/* 
           HERO IMAGE PLEIN ÉCRAN
@@ -51,7 +64,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
       <section className="relative h-[55vh] min-h-90 w-full overflow-hidden">
         <Image
           src={plat.image}
-          alt={plat.nom}
+          alt={tPlats(`${plat.id}.nom`)}
           fill
           priority
           sizes="100vw"
@@ -68,12 +81,12 @@ export default async function PlatDetailPage({ params }: PageProps) {
                             text-white/80 text-xs font-semibold hover:bg-black/45
                             transition-all cursor-pointer">
               <ArrowLeft size={14} />
-              Retour aux saveurs
+              {t('back_to_cuisine')}
             </div>
           </Link>
           <div className={`px-3 py-1.5 rounded-full ${style.bg} backdrop-blur-sm
                           text-white text-[10px] font-bold uppercase tracking-widest`}>
-            {plat.catégorie}
+            {getCategoryName(plat.catégorie)}
           </div>
         </div>
 
@@ -82,12 +95,12 @@ export default async function PlatDetailPage({ params }: PageProps) {
           <div className="flex items-center gap-2 mb-2">
             <ChefHat size={13} className="text-amber-400" />
             <span className="text-amber-400 text-xs font-semibold tracking-wide">
-              Patrimoine Culinaire · Togo
+              {t('cuisine_title')}
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight
                          text-white uppercase leading-none drop-shadow-xl">
-            {plat.nom}
+            {tPlats(`${plat.id}.nom`)}
           </h1>
         </div>
       </section>
@@ -108,7 +121,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
 
             {/* Actions rapides */}
             <div className="flex flex-wrap items-center gap-2">
-              <TTSButton text={`${plat.nom}. ${plat.description}. ${plat.histoire}`} />
+              <TTSButton text={`${tPlats(`${plat.id}.nom`)}. ${tPlats(`${plat.id}.description`)}. ${tPlats(`${plat.id}.histoire`)}`} />
               <a href="#restaurants">
                 <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full
                                    text-xs font-bold border-none text-white
@@ -116,7 +129,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                                    hover:scale-105 active:scale-95
                                    shadow-md shadow-emerald-500/20 transition-all duration-200">
                   <Utensils size={13} />
-                  Trouver à proximité
+                  {t('find_nearby')}
                 </button>
               </a>
             </div>
@@ -124,7 +137,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
             {/* Description */}
             <div className="bg-base-200 rounded-2xl p-6 border border-base-content/8">
               <p className="text-base-content/65 text-sm sm:text-base leading-relaxed italic">
-                {plat.description}
+                {tPlats(`${plat.id}.description`)}
               </p>
             </div>
 
@@ -133,11 +146,11 @@ export default async function PlatDetailPage({ params }: PageProps) {
               <h2 className="flex items-center gap-2.5 text-base font-black
                              text-emerald-500 uppercase tracking-widest">
                 <Soup size={16} className="animate-pulse" />
-                Origine &amp; Tradition
+                {t('origin_tradition')}
               </h2>
               <p className="text-base-content/70 leading-relaxed text-sm md:text-base
                              whitespace-pre-line text-justify">
-                {plat.histoire}
+                {tPlats(`${plat.id}.histoire`)}
               </p>
             </div>
 
@@ -149,10 +162,10 @@ export default async function PlatDetailPage({ params }: PageProps) {
               </div>
               <div>
                 <p className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-1">
-                  Accompagnement idéal
+                  {t('ideal_acc')}
                 </p>
                 <p className="text-sm text-base-content/70 leading-relaxed">
-                  {plat.accompagnementsIdaux}
+                  {tPlats(`${plat.id}.accompagnementsIdaux`)}
                 </p>
               </div>
             </div>
@@ -165,12 +178,12 @@ export default async function PlatDetailPage({ params }: PageProps) {
                 <h2 className="flex items-center gap-2.5 text-base font-black
                                text-base-content uppercase tracking-widest">
                   <Utensils size={16} className="text-emerald-500" />
-                  Où déguster ce plat
+                  {t('where_to_eat')}
                 </h2>
                 {restosProches.length > 0 && (
                   <span className="text-xs font-mono text-base-content/35 bg-base-200
                                    border border-base-content/8 px-2.5 py-1 rounded-lg">
-                    {restosProches.length} adresse{restosProches.length > 1 ? 's' : ''}
+                    {t('address_count', { count: restosProches.length })}
                   </span>
                 )}
               </div>
@@ -180,7 +193,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                                 p-8 text-center">
                   <Utensils size={28} className="text-base-content/20 mx-auto mb-3" />
                   <p className="text-sm text-base-content/40">
-                    Aucun restaurant répertorié pour ce plat pour le moment.
+                    {t('no_resto')}
                   </p>
                 </div>
               ) : (
@@ -275,7 +288,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                                      transition-all duration-200"
                         >
                           <Navigation size={12} />
-                          {"S'y rendre"}
+                          {t('navigate')}
                         </a>
                       </div>
                     </div>
@@ -290,7 +303,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                 <h3 className="text-xs font-bold text-base-content/40 uppercase
                                tracking-widest flex items-center gap-2">
                   <ChefHat size={12} />
-                  Autres plats · {plat.catégorie}
+                  {t('other_plats', { category: getCategoryName(plat.catégorie) })}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {suggestions.map((p) => (
@@ -302,7 +315,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                         <div className="relative h-24 w-full overflow-hidden">
                           <Image
                             src={p.image}
-                            alt={p.nom}
+                            alt={tPlats(`${p.id}.nom`)}
                             fill
                             sizes="200px"
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -313,7 +326,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                           <p className="text-xs font-bold text-base-content
                                         group-hover:text-emerald-500 transition-colors
                                         line-clamp-1">
-                            {p.nom}
+                            {tPlats(`${p.id}.nom`)}
                           </p>
                           <ChevronRight size={12} className="text-base-content/30
                                                               group-hover:text-emerald-500 shrink-0" />
@@ -333,15 +346,15 @@ export default async function PlatDetailPage({ params }: PageProps) {
             <div className="rounded-2xl border border-base-content/8 bg-base-200 overflow-hidden">
               <div className="px-5 py-4 border-b border-base-content/8">
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-base-content/35">
-                  Fiche du plat
+                  {t('sheet_title')}
                 </h3>
               </div>
               <div className="divide-y divide-base-content/5">
                 {[
-                  { label: 'Nom', value: plat.nom },
-                  { label: 'Catégorie', value: plat.catégorie },
-                  { label: 'Origine', value: 'Togo' },
-                  { label: 'Accompagnement', value: plat.accompagnementsIdaux },
+                  { label: t('sheet.name'), value: tPlats(`${plat.id}.nom`) },
+                  { label: t('sheet.category'), value: getCategoryName(plat.catégorie) },
+                  { label: t('sheet.origin'), value: 'Togo' },
+                  { label: t('sheet.acc'), value: tPlats(`${plat.id}.accompagnementsIdaux`) },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-start justify-between gap-4 px-5 py-3">
                     <span className="text-xs text-base-content/40 shrink-0">{label}</span>
@@ -356,10 +369,10 @@ export default async function PlatDetailPage({ params }: PageProps) {
             {/* Badge catégorie */}
             <div className={`rounded-2xl border p-5 ${style.pill}`}>
               <p className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-60">
-                Catégorie
+                {t('sheet.category')}
               </p>
               <p className="text-base font-black uppercase tracking-wide">
-                {plat.catégorie}
+                {getCategoryName(plat.catégorie)}
               </p>
             </div>
 
@@ -368,14 +381,14 @@ export default async function PlatDetailPage({ params }: PageProps) {
               <div className="rounded-2xl border border-base-content/8 bg-base-200 p-5">
                 <p className="text-[10px] font-bold uppercase tracking-widest
                                text-base-content/35 mb-3">
-                  Disponible dans
+                  {t('available_in')}
                 </p>
                 <div className="flex items-end gap-2">
                   <span className="text-3xl font-black text-emerald-500">
                     {restosProches.length}
                   </span>
                   <span className="text-xs text-base-content/50 mb-1">
-                    restaurant{restosProches.length > 1 ? 's' : ''} à Lomé
+                    {t('resto_in_lome', { count: restosProches.length })}
                   </span>
                 </div>
                 <div className="mt-3 space-y-1.5">
@@ -389,7 +402,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                   ))}
                   {restosProches.length > 3 && (
                     <p className="text-[10px] text-base-content/30 pl-3.5">
-                      + {restosProches.length - 3} autre{restosProches.length - 3 > 1 ? 's' : ''}…
+                      {t('other_restos', { count: restosProches.length - 3 })}
                     </p>
                   )}
                 </div>
@@ -404,7 +417,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                                  shadow-xl shadow-emerald-500/20 transition-all duration-200
                                  flex items-center justify-center gap-2 py-4">
                 <Utensils size={16} />
-                Voir les restaurants
+                {t('view_restos')}
               </button>
             </a>
 
