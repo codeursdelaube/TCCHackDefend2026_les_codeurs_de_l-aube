@@ -193,9 +193,9 @@ export default function ScanPage() {
 
       {/* Halos décoratifs */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-125 h-125
-                     bg-green-600/10 blur-[120px] rounded-full pointer-events-none" />
+                     bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-12 right-10 w-75 h-75
-                     bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+                     bg-secondary/10 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 max-w-2xl mx-auto flex flex-col justify-center h-full">
 
@@ -205,8 +205,8 @@ export default function ScanPage() {
                        text-base-content">
           <span>
             {t('title').split(' ')[0]}{' '}
-            <span className="text-green-500">Herito</span>
-            <span className="text-amber-500">go</span>
+            <span className="text-primary">Herito</span>
+            <span className="text-secondary">go</span>
           </span>
         </h1>
 
@@ -216,7 +216,7 @@ export default function ScanPage() {
 
         {/* Zone upload / aperçu */}
         <div className="bg-base-200 border-2 border-dashed border-base-content/20
-                        hover:border-green-500/40 rounded-3xl p-6 md:p-8
+                        hover:border-primary/40 rounded-3xl p-6 md:p-8
                         flex flex-col items-center justify-center min-h-80
                         relative overflow-hidden backdrop-blur-xl transition-all shadow-2xl">
           {preview ? (
@@ -241,9 +241,9 @@ export default function ScanPage() {
             </div>
           ) : (
             <div className="text-center flex flex-col items-center gap-5 py-4">
-              <div className="p-5 bg-linear-to-br from-green-500/20 to-emerald-500/10
-                              text-green-500 rounded-full border border-green-500/20
-                              shadow-lg shadow-green-500/5">
+              <div className="p-5 bg-linear-to-br from-primary/20 to-accent/10
+                              text-primary rounded-full border border-primary/20
+                              shadow-lg shadow-primary/5">
                 <Camera size={44} className="stroke-[1.5]" />
               </div>
               <div>
@@ -257,7 +257,7 @@ export default function ScanPage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="btn btn-primary rounded-full px-6 border-none
-                           bg-linear-to-r from-green-500 to-emerald-600
+                           bg-linear-to-r from-primary to-secondary
                            hover:scale-105 text-white font-bold transition-all shadow-lg"
               >
                 <Upload size={16} />
@@ -290,7 +290,7 @@ export default function ScanPage() {
             onClick={handleScanClick}
             disabled={loading}
             className="mt-6 w-full btn btn-lg rounded-2xl border-none
-                       bg-linear-to-r from-green-500 via-emerald-500 to-amber-500
+                       bg-linear-to-r from-primary via-accent to-secondary
                        text-white font-black shadow-xl hover:opacity-95 transition
                        disabled:bg-base-content/10 disabled:text-base-content/30"
           >
@@ -301,7 +301,7 @@ export default function ScanPage() {
               </>
             ) : (
               <>
-                <Sparkles size={18} className="animate-pulse text-amber-300" />
+                <Sparkles size={18} className="animate-pulse text-accent" />
                 {t('identify')}
               </>
             )}
@@ -330,7 +330,7 @@ export default function ScanPage() {
                   onClick={() => handleLangChange(lang)}
                   className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
                     selectedLang === lang
-                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
+                      ? 'bg-primary text-primary-content shadow-lg shadow-primary/30'
                       : 'bg-base-300 text-base-content/70 hover:bg-base-content/10'
                   }`}
                 >
@@ -343,8 +343,8 @@ export default function ScanPage() {
                 onClick={toggleSpeech}
                 className={`ml-auto p-2 rounded-full transition-all duration-200 ${
                   isSpeaking
-                    ? 'bg-amber-500 text-white animate-pulse shadow-lg shadow-amber-500/30'
-                    : 'bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20'
+                    ? 'bg-secondary text-secondary-content animate-pulse shadow-lg shadow-secondary/30'
+                    : 'bg-primary text-primary-content hover:opacity-90 shadow-lg shadow-primary/20'
                 }`}
                 title={isSpeaking ? t('tts_stop') : t('tts_play')}
               >
@@ -358,7 +358,7 @@ export default function ScanPage() {
                           border border-base-content/5 shadow-inner mb-4 pr-12">
                 {isTranslating ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="animate-spin h-6 w-6 text-green-500" />
+                    <Loader2 className="animate-spin h-6 w-6 text-primary" />
                   </div>
                 ) : (
                   <p className="text-base-content/70 text-sm leading-relaxed

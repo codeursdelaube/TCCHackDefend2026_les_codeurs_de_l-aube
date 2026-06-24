@@ -4,10 +4,10 @@ import "@/app/globals.css";
 import Navbar from "@/app/_components/Navbar";
 import ServiceWorkerRegister from '@/app/_components/ServiceWorkerRegister';
 import OnboardingTooltip from '@/app/_components/OnboardingTooltip';
-import ThemeInitializer from '@/app/_components/ThemeInitializer';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { cookies } from 'next/headers'; // Important pour lire les cookies
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 
@@ -38,37 +38,58 @@ export default async function LocaleLayout({
 }: LayoutProps) {
   const { locale } = await params;
 
-  // Validate locale
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  // Read theme from cookies
-  const cookieStore = await cookies();
-  const theme = cookieStore.get('theme')?.value || 'light';
-
-  // Load translations
   const messages = await getMessages();
+
+  // 1. Lire le cookie du thème côté serveur
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get('heritogo_theme')?.value;
+  
+  // 2. Déterminer la classe initiale (par défaut 'light' si aucun cookie)
+  const isDark = themeCookie === 'dark';
 
   return (
     <html
       lang={locale}
-      data-theme={theme}
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      style={{ fontFamily: 'var(--font-body)' }}
+      className={isDark ? 'dark' : ''} // Le serveur injecte DIRECTEMENT la bonne classe ici !
     >
       <head>
+        {/* Ce script sert uniquement au TOUT PREMIER chargement à vie du site (si pas de cookie) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('heritogo_theme');
+                  if (!saved) {
+                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    var theme = prefersDark ? 'dark' : 'light';
+                    if (theme === 'dark') document.documentElement.classList.add('dark');
+                    document.cookie = "heritogo_theme=" + theme + "; path=/; max-age=31536000";
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
         <meta name="theme-color" content="#16a34a"/>
         <link rel="shortcut icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className="min-h-full flex flex-col pb-20 bg-base-100">
-        <ThemeInitializer />
-        <NextIntlClientProvider messages={messages}>
-          <ServiceWorkerRegister />
-          <Navbar />
-          <OnboardingTooltip />
-          {children}
-        </NextIntlClientProvider>
+      
+      <body className={`min-h-full flex flex-col pb-20 bg-base-100 ${geistSans.variable} ${geistMono.variable} h-full antialiased`} >
+        <ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ServiceWorkerRegister />
+            <Navbar />
+            <OnboardingTooltip />
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

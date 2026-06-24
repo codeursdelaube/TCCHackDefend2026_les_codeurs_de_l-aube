@@ -10,7 +10,7 @@
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
-import { Search, Utensils, ChefHat, Sparkles, Star, MapPin, Clock, Navigation } from 'lucide-react'
+import { Search, Utensils, Sparkles, Star, MapPin, Clock, Navigation } from 'lucide-react'
 import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
 import { useTranslations } from 'next-intl'
@@ -71,7 +71,7 @@ export default function CuisinePage() {
         {/* En-tête */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <Utensils className="text-orange-500 h-6 w-6" />
+            <Utensils className="text-primary h-6 w-6" />
             <h1 className="text-2xl font-black text-base-content">
               {t('page_title')}
             </h1>
@@ -89,7 +89,7 @@ export default function CuisinePage() {
               onClick={() => setSelectedCategory(cat.id)}
               className={`flex-shrink-0 flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border transition-all ${
                 selectedCategory === cat.id
-                  ? 'bg-orange-500 border-orange-500 text-white shadow-md'
+                  ? 'bg-primary border-primary text-primary-content shadow-md'
                   : 'bg-base-200 border-base-content/10 text-base-content/70 hover:bg-base-content/5'
               }`}
             >
@@ -123,7 +123,7 @@ export default function CuisinePage() {
                       <div className="flex items-center gap-2 mb-2">
                         <div className="flex items-center gap-0.5">
                           {[...Array(resto.note || 4)].map((_, i) => (
-                            <Star key={i} size={14} className="text-orange-400 fill-orange-400" />
+                            <Star key={i} size={14} className="text-primary fill-primary" />
                           ))}
                         </div>
                         <span className="text-xs text-base-content/50">
@@ -131,11 +131,11 @@ export default function CuisinePage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-base-content/60">
-                        <span className="text-orange-500 font-semibold">
+                        <span className="text-primary font-semibold">
                           {'$'.repeat(Math.floor(Number(resto.budget_fcfa || 5000) / 5000))}
                         </span>
                         <div className="flex items-center gap-1">
-                          <MapPin size={12} className="text-red-500" />
+                          <MapPin size={12} className="text-secondary" />
                           <span>{(Math.random() * 2 + 0.3).toFixed(1)} km</span>
                         </div>
                       </div>
@@ -151,7 +151,7 @@ export default function CuisinePage() {
                           key={pid}
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-base-100 border border-base-content/10 text-base-content/70"
                         >
-                          <span className="text-orange-500">•</span>
+                          <span className="text-primary">•</span>
                           {tPlats(`${plat.id}.nom`)}
                         </span>
                       ) : null
@@ -168,7 +168,7 @@ export default function CuisinePage() {
                       href={`https://www.google.com/maps/search/?api=1&query=${resto.lat},${resto.lng}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-green-500 text-white hover:bg-green-600 active:scale-95 transition-all duration-200"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-primary text-primary-content hover:opacity-90 active:scale-95 transition-all duration-200"
                     >
                       <Navigation size={14} />
                       {t('directions')}
@@ -184,7 +184,7 @@ export default function CuisinePage() {
         <div className="mb-6">
           <div className="relative flex items-center bg-base-100
                           border border-base-content/10
-                          focus-within:border-orange-500/50
+                          focus-within:border-primary/50
                           rounded-2xl overflow-hidden transition-all">
             <div className="pl-4 text-base-content/40">
               <Search size={18} />
@@ -205,7 +205,7 @@ export default function CuisinePage() {
         {filteredPlats.length === 0 ? (
           <div className="text-center py-20 bg-base-200 border border-base-content/5
                           rounded-3xl max-w-xl mx-auto">
-            <Sparkles className="mx-auto h-8 w-8 text-amber-500/40 mb-3" />
+            <Sparkles className="mx-auto h-8 w-8 text-primary/40 mb-3" />
             <p className="text-lg text-base-content/50 font-medium">
               {t('no_plats')}
             </p>
@@ -240,7 +240,7 @@ export default function CuisinePage() {
                   {/* Contenu */}
                   <div className="p-4">
                     <h2 className="text-sm font-bold text-base-content tracking-wide
-                                   group-hover:text-orange-500 transition-colors
+                                   group-hover:text-primary transition-colors
                                    line-clamp-1 mb-2">
                       {tPlats(`${plat.id}.nom`)}
                     </h2>

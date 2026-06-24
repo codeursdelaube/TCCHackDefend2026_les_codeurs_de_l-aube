@@ -67,37 +67,40 @@ export default function AcceuilPage() {
     {
       title: t('features.scan_title'),
       description: t('features.scan_desc'),
-      icon: <Scan className="h-6 w-6 text-heritage-emerald" />,
+      icon: <Scan className="h-6 w-6 text-primary" />,
       link: '/scan',
       tag: t('features.scan_tag'),
-      tagColor: 'bg-heritage-emerald/10 text-heritage-emerald',
-      iconBg: 'bg-heritage-emerald/10',
+      tagColor: 'bg-primary/10 text-primary',
+      iconBg: 'bg-primary/10',
+      mascot: '/mascotia.png'
     },
     {
       title: t('features.geo_title'),
       description: t('features.geo_desc'),
-      icon: <Map className="h-6 w-6 text-heritage-ochre" />,
+      icon: <Map className="h-6 w-6 text-secondary" />,
       link: '/lieux',
       tag: t('features.geo_tag'),
-      tagColor: 'bg-heritage-ochre/10 text-heritage-ochre',
-      iconBg: 'bg-heritage-ochre/10',
+      tagColor: 'bg-secondary/10 text-secondary',
+      iconBg: 'bg-secondary/10',
+      mascot: '/mascotgps.png'
     },
     {
       title: t('features.cuisine_title'),
       description: t('features.cuisine_desc'),
-      icon: <Utensils className="h-6 w-6 text-heritage-coral" />,
+      icon: <Utensils className="h-6 w-6 text-accent-foreground" />,
       link: '/cuisine',
       tag: t('features.cuisine_tag'),
-      tagColor: 'bg-heritage-coral/10 text-heritage-coral',
-      iconBg: 'bg-heritage-coral/10',
+      tagColor: 'bg-accent/15 text-accent-foreground',
+      iconBg: 'bg-accent/15',
+      mascot: '/mascotculi.png'
     },
   ]
 
   const statsData = [
-    { target: 120, suffix: '+', label: t('stats.lieux'), icon: <MapPin size={20} className="text-heritage-emerald" /> },
-    { target: 7, suffix: '', label: t('stats.regions'), icon: <Globe size={20} className="text-heritage-ochre" /> },
-    { target: 500, suffix: '+', label: t('stats.explorers'), icon: <Users size={20} className="text-heritage-coral" /> },
-    { target: 4, suffix: '.8★', label: t('stats.rating'), icon: <Star size={20} className="text-heritage-emerald" /> },
+    { target: 120, suffix: '+', label: t('stats.lieux'), icon: <MapPin size={20} className="text-primary" /> },
+    { target: 7, suffix: '', label: t('stats.regions'), icon: <Globe size={20} className="text-secondary" /> },
+    { target: 500, suffix: '+', label: t('stats.explorers'), icon: <Users size={20} className="text-accent-foreground" /> },
+    { target: 4, suffix: '.8★', label: t('stats.rating'), icon: <Star size={20} className="text-primary" /> },
   ]
 
   return (
@@ -106,7 +109,7 @@ export default function AcceuilPage() {
       {/* Bandeau offline */}
       {!isOnline && (
         <div className="fixed top-12 left-0 right-0 z-[9999] flex items-center justify-center
-                     gap-2 py-2 px-4 bg-heritage-coral text-white text-xs font-medium">
+                     gap-2 py-2 px-4 bg-accent text-accent-foreground text-xs font-medium">
           <WifiOff size={12} />
           {t('offline_banner')}
         </div>
@@ -114,15 +117,15 @@ export default function AcceuilPage() {
 
       {/* Hero Section with Carousel */}
       <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-base-200">
-          <AnimatePresence mode='wait'>
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-base-200 h-[400px] md:h-[500px] lg:h-[600px]">
+          <AnimatePresence initial={false}>
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, x: 300 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -300 }}
-              transition={{ duration: 0.5 }}
-              className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full"
             >
               <Image
                 src={slides[currentSlide].image}
@@ -140,14 +143,21 @@ export default function AcceuilPage() {
                   transition={{ delay: 0.2 }}
                   className="max-w-2xl"
                 >
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight">
+                  <h1 
+                    className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight"
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontStyle: 'italic',
+                      fontWeight: 700,
+                    }}
+                  >
                     {slides[currentSlide].title}
                   </h1>
                   <p className="text-base md:text-lg text-white/80 mb-6 leading-relaxed">
                     {slides[currentSlide].description}
                   </p>
                   <Link href={slides[currentSlide].link}>
-                    <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white bg-heritage-emerald hover:bg-heritage-emerald-light active:scale-95 transition-all duration-200 shadow-lg">
+                    <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-primary-content bg-primary hover:opacity-90 active:scale-95 transition-all duration-200 shadow-lg">
                       {slides[currentSlide].buttonText}
                       <ArrowRight size={16} />
                     </button>
@@ -208,18 +218,32 @@ export default function AcceuilPage() {
       {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-black text-base-content mb-4">
+          <h2 
+            className="text-3xl sm:text-4xl font-black text-base-content mb-4"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
             {t.rich('features_header.title', {
-              highlight: (chunks) => <span className="text-heritage-emerald">{chunks}</span>
+              highlight: (chunks) => <span className="text-primary">{chunks}</span>
             })}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <div key={index} className="bg-base-100 rounded-3xl p-6 border border-base-content/10 hover:border-heritage-emerald/30 hover:shadow-lg transition-all duration-300">
-              <div className={`p-3 w-fit rounded-2xl mb-4 ${feature.iconBg}`}>
-                {feature.icon}
+            <div key={index} className="bg-base-100 rounded-3xl p-6 border border-base-content/10 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+              <div className="flex items-start justify-between mb-4">
+                <div className={`p-3 w-fit rounded-2xl ${feature.iconBg}`}>
+                  {feature.icon}
+                </div>
+                {feature.mascot && (
+                  <Image
+                    src={feature.mascot}
+                    alt={`${feature.title} mascot`}
+                    width={130}
+                    height={130}
+                    className="rounded-2xl object-cover"
+                  />
+                )}
               </div>
               <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full mb-3 inline-block ${feature.tagColor}`}>
                 {feature.tag}
@@ -230,7 +254,7 @@ export default function AcceuilPage() {
               <p className="text-sm text-base-content/60 mb-4 leading-relaxed">
                 {feature.description}
               </p>
-              <Link href={feature.link} className="inline-flex items-center gap-2 text-xs font-bold text-heritage-emerald hover:gap-3 transition-all">
+              <Link href={feature.link} className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:gap-3 transition-all">
                 {t('features.access')}
                 <ArrowRight size={14} />
               </Link>
@@ -241,15 +265,18 @@ export default function AcceuilPage() {
 
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center">
-        <div className="bg-gradient-to-br from-heritage-emerald to-heritage-emerald-light rounded-3xl p-8 sm:p-12 text-white">
-          <h2 className="text-2xl sm:text-3xl font-black mb-4">
+        <div className="bg-gradient-to-br from-primary to-secondary rounded-3xl p-8 sm:p-12 text-white">
+          <h2 
+            className="text-2xl sm:text-3xl font-black mb-4"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
             {t('how_it_works.start')}
           </h2>
           <p className="text-white/80 mb-6 max-w-md mx-auto">
             {t('how_it_works.footer_info')}
           </p>
           <Link href="/scan">
-            <button className="flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold text-sm text-heritage-emerald bg-base-100 hover:bg-base-content/90 active:scale-95 transition-all duration-200 shadow-xl mx-auto">
+            <button className="flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold text-sm text-primary bg-base-100 hover:bg-base-content/90 active:scale-95 transition-all duration-200 shadow-xl mx-auto">
               <Sparkles size={18} />
               {t('slides.0.buttonText')}
             </button>

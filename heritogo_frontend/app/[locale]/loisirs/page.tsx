@@ -41,14 +41,14 @@ export default function ParcsZoosPage() {
   return (
     <main className="min-h-screen w-full bg-base-100 text-base-content pt-20 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
       {/* Arrière-plan */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-green-500/5 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-secondary/5 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
         
         {/* En-tête */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
             <Sparkles size={14} /> {t('tag')}
           </div>
           <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
@@ -69,7 +69,7 @@ export default function ParcsZoosPage() {
             placeholder={t('search_placeholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-base-200 border border-base-content/10 rounded-2xl text-sm focus:outline-hidden focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner text-base-content"
+            className="w-full pl-12 pr-4 py-3.5 bg-base-200 border border-base-content/10 rounded-2xl text-sm focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-base-content"
           />
         </div>
 
@@ -112,7 +112,7 @@ export default function ParcsZoosPage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-emerald-800/20 to-teal-900/40 text-emerald-500 text-4xl">
+                      <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/20 to-secondary/20 text-primary text-4xl">
                         🌳
                       </div>
                     )}
@@ -125,7 +125,7 @@ export default function ParcsZoosPage() {
                   {/* Contenu */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
-                      <h2 className="font-black text-lg tracking-tight leading-tight uppercase text-base-content group-hover:text-emerald-500 transition-colors">
+                      <h2 className="font-black text-lg tracking-tight leading-tight uppercase text-base-content group-hover:text-primary transition-colors">
                         {tParcs(`${parc.id}.nom`)}
                       </h2>
                       <p className="text-xs text-base-content/60 leading-relaxed line-clamp-3">
@@ -138,15 +138,15 @@ export default function ParcsZoosPage() {
                       
                       {tParcs(`${parc.id}.tarif`) && (
                         <div className="flex items-start gap-1.5 text-xs text-base-content/70 bg-base-300/40 p-2 rounded-xl border border-base-content/5">
-                          <Banknote size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                          <Banknote size={14} className="text-primary shrink-0 mt-0.5" />
                           <span className="leading-tight font-medium">{tParcs(`${parc.id}.tarif`)}</span>
                         </div>
                       )}
 
                       {telephoneBrut && (
                         <div className="flex items-center gap-1.5 text-xs text-base-content/50 px-0.5">
-                          <Phone size={13} className="text-emerald-500 shrink-0" />
-                          <a href={`tel:${telephoneBrut.replace(/\s+/g, '')}`} className="hover:underline hover:text-emerald-500 transition-colors truncate">
+                          <Phone size={13} className="text-secondary shrink-0" />
+                          <a href={`tel:${telephoneBrut.replace(/\s+/g, '')}`} className="hover:underline hover:text-primary transition-colors truncate">
                             {parc.numero}
                           </a>
                         </div>
@@ -161,7 +161,7 @@ export default function ParcsZoosPage() {
                           href={`https://www.google.com/maps/search/?api=1&query=${parc.lat},${parc.lng}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-bold text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 font-bold text-primary hover:text-secondary transition-colors cursor-pointer"
                         >
                           <Navigation size={13} /> {t('rejoin')}
                         </a>

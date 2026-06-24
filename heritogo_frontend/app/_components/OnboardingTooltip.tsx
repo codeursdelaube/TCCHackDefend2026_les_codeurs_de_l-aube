@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { X, ChevronRight, ScanLine, Globe } from 'lucide-react'
+import { useOnboarding } from '@/hooks/useOnboarding'
 
 export default function OnboardingTooltip() {
   const t = useTranslations('Onboarding')
-  const [isVisible, setIsVisible] = useState(false)
+  const { showTooltips, dismiss } = useOnboarding()
   const [currentStep, setCurrentStep] = useState(0)
   const [position, setPosition] = useState({ top: 0, left: 0 })
   const tooltipRef = useRef<HTMLDivElement>(null)
@@ -15,57 +16,68 @@ export default function OnboardingTooltip() {
     {
       target: 'scan-button',
       tooltip: t('scan_tooltip'),
-      icon: <ScanLine size={20} className="text-orange-500" />
+      icon: <ScanLine size={20} className="text-primary" />
     },
     {
       target: 'settings-button',
       tooltip: t('lang_tooltip'),
-      icon: <Globe size={20} className="text-orange-500" />
+      icon: <Globe size={20} className="text-primary" />
     }
   ]
 
   useEffect(() => {
-    // Check if onboarding has been completed
-    const hasCompletedOnboarding = localStorage.getItem('heritogo_onboarding_completed')
-    if (!hasCompletedOnboarding) {
-      // Delay slightly to ensure DOM is ready
-      setTimeout(() => {
-        setIsVisible(true)
-        updateTooltipPosition(0)
-      }, 1000)
+    if (showTooltips) {
+      updateTooltipPosition(currentStep)
     }
-  }, [])
+  }, [showTooltips, currentStep])
 
   const updateTooltipPosition = (stepIndex: number) => {
     const targetElement = document.querySelector(`[data-onboarding="${steps[stepIndex].target}"]`)
     if (targetElement) {
       const rect = targetElement.getBoundingClientRect()
-      setPosition({
-        top: rect.top - 80,
-        left: rect.left + rect.width / 2 - 100
-      })
+      const tooltipWidth = 256 // w-64 = 256px
+      const tooltipHeight = 200 // hauteur approximative du tooltip
+      
+      let top = rect.top - 80
+      let left = rect.left + rect.width / 2 - tooltipWidth / 2
+      
+      // S'assurer que le tooltip ne dépasse pas à gauche
+      if (left < 10) {
+        left = 10
+      }
+      
+      // S'assurer que le tooltip ne dépasse pas à droite
+      if (left + tooltipWidth > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipWidth - 10
+      }
+      
+      // S'assurer que le tooltip ne dépasse pas en haut
+      if (top < 10) {
+        top = rect.bottom + 10
+      }
+      
+      // S'assurer que le tooltip ne dépasse pas en bas
+      if (top + tooltipHeight > window.innerHeight - 10) {
+        top = window.innerHeight - tooltipHeight - 10
+      }
+      
+      setPosition({ top, left })
     }
   }
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
-      updateTooltipPosition(currentStep + 1)
     } else {
-      handleComplete()
+      dismiss()
     }
   }
 
   const handleSkip = () => {
-    handleComplete()
+    dismiss()
   }
 
-  const handleComplete = () => {
-    setIsVisible(false)
-    localStorage.setItem('heritogo_onboarding_completed', 'true')
-  }
-
-  if (!isVisible) return null
+  if (!showTooltips) return null
 
   return (
     <>
@@ -75,7 +87,7 @@ export default function OnboardingTooltip() {
       {/* Tooltip */}
       <div
         ref={tooltipRef}
-        className="fixed z-[101] bg-white rounded-2xl shadow-2xl p-4 w-64 border border-orange-200"
+        className="fixed z-[101] bg-base-200 rounded-2xl shadow-2xl p-4 w-64 border border-border"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
@@ -106,7 +118,7 @@ export default function OnboardingTooltip() {
             <div
               key={index}
               className={`h-1 rounded-full flex-1 ${
-                index <= currentStep ? 'bg-orange-500' : 'bg-base-content/20'
+                index <= currentStep ? 'bg-primary' : 'bg-base-content/20'
               }`}
             />
           ))}
@@ -122,7 +134,7 @@ export default function OnboardingTooltip() {
           </button>
           <button
             onClick={handleNext}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-content text-xs font-bold hover:opacity-90 active:scale-95 transition-all"
           >
             {currentStep === steps.length - 1 ? t('finish') : t('next')}
             <ChevronRight size={14} />

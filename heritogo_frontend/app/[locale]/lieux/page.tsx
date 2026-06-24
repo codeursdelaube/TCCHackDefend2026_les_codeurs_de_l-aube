@@ -39,9 +39,9 @@ export default function ToutPage() {
 
       {/* Halos décoratifs */}
       <div className="absolute top-10 left-1/4 w-100 h-100
-                      bg-green-600/5 blur-[120px] rounded-full pointer-events-none" />
+                      bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-1/3 right-1/4 w-125 h-125
-                      bg-amber-500/5 blur-[130px] rounded-full pointer-events-none" />
+                      bg-secondary/5 blur-[130px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 container mx-auto">
 
@@ -49,11 +49,11 @@ export default function ToutPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-black tracking-tight text-base-content
                          sm:text-5xl uppercase flex items-center justify-center gap-3">
-            <Compass className="text-green-500 h-8 w-8 animate-spin-slow" />
+            <Compass className="text-primary h-8 w-8 animate-spin-slow" />
             <span>
               {t('title').split(' ')[0]} {t('title').split(' ')[1]}{' '}
-              <span className="text-green-500">To</span>
-              <span className="text-amber-500">go</span>
+              <span className="text-primary">To</span>
+              <span className="text-secondary">go</span>
             </span>
           </h1>
           <p className="mt-3 text-base text-base-content/50 max-w-xl mx-auto">
@@ -65,11 +65,11 @@ export default function ToutPage() {
         <div className="max-w-md mx-auto mb-12 px-2">
           <div className="relative flex items-center bg-base-200
                           border border-base-content/10
-                          focus-within:border-green-500/50
-                          focus-within:ring-2 focus-within:ring-green-500/20
+                          focus-within:border-primary/50
+                          focus-within:ring-2 focus-within:ring-primary/20
                           rounded-2xl overflow-hidden transition-all shadow-xl group">
             <div className="pl-4 text-base-content/40
-                            group-focus-within:text-green-500 transition-colors">
+                            group-focus-within:text-primary transition-colors">
               <Search size={20} />
             </div>
             <input
@@ -87,7 +87,7 @@ export default function ToutPage() {
             <p className="text-center text-xs italic text-base-content/40
                           mt-3 animate-fade-in">
               {t('results_for')}{' '}
-              <span className="text-green-500 font-semibold">{searchInput}</span>
+              <span className="text-primary font-semibold">{searchInput}</span>
             </p>
           )}
         </div>
@@ -96,7 +96,7 @@ export default function ToutPage() {
         {filteredSites.length === 0 ? (
           <div className="text-center py-20 bg-base-200 border border-base-content/5
                           rounded-3xl max-w-xl mx-auto">
-            <Sparkles className="mx-auto h-8 w-8 text-amber-500/40 mb-3" />
+            <Sparkles className="mx-auto h-8 w-8 text-primary/40 mb-3" />
             <p className="text-lg text-base-content/50 font-medium">
               {t('no_sites')}
             </p>
@@ -131,8 +131,8 @@ export default function ToutPage() {
                                   from-black/60 to-transparent" />
 
                   {/* Badge région */}
-                  <span className="absolute top-3 right-3 badge bg-green-600
-                                   border-none text-white font-bold text-[10px]
+                  <span className="absolute top-3 right-3 badge bg-primary
+                                   border-none text-primary-content font-bold text-[10px]
                                    tracking-wider uppercase px-2.5 py-1.5
                                    rounded-full shadow-lg">
                     {getRegionName(site.région)}
@@ -143,15 +143,15 @@ export default function ToutPage() {
                 <div className="p-5 flex flex-col justify-between grow gap-4">
                   <div className="space-y-2">
                     <h2 className="text-lg font-bold text-base-content
-                                   tracking-wide group-hover:text-green-500
+                                   tracking-wide group-hover:text-primary
                                    transition-colors line-clamp-1">
                       {tMonuments(`${site.id}.nom`)}
                     </h2>
 
                     <p className="inline-flex items-center gap-1 text-xs
-                                  text-amber-500 font-semibold
-                                  bg-amber-400/10 px-2 py-0.5 rounded-md
-                                  border border-amber-400/20">
+                                  text-secondary font-semibold
+                                  bg-secondary/10 px-2 py-0.5 rounded-md
+                                  border border-secondary/20">
                       <MapPin size={12} />
                       {site.localite}
                     </p>
@@ -169,8 +169,8 @@ export default function ToutPage() {
                       <button className="btn btn-sm btn-block rounded-xl
                                          border-none bg-base-content/5
                                          hover:bg-linear-to-r
-                                         hover:from-green-500
-                                         hover:to-emerald-600
+                                         hover:from-primary
+                                         hover:to-secondary
                                          text-base-content/60
                                          hover:text-white transition-all
                                          duration-300 font-bold tracking-wide">

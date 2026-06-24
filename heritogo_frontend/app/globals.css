@@ -1,101 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light, night;
+@plugin "daisyui";
+
+/* ── THÈME CLAIR ── */
+:root {
+  --card: #F1F0E5;
+  --ring: #A37764;
+  --input: #BAAB92;
+  --muted: #E4C7B8;
+  --accent: #E4C7B8;
+  --border: #BAAB92;
+  --radius: 0.5rem;
+  --chart-1: #A37764;
+  --chart-2: #8A655A;
+  --chart-3: #C39E88;
+  --chart-4: #BAAB92;
+  --chart-5: #A28777;
+  --popover: #FFFFFF;
+  --primary: #A37764;
+  --sidebar: #ebd6cb;
+  --font-mono: Menlo, monospace;
+  --font-sans: 'DM Sans', sans-serif;
+  --secondary: #BAAB92;
+  --background: #F1F0E5;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --foreground: #56453F;
+  --destructive: #1f1a17;
+  --shadow-blur: 0px;
+  --shadow-color: hsl(20 18% 51% / 0.4);
+  --sidebar-ring: #A37764;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.11;
+  --sidebar-accent: #C39E88;
+  --sidebar-border: #A28777;
+  --card-foreground: #56453F;
+  --shadow-offset-x: 2px;
+  --shadow-offset-y: 2px;
+  --sidebar-primary: #A37764;
+  --muted-foreground: #8A655A;
+  --accent-foreground: #56453F;
+  --popover-foreground: #56453F;
+  --primary-foreground: #FFFFFF;
+  --sidebar-foreground: #56453F;
+  --secondary-foreground: #ffffff;
+  --destructive-foreground: #FFFFFF;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-primary-foreground: #FFFFFF;
+
+  /* DaisyUI Overrides */
+  --base-100: var(--background);
+  --base-200: var(--card);
+  --base-300: var(--border);
+  --base-content: var(--foreground);
+  --primary-content: var(--primary-foreground);
+  --secondary-content: var(--secondary-foreground);
+  --accent-content: var(--accent-foreground);
 }
 
-@theme {
-  --color-heritage-emerald: #0d5c4a;
-  --color-heritage-emerald-light: #1a7a62;
-  --color-heritage-ochre: #d4a017;
-  --color-heritage-ochre-light: #e8c547;
-  --color-heritage-coral: #e07a5f;
-  --color-heritage-coral-light: #f09a80;
-  --color-heritage-ivory: #faf8f3;
-  --color-heritage-stone: #f5f5f0;
+/* ── THÈME SOMBRE ── */
+.dark {
+  --card: #3c332e;
+  --ring: #C39E88;
+  --input: #56453F;
+  --muted: #56453F;
+  --accent: #BAAB92;
+  --border: #56453F;
+  --chart-1: #C39E88;
+  --chart-2: #BAAB92;
+  --chart-3: #A37764;
+  --chart-4: #8A655A;
+  --chart-5: #A28777;
+  --popover: #3c332e;
+  --primary: #C39E88;
+  --sidebar: #1f1a17;
+  --secondary: #8A655A;
+  --background: #2d2521;
+  --foreground: #F1F0E5;
+  --destructive: #E57373;
+  --shadow-color: hsl(20 18% 30% / 0.5);
+  --sidebar-ring: #C39E88;
+  --sidebar-accent: #BAAB92;
+  --sidebar-border: #56453F;
+  --card-foreground: #F1F0E5;
+  --sidebar-primary: #C39E88;
+  --muted-foreground: #c5aa9b;
+  --accent-foreground: #2d2521;
+  --popover-foreground: #F1F0E5;
+  --primary-foreground: #2d2521;
+  --sidebar-foreground: #F1F0E5;
+  --secondary-foreground: #F1F0E5;
+  --destructive-foreground: #2d2521;
+  --sidebar-accent-foreground: #1f1a17;
+  --sidebar-primary-foreground: #1f1a17;
+
+  /* DaisyUI Overrides */
+  --base-100: var(--background);
+  --base-200: var(--card);
+  --base-300: var(--border);
+  --base-content: var(--foreground);
+  --primary-content: var(--primary-foreground);
+  --secondary-content: var(--secondary-foreground);
+  --accent-content: var(--accent-foreground);
 }
 
-html{
-  scroll-behavior: smooth;
+/* ── BRIDGE TAILWIND V4 ── */
+@theme inline {
+  --color-card: var(--card);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-sidebar: var(--sidebar);
+  --color-secondary: var(--secondary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-card-foreground: var(--card-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+
+  /* DaisyUI Overrides */
+  --color-base-100: var(--base-100);
+  --color-base-200: var(--base-200);
+  --color-base-300: var(--base-300);
+  --color-base-content: var(--base-content);
+  --color-primary-content: var(--primary-content);
+  --color-secondary-content: var(--secondary-content);
+  --color-accent-content: var(--accent-content);
+
+  /* Core Tailwind raw color mappings to theme values */
+  --color-orange-100: var(--accent);
+  --color-orange-200: var(--muted);
+  --color-orange-500: var(--primary);
+  --color-orange-600: var(--chart-2);
+  --color-green-500: var(--primary);
+  --color-green-600: var(--chart-2);
+  --color-emerald-500: var(--primary);
+  --color-emerald-600: var(--chart-2);
+  --color-amber-400: var(--chart-3);
+  --color-amber-500: var(--secondary);
+  --color-amber-600: var(--chart-2);
+
+  /* Heritage color overrides */
+  --color-heritage-emerald: var(--primary);
+  --color-heritage-emerald-light: var(--muted);
+  --color-heritage-ochre: var(--secondary);
+  --color-heritage-ochre-light: var(--chart-3);
+  --color-heritage-coral: var(--accent);
+  --color-heritage-coral-light: var(--muted);
+  --color-heritage-ivory: var(--background);
+  --color-heritage-stone: var(--card);
+
+  /* Fonts */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    Menlo, monospace;
+
+  /* Border radius */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+  --radius-2xl: calc(var(--radius) + 16px);
+  --radius-full: 9999px;
 }
 
-/* Animations CSS simples pour tout le site */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* ── BASE GLOBALE ── */
+@layer base {
+  * {
+    border-color: var(--border);
+    box-sizing: border-box;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  html, body {
+    font-family: var(--font-body);
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
   }
-}
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--foreground);
   }
-  50% {
-    opacity: 0.5;
+
+  h4, h5, h6, p, span, a, button, input, textarea, label, li {
+    font-family: var(--font-body);
   }
-}
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
+  /* Transitions douces thème */
+  *, *::before, *::after {
+    transition: background-color 0.2s ease, border-color 0.15s ease;
   }
-  50% {
-    transform: translateY(-5px);
-  }
-}
 
-/* Classes utilitaires pour les animations */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.3s ease-out;
-}
-
-.animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.animate-bounce {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-/* Transitions douces pour tous les éléments interactifs */
-button, a, input {
-  transition: all 0.2s ease-in-out;
-}
-
-/* Scrollbar personnalisée */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 }

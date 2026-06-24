@@ -16,14 +16,8 @@ interface PageProps {
   params: Promise<{ id: string; locale: string }>
 }
 
-const getCategoryStyle = (categorie: string) => {
-  switch (categorie) {
-    case 'Plat Principal': return { bg: 'bg-emerald-600', pill: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' }
-    case 'Sauce':          return { bg: 'bg-red-600',     pill: 'bg-red-500/15 border-red-500/30 text-red-400' }
-    case 'Street Food':    return { bg: 'bg-amber-600',   pill: 'bg-amber-500/15 border-amber-500/30 text-amber-400' }
-    case 'Accompagnement': return { bg: 'bg-blue-600',    pill: 'bg-blue-500/15 border-blue-500/30 text-blue-400' }
-    default:               return { bg: 'bg-base-content/40', pill: 'bg-base-content/10 border-base-content/20 text-base-content/50' }
-  }
+const getCategoryStyle = (_categorie: string) => {
+  return { bg: 'bg-primary', pill: 'bg-primary/15 border-primary/30 text-primary' }
 }
 
 export default async function PlatDetailPage({ params }: PageProps) {
@@ -93,8 +87,8 @@ export default async function PlatDetailPage({ params }: PageProps) {
         {/* Titre bas du hero */}
         <div className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-16 pb-8">
           <div className="flex items-center gap-2 mb-2">
-            <ChefHat size={13} className="text-amber-400" />
-            <span className="text-amber-400 text-xs font-semibold tracking-wide">
+            <ChefHat size={13} className="text-secondary" />
+            <span className="text-secondary text-xs font-semibold tracking-wide">
               {t('cuisine_title')}
             </span>
           </div>
@@ -111,8 +105,8 @@ export default async function PlatDetailPage({ params }: PageProps) {
       <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20">
 
         {/* Halos */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/4 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-amber-500/4 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/4 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/4 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
 
@@ -124,10 +118,10 @@ export default async function PlatDetailPage({ params }: PageProps) {
               <TTSButton text={`${tPlats(`${plat.id}.nom`)}. ${tPlats(`${plat.id}.description`)}. ${tPlats(`${plat.id}.histoire`)}`} />
               <a href="#restaurants">
                 <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full
-                                   text-xs font-bold border-none text-white
-                                   bg-linear-to-r from-emerald-500 to-green-600
+                                   text-xs font-bold border-none text-primary-content
+                                   bg-linear-to-r from-primary to-secondary
                                    hover:scale-105 active:scale-95
-                                   shadow-md shadow-emerald-500/20 transition-all duration-200">
+                                   shadow-md shadow-primary/20 transition-all duration-200">
                   <Utensils size={13} />
                   {t('find_nearby')}
                 </button>
@@ -144,7 +138,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
             {/* Origine & Tradition */}
             <div className="space-y-4">
               <h2 className="flex items-center gap-2.5 text-base font-black
-                             text-emerald-500 uppercase tracking-widest">
+                             text-primary uppercase tracking-widest">
                 <Soup size={16} className="animate-pulse" />
                 {t('origin_tradition')}
               </h2>
@@ -156,12 +150,12 @@ export default async function PlatDetailPage({ params }: PageProps) {
 
             {/* Accompagnement idéal */}
             <div className="flex items-start gap-4 p-5 rounded-2xl
-                            bg-amber-500/6 border border-amber-500/15">
-              <div className="p-2 rounded-xl bg-amber-500/15 border border-amber-500/20 shrink-0">
-                <Flame size={16} className="text-amber-400" />
+                            bg-secondary/8 border border-secondary/15">
+              <div className="p-2 rounded-xl bg-secondary/15 border border-secondary/20 shrink-0">
+                <Flame size={16} className="text-secondary" />
               </div>
               <div>
-                <p className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-1">
+                <p className="text-xs font-bold text-secondary uppercase tracking-widest mb-1">
                   {t('ideal_acc')}
                 </p>
                 <p className="text-sm text-base-content/70 leading-relaxed">
@@ -177,7 +171,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
               <div className="flex items-center justify-between">
                 <h2 className="flex items-center gap-2.5 text-base font-black
                                text-base-content uppercase tracking-widest">
-                  <Utensils size={16} className="text-emerald-500" />
+                  <Utensils size={16} className="text-primary" />
                   {t('where_to_eat')}
                 </h2>
                 {restosProches.length > 0 && (
@@ -202,7 +196,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                     <div
                       key={resto.id}
                       className="group rounded-2xl border border-base-content/8
-                                 bg-base-200 hover:border-emerald-500/25
+                                 bg-base-200 hover:border-primary/25
                                  hover:bg-base-200/80 transition-all duration-200
                                  overflow-hidden"
                     >
@@ -211,12 +205,12 @@ export default async function PlatDetailPage({ params }: PageProps) {
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <h3 className="text-sm font-bold text-base-content
-                                           group-hover:text-emerald-500 transition-colors
+                                           group-hover:text-primary transition-colors
                                            leading-tight truncate">
                               {resto.nom}
                             </h3>
                             <div className="flex items-center gap-1.5 mt-1">
-                              <MapPin size={11} className="text-emerald-500 shrink-0" />
+                              <MapPin size={11} className="text-primary shrink-0" />
                               <span className="text-[11px] text-base-content/50 truncate">
                                 {resto.quartier}
                               </span>
@@ -224,11 +218,11 @@ export default async function PlatDetailPage({ params }: PageProps) {
                           </div>
                           {/* Note */}
                           {resto.note && (
-                            <div className="flex items-center gap-1 bg-amber-500/10
-                                            border border-amber-500/20 px-2 py-0.5
+                            <div className="flex items-center gap-1 bg-primary/10
+                                            border border-primary/20 px-2 py-0.5
                                             rounded-lg shrink-0">
-                              <Star size={10} className="text-amber-400 fill-amber-400" />
-                              <span className="text-[11px] font-bold text-amber-400">
+                              <Star size={10} className="text-primary fill-primary" />
+                              <span className="text-[11px] font-bold text-primary">
                                 {resto.note}
                               </span>
                             </div>
@@ -251,8 +245,8 @@ export default async function PlatDetailPage({ params }: PageProps) {
                           <Phone size={12} className="text-base-content/25 shrink-0" />
                           <a
                             href={`tel:${resto.telephone}`}
-                            className="text-[11px] font-mono text-emerald-500
-                                       hover:text-emerald-400 transition-colors"
+                            className="text-[11px] font-mono text-primary
+                                       hover:text-secondary transition-colors"
                           >
                             {resto.telephone}
                           </a>
@@ -283,8 +277,8 @@ export default async function PlatDetailPage({ params }: PageProps) {
                           rel="noopener noreferrer"
                           className="flex items-center justify-center gap-2
                                      w-full py-2.5 rounded-xl text-[11px] font-bold
-                                     bg-emerald-500/10 border border-emerald-500/20
-                                     text-emerald-400 hover:bg-emerald-500/20
+                                     bg-primary/10 border border-primary/20
+                                     text-primary hover:bg-primary/20
                                      transition-all duration-200"
                         >
                           <Navigation size={12} />
@@ -324,12 +318,12 @@ export default async function PlatDetailPage({ params }: PageProps) {
                         </div>
                         <div className="p-3 flex items-center justify-between">
                           <p className="text-xs font-bold text-base-content
-                                        group-hover:text-emerald-500 transition-colors
+                                        group-hover:text-primary transition-colors
                                         line-clamp-1">
                             {tPlats(`${p.id}.nom`)}
                           </p>
                           <ChevronRight size={12} className="text-base-content/30
-                                                              group-hover:text-emerald-500 shrink-0" />
+                                                              group-hover:text-primary shrink-0" />
                         </div>
                       </div>
                     </Link>
@@ -384,7 +378,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                   {t('available_in')}
                 </p>
                 <div className="flex items-end gap-2">
-                  <span className="text-3xl font-black text-emerald-500">
+                  <span className="text-3xl font-black text-primary">
                     {restosProches.length}
                   </span>
                   <span className="text-xs text-base-content/50 mb-1">
@@ -394,7 +388,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                 <div className="mt-3 space-y-1.5">
                   {restosProches.slice(0, 3).map((r) => (
                     <div key={r.id} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <span className="text-[11px] text-base-content/50 truncate">
                         {r.nom}
                       </span>
@@ -411,10 +405,10 @@ export default async function PlatDetailPage({ params }: PageProps) {
 
             {/* CTA scroll vers restaurants */}
             <a href="#restaurants" className="block">
-              <button className="w-full btn rounded-2xl border-none text-white font-bold
-                                 bg-linear-to-r from-emerald-500 via-green-600 to-teal-500
+              <button className="w-full btn rounded-2xl border-none text-primary-content font-bold
+                                 bg-linear-to-r from-primary via-primary to-secondary
                                  hover:scale-[1.02] active:scale-[0.98]
-                                 shadow-xl shadow-emerald-500/20 transition-all duration-200
+                                 shadow-xl shadow-primary/20 transition-all duration-200
                                  flex items-center justify-center gap-2 py-4">
                 <Utensils size={16} />
                 {t('view_restos')}

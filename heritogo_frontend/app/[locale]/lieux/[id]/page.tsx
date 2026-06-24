@@ -2,12 +2,12 @@
 
 import { use, useState } from 'react'
 import Image from 'next/image'
-import { Link } from '@/i18n/navigation'
-import { notFound } from 'next/navigation'
-import {
+import { Link }
   ArrowLeft, MapPin, Navigation,
-  Volume2, VolumeX, Share2, Check,
-  BedDouble, Star, Banknote, Info, BookOpen
+  Volume2, VolumeX,  from '@/i18n/navigation'
+import { notFound } from 'next/navigation'
+import {Share2, Check,
+  BedDouble, Star, Info, BookOpen
 } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 
@@ -62,7 +62,7 @@ function TTSButton({ text, playLabel, stopLabel }: { text: string; playLabel: st
       className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold
                   border transition-all duration-200
                   ${speaking
-                    ? 'bg-orange-500/15 border-orange-500/30 text-orange-400'
+                    ? 'bg-secondary/15 border-secondary/30 text-secondary'
                     : 'bg-base-300 border-base-content/10 text-base-content/50 hover:text-base-content hover:border-base-content/20'}`}>
       {speaking ? <><VolumeX size={13} className="animate-pulse" /> {stopLabel}</> : <><Volume2 size={13} /> {playLabel}</>}
     </button>
@@ -87,7 +87,7 @@ function ShareButton({ nom, shareLabel, copiedLabel }: { nom: string; shareLabel
       className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold
                  bg-base-300 border border-base-content/10 text-base-content/50
                  hover:text-base-content hover:border-base-content/20 transition-all duration-200">
-      {copied ? <><Check size={13} className="text-green-500" /> {copiedLabel}</> : <><Share2 size={13} /> {shareLabel}</>}
+      {copied ? <><Check size={13} className="text-primary" /> {copiedLabel}</> : <><Share2 size={13} /> {shareLabel}</>}
     </button>
   )
 }
@@ -149,32 +149,32 @@ export default function SiteDetailPage({ params }: PageProps) {
           </Link>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4">
-          <h1 className="text-3xl font-black text-white uppercase leading-none">
+        <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4 my-8">
+          <h1 className="text-2xl font-black text-white uppercase leading-none">
             {siteNom}
           </h1>
         </div>
       </section>
 
       {/* CARD FLOTTANTE AVEC INFO */}
-      <section className="relative z-30 -mt-16 px-4">
-        <div className="bg-white rounded-3xl p-5 shadow-lg border border-base-content/10">
+      <section className="relative z-30 -mt-12 px-4 ">
+        <div className="bg-base-100 rounded-3xl p-5 shadow-lg border border-base-content/10">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-orange-500 font-bold">
-                <Star size={16} className="fill-orange-500" />
+              <div className="flex items-center gap-1 text-primary font-bold">
+                <Star size={16} className="fill-primary" />
                 <span>4.7</span>
               </div>
               <span className="text-xs text-base-content/50">{t('rating')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-orange-500 font-bold">
+              <div className="flex items-center gap-1 text-primary font-bold">
                 <span>12 400</span>
               </div>
               <span className="text-xs text-base-content/50">{t('visits_per_year')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-orange-500 font-bold">
+              <div className="flex items-center gap-1 text-primary font-bold">
                 <MapPin size={14} />
                 <span>0.3 km</span>
               </div>
@@ -183,18 +183,18 @@ export default function SiteDetailPage({ params }: PageProps) {
           </div>
 
           {/* Tag période */}
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-100 text-orange-600 text-xs font-medium mb-4">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
             {t('period_tag')}
           </div>
 
           {/* Boutons */}
           <div className="flex gap-3">
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 transition-colors">
+            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-content font-bold text-sm hover:opacity-90 transition-colors">
               <BookOpen size={16} />
               {t('history_btn')}
             </button>
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-white border border-base-content/20 text-base-content font-bold text-sm hover:bg-base-content/5 transition-colors">
-              <Info size={16} className="text-blue-500" />
+            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-base-200 border border-base-content/10 text-base-content font-bold text-sm hover:bg-base-300 transition-colors">
+              <Info size={16} className="text-secondary" />
               {t('info_btn')}
             </button>
           </div>
@@ -219,7 +219,7 @@ export default function SiteDetailPage({ params }: PageProps) {
       {/* HÔTELS À PROXIMITÉ */}
       <section className="px-4 py-6">
         <div className="flex items-center gap-2 mb-4">
-          <BedDouble size={20} className="text-orange-500" />
+          <BedDouble size={20} className="text-primary" />
           <h2 className="text-lg font-bold text-base-content">{t('hotels_nearby')}</h2>
         </div>
 
@@ -237,7 +237,7 @@ export default function SiteDetailPage({ params }: PageProps) {
               <div className="p-3">
                 <h3 className="text-sm font-bold text-base-content mb-1">{hotel.nom}</h3>
                 <div className="flex items-center justify-between">
-                  <span className="text-orange-500 font-bold text-sm">
+                  <span className="text-primary font-bold text-sm">
                     {hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA
                   </span>
                   <span className="text-xs text-base-content/50">{formatDistance(hotel.distance_km)}</span>
@@ -255,8 +255,8 @@ export default function SiteDetailPage({ params }: PageProps) {
           <ShareButton nom={siteNom} shareLabel={t('share')} copiedLabel={t('copied')} />
           <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
             <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full
-                               text-xs font-bold border-none text-white
-                               bg-orange-500 hover:bg-orange-600 transition-colors">
+                               text-xs font-bold border-none text-primary-content
+                               bg-primary hover:opacity-90 transition-colors">
               <Navigation size={13} /> {t('gps_action')}
             </button>
           </a>

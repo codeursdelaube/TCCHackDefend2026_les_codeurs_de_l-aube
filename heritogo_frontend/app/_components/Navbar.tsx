@@ -13,6 +13,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { ScanLine, Map, UtensilsCrossed, Home, Moon, Sun, Globe, ChevronDown, X, Settings } from 'lucide-react'
 import Image from 'next/image'
+import { useTheme } from '@/hooks/useTheme'
 
 interface NavLinkItem {
   href: string;
@@ -24,23 +25,8 @@ export default function Navbar() {
   const pathname = usePathname()
   const locale = useLocale()
   const t = useTranslations('Navbar')
-  const [theme, setTheme] = useState<string>('light')
+  const { toggle, isDark, mounted } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
-
-  // Initialiser le thème depuis le DOM
-  useEffect(() => {
-    const activeTheme = document.documentElement.getAttribute('data-theme') || 'light'
-    setTheme(activeTheme)
-  }, [])
-
-  // Gérer le changement de thème (light/night)
-  const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextTheme = e.target.checked ? 'night' : 'light'
-    setTheme(nextTheme)
-    document.documentElement.setAttribute('data-theme', nextTheme)
-    document.cookie = `theme=${nextTheme}; path=/; max-age=31536000; SameSite=Lax`
-    localStorage.setItem('theme', nextTheme)
-  }
 
   // Liens de navigation
   const navLinks: NavLinkItem[] = [
@@ -61,9 +47,9 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <Image src="/icons/icon-192x192.png" alt="HeriTogo" width={32} height={32} className="w-8 h-8" />
-            <span className="font-black text-xl tracking-wider">
-              <span className="text-green-600">Heri</span>
-              <span className="text-orange-500">togo</span>
+            <span className="text-xl tracking-wider" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+              <span className="text-primary">Heri</span>
+              <span className="text-secondary">togo</span>
             </span>
           </Link>
 
@@ -108,7 +94,7 @@ export default function Navbar() {
                     onClick={() => setSettingsOpen(false)}
                     className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium transition-colors ${
                       locale === lang.code
-                        ? 'bg-orange-500 text-white'
+                        ? 'bg-primary text-primary-content'
                         : 'bg-base-200 text-base-content/70 hover:bg-base-content/10'
                     }`}
                   >
@@ -121,22 +107,26 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <div>
               <label className="text-xs font-semibold text-base-content/60 mb-2 block">{t('theme')}</label>
-              <label className="flex items-center justify-between cursor-pointer p-3 rounded-xl bg-base-200 hover:bg-base-content/5 transition-colors">
-                <div className="flex items-center gap-2">
-                  <Sun className="h-4 w-4 text-amber-500" />
-                  <span className="text-xs font-medium text-base-content/70">{t('light')}</span>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={theme === 'night'}
-                  onChange={handleThemeChange}
-                  className="toggle toggle-sm toggle-orange"
-                />
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-base-content/70">{t('dark')}</span>
-                  <Moon className="h-4 w-4 text-slate-400" />
-                </div>
-              </label>
+              {!mounted ? (
+                <div className="h-[48px] w-full" />
+              ) : (
+                <label className="flex items-center justify-between cursor-pointer p-3 rounded-xl bg-base-200 hover:bg-base-content/5 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4 text-secondary" />
+                    <span className="text-xs font-medium text-base-content/70">{t('light')}</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isDark}
+                    onChange={toggle}
+                    className="toggle toggle-sm toggle-primary"
+                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-base-content/70">{t('dark')}</span>
+                    <Moon className="h-4 w-4 text-slate-400" />
+                  </div>
+                </label>
+              )}
             </div>
           </div>
         )}
@@ -155,7 +145,7 @@ export default function Navbar() {
                   href={link.href}
                   className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 active:scale-95 ${
                     active
-                      ? 'bg-orange-500 text-white'
+                      ? 'bg-primary text-primary-content'
                       : 'text-base-content/50 hover:text-base-content/70 hover:bg-base-content/5'
                   }`}
                   {...(link.href === '/scan' ? { 'data-onboarding': 'scan-button' } : {})}
