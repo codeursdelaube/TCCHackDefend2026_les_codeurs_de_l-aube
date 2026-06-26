@@ -1,289 +1,185 @@
-'use client'
+﻿'use client'
 
-/**
- * Page d'accueil (Homepage)
- * Présentation de l'application HériTogo avec :
- * - Section hero avec logo et CTA
- * - Statistiques de l'application
- * - Fonctionnalités principales
- * - CTA pour commencer
- */
-import React, { useState, useEffect } from 'react'
-import { Link } from '@/i18n/navigation'
-import { useTranslations } from 'next-intl'
-import {
-  Scan, Map, Utensils, Sparkles, ArrowRight,
-  Users, MapPin, Star, Trophy, Globe, WifiOff, ChevronLeft, ChevronRight
-} from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Camera, ChevronLeft, ChevronRight, MapPin, Scan, Utensils, WifiOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
+
+interface SlideItem {
+  image: string
+  title: string
+  subtitle: string
+  description: string
+  buttonText: string
+  link: string
+}
 
 export default function AcceuilPage() {
   const t = useTranslations('Accueil')
   const [isOnline, setIsOnline] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  const slides = [
+  const slides = useMemo<SlideItem[]>(() => [
     {
       image: '/deuxlions.png',
       title: t('slides.0.title'),
+      subtitle: t('slides.0.subtitle'),
       description: t('slides.0.description'),
       buttonText: t('slides.0.buttonText'),
-      link: '/scan'
+      link: '/scan',
     },
     {
       image: '/Hero2.png',
       title: t('slides.1.title'),
+      subtitle: t('slides.1.subtitle'),
       description: t('slides.1.description'),
       buttonText: t('slides.1.buttonText'),
-      link: '/lieux'
+      link: '/lieux',
     },
     {
       image: '/fufuhero.png',
       title: t('slides.2.title'),
+      subtitle: t('slides.2.subtitle'),
       description: t('slides.2.description'),
       buttonText: t('slides.2.buttonText'),
-      link: '/cuisine'
-    }
+      link: '/cuisine',
+    },
+  ], [t])
+
+  const featureCards = [
+    { href: '/scan', icon: Scan, title: t('features.scan_title'), description: t('features.scan_desc'), tag: t('features.scan_tag') },
+    { href: '/lieux', icon: MapPin, title: t('features.geo_title'), description: t('features.geo_desc'), tag: t('features.geo_tag') },
+    { href: '/cuisine', icon: Utensils, title: t('features.cuisine_title'), description: t('features.cuisine_desc'), tag: t('features.cuisine_tag') },
   ]
 
-  // Auto-play slides
+  const stats = [
+    { value: '120+', label: t('stats.lieux') },
+    { value: '7', label: t('stats.regions') },
+    { value: '500+', label: t('stats.explorers') },
+    { value: '4.8', label: t('stats.rating') },
+  ]
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(timer)
+    const timer = window.setInterval(() => {
+      setCurrentSlide((value) => (value + 1) % slides.length)
+    }, 5200)
+    return () => window.clearInterval(timer)
   }, [slides.length])
 
-  // Détecter le statut de connexion
   useEffect(() => {
     const update = () => setIsOnline(navigator.onLine)
+    update()
     window.addEventListener('online', update)
     window.addEventListener('offline', update)
-    return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update) }
+    return () => {
+      window.removeEventListener('online', update)
+      window.removeEventListener('offline', update)
+    }
   }, [])
 
-  const features = [
-    {
-      title: t('features.scan_title'),
-      description: t('features.scan_desc'),
-      icon: <Scan className="h-6 w-6 text-primary" />,
-      link: '/scan',
-      tag: t('features.scan_tag'),
-      tagColor: 'bg-primary/10 text-primary',
-      iconBg: 'bg-primary/10',
-      mascot: '/mascotia.png'
-    },
-    {
-      title: t('features.geo_title'),
-      description: t('features.geo_desc'),
-      icon: <Map className="h-6 w-6 text-secondary" />,
-      link: '/lieux',
-      tag: t('features.geo_tag'),
-      tagColor: 'bg-secondary/10 text-secondary',
-      iconBg: 'bg-secondary/10',
-      mascot: '/mascotgps.png'
-    },
-    {
-      title: t('features.cuisine_title'),
-      description: t('features.cuisine_desc'),
-      icon: <Utensils className="h-6 w-6 text-accent-foreground" />,
-      link: '/cuisine',
-      tag: t('features.cuisine_tag'),
-      tagColor: 'bg-accent/15 text-accent-foreground',
-      iconBg: 'bg-accent/15',
-      mascot: '/mascotculi.png'
-    },
-  ]
-
-  const statsData = [
-    { target: 120, suffix: '+', label: t('stats.lieux'), icon: <MapPin size={20} className="text-primary" /> },
-    { target: 7, suffix: '', label: t('stats.regions'), icon: <Globe size={20} className="text-secondary" /> },
-    { target: 500, suffix: '+', label: t('stats.explorers'), icon: <Users size={20} className="text-accent-foreground" /> },
-    { target: 4, suffix: '.8★', label: t('stats.rating'), icon: <Star size={20} className="text-primary" /> },
-  ]
+  const activeSlide = slides[currentSlide]
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden bg-base-100 pb-24">
-
-      {/* Bandeau offline */}
+    <main className="min-h-screen bg-base-100 px-4 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
       {!isOnline && (
-        <div className="fixed top-12 left-0 right-0 z-[9999] flex items-center justify-center
-                     gap-2 py-2 px-4 bg-accent text-accent-foreground text-xs font-medium">
-          <WifiOff size={12} />
+        <div className="fixed left-4 right-4 top-20 z-[60] mx-auto flex max-w-md items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-3 text-xs font-black text-secondary-content shadow-xl">
+          <WifiOff className="h-4 w-4" />
           {t('offline_banner')}
         </div>
       )}
 
-      {/* Hero Section with Carousel */}
-      <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-base-200 h-[400px] md:h-[500px] lg:h-[600px]">
-          <AnimatePresence initial={false}>
+      <section className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+        <div className="flex min-h-[460px] flex-col justify-between rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7 lg:min-h-[600px]">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-base-content/65">
+              <Camera className="h-4 w-4 text-secondary" />
+              {t('hackathon_badge')}
+            </div>
+            <h1 className="max-w-xl text-4xl font-black leading-[1.02] tracking-normal text-base-content sm:text-6xl lg:text-7xl">
+              {activeSlide.title}
+            </h1>
+            <p className="mt-3 text-xl font-bold text-secondary sm:text-2xl">{activeSlide.subtitle}</p>
+            <p className="mt-5 max-w-lg text-sm font-medium leading-7 text-base-content/65 sm:text-base">
+              {activeSlide.description}
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+            <Link href={activeSlide.link} className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-primary px-6 py-4 text-sm font-black uppercase tracking-wide text-primary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] dark:bg-secondary dark:text-secondary-content">
+              {activeSlide.buttonText}
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link href="/lieux" className="inline-flex min-h-14 items-center justify-center gap-2 rounded-[22px] border border-border bg-base-100 px-5 py-4 text-sm font-black text-base-content transition-all hover:border-secondary/50 active:scale-[0.98]">
+              {t('discover')}
+              <MapPin className="h-4 w-4 text-secondary" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative min-h-[440px] overflow-hidden rounded-[32px] bg-stone-950 shadow-2xl lg:min-h-[600px]">
+          <AnimatePresence initial={false} mode="popLayout">
             <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              key={activeSlide.image}
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full"
+              transition={{ duration: 0.45 }}
+              className="absolute inset-0"
             >
-              <Image
-                src={slides[currentSlide].image}
-                alt={slides[currentSlide].title}
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-              
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-12">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="max-w-2xl"
-                >
-                  <h1 
-                    className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight"
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontStyle: 'italic',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {slides[currentSlide].title}
-                  </h1>
-                  <p className="text-base md:text-lg text-white/80 mb-6 leading-relaxed">
-                    {slides[currentSlide].description}
-                  </p>
-                  <Link href={slides[currentSlide].link}>
-                    <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-primary-content bg-primary hover:opacity-90 active:scale-95 transition-all duration-200 shadow-lg">
-                      {slides[currentSlide].buttonText}
-                      <ArrowRight size={16} />
-                    </button>
-                  </Link>
-                </motion.div>
-              </div>
+              <Image src={activeSlide.image} alt={activeSlide.title} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation buttons */}
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white transition-all duration-200"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white transition-all duration-200"
-          >
-            <ChevronRight size={24} />
-          </button>
-
-          {/* Dots indicator */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                  currentSlide === index ? 'bg-white' : 'bg-white/50'
-                }`}
-              />
-            ))}
+          <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4">
+            <div className="min-w-0 text-white">
+              <p className="text-[11px] font-black uppercase tracking-wider text-white/65">{t('scroll')}</p>
+              <p className="mt-1 line-clamp-2 text-xl font-black leading-tight sm:text-2xl">{activeSlide.title}</p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <button type="button" onClick={() => setCurrentSlide((value) => (value - 1 + slides.length) % slides.length)} className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/90 text-stone-950 transition-all hover:bg-white active:scale-95" aria-label={t('previous_slide')}>
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button type="button" onClick={() => setCurrentSlide((value) => (value + 1) % slides.length)} className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/90 text-stone-950 transition-all hover:bg-white active:scale-95" aria-label={t('next_slide')}>
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-base-100 border-y border-base-content/10 py-12">
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {statsData.map((stat, i) => (
-            <div key={i} className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 mb-2">
-                {stat.icon}
-                <span className="text-3xl font-black text-base-content">
-                  {stat.target}{stat.suffix}
-                </span>
-              </div>
-              <span className="text-xs text-base-content/60 font-medium">
-                {stat.label}
-              </span>
-            </div>
-          ))}
-        </div>
+      <section className="mx-auto mt-5 grid max-w-7xl gap-5 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm">
+            <p className="text-3xl font-black text-base-content">{stat.value}</p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-wide text-base-content/55">{stat.label}</p>
+          </div>
+        ))}
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 
-            className="text-3xl sm:text-4xl font-black text-base-content mb-4"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            {t.rich('features_header.title', {
-              highlight: (chunks) => <span className="text-primary">{chunks}</span>
-            })}
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div key={index} className="bg-base-100 rounded-3xl p-6 border border-base-content/10 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-              <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 w-fit rounded-2xl ${feature.iconBg}`}>
-                  {feature.icon}
+      <section className="mx-auto mt-5 grid max-w-7xl gap-5 md:grid-cols-3">
+        {featureCards.map((feature, index) => {
+          const Icon = feature.icon
+          return (
+            <Link key={feature.href} href={feature.href} className={`group rounded-[32px] border border-border bg-base-200 p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl ${index === 0 ? 'md:col-span-1 md:row-span-2' : ''}`}>
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content">
+                  <Icon className="h-6 w-6" />
                 </div>
-                {feature.mascot && (
-                  <Image
-                    src={feature.mascot}
-                    alt={`${feature.title} mascot`}
-                    width={130}
-                    height={130}
-                    className="rounded-2xl object-cover"
-                  />
-                )}
+                <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-black uppercase tracking-wide text-secondary-content">{feature.tag}</span>
               </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full mb-3 inline-block ${feature.tagColor}`}>
-                {feature.tag}
-              </span>
-              <h3 className="text-lg font-bold text-base-content mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-base-content/60 mb-4 leading-relaxed">
-                {feature.description}
-              </p>
-              <Link href={feature.link} className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:gap-3 transition-all">
+              <h2 className="text-xl font-black tracking-normal text-base-content">{feature.title}</h2>
+              <p className="mt-3 line-clamp-4 text-sm font-medium leading-6 text-base-content/62">{feature.description}</p>
+              <span className="mt-6 inline-flex items-center gap-2 text-sm font-black text-secondary">
                 {t('features.access')}
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-          ))}
-        </div>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </Link>
+          )
+        })}
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center">
-        <div className="bg-gradient-to-br from-primary to-secondary rounded-3xl p-8 sm:p-12 text-white">
-          <h2 
-            className="text-2xl sm:text-3xl font-black mb-4"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            {t('how_it_works.start')}
-          </h2>
-          <p className="text-white/80 mb-6 max-w-md mx-auto">
-            {t('how_it_works.footer_info')}
-          </p>
-          <Link href="/scan">
-            <button className="flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold text-sm text-primary bg-base-100 hover:bg-base-content/90 active:scale-95 transition-all duration-200 shadow-xl mx-auto">
-              <Sparkles size={18} />
-              {t('slides.0.buttonText')}
-            </button>
-          </Link>
-        </div>
-      </section>
-
     </main>
   )
 }

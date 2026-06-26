@@ -11,7 +11,10 @@
     "language": "Langue",
     "theme": "Thème",
     "light": "Clair",
-    "dark": "Sombre"
+    "dark": "Sombre",
+    "tagline": "Patrimoine mobile",
+    "close_settings": "Fermer les paramètres",
+    "histoire": "Histoire"
   },
   "Accueil": {
     "offline_banner": "Mode hors-ligne — données mises en cache disponibles",
@@ -94,7 +97,9 @@
       "step3_desc": "L'IA identifie le lieu. La synthèse vocale vous en raconte l'histoire — en français ou en anglais.",
       "start": "Commencer l'aventure",
       "footer_info": "Gratuis · Aucune installation · Fonctionne hors-ligne"
-    }
+    },
+    "previous_slide": "Image précédente",
+    "next_slide": "Image suivante"
   },
   "Scan": {
     "title": "Scanner Heritogo",
@@ -112,7 +117,8 @@
       "unknown": "Ce monument ou objet n'est pas répertorié dans la base officielle HeriTogo.",
       "general": "Une erreur est survenue lors de l'analyse.",
       "server": "Impossible de joindre le serveur ou le service Gemini."
-    }
+    },
+    "result_label": "Monument identifié"
   },
   "Lieux": {
     "title": "Découvrir le Togo",
@@ -122,6 +128,7 @@
     "no_sites": "Aucun site touristique trouvé",
     "try_other": "Essayez une autre orthographe ou un autre mot-clé.",
     "regions": {
+      "all": "Tous",
       "maritime": "Maritime",
       "plateaux": "Plateaux",
       "kara": "Kara",
@@ -143,7 +150,9 @@
     "listen": "Écouter",
     "stop": "Arrêter",
     "share": "Partager",
-    "copied": "Copié !"
+    "copied": "Copié !",
+    "hero_badge": "Explorer près de vous",
+    "filter_region": "Filtrer par région"
   },
   "Cuisine": {
     "title": "Saveurs du Togo",
@@ -185,7 +194,19 @@
     "page_subtitle": "Découvrez les saveurs authentiques du Togo",
     "all": "Tous",
     "restaurants_available": "{count} restaurant{count, plural, =1 {} other {s}} disponible{count, plural, =1 {} other {s}}",
-    "directions": "Itinéraire"
+    "directions": "Itinéraire",
+    "hero_badge": "Saveurs locales",
+    "lome_area": "Lomé",
+    "default_hours": "07h-22h",
+    "origin_country": "Togo",
+    "filters": {
+      "ayimolou": "Ayimolou",
+      "fufu": "Fufu",
+      "djenkoume": "Djenkoumé",
+      "gboma": "Gboma",
+      "akoume": "Akoumé"
+    },
+    "filter_category": "Filtrer par plat"
   },
   "Loisirs": {
     "tag": "Distractions & Biodiversité",
@@ -413,5 +434,42 @@
       "description": "Le plus petit des trois parcs nationaux togolais, établi en 1954.",
       "tarif": "Entrée : 3000 FCFA / personne"
     }
+  },
+  "Common": {
+    "listen": "Écouter",
+    "stop": "Arrêter"
+  },
+  "ChatBot": {
+    "title": "TGO AI",
+    "subtitle": "Assistant culturel",
+    "welcome": "Woezon ! Je suis TGO AI, votre guide culturel pour découvrir les monuments, régions et saveurs du Togo.",
+    "fallback_response": "Merci pour votre question. Je suis prêt à vous orienter vers les lieux, plats et expériences culturelles les plus utiles pendant votre séjour.",
+    "typing": "TGO AI prépare une réponse...",
+    "placeholder": "Posez une question sur le Togo...",
+    "send": "Envoyer",
+    "open": "Ouvrir le chat TGO AI",
+    "close": "Fermer le chat"
+  },
+  "Histoire": {
+    "badge": "Mémoire nationale",
+    "title": "Histoire du Togo",
+    "subtitle": "Une page de lecture immersive pour raconter les origines, les royaumes, les rencontres, les résistances et les grandes étapes du Togo.",
+    "listen_language": "Langue de lecture",
+    "listen": "Lire l’histoire",
+    "stop": "Arrêter la lecture",
+    "contents": "Sommaire",
+    "section": "Section",
+    "paste_hint": "Colle ton texte complet dans la constante TOGO_HISTORY_TEXT de ce fichier. Sépare les paragraphes par une ligne vide pour obtenir automatiquement des sections animées.",
+    "stats": {
+      "period": "Togo",
+      "period_label": "Récit",
+      "sections": "Sections"
+    },
+    "paragraphs": [
+      "Le Togo possède une histoire dense, façonnée par ses peuples, ses langues, ses migrations, ses échanges commerciaux et ses traditions spirituelles. Cette page sert de base éditoriale pour accueillir un récit complet et accessible aux visiteurs.",
+      "Avant la période coloniale, les territoires togolais étaient traversés par des communautés organisées autour de chefferies, de royaumes, de routes marchandes et de savoir-faire transmis de génération en génération.",
+      "À partir du XIXe siècle, les contacts avec les puissances européennes transforment profondément la région. La période coloniale allemande, puis les administrations française et britannique, laissent des traces politiques, architecturales et sociales.",
+      "L’indépendance du Togo, proclamée le 27 avril 1960, marque une étape majeure de souveraineté nationale. Depuis, le pays continue d’écrire son histoire entre mémoire, création culturelle et construction d’un avenir partagé."
+    ]
   }
 }

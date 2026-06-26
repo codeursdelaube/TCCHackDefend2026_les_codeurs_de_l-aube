@@ -1,31 +1,21 @@
-'use client'
+﻿'use client'
 
 import { use, useState } from 'react'
 import Image from 'next/image'
-import { Link }
-  ArrowLeft, MapPin, Navigation,
-  Volume2, VolumeX,  from '@/i18n/navigation'
 import { notFound } from 'next/navigation'
-import {Share2, Check,
-  BedDouble, Star, Info, BookOpen
-} from 'lucide-react'
-import { useTranslations, useLocale } from 'next-intl'
-
+import { ArrowLeft, BedDouble, BookOpen, Check, MapPin, Navigation, Share2, Star, Volume2, VolumeX } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { monuments } from '@/app/LieuxT/site'
 import hotels from '@/app/nearbyhotels/hotels'
 
-type MonumentWithRegionAlias = { region?: string }
-
-// Utilitaires de distance
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371
-  const toRad = (d: number) => (d * Math.PI) / 180
+  const earthRadiusKm = 6371
+  const toRad = (degree: number) => (degree * Math.PI) / 180
   const dLat = toRad(lat2 - lat1)
   const dLng = toRad(lng2 - lng1)
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
 function formatDistance(km: number): string {
@@ -36,58 +26,53 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-// TTS Button
 function TTSButton({ text, playLabel, stopLabel }: { text: string; playLabel: string; stopLabel: string }) {
   const locale = useLocale()
   const [speaking, setSpeaking] = useState(false)
-  
-  const toggle = () => {
-    if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
-    const u = new SpeechSynthesisUtterance(text)
-    
-    if (locale === 'fr') u.lang = 'fr-FR'
-    else if (locale === 'en') u.lang = 'en-US'
-    else if (locale === 'es') u.lang = 'es-ES'
-    else if (locale === 'zh') u.lang = 'zh-CN'
-    else u.lang = 'fr-FR'
 
-    u.onend = () => setSpeaking(false)
-    u.onerror = () => setSpeaking(false)
-    window.speechSynthesis.speak(u)
+  const toggle = () => {
+    if (speaking) {
+      window.speechSynthesis.cancel()
+      setSpeaking(false)
+      return
+    }
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : locale === 'zh' ? 'zh-CN' : 'fr-FR'
+    utterance.onend = () => setSpeaking(false)
+    utterance.onerror = () => setSpeaking(false)
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utterance)
     setSpeaking(true)
   }
-  
+
   return (
-    <button onClick={toggle}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold
-                  border transition-all duration-200
-                  ${speaking
-                    ? 'bg-secondary/15 border-secondary/30 text-secondary'
-                    : 'bg-base-300 border-base-content/10 text-base-content/50 hover:text-base-content hover:border-base-content/20'}`}>
-      {speaking ? <><VolumeX size={13} className="animate-pulse" /> {stopLabel}</> : <><Volume2 size={13} /> {playLabel}</>}
+    <button type="button" onClick={toggle} className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] px-5 text-sm font-black transition-all active:scale-95 ${speaking ? 'bg-secondary text-secondary-content' : 'bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content'}`}>
+      {speaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      {speaking ? stopLabel : playLabel}
     </button>
   )
 }
 
-// Share Button
-function ShareButton({ nom, shareLabel, copiedLabel }: { nom: string; shareLabel: string; copiedLabel: string }) {
+function ShareButton({ title, shareLabel, copiedLabel }: { title: string; shareLabel: string; copiedLabel: string }) {
   const [copied, setCopied] = useState(false)
+
   const share = async () => {
     const url = window.location.href
     if (navigator.share) {
-      try { await navigator.share({ title: nom, url }) } catch {}
-    } else {
-      await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      try {
+        await navigator.share({ title, url })
+      } catch {}
+      return
     }
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1800)
   }
+
   return (
-    <button onClick={share}
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold
-                 bg-base-300 border border-base-content/10 text-base-content/50
-                 hover:text-base-content hover:border-base-content/20 transition-all duration-200">
-      {copied ? <><Check size={13} className="text-primary" /> {copiedLabel}</> : <><Share2 size={13} /> {shareLabel}</>}
+    <button type="button" onClick={share} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] border border-border bg-base-200 px-5 text-sm font-black text-base-content transition-all hover:border-secondary/50 active:scale-95">
+      {copied ? <Check className="h-5 w-5 text-secondary" /> : <Share2 className="h-5 w-5 text-secondary" />}
+      {copied ? copiedLabel : shareLabel}
     </button>
   )
 }
@@ -96,173 +81,116 @@ export default function SiteDetailPage({ params }: PageProps) {
   const t = useTranslations('Lieux')
   const tMonuments = useTranslations('Monuments')
   const resolvedParams = use(params)
-  const site = monuments.find((m) => m.id === resolvedParams.id)
+  const site = monuments.find((item) => item.id === resolvedParams.id)
   if (!site) notFound()
 
-  const siteRegion = site.région || (site as MonumentWithRegionAlias).region
   const siteLat = Number(site.lat)
   const siteLng = Number(site.lng)
-
-  const siteNom = tMonuments(`${site.id}.nom`)
+  const siteName = tMonuments(`${site.id}.nom`)
   const siteDescription = tMonuments(`${site.id}.description`)
-  const siteHistoire = tMonuments(`${site.id}.histoire`)
+  const siteHistory = tMonuments(`${site.id}.histoire`)
 
-  const getRegionName = (reg: string): string => {
-    switch (reg) {
+  const getRegionName = (region: string): string => {
+    switch (region) {
       case 'Maritime': return t('regions.maritime')
       case 'Plateaux': return t('regions.plateaux')
-      case 'Kara':     return t('regions.kara')
+      case 'Kara': return t('regions.kara')
       case 'Centrale': return t('regions.centrale')
-      case 'Savanes':  return t('regions.savanes')
-      default:         return reg
+      case 'Savanes': return t('regions.savanes')
+      default: return region
     }
   }
 
-  // HÔTELS
-  const allHotelsWithDist = hotels.map((h) => ({
-    ...h,
-    distance_km: haversine(siteLat, siteLng, h.lat, h.lng)
-  }))
-
-  const hotelsProches = allHotelsWithDist
+  const nearbyHotels = hotels
+    .map((hotel) => ({ ...hotel, distance_km: haversine(siteLat, siteLng, hotel.lat, hotel.lng) }))
     .sort((a, b) => a.distance_km - b.distance_km)
     .slice(0, 6)
 
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${siteLat},${siteLng}`
 
   return (
-    <main className="relative min-h-screen w-full bg-base-100 text-base-content overflow-x-hidden pb-24">
+    <main className="min-h-screen bg-base-100 pb-28 text-base-content">
+      <section className="relative min-h-[62vh] overflow-hidden">
+        <Image src={site.image} alt={siteName} fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/45" />
 
-      {/* HERO */}
-      <section className="relative h-[50vh] w-full overflow-hidden">
-        <Image src={site.image} alt={siteNom} fill priority sizes="100vw"
-          className="object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
-
-        <div className="absolute top-0 left-0 right-0 z-20 pt-4 px-4 flex items-center justify-between">
-          <Link href="/lieux">
-            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full
-                       bg-white/20 backdrop-blur-md border border-white/30
-                       text-white text-xs font-semibold hover:bg-white/30 transition-all">
-              <ArrowLeft size={14} />
-            </div>
+        <div className="absolute left-4 right-4 top-20 z-10 mx-auto flex max-w-7xl items-center justify-between">
+          <Link href="/lieux" className="inline-flex h-12 w-12 items-center justify-center rounded-[20px] bg-white/90 text-stone-950 shadow-sm transition-all hover:bg-white active:scale-95" aria-label={t('back_to_sites')}>
+            <ArrowLeft className="h-5 w-5" />
           </Link>
+          <span className="rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">{getRegionName(site.région)}</span>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4 my-8">
-          <h1 className="text-2xl font-black text-white uppercase leading-none">
-            {siteNom}
-          </h1>
-        </div>
-      </section>
-
-      {/* CARD FLOTTANTE AVEC INFO */}
-      <section className="relative z-30 -mt-12 px-4 ">
-        <div className="bg-base-100 rounded-3xl p-5 shadow-lg border border-base-content/10">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-primary font-bold">
-                <Star size={16} className="fill-primary" />
-                <span>4.7</span>
-              </div>
-              <span className="text-xs text-base-content/50">{t('rating')}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-primary font-bold">
-                <span>12 400</span>
-              </div>
-              <span className="text-xs text-base-content/50">{t('visits_per_year')}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-primary font-bold">
-                <MapPin size={14} />
-                <span>0.3 km</span>
-              </div>
-              <span className="text-xs text-base-content/50">{t('distance')}</span>
-            </div>
-          </div>
-
-          {/* Tag période */}
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
-            {t('period_tag')}
-          </div>
-
-          {/* Boutons */}
-          <div className="flex gap-3">
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-content font-bold text-sm hover:opacity-90 transition-colors">
-              <BookOpen size={16} />
-              {t('history_btn')}
-            </button>
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-base-200 border border-base-content/10 text-base-content font-bold text-sm hover:bg-base-300 transition-colors">
-              <Info size={16} className="text-secondary" />
-              {t('info_btn')}
-            </button>
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-8">
+          <div className="mx-auto max-w-7xl">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-2xl bg-white/12 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-white backdrop-blur-md">
+              <MapPin className="h-4 w-4 text-secondary" />
+              {site.localite}
+            </p>
+            <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-normal text-white sm:text-6xl">{siteName}</h1>
           </div>
         </div>
       </section>
 
-      {/* DESCRIPTION */}
-      <section className="px-4 py-6">
-        <p className="text-sm text-base-content/70 leading-relaxed">
-          {siteDescription}
-        </p>
-      </section>
-
-      {/* HISTOIRE */}
-      <section className="px-4 py-4">
-        <h2 className="text-lg font-bold text-base-content mb-3">Histoire</h2>
-        <p className="text-sm text-base-content/70 leading-relaxed whitespace-pre-line">
-          {siteHistoire}
-        </p>
-      </section>
-
-      {/* HÔTELS À PROXIMITÉ */}
-      <section className="px-4 py-6">
-        <div className="flex items-center gap-2 mb-4">
-          <BedDouble size={20} className="text-primary" />
-          <h2 className="text-lg font-bold text-base-content">{t('hotels_nearby')}</h2>
+      <section className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-5 rounded-[32px] border border-border bg-base-200 p-5 shadow-xl sm:grid-cols-3 sm:p-6">
+          <div className="rounded-[24px] bg-base-100 p-4">
+            <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('rating')}</p>
+            <p className="mt-2 flex items-center gap-2 text-2xl font-black"><Star className="h-5 w-5 fill-secondary text-secondary" />4.7</p>
+          </div>
+          <div className="rounded-[24px] bg-base-100 p-4">
+            <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('visits_per_year')}</p>
+            <p className="mt-2 text-2xl font-black">12 400</p>
+          </div>
+          <div className="rounded-[24px] bg-base-100 p-4">
+            <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('distance')}</p>
+            <p className="mt-2 flex items-center gap-2 text-2xl font-black"><MapPin className="h-5 w-5 text-secondary" />{site.localite}</p>
+          </div>
         </div>
+      </section>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-          {hotelsProches.map((hotel) => (
-            <div
-              key={hotel.id}
-              className="flex-shrink-0 w-64 bg-base-200 rounded-2xl overflow-hidden border border-base-content/10"
-            >
-              <div className="relative h-32 w-full bg-base-300">
-                <div className="w-full h-full flex items-center justify-center text-4xl">
-                  🏨
+      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_22rem] lg:px-8">
+        <div className="space-y-5">
+          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BookOpen className="h-5 w-5 text-secondary" />{t('desc_title')}</h2>
+            <p className="m-0 text-sm font-medium leading-7 text-base-content/68">{siteDescription}</p>
+          </article>
+
+          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BookOpen className="h-5 w-5 text-secondary" />{t('history_title')}</h2>
+            <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/68">{siteHistory}</p>
+          </article>
+
+          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BedDouble className="h-5 w-5 text-secondary" />{t('hotels_nearby')}</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {nearbyHotels.map((hotel) => (
+                <div key={hotel.id} className="rounded-[24px] border border-border bg-base-100 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-black">{hotel.nom}</h3>
+                      <p className="mt-1 text-xs font-semibold text-base-content/50">{formatDistance(hotel.distance_km)}</p>
+                    </div>
+                    <BedDouble className="h-5 w-5 text-secondary" />
+                  </div>
+                  <p className="mt-3 text-sm font-black text-secondary">{hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA</p>
                 </div>
-              </div>
-              <div className="p-3">
-                <h3 className="text-sm font-bold text-base-content mb-1">{hotel.nom}</h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-primary font-bold text-sm">
-                    {hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA
-                  </span>
-                  <span className="text-xs text-base-content/50">{formatDistance(hotel.distance_km)}</span>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
+          </article>
         </div>
-      </section>
 
-      {/* ACTIONS RAPIDES */}
-      <section className="px-4 py-6 pb-24">
-        <div className="flex flex-wrap items-center gap-2">
-          <TTSButton text={`${siteNom}. ${siteDescription}. ${siteHistoire}`} playLabel={t('listen')} stopLabel={t('stop')} />
-          <ShareButton nom={siteNom} shareLabel={t('share')} copiedLabel={t('copied')} />
-          <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
-            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full
-                               text-xs font-bold border-none text-primary-content
-                               bg-primary hover:opacity-90 transition-colors">
-              <Navigation size={13} /> {t('gps_action')}
-            </button>
-          </a>
-        </div>
+        <aside className="h-fit rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
+          <div className="space-y-3">
+            <TTSButton text={`${siteName}. ${siteDescription}. ${siteHistory}`} playLabel={t('listen')} stopLabel={t('stop')} />
+            <ShareButton title={siteName} shareLabel={t('share')} copiedLabel={t('copied')} />
+            <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
+              <Navigation className="h-5 w-5" />
+              {t('gps_action')}
+            </a>
+          </div>
+        </aside>
       </section>
-
     </main>
   )
 }

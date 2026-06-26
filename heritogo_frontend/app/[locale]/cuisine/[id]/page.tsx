@@ -1,13 +1,8 @@
-import Image from 'next/image'
-import { Link } from '@/i18n/navigation'
+﻿import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import {
-  ArrowLeft, ChefHat, Utensils, Soup,
-  ChevronRight, Flame, MapPin, Phone,
-  Clock, Banknote, Star, Navigation
-} from 'lucide-react'
+import { ArrowLeft, Banknote, ChefHat, ChevronRight, Flame, MapPin, Navigation, Phone, Soup, Star, Utensils } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
-
+import { Link } from '@/i18n/navigation'
 import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
 import TTSButton from '@/app/_components/TTSButton'
@@ -16,407 +11,156 @@ interface PageProps {
   params: Promise<{ id: string; locale: string }>
 }
 
-const getCategoryStyle = (_categorie: string) => {
-  return { bg: 'bg-primary', pill: 'bg-primary/15 border-primary/30 text-primary' }
-}
-
 export default async function PlatDetailPage({ params }: PageProps) {
   const resolvedParams = await params
   const t = await getTranslations({ locale: resolvedParams.locale, namespace: 'Cuisine' })
   const tPlats = await getTranslations({ locale: resolvedParams.locale, namespace: 'Plats' })
-  const plat = platsTogolais.find((p) => p.id === resolvedParams.id)
+  const plat = platsTogolais.find((item) => item.id === resolvedParams.id)
   if (!plat) notFound()
 
-  const getCategoryName = (cat: string): string => {
-    switch (cat) {
+  const getCategoryName = (category: string): string => {
+    switch (category) {
       case 'Accompagnement': return t('categories.accompagnement')
       case 'Plat Principal': return t('categories.plat_principal')
-      case 'Street Food':    return t('categories.street_food')
-      case 'Sauce':          return t('categories.sauce')
-      default:               return cat
+      case 'Street Food': return t('categories.street_food')
+      case 'Sauce': return t('categories.sauce')
+      default: return category
     }
   }
 
-  const style = getCategoryStyle(plat.catégorie)
-
-  /* Plats de la même catégorie (suggérés) */
-  const suggestions = platsTogolais
-    .filter((p) => p.catégorie === plat.catégorie && p.id !== plat.id)
-    .slice(0, 3)
-
-  /* Restaurants qui proposent ce plat */
-  const restosProches = restaurants.filter((r) =>
-    r.plats_ids.includes(plat.id)
-  )
+  const suggestions = platsTogolais.filter((item) => item.catégorie === plat.catégorie && item.id !== plat.id).slice(0, 3)
+  const nearbyRestaurants = restaurants.filter((restaurant) => restaurant.plats_ids.includes(plat.id))
+  const platName = tPlats(`${plat.id}.nom`)
+  const platDescription = tPlats(`${plat.id}.description`)
+  const platHistory = tPlats(`${plat.id}.histoire`)
+  const platAcc = tPlats(`${plat.id}.accompagnementsIdaux`)
 
   return (
-    <main className="relative min-h-screen w-full bg-base-100 text-base-content overflow-x-hidden pb-24">
+    <main className="min-h-screen bg-base-100 pb-28 text-base-content">
+      <section className="relative min-h-[62vh] overflow-hidden">
+        <Image src={plat.image} alt={platName} fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/25 to-black/40" />
 
-      {/* 
-          HERO IMAGE PLEIN ÉCRAN
-      */}
-      <section className="relative h-[55vh] min-h-90 w-full overflow-hidden">
-        <Image
-          src={plat.image}
-          alt={tPlats(`${plat.id}.nom`)}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center scale-[1.02] hover:scale-100 transition-transform duration-[2s]"
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-base-100 via-black/35 to-black/15" />
-
-        {/* Nav dans le hero */}
-        <div className="absolute top-0 left-0 right-0 z-20 pt-6 px-4 sm:px-8
-                        flex items-center justify-between">
-          <Link href="/cuisine">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full
-                            bg-black/30 backdrop-blur-md border border-white/15
-                            text-white/80 text-xs font-semibold hover:bg-black/45
-                            transition-all cursor-pointer">
-              <ArrowLeft size={14} />
-              {t('back_to_cuisine')}
-            </div>
+        <div className="absolute left-4 right-4 top-20 z-10 mx-auto flex max-w-7xl items-center justify-between">
+          <Link href="/cuisine" className="inline-flex min-h-12 items-center gap-2 rounded-[20px] bg-white/90 px-4 text-sm font-black text-stone-950 shadow-sm transition-all hover:bg-white active:scale-95">
+            <ArrowLeft className="h-5 w-5" />
+            {t('back_to_cuisine')}
           </Link>
-          <div className={`px-3 py-1.5 rounded-full ${style.bg} backdrop-blur-sm
-                          text-white text-[10px] font-bold uppercase tracking-widest`}>
-            {getCategoryName(plat.catégorie)}
-          </div>
+          <span className="rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">{getCategoryName(plat.catégorie)}</span>
         </div>
 
-        {/* Titre bas du hero */}
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-16 pb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <ChefHat size={13} className="text-secondary" />
-            <span className="text-secondary text-xs font-semibold tracking-wide">
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-8">
+          <div className="mx-auto max-w-7xl">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-2xl bg-white/12 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-white backdrop-blur-md">
+              <ChefHat className="h-4 w-4 text-secondary" />
               {t('cuisine_title')}
-            </span>
+            </p>
+            <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-normal text-white sm:text-6xl">{platName}</h1>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight
-                         text-white uppercase leading-none drop-shadow-xl">
-            {tPlats(`${plat.id}.nom`)}
-          </h1>
         </div>
       </section>
 
-      {/* 
-          CONTENU PRINCIPAL
-     */}
-      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20">
-
-        {/* Halos */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/4 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/4 blur-[100px] rounded-full pointer-events-none" />
-
-        <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
-
-          {/* ── COLONNE PRINCIPALE (2/3) ── */}
-          <div className="lg:col-span-2 space-y-8">
-
-            {/* Actions rapides */}
-            <div className="flex flex-wrap items-center gap-2">
-              <TTSButton text={`${tPlats(`${plat.id}.nom`)}. ${tPlats(`${plat.id}.description`)}. ${tPlats(`${plat.id}.histoire`)}`} />
-              <a href="#restaurants">
-                <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full
-                                   text-xs font-bold border-none text-primary-content
-                                   bg-linear-to-r from-primary to-secondary
-                                   hover:scale-105 active:scale-95
-                                   shadow-md shadow-primary/20 transition-all duration-200">
-                  <Utensils size={13} />
-                  {t('find_nearby')}
-                </button>
-              </a>
-            </div>
-
-            {/* Description */}
-            <div className="bg-base-200 rounded-2xl p-6 border border-base-content/8">
-              <p className="text-base-content/65 text-sm sm:text-base leading-relaxed italic">
-                {tPlats(`${plat.id}.description`)}
-              </p>
-            </div>
-
-            {/* Origine & Tradition */}
-            <div className="space-y-4">
-              <h2 className="flex items-center gap-2.5 text-base font-black
-                             text-primary uppercase tracking-widest">
-                <Soup size={16} className="animate-pulse" />
-                {t('origin_tradition')}
-              </h2>
-              <p className="text-base-content/70 leading-relaxed text-sm md:text-base
-                             whitespace-pre-line text-justify">
-                {tPlats(`${plat.id}.histoire`)}
-              </p>
-            </div>
-
-            {/* Accompagnement idéal */}
-            <div className="flex items-start gap-4 p-5 rounded-2xl
-                            bg-secondary/8 border border-secondary/15">
-              <div className="p-2 rounded-xl bg-secondary/15 border border-secondary/20 shrink-0">
-                <Flame size={16} className="text-secondary" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-secondary uppercase tracking-widest mb-1">
-                  {t('ideal_acc')}
-                </p>
-                <p className="text-sm text-base-content/70 leading-relaxed">
-                  {tPlats(`${plat.id}.accompagnementsIdaux`)}
-                </p>
-              </div>
-            </div>
-
-            {/* ══════════════════════════════════════════════════
-                RESTAURANTS QUI PROPOSENT CE PLAT
-            ══════════════════════════════════════════════════ */}
-            <div id="restaurants" className="space-y-5 scroll-mt-6">
-              <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2.5 text-base font-black
-                               text-base-content uppercase tracking-widest">
-                  <Utensils size={16} className="text-primary" />
-                  {t('where_to_eat')}
-                </h2>
-                {restosProches.length > 0 && (
-                  <span className="text-xs font-mono text-base-content/35 bg-base-200
-                                   border border-base-content/8 px-2.5 py-1 rounded-lg">
-                    {t('address_count', { count: restosProches.length })}
-                  </span>
-                )}
-              </div>
-
-              {restosProches.length === 0 ? (
-                <div className="rounded-2xl border border-base-content/8 bg-base-200
-                                p-8 text-center">
-                  <Utensils size={28} className="text-base-content/20 mx-auto mb-3" />
-                  <p className="text-sm text-base-content/40">
-                    {t('no_resto')}
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {restosProches.map((resto) => (
-                    <div
-                      key={resto.id}
-                      className="group rounded-2xl border border-base-content/8
-                                 bg-base-200 hover:border-primary/25
-                                 hover:bg-base-200/80 transition-all duration-200
-                                 overflow-hidden"
-                    >
-                      {/* En-tête carte restaurant */}
-                      <div className="px-5 pt-5 pb-3 border-b border-base-content/5">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-bold text-base-content
-                                           group-hover:text-primary transition-colors
-                                           leading-tight truncate">
-                              {resto.nom}
-                            </h3>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <MapPin size={11} className="text-primary shrink-0" />
-                              <span className="text-[11px] text-base-content/50 truncate">
-                                {resto.quartier}
-                              </span>
-                            </div>
-                          </div>
-                          {/* Note */}
-                          {resto.note && (
-                            <div className="flex items-center gap-1 bg-primary/10
-                                            border border-primary/20 px-2 py-0.5
-                                            rounded-lg shrink-0">
-                              <Star size={10} className="text-primary fill-primary" />
-                              <span className="text-[11px] font-bold text-primary">
-                                {resto.note}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Infos détaillées */}
-                      <div className="px-5 py-4 space-y-2.5">
-                        {/* Adresse */}
-                        <div className="flex items-start gap-2.5">
-                          <MapPin size={12} className="text-base-content/25 mt-0.5 shrink-0" />
-                          <p className="text-[11px] text-base-content/55 leading-relaxed">
-                            {resto.adresse}
-                          </p>
-                        </div>
-
-                        {/* Téléphone */}
-                        <div className="flex items-center gap-2.5">
-                          <Phone size={12} className="text-base-content/25 shrink-0" />
-                          <a
-                            href={`tel:${resto.telephone}`}
-                            className="text-[11px] font-mono text-primary
-                                       hover:text-secondary transition-colors"
-                          >
-                            {resto.telephone}
-                          </a>
-                        </div>
-
-                        {/* Horaires */}
-                        <div className="flex items-start gap-2.5">
-                          <Clock size={12} className="text-base-content/25 mt-0.5 shrink-0" />
-                          <p className="text-[11px] text-base-content/50 leading-relaxed">
-                            {resto.horaires}
-                          </p>
-                        </div>
-
-                        {/* Budget */}
-                        <div className="flex items-center gap-2.5">
-                          <Banknote size={12} className="text-base-content/25 shrink-0" />
-                          <span className="text-[11px] text-base-content/50">
-                            {resto.budget_fcfa} FCFA
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* CTA GPS */}
-                      <div className="px-5 pb-4">
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${resto.lat},${resto.lng}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2
-                                     w-full py-2.5 rounded-xl text-[11px] font-bold
-                                     bg-primary/10 border border-primary/20
-                                     text-primary hover:bg-primary/20
-                                     transition-all duration-200"
-                        >
-                          <Navigation size={12} />
-                          {t('navigate')}
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Suggestions */}
-            {suggestions.length > 0 && (
-              <div className="space-y-4 pt-2">
-                <h3 className="text-xs font-bold text-base-content/40 uppercase
-                               tracking-widest flex items-center gap-2">
-                  <ChefHat size={12} />
-                  {t('other_plats', { category: getCategoryName(plat.catégorie) })}
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {suggestions.map((p) => (
-                    <Link key={p.id} href={`/cuisine/${p.id}`}>
-                      <div className="group relative rounded-xl overflow-hidden
-                                      border border-base-content/8 bg-base-200
-                                      hover:border-base-content/20 hover:-translate-y-1
-                                      transition-all duration-200 cursor-pointer">
-                        <div className="relative h-24 w-full overflow-hidden">
-                          <Image
-                            src={p.image}
-                            alt={tPlats(`${p.id}.nom`)}
-                            fill
-                            sizes="200px"
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
-                        </div>
-                        <div className="p-3 flex items-center justify-between">
-                          <p className="text-xs font-bold text-base-content
-                                        group-hover:text-primary transition-colors
-                                        line-clamp-1">
-                            {tPlats(`${p.id}.nom`)}
-                          </p>
-                          <ChevronRight size={12} className="text-base-content/30
-                                                              group-hover:text-primary shrink-0" />
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_22rem] lg:px-8">
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-3 rounded-[32px] border border-border bg-base-200 p-5 shadow-sm">
+            <TTSButton text={`${platName}. ${platDescription}. ${platHistory}`} />
+            <a href="#restaurants" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
+              <Utensils className="h-5 w-5" />
+              {t('find_nearby')}
+            </a>
           </div>
 
-          {/* ── SIDEBAR STICKY (1/3) ── */}
-          <aside className="space-y-5 lg:sticky lg:top-24 self-start">
+          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <p className="m-0 text-lg font-bold leading-8 text-base-content/75">{platDescription}</p>
+          </article>
 
-            {/* Fiche récap */}
-            <div className="rounded-2xl border border-base-content/8 bg-base-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-base-content/8">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-base-content/35">
-                  {t('sheet_title')}
-                </h3>
+          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><Soup className="h-5 w-5 text-secondary" />{t('origin_tradition')}</h2>
+            <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/68">{platHistory}</p>
+          </article>
+
+          <article className="rounded-[32px] border border-secondary/25 bg-secondary/10 p-5 shadow-sm sm:p-7">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wide text-secondary"><Flame className="h-5 w-5" />{t('ideal_acc')}</h2>
+            <p className="m-0 text-sm font-semibold leading-7 text-base-content/70">{platAcc}</p>
+          </article>
+
+          <article id="restaurants" className="scroll-mt-24 rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-xl font-black tracking-normal"><Utensils className="h-5 w-5 text-secondary" />{t('where_to_eat')}</h2>
+              <span className="rounded-2xl border border-border bg-base-100 px-3 py-2 text-xs font-black text-base-content/60">{t('address_count', { count: nearbyRestaurants.length })}</span>
+            </div>
+
+            {nearbyRestaurants.length === 0 ? (
+              <div className="rounded-[28px] border border-border bg-base-100 p-8 text-center">
+                <Utensils className="mx-auto h-8 w-8 text-secondary" />
+                <p className="mt-3 text-sm font-semibold text-base-content/55">{t('no_resto')}</p>
               </div>
-              <div className="divide-y divide-base-content/5">
-                {[
-                  { label: t('sheet.name'), value: tPlats(`${plat.id}.nom`) },
-                  { label: t('sheet.category'), value: getCategoryName(plat.catégorie) },
-                  { label: t('sheet.origin'), value: 'Togo' },
-                  { label: t('sheet.acc'), value: tPlats(`${plat.id}.accompagnementsIdaux`) },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex items-start justify-between gap-4 px-5 py-3">
-                    <span className="text-xs text-base-content/40 shrink-0">{label}</span>
-                    <span className="text-xs font-semibold text-base-content/80 text-right line-clamp-2">
-                      {value}
-                    </span>
-                  </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {nearbyRestaurants.map((restaurant) => (
+                  <article key={restaurant.id} className="rounded-[28px] border border-border bg-base-100 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-base font-black">{restaurant.nom}</h3>
+                        <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-base-content/55"><MapPin className="h-3.5 w-3.5 text-secondary" />{restaurant.quartier}</p>
+                      </div>
+                      {restaurant.note && <span className="inline-flex items-center gap-1 rounded-2xl border border-border bg-base-200 px-2.5 py-1 text-xs font-black"><Star className="h-3.5 w-3.5 fill-secondary text-secondary" />{restaurant.note}</span>}
+                    </div>
+                    <div className="mt-4 space-y-2 text-xs font-semibold text-base-content/60">
+                      <p className="flex items-start gap-2"><MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-secondary" />{restaurant.adresse}</p>
+                      <a href={`tel:${restaurant.telephone}`} className="flex items-center gap-2 transition-colors hover:text-secondary"><Phone className="h-3.5 w-3.5 text-secondary" />{restaurant.telephone}</a>
+                      <p className="flex items-center gap-2"><Banknote className="h-3.5 w-3.5 text-secondary" />{restaurant.budget_fcfa} FCFA</p>
+                    </div>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-primary px-4 py-2 text-xs font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-secondary dark:text-secondary-content">
+                      <Navigation className="h-4 w-4" />
+                      {t('navigate')}
+                    </a>
+                  </article>
                 ))}
               </div>
-            </div>
-
-            {/* Badge catégorie */}
-            <div className={`rounded-2xl border p-5 ${style.pill}`}>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-60">
-                {t('sheet.category')}
-              </p>
-              <p className="text-base font-black uppercase tracking-wide">
-                {getCategoryName(plat.catégorie)}
-              </p>
-            </div>
-
-            {/* Compteur restaurants */}
-            {restosProches.length > 0 && (
-              <div className="rounded-2xl border border-base-content/8 bg-base-200 p-5">
-                <p className="text-[10px] font-bold uppercase tracking-widest
-                               text-base-content/35 mb-3">
-                  {t('available_in')}
-                </p>
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-black text-primary">
-                    {restosProches.length}
-                  </span>
-                  <span className="text-xs text-base-content/50 mb-1">
-                    {t('resto_in_lome', { count: restosProches.length })}
-                  </span>
-                </div>
-                <div className="mt-3 space-y-1.5">
-                  {restosProches.slice(0, 3).map((r) => (
-                    <div key={r.id} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                      <span className="text-[11px] text-base-content/50 truncate">
-                        {r.nom}
-                      </span>
-                    </div>
-                  ))}
-                  {restosProches.length > 3 && (
-                    <p className="text-[10px] text-base-content/30 pl-3.5">
-                      {t('other_restos', { count: restosProches.length - 3 })}
-                    </p>
-                  )}
-                </div>
-              </div>
             )}
+          </article>
 
-            {/* CTA scroll vers restaurants */}
-            <a href="#restaurants" className="block">
-              <button className="w-full btn rounded-2xl border-none text-primary-content font-bold
-                                 bg-linear-to-r from-primary via-primary to-secondary
-                                 hover:scale-[1.02] active:scale-[0.98]
-                                 shadow-xl shadow-primary/20 transition-all duration-200
-                                 flex items-center justify-center gap-2 py-4">
-                <Utensils size={16} />
-                {t('view_restos')}
-              </button>
-            </a>
-
-          </aside>
+          {suggestions.length > 0 && (
+            <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+              <h2 className="mb-4 text-sm font-black uppercase tracking-wide text-base-content/50">{t('other_plats', { category: getCategoryName(plat.catégorie) })}</h2>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {suggestions.map((suggestion) => (
+                  <Link key={suggestion.id} href={`/cuisine/${suggestion.id}`} className="group overflow-hidden rounded-[24px] border border-border bg-base-100 transition-all hover:-translate-y-1 hover:shadow-md">
+                    <figure className="relative h-28 overflow-hidden bg-base-300">
+                      <Image src={suggestion.image} alt={tPlats(`${suggestion.id}.nom`)} fill sizes="240px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                    </figure>
+                    <div className="flex items-center justify-between gap-2 p-3">
+                      <p className="line-clamp-1 text-xs font-black group-hover:text-secondary">{tPlats(`${suggestion.id}.nom`)}</p>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-secondary" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </article>
+          )}
         </div>
+
+        <aside className="h-fit rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
+          <h2 className="mb-4 text-xs font-black uppercase tracking-wide text-base-content/50">{t('sheet_title')}</h2>
+          <div className="space-y-3">
+            {[
+              { label: t('sheet.name'), value: platName },
+              { label: t('sheet.category'), value: getCategoryName(plat.catégorie) },
+              { label: t('sheet.origin'), value: t('origin_country') },
+              { label: t('sheet.acc'), value: platAcc },
+            ].map((item) => (
+              <div key={item.label} className="rounded-[22px] border border-border bg-base-100 p-4">
+                <p className="text-[11px] font-black uppercase tracking-wide text-base-content/42">{item.label}</p>
+                <p className="mt-1 line-clamp-3 text-sm font-bold leading-6 text-base-content/75">{item.value}</p>
+              </div>
+            ))}
+          </div>
+          <a href="#restaurants" className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
+            <Utensils className="h-5 w-5" />
+            {t('view_restos')}
+          </a>
+        </aside>
       </section>
     </main>
   )

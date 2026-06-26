@@ -1,36 +1,25 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
-import { Search, Sparkles, Navigation, Info, Phone, Banknote } from 'lucide-react'
 import Image from 'next/image'
-import parcs, { Parc } from '@/app/P&Z/pzo'
-import { useTranslations } from 'next-intl'
+import { Banknote, Info, Navigation, Phone, Search, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
+import parcs, { Parc } from '@/app/P&Z/pzo'
 
 export default function ParcsZoosPage() {
   const t = useTranslations('Loisirs')
   const tParcs = useTranslations('Parcs')
-  const [searchInput, setSearchInput] = useState<string>('')
+  const [searchInput, setSearchInput] = useState('')
 
-  const rawList: Parc[] = parcs;
+  const normalizeText = (text: string): string => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-  // Fonction utilitaire pour ignorer les accents et la casse
-  const normaliserTexte = (texte: string): string => {
-    return texte ? texte.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : ''
-  }
-
-  // Filtrage robuste et sécurisé avec le type Parc
-  const filteredParcs = rawList.filter((parc: Parc) => {
-    const parcNom = tParcs(`${parc.id}.nom`)
-    const parcDescription = tParcs(`${parc.id}.description`)
-    const rechercheNettoyee = normaliserTexte(searchInput)
-    const matchesNom = normaliserTexte(parcNom).includes(rechercheNettoyee)
-    const matchesDesc = normaliserTexte(parcDescription).includes(rechercheNettoyee)
-    return matchesNom || matchesDesc
+  const filteredParcs = parcs.filter((parc: Parc) => {
+    const search = normalizeText(searchInput)
+    return normalizeText(tParcs(`${parc.id}.nom`)).includes(search) || normalizeText(tParcs(`${parc.id}.description`)).includes(search)
   })
 
-  // Détermination de la région géographique selon la latitude
-  const obtenirRegion = (lat: number): string => {
+  const getRegion = (lat: number): string => {
     if (lat > 10) return t('regions.savanes')
     if (lat > 9) return t('regions.kara')
     if (lat > 8) return t('regions.centrale')
@@ -39,141 +28,97 @@ export default function ParcsZoosPage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-base-100 text-base-content pt-20 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
-      {/* Arrière-plan */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-secondary/5 blur-[100px] rounded-full pointer-events-none" />
-
-      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
-        
-        {/* En-tête */}
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-            <Sparkles size={14} /> {t('tag')}
+    <main className="min-h-screen bg-base-100 px-4 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl">
+        <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+          <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
+              <Sparkles className="h-4 w-4" />
+              {t('tag')}
+            </div>
+            <h1 className="text-4xl font-black leading-tight tracking-normal sm:text-5xl">{t('title')}</h1>
+            <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65">{t('subtitle')}</p>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
-            {t('title')}
-          </h1>
-          <p className="text-sm text-base-content/60">
-            {t('subtitle')}
-          </p>
+
+          <div className="rounded-[32px] border border-border bg-base-200 p-4 shadow-sm">
+            <div className="relative flex items-center rounded-[24px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15">
+              <Search className="h-5 w-5 shrink-0 text-base-content/40" />
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder={t('search_placeholder')}
+                className="min-h-14 w-full bg-transparent px-3 text-sm font-semibold outline-none placeholder:text-base-content/38"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Barre de recherche */}
-        <div className="max-w-md mx-auto relative">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-base-content/40">
-            <Search size={18} />
-          </div>
-          <input
-            type="text"
-            placeholder={t('search_placeholder')}
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-base-200 border border-base-content/10 rounded-2xl text-sm focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-base-content"
-          />
-        </div>
-
-        {/* Grille de résultats */}
         {filteredParcs.length === 0 ? (
-          <div className="bg-base-200/50 rounded-3xl border border-dashed border-base-content/10 p-12 text-center max-w-md mx-auto">
-            <Info className="mx-auto text-base-content/20 mb-3" size={32} />
-            <p className="text-sm font-bold text-base-content/50">{t('no_parcs')}</p>
-            <p className="text-xs text-base-content/40 mt-1">
-              {t('try_other')}
-            </p>
+          <div className="mx-auto mt-8 max-w-md rounded-[32px] border border-border bg-base-200 p-8 text-center shadow-sm">
+            <Info className="mx-auto h-8 w-8 text-secondary" />
+            <p className="mt-4 text-lg font-black">{t('no_parcs')}</p>
+            <p className="mt-2 text-sm font-medium text-base-content/55">{t('try_other')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredParcs.map((parc: Parc) => {
-              const regionText = obtenirRegion(parc.lat)
-              
-              // Sécurisation du numéro de téléphone
-              const estNumeroValide = parc.numero && parc.numero !== "Non disponible"
-              const telephoneBrut = estNumeroValide ? parc.numero.split('/')[0].trim() : null
+          <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredParcs.map((parc: Parc, index) => {
+              const region = getRegion(parc.lat)
+              const hasPhone = parc.numero && parc.numero !== 'Non disponible'
+              const phone = hasPhone ? parc.numero.split('/')[0].trim() : null
 
               return (
-                <motion.div
+                <motion.article
                   key={parc.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-base-200 border border-base-content/10 rounded-3xl overflow-hidden shadow-lg flex flex-col group hover:shadow-xl transition-all duration-300"
+                  transition={{ delay: Math.min(index * 0.03, 0.18) }}
+                  className={`group overflow-hidden rounded-[32px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl ${index === 0 ? 'lg:col-span-2' : ''}`}
                 >
-                  {/* Image */}
-                  <div className="w-full h-48 bg-base-300 relative overflow-hidden shrink-0">
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent z-10" />
-                    
+                  <figure className={`${index === 0 ? 'h-72' : 'h-56'} relative overflow-hidden bg-base-300`}>
                     {parc.image ? (
-                      <Image 
-                        src={parc.image} 
-                        alt={tParcs(`${parc.id}.nom`)}
-                        fill
-                        placeholder="blur"
-                        sizes="(max-w-7xl) 33vw, 100vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      <Image src={parc.image} alt={tParcs(`${parc.id}.nom`)} fill placeholder="blur" sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/20 to-secondary/20 text-primary text-4xl">
-                        🌳
+                      <div className="flex h-full w-full items-center justify-center bg-base-100 text-base-content/35">
+                        <Sparkles className="h-10 w-10" />
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/68 via-black/10 to-transparent" />
+                    <span className="absolute right-4 top-4 rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content">{region}</span>
+                  </figure>
 
-                    <span className="absolute top-4 right-4 z-20 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase border border-white/10 tracking-wider">
-                      {regionText}
-                    </span>
-                  </div>
+                  <div className="p-5">
+                    <h2 className="text-xl font-black leading-tight tracking-normal group-hover:text-secondary">{tParcs(`${parc.id}.nom`)}</h2>
+                    <p className="mt-3 line-clamp-3 text-sm font-medium leading-6 text-base-content/60">{tParcs(`${parc.id}.description`)}</p>
 
-                  {/* Contenu */}
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                    <div className="space-y-2">
-                      <h2 className="font-black text-lg tracking-tight leading-tight uppercase text-base-content group-hover:text-primary transition-colors">
-                        {tParcs(`${parc.id}.nom`)}
-                      </h2>
-                      <p className="text-xs text-base-content/60 leading-relaxed line-clamp-3">
-                        {tParcs(`${parc.id}.description`)}
-                      </p>
-                    </div>
+                    <div className="mt-5 space-y-3 border-t border-border pt-4">
+                      <div className="flex items-start gap-2 rounded-[20px] border border-border bg-base-100 p-3 text-xs font-semibold leading-5 text-base-content/65">
+                        <Banknote className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
+                        {tParcs(`${parc.id}.tarif`)}
+                      </div>
 
-                    {/* Tarifs et Actions */}
-                    <div className="pt-3 border-t border-base-content/5 space-y-2">
-                      
-                      {tParcs(`${parc.id}.tarif`) && (
-                        <div className="flex items-start gap-1.5 text-xs text-base-content/70 bg-base-300/40 p-2 rounded-xl border border-base-content/5">
-                          <Banknote size={14} className="text-primary shrink-0 mt-0.5" />
-                          <span className="leading-tight font-medium">{tParcs(`${parc.id}.tarif`)}</span>
-                        </div>
+                      {phone && (
+                        <a href={`tel:${phone.replace(/\s+/g, '')}`} className="flex items-center gap-2 text-xs font-bold text-base-content/60 transition-colors hover:text-secondary">
+                          <Phone className="h-4 w-4 text-secondary" />
+                          {parc.numero}
+                        </a>
                       )}
 
-                      {telephoneBrut && (
-                        <div className="flex items-center gap-1.5 text-xs text-base-content/50 px-0.5">
-                          <Phone size={13} className="text-secondary shrink-0" />
-                          <a href={`tel:${telephoneBrut.replace(/\s+/g, '')}`} className="hover:underline hover:text-primary transition-colors truncate">
-                            {parc.numero}
-                          </a>
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between gap-2 text-xs pt-1 px-0.5">
-                        <span className="font-mono text-base-content/20 text-[9px] uppercase tracking-wider">
-                          {t('gps_available')}
-                        </span>
-                        
-                        <a 
-                          href={`https://www.google.com/maps/search/?api=1&query=${parc.lat},${parc.lng}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-bold text-primary hover:text-secondary transition-colors cursor-pointer"
-                        >
-                          <Navigation size={13} /> {t('rejoin')}
+                      <div className="flex items-center justify-between gap-3 pt-1">
+                        <span className="text-[10px] font-black uppercase tracking-wide text-base-content/40">{t('gps_available')}</span>
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${parc.lat},${parc.lng}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-[18px] bg-primary px-4 py-2 text-xs font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-secondary dark:text-secondary-content">
+                          <Navigation className="h-4 w-4" />
+                          {t('rejoin')}
                         </a>
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </motion.article>
               )
             })}
           </div>
         )}
-      </div>
+      </section>
     </main>
   )
 }

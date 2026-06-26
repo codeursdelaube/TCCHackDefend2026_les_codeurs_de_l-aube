@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect } from 'react'
 
@@ -9,7 +9,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const saved = localStorage.getItem('heritogo_theme')
         if (!saved) return
 
-        // On vérifie l'état actuel du DOM pour ne pas faire de modifications inutiles
         const hasDarkClass = document.documentElement.classList.contains('dark')
 
         if (saved === 'dark' && !hasDarkClass) {
@@ -17,10 +16,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         } else if (saved === 'light' && hasDarkClass) {
           document.documentElement.classList.remove('dark')
         }
-      } catch (e) {}
+      } catch {}
     }
 
-    // Écoute uniquement si l'utilisateur modifie le thème (ex: via un bouton toggle)
     window.addEventListener('storage', syncTheme)
     return () => window.removeEventListener('storage', syncTheme)
   }, [])

@@ -1,20 +1,25 @@
-'use client'
+﻿'use client'
 
-import { useState, useRef, useEffect, useActionState, startTransition } from 'react'
-import { Camera, Upload, Sparkles, Loader2, Volume2, VolumeX, MapPin, RefreshCw, Speaker } from 'lucide-react'
+import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useTranslations, useLocale } from 'next-intl'
+import { Camera, Loader2, MapPin, RefreshCw, Sparkles, Upload, Volume2, VolumeX } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface PredictionResult {
-  prediction_status: string;
+  prediction_status: string
   data: {
-    monument: string;
-    histoire: string;
-    latitude: number;
-    longitude: number;
-    source: string;
-  };
+    monument: string
+    histoire: string
+    latitude: number
+    longitude: number
+    source: string
+  }
 }
+
+type GoogleTranslateItem = [string]
+
+const languageCodes = ['fr', 'en', 'es', 'zh'] as const
+type LanguageCode = (typeof languageCodes)[number]
 
 export default function ScanPage() {
   const t = useTranslations('Scan')
@@ -22,372 +27,251 @@ export default function ScanPage() {
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [result, setResult] = useState<PredictionResult | null>(null)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [selectedLang, setSelectedLang] = useState<LanguageCode>(() => languageCodes.includes(locale as LanguageCode) ? (locale as LanguageCode) : 'fr')
+  const [translatedText, setTranslatedText] = useState<Partial<Record<LanguageCode, string>>>({})
+  const [isTranslating, setIsTranslating] = useState(false)
+  const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
-  const [selectedLang, setSelectedLang] = useState<string>('fr')
-  const [translatedText, setTranslatedText] = useState<Record<string, string>>({})
-  const [isTranslating, setIsTranslating] = useState<boolean>(false)
-  
-  // État pour stocker la position GPS en temps réel du touriste
-  const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null)
-
-  // Récupération automatique du GPS au chargement de l'application
   useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            long: position.coords.longitude,
-          })
-        },
-        (err) => console.log("GPS indisponible ou refusé :", err.message)
-      )
-    }
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (position) => setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude }),
+      () => setUserLocation(null),
+    )
   }, [])
 
-  // Sync selected language with current page locale
   useEffect(() => {
-    if (locale === 'fr') setSelectedLang('fr')
-    else if (locale === 'en') setSelectedLang('en')
-    else if (locale === 'es') setSelectedLang('es')
-    else if (locale === 'zh') setSelectedLang('zh')
-  }, [locale])
-
-  useEffect(() => {
-    return () => { window.speechSynthesis.cancel() }
+    return () => window.speechSynthesis.cancel()
   }, [result])
 
-  const [error, submitScanAction, loading] = useActionState(
-    async (previousState: unknown, formData: FormData) => {
+  const [error, submitScanAction, loading] = useActionState<string | null, FormData>(
+    async (_previousState, formData) => {
       try {
-        const res = await fetch('/api/scan', { method: 'POST', body: formData })
-        const data = await res.json()
-        
-        if (res.ok) {
-          // Si le backend a répondu "unknown" (ex: chaussure), on l'intercepte
-          if (data.prediction_status === 'unknown') {
-            setResult(null) // On nettoie un éventuel ancien résultat valide
-            setTranslatedText({})
-            return data.detail || t('errors.unknown')
-          }
+        const response = await fetch('/api/scan', { method: 'POST', body: formData })
+        const data = await response.json()
 
-          setResult(data)
-          setTranslatedText({ fr: data.data.histoire })
-          return null
-        } else {
-          return data.error || t('errors.general')
+        if (!response.ok) return data.error || t('errors.general')
+        if (data.prediction_status === 'unknown') {
+          setResult(null)
+          setTranslatedText({})
+          return data.detail || t('errors.unknown')
         }
-      } catch (err) {
-        console.error(err)
+
+        setResult(data)
+        setTranslatedText({ fr: data.data.histoire })
+        return null
+      } catch (scanError) {
+        console.error(scanError)
         return t('errors.server')
       }
     },
-    null
+    null,
   )
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      setImage(file)
-      setPreview(URL.createObjectURL(file))
-      setResult(null)
-      setTranslatedText({})
-      window.speechSynthesis.cancel()
-      setIsSpeaking(false)
-    }
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setImage(file)
+    setPreview(URL.createObjectURL(file))
+    setResult(null)
+    setTranslatedText({})
+    window.speechSynthesis.cancel()
+    setIsSpeaking(false)
   }
 
   const handleScanClick = () => {
     if (!image) return
     const formData = new FormData()
     formData.append('image', image)
-    
-    // Si le GPS est disponible, on l'injecte pour activer le Bouclier 1 du Backend
     if (userLocation) {
       formData.append('lat', userLocation.lat.toString())
       formData.append('long', userLocation.long.toString())
     }
-
-    startTransition(() => { submitScanAction(formData) })
+    startTransition(() => submitScanAction(formData))
   }
 
-  const translateText = async (text: string, targetLang: string) => {
-    if (translatedText[targetLang]) {
-      return translatedText[targetLang]
-    }
-
+  const translateText = async (text: string, targetLang: LanguageCode) => {
+    if (translatedText[targetLang]) return translatedText[targetLang]
     setIsTranslating(true)
     try {
-      const response = await fetch(
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
-      )
-      const data = await response.json()
-      const translated = data[0].map((item: any) => item[0]).join('')
-      setTranslatedText(prev => ({ ...prev, [targetLang]: translated }))
+      const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`)
+      const data: [GoogleTranslateItem[]] = await response.json()
+      const translated = data[0].map((item) => item[0]).join('')
+      setTranslatedText((current) => ({ ...current, [targetLang]: translated }))
       return translated
-    } catch (error) {
-      console.error('Translation error:', error)
+    } catch (translateError) {
+      console.error(translateError)
       return text
     } finally {
       setIsTranslating(false)
     }
   }
 
-  const handleLangChange = async (lang: string) => {
+  const handleLangChange = async (lang: LanguageCode) => {
     setSelectedLang(lang)
-    if (result?.data?.histoire && !translatedText[lang] && lang !== 'fr') {
-      await translateText(result.data.histoire, lang)
-    }
+    if (result?.data.histoire && lang !== 'fr') await translateText(result.data.histoire, lang)
     if (isSpeaking) {
       window.speechSynthesis.cancel()
       setIsSpeaking(false)
     }
-  }
-
-  const toggleSpeech = () => {
-    if (!result?.data?.histoire) return
-    if (isSpeaking) {
-      window.speechSynthesis.cancel()
-      setIsSpeaking(false)
-    } else {
-      window.speechSynthesis.cancel()
-      
-      const currentText = selectedLang === 'fr' 
-        ? result.data.histoire 
-        : translatedText[selectedLang] || result.data.histoire
-      
-      const langMap: Record<string, string> = {
-        'fr': 'fr-FR',
-        'en': 'en-US',
-        'es': 'es-ES',
-        'zh': 'zh-CN'
-      }
-      
-      const utterance = new SpeechSynthesisUtterance(currentText)
-      utterance.lang = langMap[selectedLang]
-      utterance.rate = 0.95
-      utterance.onend = () => setIsSpeaking(false)
-      utterance.onerror = () => setIsSpeaking(false)
-      window.speechSynthesis.speak(utterance)
-      setIsSpeaking(true)
-    }
-  }
-
-  const resetScanner = () => {
-    setPreview(null); setImage(null); setResult(null); setTranslatedText({})
-    window.speechSynthesis.cancel(); setIsSpeaking(false)
   }
 
   const getCurrentText = () => {
-    if (!result?.data?.histoire) return ''
-    return selectedLang === 'fr' 
-      ? result.data.histoire 
-      : translatedText[selectedLang] || result.data.histoire
+    if (!result?.data.histoire) return ''
+    return selectedLang === 'fr' ? result.data.histoire : translatedText[selectedLang] || result.data.histoire
+  }
+
+  const toggleSpeech = () => {
+    if (!result?.data.histoire) return
+    if (isSpeaking) {
+      window.speechSynthesis.cancel()
+      setIsSpeaking(false)
+      return
+    }
+
+    const langMap: Record<LanguageCode, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', zh: 'zh-CN' }
+    const utterance = new SpeechSynthesisUtterance(getCurrentText())
+    utterance.lang = langMap[selectedLang]
+    utterance.rate = 0.95
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utterance)
+    setIsSpeaking(true)
+  }
+
+  const resetScanner = () => {
+    if (preview) URL.revokeObjectURL(preview)
+    setPreview(null)
+    setImage(null)
+    setResult(null)
+    setTranslatedText({})
+    window.speechSynthesis.cancel()
+    setIsSpeaking(false)
   }
 
   return (
-    <main className="relative min-h-screen w-full bg-base-100 text-base-content
-                    pt-20 pb-24 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+    <main className="min-h-screen bg-base-100 px-4 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
+      <section className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
+            <Sparkles className="h-4 w-4" />
+            {userLocation ? t('gps_available') : t('select_capture')}
+          </div>
+          <h1 className="text-4xl font-black leading-tight tracking-normal sm:text-5xl">{t('title')}</h1>
+          <p className="mt-4 text-sm font-medium leading-7 text-base-content/65">{t('subtitle')}</p>
 
-      {/* Halos décoratifs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-125 h-125
-                     bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-12 right-10 w-75 h-75
-                     bg-secondary/10 blur-[100px] rounded-full pointer-events-none" />
-
-      <div className="relative z-10 max-w-2xl mx-auto flex flex-col justify-center h-full">
-
-        {/* Titre */}
-        <h1 className="text-3xl md:text-4xl font-black text-center mb-2
-                       tracking-wide uppercase flex items-center justify-center gap-3
-                       text-base-content">
-          <span>
-            {t('title').split(' ')[0]}{' '}
-            <span className="text-primary">Herito</span>
-            <span className="text-secondary">go</span>
-          </span>
-        </h1>
-
-        <p className="text-center text-sm text-base-content/50 mb-8 max-w-md mx-auto">
-          {t('subtitle')}
-        </p>
-
-        {/* Zone upload / aperçu */}
-        <div className="bg-base-200 border-2 border-dashed border-base-content/20
-                        hover:border-primary/40 rounded-3xl p-6 md:p-8
-                        flex flex-col items-center justify-center min-h-80
-                        relative overflow-hidden backdrop-blur-xl transition-all shadow-2xl">
-          {preview ? (
-            <div className="w-full flex flex-col items-center">
-              <div className="relative w-full max-h-72 h-64 rounded-2xl overflow-hidden
-                              mb-4 border border-base-content/10 shadow-inner">
-                <Image
-                  src={preview}
-                  alt={t('select_capture')}
-                  fill
-                  className="object-contain bg-base-300/40"
-                />
-              </div>
+          <div className="mt-8 grid gap-3">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-primary px-6 py-4 text-sm font-black uppercase tracking-wide text-primary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] dark:bg-secondary dark:text-secondary-content"
+            >
+              <Upload className="h-5 w-5" />
+              {preview ? t('change_image') : t('open_gallery')}
+            </button>
+            {preview && !result && (
               <button
-                onClick={resetScanner}
-                className="btn btn-ghost btn-xs text-error hover:bg-error/10
-                           rounded-full gap-1"
+                type="button"
+                onClick={handleScanClick}
+                disabled={loading}
+                className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-secondary px-6 py-4 text-sm font-black uppercase tracking-wide text-secondary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:translate-y-0 disabled:opacity-55"
               >
-                <RefreshCw className="h-3 w-3" />
-                {t('change_image')}
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
+                {loading ? t('analyzing') : t('identify')}
               </button>
-            </div>
-          ) : (
-            <div className="text-center flex flex-col items-center gap-5 py-4">
-              <div className="p-5 bg-linear-to-br from-primary/20 to-accent/10
-                              text-primary rounded-full border border-primary/20
-                              shadow-lg shadow-primary/5">
-                <Camera size={44} className="stroke-[1.5]" />
-              </div>
-              <div>
-                <p className="font-semibold text-lg text-base-content">
-                  {t('select_capture')}
-                </p>
-                <p className="text-xs text-base-content/50 mt-1 max-w-xs mx-auto">
-                  {t('compatible_info')}
-                </p>
-              </div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="btn btn-primary rounded-full px-6 border-none
-                           bg-linear-to-r from-primary to-secondary
-                           hover:scale-105 text-white font-bold transition-all shadow-lg"
-              >
-                <Upload size={16} />
-                {t('open_gallery')}
-              </button>
-            </div>
-          )}
+            )}
+          </div>
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
         </div>
 
-        {/* Section d'affichage des erreurs */}
-        {error && (
-          <div className="alert alert-error mt-4 rounded-2xl
-                          bg-error/10 border border-error/20
-                          text-error text-sm font-semibold p-4">
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Bouton lancer l'IA */}
-        {preview && !result && (
-          <button
-            onClick={handleScanClick}
-            disabled={loading}
-            className="mt-6 w-full btn btn-lg rounded-2xl border-none
-                       bg-linear-to-r from-primary via-accent to-secondary
-                       text-white font-black shadow-xl hover:opacity-95 transition
-                       disabled:bg-base-content/10 disabled:text-base-content/30"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin h-5 w-5" />
-                {t('analyzing')}
-              </>
+        <div className="rounded-[32px] border border-dashed border-border bg-base-200 p-3 shadow-sm sm:p-4">
+          <div className="relative flex min-h-[390px] items-center justify-center overflow-hidden rounded-[28px] bg-base-100">
+            {preview ? (
+              <Image src={preview} alt={t('select_capture')} fill className="object-contain p-2" />
             ) : (
-              <>
-                <Sparkles size={18} className="animate-pulse text-accent" />
-                {t('identify')}
-              </>
-            )}
-          </button>
-        )}
-
-        {/* Résultats */}
-        {result?.data && (
-          <div className="mt-8 p-6 bg-base-200 border border-base-content/10
-                          rounded-3xl shadow-2xl animate-fade-in">
-
-            {/* En-tête résultat */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between
-                            gap-4 mb-4 pb-4 border-b border-base-content/5">
-              <h2 className="text-xl md:text-2xl font-black text-base-content
-                             flex items-center gap-2">
-                 {result.data.monument}
-              </h2>
-            </div>
-
-            {/* Onglets de langue et TTS */}
-            <div className="flex items-center gap-2 mb-4">
-              {['fr', 'en', 'es', 'zh'].map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => handleLangChange(lang)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-                    selectedLang === lang
-                      ? 'bg-primary text-primary-content shadow-lg shadow-primary/30'
-                      : 'bg-base-300 text-base-content/70 hover:bg-base-content/10'
-                  }`}
-                >
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-              
-              {/* Bouton TTS */}
-              <button
-                onClick={toggleSpeech}
-                className={`ml-auto p-2 rounded-full transition-all duration-200 ${
-                  isSpeaking
-                    ? 'bg-secondary text-secondary-content animate-pulse shadow-lg shadow-secondary/30'
-                    : 'bg-primary text-primary-content hover:opacity-90 shadow-lg shadow-primary/20'
-                }`}
-                title={isSpeaking ? t('tts_stop') : t('tts_play')}
-              >
-                {isSpeaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              </button>
-            </div>
-
-            {/* Histoire avec TTS */}
-            <div className="relative">
-              <div className="bg-base-300 p-4 rounded-2xl
-                          border border-base-content/5 shadow-inner mb-4 pr-12">
-                {isTranslating ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="animate-spin h-6 w-6 text-primary" />
-                  </div>
-                ) : (
-                  <p className="text-base-content/70 text-sm leading-relaxed
-                                whitespace-pre-line font-medium">
-                    {getCurrentText()}
-                  </p>
-                )}
+              <div className="max-w-sm px-6 text-center">
+                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[28px] bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content">
+                  <Camera className="h-10 w-10" />
+                </div>
+                <p className="text-lg font-black">{t('select_capture')}</p>
+                <p className="mt-2 text-sm font-medium leading-6 text-base-content/55">{t('compatible_info')}</p>
               </div>
-
-             
-            </div>
-
-            {/* Badges GPS */}
-            <div className="flex flex-wrap gap-2 mt-4 text-xs">
-              {result.data.latitude && result.data.longitude && (
-                <span className="flex items-center gap-1.5
-                                 bg-base-300 border border-base-content/10
-                                 px-3 py-1.5 rounded-full
-                                 text-base-content/70 font-semibold">
-                  <MapPin size={14} className="text-error" />
-                  {Number(result.data.latitude).toFixed(4)},{' '}
-                  {Number(result.data.longitude).toFixed(4)}
-                </span>
-              )}
-            </div>
-
+            )}
           </div>
-        )}
-      </div>
+          {preview && (
+            <button type="button" onClick={resetScanner} className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-4 py-2 text-xs font-black text-base-content/70 transition-colors hover:border-secondary/50 hover:text-secondary">
+              <RefreshCw className="h-4 w-4" />
+              {t('change_image')}
+            </button>
+          )}
+        </div>
+      </section>
+
+      {error && (
+        <section className="mx-auto mt-5 max-w-6xl rounded-[24px] border border-secondary/30 bg-secondary/10 p-4 text-sm font-bold text-secondary">
+          {error}
+        </section>
+      )}
+
+      {result?.data && (
+        <section className="mx-auto mt-5 max-w-6xl rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+          <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-wide text-base-content/50">{t('result_label')}</p>
+              <h2 className="mt-1 text-2xl font-black tracking-normal text-base-content">{result.data.monument}</h2>
+            </div>
+            <button
+              type="button"
+              onClick={toggleSpeech}
+              className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] px-5 text-sm font-black transition-all active:scale-95 ${
+                isSpeaking ? 'bg-secondary text-secondary-content' : 'bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content'
+              }`}
+            >
+              {isSpeaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              {isSpeaking ? t('tts_stop') : t('tts_play')}
+            </button>
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {languageCodes.map((lang) => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => handleLangChange(lang)}
+                className={`rounded-2xl border px-4 py-2 text-xs font-black uppercase transition-all active:scale-95 ${
+                  selectedLang === lang
+                    ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
+                    : 'border-border bg-base-100 text-base-content/60 hover:border-secondary/50'
+                }`}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-[28px] border border-border bg-base-100 p-5">
+            {isTranslating ? (
+              <div className="flex min-h-40 items-center justify-center">
+                <Loader2 className="h-7 w-7 animate-spin text-secondary" />
+              </div>
+            ) : (
+              <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/75">{getCurrentText()}</p>
+            )}
+          </div>
+
+          {result.data.latitude && result.data.longitude && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-4 py-3 text-xs font-bold text-base-content/65">
+              <MapPin className="h-4 w-4 text-secondary" />
+              {Number(result.data.latitude).toFixed(4)}, {Number(result.data.longitude).toFixed(4)}
+            </div>
+          )}
+        </section>
+      )}
     </main>
   )
 }
+

@@ -1,189 +1,144 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
-import { Link } from '@/i18n/navigation'
-import { Search, MapPin, Compass, Sparkles } from 'lucide-react'
-import SitesTour from '@/app/LieuxT/site'
+import { ArrowRight, Compass, Filter, MapPin, Search, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
+import { Monument, monuments } from '@/app/LieuxT/site'
+
+const regionsTogo = ['all', 'Maritime', 'Plateaux', 'Centrale', 'Kara', 'Savanes'] as const
+
+type RegionFilter = (typeof regionsTogo)[number]
 
 export default function ToutPage() {
   const t = useTranslations('Lieux')
   const tMonuments = useTranslations('Monuments')
   const [searchInput, setSearchInput] = useState('')
+  const [selectedRegion, setSelectedRegion] = useState<RegionFilter>('all')
   const [, startTransition] = useTransition()
 
-  const filteredSites = SitesTour.filter((site) => {
-    const siteNom = tMonuments(`${site.id}.nom`)
-    return siteNom.toLowerCase().includes(searchInput.toLowerCase())
-  })
-
-  const handleSearchChange = (value: string) => {
-    startTransition(() => { setSearchInput(value) })
-  }
-
-  const getRegionName = (reg: string): string => {
-    switch (reg) {
+  const getRegionName = (region: string): string => {
+    switch (region) {
+      case 'all': return t('regions.all')
       case 'Maritime': return t('regions.maritime')
       case 'Plateaux': return t('regions.plateaux')
-      case 'Kara':     return t('regions.kara')
+      case 'Kara': return t('regions.kara')
       case 'Centrale': return t('regions.centrale')
-      case 'Savanes':  return t('regions.savanes')
-      default:         return reg
+      case 'Savanes': return t('regions.savanes')
+      default: return region
     }
   }
 
+  const filteredSites = monuments.filter((site: Monument) => {
+    const siteName = tMonuments(`${site.id}.nom`).toLowerCase()
+    const siteDescription = tMonuments(`${site.id}.description`).toLowerCase()
+    const search = searchInput.toLowerCase()
+    const matchesSearch = siteName.includes(search) || siteDescription.includes(search) || site.localite.toLowerCase().includes(search)
+    const matchesRegion = selectedRegion === 'all' || site.région === selectedRegion
+    return matchesSearch && matchesRegion
+  })
+
   return (
-    <main className="relative min-h-screen w-full bg-base-100 text-base-content
-                     pt-20 pb-24 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
-
-      {/* Halos décoratifs */}
-      <div className="absolute top-10 left-1/4 w-100 h-100
-                      bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/4 w-125 h-125
-                      bg-secondary/5 blur-[130px] rounded-full pointer-events-none" />
-
-      <div className="relative z-10 container mx-auto">
-
-        {/* En-tête */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-black tracking-tight text-base-content
-                         sm:text-5xl uppercase flex items-center justify-center gap-3">
-            <Compass className="text-primary h-8 w-8 animate-spin-slow" />
-            <span>
-              {t('title').split(' ')[0]} {t('title').split(' ')[1]}{' '}
-              <span className="text-primary">To</span>
-              <span className="text-secondary">go</span>
-            </span>
-          </h1>
-          <p className="mt-3 text-base text-base-content/50 max-w-xl mx-auto">
-            {t('subtitle')}
-          </p>
-        </div>
-
-        {/* Barre de recherche */}
-        <div className="max-w-md mx-auto mb-12 px-2">
-          <div className="relative flex items-center bg-base-200
-                          border border-base-content/10
-                          focus-within:border-primary/50
-                          focus-within:ring-2 focus-within:ring-primary/20
-                          rounded-2xl overflow-hidden transition-all shadow-xl group">
-            <div className="pl-4 text-base-content/40
-                            group-focus-within:text-primary transition-colors">
-              <Search size={20} />
+    <main className="min-h-screen bg-base-100 px-3 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl">
+        <div className="grid gap-3 sm:gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(22rem,1.08fr)] lg:items-stretch">
+          <div className="overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7 lg:min-h-[18rem]">
+            <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:text-[11px]">
+              <Compass className="h-4 w-4 shrink-0" />
+              <span className="truncate">{t('hero_badge')}</span>
             </div>
-            <input
-              type="search"
-              defaultValue={searchInput}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder={t('search_placeholder')}
-              className="w-full bg-transparent p-3.5 pl-3 text-sm
-                         text-base-content placeholder:text-base-content/30
-                         outline-none"
-            />
+            <h1 className="max-w-3xl text-3xl font-black leading-tight tracking-normal sm:text-5xl lg:text-6xl">{t('title')}</h1>
+            <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('subtitle')}</p>
           </div>
 
-          {searchInput && (
-            <p className="text-center text-xs italic text-base-content/40
-                          mt-3 animate-fade-in">
-              {t('results_for')}{' '}
-              <span className="text-primary font-semibold">{searchInput}</span>
-            </p>
-          )}
+          <div className="rounded-[28px] border border-border bg-base-200 p-3 shadow-sm sm:rounded-[32px] sm:p-4 lg:self-end">
+            <label className="relative flex min-h-14 items-center rounded-[22px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15 sm:rounded-[24px]">
+              <Search className="h-5 w-5 shrink-0 text-base-content/40" />
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(event) => startTransition(() => setSearchInput(event.target.value))}
+                placeholder={t('search_placeholder')}
+                className="min-w-0 flex-1 bg-transparent px-3 text-sm font-semibold outline-none placeholder:text-base-content/38"
+              />
+            </label>
+
+            <div className="mt-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-wide text-base-content/50">
+              <Filter className="h-3.5 w-3.5 shrink-0 text-secondary" />
+              {t('filter_region')}
+            </div>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap sm:overflow-visible">
+              {regionsTogo.map((region) => {
+                const active = selectedRegion === region
+                return (
+                  <button
+                    key={region}
+                    type="button"
+                    onClick={() => setSelectedRegion(region)}
+                    className={`min-h-11 shrink-0 rounded-2xl border px-4 text-xs font-black transition-all active:scale-95 ${
+                      active
+                        ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
+                        : 'border-border bg-base-100 text-base-content/65 hover:border-secondary/50'
+                    }`}
+                  >
+                    {getRegionName(region)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
-        {/* Grille ou état vide */}
+        {searchInput && (
+          <p className="mt-5 rounded-2xl bg-base-200 px-4 py-3 text-sm font-semibold text-base-content/55">
+            {t('results_for')} <span className="text-secondary">{searchInput}</span>
+          </p>
+        )}
+
         {filteredSites.length === 0 ? (
-          <div className="text-center py-20 bg-base-200 border border-base-content/5
-                          rounded-3xl max-w-xl mx-auto">
-            <Sparkles className="mx-auto h-8 w-8 text-primary/40 mb-3" />
-            <p className="text-lg text-base-content/50 font-medium">
-              {t('no_sites')}
-            </p>
-            <p className="text-xs text-base-content/30 mt-1">
-              {t('try_other')}
-            </p>
+          <div className="mx-auto mt-8 max-w-md rounded-[28px] border border-border bg-base-200 p-8 text-center shadow-sm sm:rounded-[32px]">
+            <Sparkles className="mx-auto h-8 w-8 text-secondary" />
+            <p className="mt-4 text-lg font-black">{t('no_sites')}</p>
+            <p className="mt-2 text-sm font-medium text-base-content/55">{t('try_other')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
-                          lg:grid-cols-4 gap-6 justify-items-center">
-            {filteredSites.map((site) => (
-              <div
-                key={site.id}
-                className="group bg-base-200 hover:bg-base-300 w-full max-w-xs
-                           rounded-2xl border border-base-content/5
-                           hover:border-base-content/10 shadow-xl hover:shadow-2xl
-                           hover:-translate-y-1 transition-all duration-300
-                           flex flex-col overflow-hidden"
-              >
-                {/* Image */}
-                <figure className="relative w-full h-48 overflow-hidden bg-base-300">
-                  <Image
-                    src={site.image}
-                    alt={tMonuments(`${site.id}.nom`)}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-700
-                               ease-out group-hover:scale-105"
-                  />
-                  {/* Overlay image */}
-                  <div className="absolute inset-0 bg-linear-to-t
-                                  from-black/60 to-transparent" />
-
-                  {/* Badge région */}
-                  <span className="absolute top-3 right-3 badge bg-primary
-                                   border-none text-primary-content font-bold text-[10px]
-                                   tracking-wider uppercase px-2.5 py-1.5
-                                   rounded-full shadow-lg">
-                    {getRegionName(site.région)}
-                  </span>
-                </figure>
-
-                {/* Contenu */}
-                <div className="p-5 flex flex-col justify-between grow gap-4">
-                  <div className="space-y-2">
-                    <h2 className="text-lg font-bold text-base-content
-                                   tracking-wide group-hover:text-primary
-                                   transition-colors line-clamp-1">
-                      {tMonuments(`${site.id}.nom`)}
-                    </h2>
-
-                    <p className="inline-flex items-center gap-1 text-xs
-                                  text-secondary font-semibold
-                                  bg-secondary/10 px-2 py-0.5 rounded-md
-                                  border border-secondary/20">
-                      <MapPin size={12} />
-                      {site.localite}
-                    </p>
-
-                    <p className="text-sm text-base-content/60 line-clamp-3
-                                  leading-relaxed pt-1">
-                      {tMonuments(`${site.id}.description`)}
-                    </p>
-                  </div>
-
-                  {/* Action */}
-                  <div className="pt-3 border-t border-base-content/5
-                                  flex justify-end">
-                    <Link href={`/lieux/${site.id}`} className="w-full">
-                      <button className="btn btn-sm btn-block rounded-xl
-                                         border-none bg-base-content/5
-                                         hover:bg-linear-to-r
-                                         hover:from-primary
-                                         hover:to-secondary
-                                         text-base-content/60
-                                         hover:text-white transition-all
-                                         duration-300 font-bold tracking-wide">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {filteredSites.map((site, index) => {
+              const featured = index === 0
+              return (
+                <Link
+                  key={site.id}
+                  href={`/lieux/${site.id}`}
+                  className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-[32px] ${featured ? 'lg:col-span-2 lg:row-span-2' : ''}`}
+                >
+                  <article className="flex min-w-0 flex-1 flex-col">
+                    <figure className={`${featured ? 'h-56 sm:h-72 lg:h-[28rem]' : 'h-48 sm:h-52'} relative shrink-0 overflow-hidden bg-base-300`}>
+                      <Image src={site.image} alt={tMonuments(`${site.id}.nom`)} fill placeholder="blur" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/15 to-transparent" />
+                      <span className="absolute right-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:right-4 sm:top-4">
+                        {getRegionName(site.région)}
+                      </span>
+                    </figure>
+                    <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
+                      <h2 className="line-clamp-2 text-lg font-black leading-tight tracking-normal text-base-content group-hover:text-secondary sm:text-xl">{tMonuments(`${site.id}.nom`)}</h2>
+                      <p className="mt-3 inline-flex w-fit max-w-full items-center gap-1.5 rounded-2xl border border-border bg-base-100 px-3 py-1.5 text-xs font-bold text-base-content/65">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-secondary" />
+                        <span className="truncate">{site.localite}</span>
+                      </p>
+                      <p className="mt-3 line-clamp-3 text-sm font-medium leading-6 text-base-content/60">{tMonuments(`${site.id}.description`)}</p>
+                      <span className="mt-auto pt-5 inline-flex items-center gap-2 text-sm font-black text-secondary">
                         {t('discover')}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </article>
+                </Link>
+              )
+            })}
           </div>
         )}
-      </div>
+      </section>
     </main>
   )
 }

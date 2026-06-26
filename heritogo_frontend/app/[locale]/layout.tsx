@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import Navbar from "@/app/_components/Navbar";
@@ -10,6 +10,7 @@ import { getMessages } from 'next-intl/server';
 import { cookies } from 'next/headers'; // Important pour lire les cookies
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
+import ChatBot from "../_components/ChatBot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,17 +39,17 @@ export default async function LocaleLayout({
 }: LayoutProps) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as any)) {
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
 
   const messages = await getMessages();
 
-  // 1. Lire le cookie du thème côté serveur
+  // 1. Lire le cookie du thÃ¨me cÃ´tÃ© serveur
   const cookieStore = await cookies();
   const themeCookie = cookieStore.get('heritogo_theme')?.value;
   
-  // 2. Déterminer la classe initiale (par défaut 'light' si aucun cookie)
+  // 2. DÃ©terminer la classe initiale (par dÃ©faut 'light' si aucun cookie)
   const isDark = themeCookie === 'dark';
 
   return (
@@ -59,7 +60,7 @@ export default async function LocaleLayout({
       className={isDark ? 'dark' : ''} // Le serveur injecte DIRECTEMENT la bonne classe ici !
     >
       <head>
-        {/* Ce script sert uniquement au TOUT PREMIER chargement à vie du site (si pas de cookie) */}
+        {/* Ce script sert uniquement au TOUT PREMIER chargement Ã  vie du site (si pas de cookie) */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -88,9 +89,14 @@ export default async function LocaleLayout({
             <Navbar />
             <OnboardingTooltip />
             {children}
+            <footer>
+              <ChatBot />
+            </footer>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
+

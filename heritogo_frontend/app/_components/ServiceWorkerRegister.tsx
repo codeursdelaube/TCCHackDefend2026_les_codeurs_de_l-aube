@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 
 export default function ServiceWorkerRegister() {
   useEffect(() => {
+    // 💡 Bloque le Service Worker en mode développement
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')

@@ -1,27 +1,15 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { Volume2, VolumeX } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 export default function TTSButton({ text }: { text: string }) {
   const [speaking, setSpeaking] = useState(false)
   const locale = useLocale()
+  const t = useTranslations('Common')
 
-  const playLabel = locale === 'en' ? "Listen to the story" 
-                  : locale === 'es' ? "Escuchar la historia" 
-                  : locale === 'zh' ? "收听历史故事" 
-                  : "Écouter l'histoire"
-
-  const stopLabel = locale === 'en' ? "Stop" 
-                  : locale === 'es' ? "Detener" 
-                  : locale === 'zh' ? "停止" 
-                  : "Arrêter"
-
-  const langCode = locale === 'en' ? 'en-US' 
-                 : locale === 'es' ? 'es-ES' 
-                 : locale === 'zh' ? 'zh-CN' 
-                 : 'fr-FR'
+  const langCode = locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : locale === 'zh' ? 'zh-CN' : 'fr-FR'
 
   const toggle = () => {
     if (speaking) {
@@ -33,24 +21,21 @@ export default function TTSButton({ text }: { text: string }) {
     utterance.lang = langCode
     utterance.onend = () => setSpeaking(false)
     utterance.onerror = () => setSpeaking(false)
+    window.speechSynthesis.cancel()
     window.speechSynthesis.speak(utterance)
     setSpeaking(true)
   }
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full
-                  text-xs font-bold border transition-all duration-200
-                  ${speaking
-                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
-                    : 'bg-base-200 border-base-content/10 text-base-content/50 hover:text-base-content hover:border-base-content/20'
-                  }`}
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] px-5 text-sm font-black transition-all active:scale-95 ${
+        speaking ? 'bg-secondary text-secondary-content' : 'bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content'
+      }`}
     >
-      {speaking
-        ? <><VolumeX size={13} className="animate-pulse" /> {stopLabel}</>
-        : <><Volume2 size={13} /> {playLabel}</>
-      }
+      {speaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      {speaking ? t('stop') : t('listen')}
     </button>
   )
 }

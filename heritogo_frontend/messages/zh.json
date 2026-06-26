@@ -11,7 +11,10 @@
     "language": "语言",
     "theme": "主题",
     "light": "浅色",
-    "dark": "深色"
+    "dark": "深色",
+    "tagline": "移动文化遗产",
+    "close_settings": "关闭设置",
+    "histoire": "历史"
   },
   "Accueil": {
     "offline_banner": "离线模式 — 可用缓存数据",
@@ -94,7 +97,9 @@
       "step3_desc": "AI 识别该地点。语音合成将为您讲述它的历史 — 支持法语和英语。",
       "start": "开始探索旅程",
       "footer_info": "免费 · 无需安装 · 支持离线工作"
-    }
+    },
+    "previous_slide": "上一张图片",
+    "next_slide": "下一张图片"
   },
   "Scan": {
     "title": "Heritogo 扫描器",
@@ -112,9 +117,11 @@
       "unknown": "多哥官方数据库中未收录此纪念碑或物体。",
       "general": "分析过程中发生错误，请稍后再试。",
       "server": "无法连接到服务器或双子座 AI 服务。"
-    }
+    },
+    "result_label": "已识别的纪念地"
   },
   "Lieux": {
+    "all": "全部",
     "title": "发现多哥",
     "subtitle": "探索我们宏伟的国家遗产中蕴藏的文化、历史和自然财富。",
     "search_placeholder": "搜索旅游景点、瀑布...",
@@ -143,7 +150,9 @@
     "listen": "收听",
     "stop": "停止",
     "share": "分享",
-    "copied": "已复制！"
+    "copied": "已复制！",
+    "hero_badge": "探索附近",
+    "filter_region": "按地区筛选"
   },
   "Cuisine": {
     "title": "多哥风味",
@@ -185,7 +194,19 @@
     "page_subtitle": "发现多哥的地道风味",
     "all": "全部",
     "restaurants_available": "{count} 家餐厅可用",
-    "directions": "路线"
+    "directions": "路线",
+    "hero_badge": "本地风味",
+    "lome_area": "洛美",
+    "default_hours": "07:00-22:00",
+    "origin_country": "多哥",
+    "filters": {
+      "ayimolou": "Ayimolou",
+      "fufu": "Fufu",
+      "djenkoume": "Djenkoume",
+      "gboma": "Gboma",
+      "akoume": "Akoume"
+    },
+    "filter_category": "按菜品筛选"
   },
   "Loisirs": {
     "tag": "娱乐与生物多样性",
@@ -413,5 +434,42 @@
       "description": "三个多哥国家公园中最小的一个，建于1954年。",
       "tarif": "入场：每人 3000 FCFA"
     }
+  },
+  "Common": {
+    "listen": "收听",
+    "stop": "停止"
+  },
+  "ChatBot": {
+    "title": "TGO AI",
+    "subtitle": "文化助手",
+    "welcome": "Woezon！我是 TGO AI，你的文化导游，帮助你了解多哥的纪念地、地区和美食。",
+    "fallback_response": "感谢你的提问。我可以帮助你找到旅途中实用的景点、美食和文化体验。",
+    "typing": "TGO AI 正在准备回复...",
+    "placeholder": "询问关于多哥的问题...",
+    "send": "发送",
+    "open": "打开 TGO AI 聊天",
+    "close": "关闭聊天"
+  },
+  "Histoire": {
+    "badge": "国家记忆",
+    "title": "多哥历史",
+    "subtitle": "一个沉浸式阅读页面，用来讲述多哥的起源、王国、交流、抗争和重要阶段。",
+    "listen_language": "朗读语言",
+    "listen": "朗读历史",
+    "stop": "停止朗读",
+    "contents": "目录",
+    "section": "章节",
+    "paste_hint": "把完整文本粘贴到此文件中的 TOGO_HISTORY_TEXT 常量里。用空行分隔段落，即可自动生成带动画的章节。",
+    "stats": {
+      "period": "多哥",
+      "period_label": "叙事",
+      "sections": "章节"
+    },
+    "paragraphs": [
+      "多哥拥有丰富的历史，这段历史由不同民族、语言、迁徙、贸易路线和精神传统共同塑造。本页面是一个编辑基础，用于向游客呈现完整且易读的故事。",
+      "在殖民时期以前，多哥地区有许多围绕酋邦、王国、市场和代代相传知识而组织起来的社群。",
+      "从十九世纪开始，与欧洲列强的接触深刻改变了这一地区。德国殖民统治以及后来的法国和英国行政管理，留下了政治、建筑和社会层面的痕迹。",
+      "多哥于1960年4月27日宣布独立，这是国家主权的重要一步。此后，多哥继续在记忆、文化创造和共同未来之间书写自己的历史。"
+    ]
   }
 }

@@ -11,7 +11,10 @@
     "language": "Language",
     "theme": "Theme",
     "light": "Light",
-    "dark": "Dark"
+    "dark": "Dark",
+    "tagline": "Mobile heritage",
+    "close_settings": "Close settings",
+    "histoire": "History"
   },
   "Accueil": {
     "offline_banner": "Offline Mode — cached data available",
@@ -94,7 +97,9 @@
       "step3_desc": "The AI identifies the place. The voice synthesis tells you its history — in French or English.",
       "start": "Start the Adventure",
       "footer_info": "Free · No installation · Works offline"
-    }
+    },
+    "previous_slide": "Previous image",
+    "next_slide": "Next image"
   },
   "Scan": {
     "title": "Heritogo Scanner",
@@ -112,9 +117,11 @@
       "unknown": "This monument or object is not listed in the official HeriTogo database.",
       "general": "An error occurred during analysis.",
       "server": "Unable to reach the server or Gemini service."
-    }
+    },
+    "result_label": "Identified monument"
   },
   "Lieux": {
+    "all": "All",
     "title": "Discover Togo",
     "subtitle": "Explore the cultural, historical, and natural riches of our magnificent national heritage.",
     "search_placeholder": "Search for a tourist site, waterfall...",
@@ -143,7 +150,9 @@
     "listen": "Listen",
     "stop": "Stop",
     "share": "Share",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "hero_badge": "Explore nearby",
+    "filter_region": "Filter by region"
   },
   "Cuisine": {
     "title": "Tastes of Togo",
@@ -185,7 +194,19 @@
     "page_subtitle": "Discover the authentic flavors of Togo",
     "all": "All",
     "restaurants_available": "{count} restaurant{count, plural, =1 {} other {s}} available",
-    "directions": "Directions"
+    "directions": "Directions",
+    "hero_badge": "Local flavors",
+    "lome_area": "Lome",
+    "default_hours": "7 AM-10 PM",
+    "origin_country": "Togo",
+    "filters": {
+      "ayimolou": "Ayimolou",
+      "fufu": "Fufu",
+      "djenkoume": "Djenkoume",
+      "gboma": "Gboma",
+      "akoume": "Akoume"
+    },
+    "filter_category": "Filter by dish"
   },
   "Loisirs": {
     "tag": "Entertainment & Biodiversity",
@@ -413,5 +434,42 @@
       "description": "The smallest of the three Togolese national parks, established in 1954.",
       "tarif": "Entry: 3000 FCFA / person"
     }
+  },
+  "Common": {
+    "listen": "Listen",
+    "stop": "Stop"
+  },
+  "ChatBot": {
+    "title": "TGO AI",
+    "subtitle": "Cultural assistant",
+    "welcome": "Woezon! I am TGO AI, your cultural guide for discovering Togo’s monuments, regions and flavors.",
+    "fallback_response": "Thanks for your question. I can help point you toward useful places, dishes and cultural experiences during your stay.",
+    "typing": "TGO AI is preparing a reply...",
+    "placeholder": "Ask a question about Togo...",
+    "send": "Send",
+    "open": "Open TGO AI chat",
+    "close": "Close chat"
+  },
+  "Histoire": {
+    "badge": "National memory",
+    "title": "History of Togo",
+    "subtitle": "An immersive reading page for telling the origins, kingdoms, encounters, resistance and major milestones of Togo.",
+    "listen_language": "Reading language",
+    "listen": "Read the history",
+    "stop": "Stop reading",
+    "contents": "Contents",
+    "section": "Section",
+    "paste_hint": "Paste your full text into the TOGO_HISTORY_TEXT constant in this file. Separate paragraphs with a blank line to automatically create animated sections.",
+    "stats": {
+      "period": "Togo",
+      "period_label": "Story",
+      "sections": "Sections"
+    },
+    "paragraphs": [
+      "Togo has a rich history shaped by its peoples, languages, migrations, trade routes and spiritual traditions. This page is an editorial base for a complete and accessible story for visitors.",
+      "Before the colonial period, Togolese territories were crossed by communities organized around chiefdoms, kingdoms, markets and knowledge passed from generation to generation.",
+      "From the nineteenth century onward, contact with European powers deeply transformed the region. German colonial rule, followed by French and British administrations, left political, architectural and social traces.",
+      "Togo?s independence, proclaimed on April 27, 1960, marked a major step in national sovereignty. Since then, the country has continued to write its history through memory, cultural creation and a shared future."
+    ]
   }
 }

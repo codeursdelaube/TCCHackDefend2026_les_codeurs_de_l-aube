@@ -1,261 +1,191 @@
-'use client'
+﻿'use client'
 
-/**
- * Page Cuisine
- * Liste des plats togolais avec :
- * - Recherche de plats
- * - Filtrage par catégorie
- * - Liste des restaurants proposant chaque plat
- */
-import { useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import Image from 'next/image'
+import { ArrowRight, ChefHat, Clock, Filter, MapPin, Navigation, Search, Sparkles, Star, Utensils } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { Search, Utensils, Sparkles, Star, MapPin, Clock, Navigation } from 'lucide-react'
 import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
-import { useTranslations } from 'next-intl'
+
+const categoryFilters = ['all', 'Ayimolou', 'Fufu', 'Djenkoumé', 'Gboma', 'Akoumé'] as const
+type CategoryFilter = (typeof categoryFilters)[number]
 
 export default function CuisinePage() {
   const t = useTranslations('Cuisine')
   const tPlats = useTranslations('Plats')
   const [searchInput, setSearchInput] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all')
   const [, startTransition] = useTransition()
 
-  const categories = [
-    { id: 'all', name: t('all'), icon: '🍽️' },
-    { id: 'Ayimolou', name: 'Ayimolou', icon: '🥘' },
-    { id: 'Fufu', name: 'Fufu', icon: '🍠' },
-    { id: 'Djenkoumé', name: 'Djenkoumé', icon: '🌾' },
-    { id: 'Gboma', name: 'Gboma', icon: '🥬' },
-    { id: 'Akoumé', name: 'Akoumé', icon: '🌾' },
-  ]
-
-  const filteredPlats = platsTogolais.filter((plat) => {
-    const platNom = tPlats(`${plat.id}.nom`)
-    const matchesNom = platNom.toLowerCase().includes(searchInput.toLowerCase())
-    const matchesCategorie = plat.catégorie.toLowerCase().includes(searchInput.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || platNom.toLowerCase().includes(selectedCategory.toLowerCase())
-    return (matchesNom || matchesCategorie) && matchesCategory
-  })
-
-  const handleSearchChange = (value: string) => {
-    startTransition(() => { setSearchInput(value) })
+  const getFilterLabel = (category: CategoryFilter): string => {
+    switch (category) {
+      case 'all': return t('all')
+      case 'Ayimolou': return t('filters.ayimolou')
+      case 'Fufu': return t('filters.fufu')
+      case 'Djenkoumé': return t('filters.djenkoume')
+      case 'Gboma': return t('filters.gboma')
+      case 'Akoumé': return t('filters.akoume')
+      default: return category
+    }
   }
 
-  const getCategoryName = (cat: string): string => {
-    switch (cat) {
+  const getCategoryName = (category: string): string => {
+    switch (category) {
       case 'Accompagnement': return t('categories.accompagnement')
       case 'Plat Principal': return t('categories.plat_principal')
       case 'Street Food': return t('categories.street_food')
       case 'Sauce': return t('categories.sauce')
-      default: return cat
+      default: return category
     }
   }
 
-  // Get restaurants for selected category
-  const categoryRestaurants = selectedCategory === 'all' 
-    ? restaurants.slice(0, 4)
-    : restaurants.filter(r => r.plats_ids.some(pid => {
-        const plat = platsTogolais.find(p => p.id === pid)
-        const platNom = plat ? tPlats(`${plat.id}.nom`) : ''
-        return plat && platNom.toLowerCase().includes(selectedCategory.toLowerCase())
-      }))
+  const filteredPlats = platsTogolais.filter((plat) => {
+    const platName = tPlats(`${plat.id}.nom`).toLowerCase()
+    const platDescription = tPlats(`${plat.id}.description`).toLowerCase()
+    const search = searchInput.toLowerCase()
+    const matchesSearch = platName.includes(search) || platDescription.includes(search) || plat.catégorie.toLowerCase().includes(search)
+    const matchesCategory = selectedCategory === 'all' || platName.includes(selectedCategory.toLowerCase())
+    return matchesSearch && matchesCategory
+  })
+
+  const categoryRestaurants = useMemo(() => {
+    if (selectedCategory === 'all') return restaurants.slice(0, 4)
+    return restaurants.filter((restaurant) => restaurant.plats_ids.some((platId) => {
+      const plat = platsTogolais.find((item) => item.id === platId)
+      return plat ? tPlats(`${plat.id}.nom`).toLowerCase().includes(selectedCategory.toLowerCase()) : false
+    }))
+  }, [selectedCategory, tPlats])
 
   return (
-    <main className="relative min-h-screen w-full bg-base-100 text-base-content
-                     pt-20 pb-24 px-4 overflow-x-hidden">
-
-      <div className="relative z-10 max-w-6xl mx-auto">
-
-        {/* En-tête */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Utensils className="text-primary h-6 w-6" />
-            <h1 className="text-2xl font-black text-base-content">
-              {t('page_title')}
-            </h1>
-          </div>
-          <p className="text-sm text-base-content/60">
-            {t('page_subtitle')}
-          </p>
-        </div>
-
-        {/* Catégories scrollables */}
-        <div className="flex gap-3 overflow-x-auto pb-4 mb-6 scrollbar-hide">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`flex-shrink-0 flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border transition-all ${
-                selectedCategory === cat.id
-                  ? 'bg-primary border-primary text-primary-content shadow-md'
-                  : 'bg-base-200 border-base-content/10 text-base-content/70 hover:bg-base-content/5'
-              }`}
-            >
-              <span className="text-2xl">{cat.icon}</span>
-              <span className="text-xs font-medium">{cat.name}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Section restaurants pour la catégorie */}
-        {selectedCategory !== 'all' && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-base-content">
-                {selectedCategory} - {t('restaurants_available', { count: categoryRestaurants.length })}
-              </h2>
+    <main className="min-h-screen bg-base-100 px-3 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl">
+        <div className="grid gap-3 sm:gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,1.05fr)] lg:items-stretch">
+          <div className="overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7 lg:min-h-[18rem]">
+            <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:text-[11px]">
+              <ChefHat className="h-4 w-4 shrink-0" />
+              <span className="truncate">{t('hero_badge')}</span>
             </div>
+            <h1 className="max-w-3xl text-3xl font-black leading-tight tracking-normal sm:text-5xl lg:text-6xl">{t('page_title')}</h1>
+            <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('page_subtitle')}</p>
+          </div>
 
-            <div className="space-y-4">
-              {categoryRestaurants.map((resto) => (
-                <div
-                  key={resto.id}
-                  className="bg-base-100 rounded-3xl p-4 border border-base-content/10 shadow-sm"
-                >
-                  {/* En-tête restaurant */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-base font-bold text-base-content mb-1">
-                        {resto.nom}
-                      </h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex items-center gap-0.5">
-                          {[...Array(resto.note || 4)].map((_, i) => (
-                            <Star key={i} size={14} className="text-primary fill-primary" />
-                          ))}
-                        </div>
-                        <span className="text-xs text-base-content/50">
-                          {resto.note || 4.5} ★
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-base-content/60">
-                        <span className="text-primary font-semibold">
-                          {'$'.repeat(Math.floor(Number(resto.budget_fcfa || 5000) / 5000))}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <MapPin size={12} className="text-secondary" />
-                          <span>{(Math.random() * 2 + 0.3).toFixed(1)} km</span>
-                        </div>
-                      </div>
+          <div className="rounded-[28px] border border-border bg-base-200 p-3 shadow-sm sm:rounded-[32px] sm:p-4 lg:self-end">
+            <label className="relative flex min-h-14 items-center rounded-[22px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15 sm:rounded-[24px]">
+              <Search className="h-5 w-5 shrink-0 text-base-content/40" />
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(event) => startTransition(() => setSearchInput(event.target.value))}
+                placeholder={t('search_placeholder')}
+                className="min-w-0 flex-1 bg-transparent px-3 text-sm font-semibold outline-none placeholder:text-base-content/38"
+              />
+            </label>
+            <div className="mt-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-wide text-base-content/50">
+              <Filter className="h-3.5 w-3.5 shrink-0 text-secondary" />
+              {t('filter_category')}
+            </div>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap sm:overflow-visible">
+              {categoryFilters.map((category) => {
+                const active = selectedCategory === category
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setSelectedCategory(category)}
+                    className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border px-4 text-xs font-black transition-all active:scale-95 ${
+                      active
+                        ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
+                        : 'border-border bg-base-100 text-base-content/65 hover:border-secondary/50'
+                    }`}
+                  >
+                    <Utensils className="h-3.5 w-3.5 shrink-0" />
+                    {getFilterLabel(category)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {searchInput && (
+          <p className="mt-5 rounded-2xl bg-base-200 px-4 py-3 text-sm font-semibold text-base-content/55">
+            {t('results_for')} <span className="text-secondary">{searchInput}</span>
+          </p>
+        )}
+
+        {selectedCategory !== 'all' && (
+          <section className="mt-5 rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-[32px] sm:p-5">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-lg font-black tracking-normal">{t('restaurants_available', { count: categoryRestaurants.length })}</h2>
+              <span className="w-fit rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content">{getFilterLabel(selectedCategory)}</span>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {categoryRestaurants.map((resto, index) => (
+                <article key={resto.id} className="rounded-[24px] border border-border bg-base-100 p-4 sm:rounded-[28px]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="line-clamp-2 text-base font-black">{resto.nom}</h3>
+                      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-base-content/55">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-secondary" />
+                        <span className="truncate">{resto.quartier || t('lome_area')}</span>
+                      </p>
                     </div>
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-2xl border border-border bg-base-200 px-2.5 py-1 text-xs font-black">
+                      <Star className="h-3.5 w-3.5 fill-secondary text-secondary" />
+                      {resto.note || 4 + index / 10}
+                    </span>
                   </div>
-
-                  {/* Badges plats */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {resto.plats_ids.slice(0, 3).map((pid) => {
-                      const plat = platsTogolais.find(p => p.id === pid)
-                      return plat ? (
-                        <span
-                          key={pid}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-base-100 border border-base-content/10 text-base-content/70"
-                        >
-                          <span className="text-primary">•</span>
-                          {tPlats(`${plat.id}.nom`)}
-                        </span>
-                      ) : null
-                    })}
-                  </div>
-
-                  {/* Horaires et bouton */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs text-base-content/50">
-                      <Clock size={12} />
-                      <span>{resto.horaires || '07h-22h'}</span>
-                    </div>
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${resto.lat},${resto.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-primary text-primary-content hover:opacity-90 active:scale-95 transition-all duration-200"
-                    >
-                      <Navigation size={14} />
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-base-content/55">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      {resto.horaires || t('default_hours')}
+                    </span>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${resto.lat},${resto.lng}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-2 text-xs font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95 sm:w-auto">
+                      <Navigation className="h-4 w-4" />
                       {t('directions')}
                     </a>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Barre de recherche */}
-        <div className="mb-6">
-          <div className="relative flex items-center bg-base-100
-                          border border-base-content/10
-                          focus-within:border-primary/50
-                          rounded-2xl overflow-hidden transition-all">
-            <div className="pl-4 text-base-content/40">
-              <Search size={18} />
-            </div>
-            <input
-              type="search"
-              defaultValue={searchInput}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder={t('search_placeholder')}
-              className="w-full bg-transparent p-3 pl-3 text-sm
-                         text-base-content placeholder:text-base-content/30
-                         outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Grille des plats */}
         {filteredPlats.length === 0 ? (
-          <div className="text-center py-20 bg-base-200 border border-base-content/5
-                          rounded-3xl max-w-xl mx-auto">
-            <Sparkles className="mx-auto h-8 w-8 text-primary/40 mb-3" />
-            <p className="text-lg text-base-content/50 font-medium">
-              {t('no_plats')}
-            </p>
-            <p className="text-xs text-base-content/30 mt-1">
-              {t('try_other')}
-            </p>
+          <div className="mx-auto mt-8 max-w-md rounded-[28px] border border-border bg-base-200 p-8 text-center shadow-sm sm:rounded-[32px]">
+            <Sparkles className="mx-auto h-8 w-8 text-secondary" />
+            <p className="mt-4 text-lg font-black">{t('no_plats')}</p>
+            <p className="mt-2 text-sm font-medium text-base-content/55">{t('try_other')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
-                          lg:grid-cols-4 gap-4">
-            {filteredPlats.map((plat) => (
-              <Link key={plat.id} href={`/cuisine/${plat.id}`}>
-                <div className="group bg-base-200 hover:bg-base-300 w-full
-                           rounded-2xl border border-base-content/5
-                           hover:border-base-content/10 shadow-sm hover:shadow-md
-                           transition-all duration-300
-                           flex flex-col overflow-hidden">
-                  {/* Image */}
-                  <figure className="relative w-full h-36 overflow-hidden bg-base-300">
-                    <Image
-                      src={plat.image}
-                      alt={tPlats(`${plat.id}.nom`)}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-500
-                                 ease-out group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t
-                                    from-black/40 to-transparent" />
-                  </figure>
-
-                  {/* Contenu */}
-                  <div className="p-4">
-                    <h2 className="text-sm font-bold text-base-content tracking-wide
-                                   group-hover:text-primary transition-colors
-                                   line-clamp-1 mb-2">
-                      {tPlats(`${plat.id}.nom`)}
-                    </h2>
-
-                    <p className="text-xs text-base-content/60 line-clamp-2
-                                  leading-relaxed">
-                      {tPlats(`${plat.id}.description`)}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {filteredPlats.map((plat, index) => {
+              const featured = index === 0
+              return (
+                <Link key={plat.id} href={`/cuisine/${plat.id}`} className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-[32px] ${featured ? 'lg:col-span-2' : ''}`}>
+                  <article className="flex min-w-0 flex-1 flex-col">
+                    <figure className={`${featured ? 'h-56 sm:h-72' : 'h-48 sm:h-52'} relative shrink-0 overflow-hidden bg-base-300`}>
+                      <Image src={plat.image} alt={tPlats(`${plat.id}.nom`)} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/15 to-transparent" />
+                      <span className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:left-4 sm:top-4">{getCategoryName(plat.catégorie)}</span>
+                    </figure>
+                    <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
+                      <h2 className="line-clamp-2 text-lg font-black leading-tight tracking-normal group-hover:text-secondary sm:text-xl">{tPlats(`${plat.id}.nom`)}</h2>
+                      <p className="mt-3 line-clamp-3 text-sm font-medium leading-6 text-base-content/60">{tPlats(`${plat.id}.description`)}</p>
+                      <span className="mt-auto pt-5 inline-flex items-center gap-2 text-sm font-black text-secondary">
+                        {t('know_more')}
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </article>
+                </Link>
+              )
+            })}
           </div>
         )}
-      </div>
+      </section>
     </main>
   )
 }
+
