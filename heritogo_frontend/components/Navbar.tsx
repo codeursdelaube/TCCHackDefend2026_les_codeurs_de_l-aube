@@ -152,34 +152,36 @@ export default function Navbar() {
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {publicLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`rounded-2xl px-4 py-2 text-sm font-bold transition-all ${
-                  isActive(link.href)
-                    ? 'bg-primary text-primary-content'
-                    : 'text-base-content/70 hover:bg-base-200'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {(!pathname.startsWith('/auth') && (profile || pathname !== '/')) && (
+            <nav className="hidden items-center gap-1 lg:flex">
+              {publicLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-2xl px-4 py-2 text-sm font-bold transition-all ${
+                    isActive(link.href)
+                      ? 'bg-primary text-primary-content'
+                      : 'text-base-content/70 hover:bg-base-200'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
 
           <div className="flex items-center gap-2">
             {!authLoading && !profile && (
               <>
                 <Link
                   href="/auth/login"
-                  className="hidden rounded-2xl border border-border px-4 py-2 text-sm font-bold text-base-content hover:bg-base-200 sm:inline-flex"
+                  className="rounded-2xl border border-border px-4 py-2 text-sm font-bold text-base-content hover:bg-base-200 inline-flex"
                 >
                   {t('login')}
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="hidden rounded-2xl px-4 py-2 text-sm font-bold text-white sm:inline-flex"
+                  className="rounded-2xl px-4 py-2 text-sm font-bold text-white inline-flex"
                   style={{ backgroundColor: COLORS.forest }}
                 >
                   {t('register')}
@@ -204,13 +206,15 @@ export default function Navbar() {
               </button>
             )}
 
-            <Link
-              href="/scan"
-              className="hidden items-center gap-2 rounded-2xl bg-secondary px-4 py-2 text-xs font-black uppercase tracking-wide text-secondary-content shadow-sm transition-all hover:-translate-y-0.5 sm:inline-flex"
-            >
-              <ScanLine className="h-4 w-4" />
-              {t('scan_button')}
-            </Link>
+            {profile && (
+              <Link
+                href="/scan"
+                className="hidden items-center gap-2 rounded-2xl bg-secondary px-4 py-2 text-xs font-black uppercase tracking-wide text-secondary-content shadow-sm transition-all hover:-translate-y-0.5 sm:inline-flex"
+              >
+                <ScanLine className="h-4 w-4" />
+                {t('scan_button')}
+              </Link>
+            )}
 
             <button
               type="button"
@@ -325,34 +329,36 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl">
-        <div className="mx-auto max-w-md px-3 pb-2 pt-2">
-          <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
-            {bottomLinks.map((link) => {
-              const Icon = link.icon
-              const active = isActive(link.href)
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[22px] px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
-                    active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
-                  }`}
-                >
-                  {active && (
-                    <motion.span
-                      layoutId="activeBottomNav"
-                      className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
-                    />
-                  )}
-                  <Icon className="relative h-5 w-5" />
-                  <span className="relative truncate">{link.label}</span>
-                </Link>
-              )
-            })}
+      {profile && (
+        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl">
+          <div className="mx-auto max-w-md px-3 pb-2 pt-2">
+            <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
+              {bottomLinks.map((link) => {
+                const Icon = link.icon
+                const active = isActive(link.href)
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[22px] px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
+                      active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
+                    }`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="activeBottomNav"
+                        className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
+                      />
+                    )}
+                    <Icon className="relative h-5 w-5" />
+                    <span className="relative truncate">{link.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
     </>
   )
 }

@@ -75,6 +75,7 @@ interface AdminLog {
   id: string
   action: string
   target_type: string
+  target_id?: string
   created_at: string
   details: any
   admin: {
@@ -671,7 +672,7 @@ export default function AdminDashboardPage() {
                       <td className="p-4">{new Date(log.created_at).toLocaleString()}</td>
                       <td className="p-4 font-bold">{log.admin.full_name}</td>
                       <td className="p-4 font-black">{log.action}</td>
-                      <td className="p-4">{log.target_type} ({log.target_id.slice(0, 8)})</td>
+                      <td className="p-4">{log.target_type}{log.target_id ? ` (${log.target_id.slice(0, 8)})` : ''}</td>
                       <td className="p-4 text-base-content/65">{JSON.stringify(log.details)}</td>
                     </tr>
                   ))}

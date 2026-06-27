@@ -8,7 +8,7 @@ import { getInitials } from '@/lib/auth/redirect'
 import { 
   Briefcase, Calendar, Clock, MapPin, CheckCircle2, XCircle, 
   AlertTriangle, Loader2, Star, ShieldCheck, Languages, BadgeCent, 
-  Send, Compass, FileText, UploadCloud, Edit3, User, Bell 
+  Send, Compass, FileText, UploadCloud, Edit3, User, Bell, Phone 
 } from 'lucide-react'
 
 interface BookingRow {

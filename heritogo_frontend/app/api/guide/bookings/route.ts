@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         quote_sent_at: new Date()
       }
       notifTitle = 'Nouveau devis reçu'
-      notifBody = `Le guide ${guideProfile.profile?.full_name || ''} vous a envoyé un devis de ${quoteAmount} XOF.`
+      notifBody = `Le guide vous a envoyé un devis de ${quoteAmount} XOF.`
     } else if (action === 'start_mission') {
       updatedStatus = 'in_progress'
       updateData = {
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
         started_at: new Date()
       }
       notifTitle = 'Mission commencée'
-      notifBody = `Votre visite guidée avec ${guideProfile.profile?.full_name || ''} a commencé.`
+      notifBody = `Votre visite guidée a commencé.`
     } else if (action === 'complete_mission') {
       updatedStatus = 'completed'
       updateData = {

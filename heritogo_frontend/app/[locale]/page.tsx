@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
@@ -551,7 +551,7 @@ export default function AccueilPage() {
                 ))}
               </ul>
               <Link
-                href="/scan"
+                href="/subscription"
                 className="mt-6 inline-flex min-h-[52px] w-full items-center justify-center
                            rounded-lg text-sm font-black text-white transition-all
                            hover:brightness-110 active:scale-[0.98]"

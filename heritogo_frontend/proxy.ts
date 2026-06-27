@@ -80,13 +80,24 @@ export default async function proxy(request: NextRequest) {
     )
   }
 
-  // Routes protégées
-  const protectedPaths = ['/dashboard', '/booking', '/guides/reserve']
+  // Routes protégées — redirige vers login si pas connecté
+  const protectedPaths = [
+    '/dashboard',
+    '/booking',
+    '/guides/reserve',
+    '/scan',
+    '/lieux',
+    '/cuisine',
+    '/guides',
+    '/histoire',
+    '/loisirs',
+    '/subscription',
+  ]
   const isProtected = protectedPaths.some(p => pathWithoutLocale.startsWith(p))
 
   if (!user && isProtected) {
     return NextResponse.redirect(
-      new URL(`/${currentLocale}/auth/register`, request.url)
+      new URL(`/${currentLocale}/auth/login`, request.url)
     )
   }
 
