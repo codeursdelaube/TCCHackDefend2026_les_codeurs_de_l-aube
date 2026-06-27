@@ -22,10 +22,13 @@ export async function registerAction(prevState: any, formData: FormData) {
       return { error: 'Le mot de passe doit contenir au moins 6 caractères.' }
     }
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
+        emailRedirectTo: `${siteUrl}/auth/confirm`,
         data: {
           full_name: fullName.trim(),
           role: role || 'tourist',

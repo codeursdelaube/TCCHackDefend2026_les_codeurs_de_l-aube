@@ -56,6 +56,8 @@ export default async function proxy(request: NextRequest) {
     '/auth/register',
     '/auth/forgot-password',
     '/auth/callback',
+    '/auth/confirm',
+    '/auth/reset-password',
     '/api',
     '/_next',
   ]
