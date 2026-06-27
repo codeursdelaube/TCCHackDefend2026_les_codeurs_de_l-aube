@@ -1,9 +1,10 @@
-﻿'use client'
+'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bot, MessageSquare, Send, Sparkles, X } from 'lucide-react'
+import { Bot, Send, Sparkles, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { COLORS } from '@/lib/constants/colors'
 
 interface Message {
   id: string
@@ -53,7 +54,7 @@ export default function ChatBot() {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999]">
+    <div className="fixed inset-0 z-[9999] pointer-events-none">
       <AnimatePresence mode="wait">
         {isOpen && (
           <motion.div
@@ -65,14 +66,14 @@ export default function ChatBot() {
           >
             <div className="flex shrink-0 items-center justify-between border-b border-border bg-base-200 p-3.5 sm:p-4">
               <div className="flex items-center gap-3">
-                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content sm:h-11 sm:w-11">
-                  <Bot className="h-5 w-5" />
-                  <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-base-200 bg-secondary" />
+                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content sm:h-11 sm:w-11" style={{ backgroundColor: COLORS.forest }}>
+                  <Bot className="h-5 w-5 text-white" />
+                  <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-base-200 bg-secondary" style={{ backgroundColor: COLORS.rust }} />
                 </div>
                 <div>
                   <h3 className="flex items-center gap-1.5 text-sm font-black uppercase tracking-wide">
                     {t('title')}
-                    <Sparkles className="h-3.5 w-3.5 text-secondary" />
+                    <Sparkles className="h-3.5 w-3.5 text-secondary" style={{ color: COLORS.rust }} />
                   </h3>
                   <p className="line-clamp-1 text-[11px] font-semibold text-base-content/55">{t('subtitle')}</p>
                 </div>
@@ -101,8 +102,9 @@ export default function ChatBot() {
                       className={`min-w-0 overflow-hidden break-words rounded-[20px] px-3.5 py-3 text-xs font-medium leading-relaxed shadow-sm sm:rounded-[22px] ${
                         isAi
                           ? 'rounded-tl-md border border-border bg-base-200 text-base-content'
-                          : 'rounded-tr-md bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content'
+                          : 'rounded-tr-md text-white'
                       }`}
+                      style={!isAi ? { backgroundColor: COLORS.forest } : undefined}
                     >
                       <p className="m-0 text-inherit">{message.text}</p>
                       <span className="mt-1 block text-right text-[9px] opacity-55">
@@ -137,7 +139,8 @@ export default function ChatBot() {
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isTyping}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-secondary text-secondary-content shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 disabled:translate-y-0 disabled:opacity-40 sm:h-12 sm:w-12"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 disabled:translate-y-0 disabled:opacity-40 sm:h-12 sm:w-12"
+                style={{ backgroundColor: COLORS.rust }}
                 aria-label={t('send')}
               >
                 <Send className="h-4 w-4" />
@@ -147,28 +150,18 @@ export default function ChatBot() {
         )}
       </AnimatePresence>
 
-      <motion.button
-        type="button"
-        whileHover={{ scale: 1.04 }}
-        whileTap={{ scale: 0.96 }}
-        onClick={() => setIsOpen((value) => !value)}
-        className="pointer-events-auto fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 flex h-14 w-14 items-center justify-center rounded-[24px] bg-secondary text-secondary-content shadow-xl shadow-black/15 transition-colors hover:bg-[#a82f0a] sm:bottom-6 sm:right-6"
-        aria-label={isOpen ? t('close') : t('open')}
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.span key="close" initial={{ rotate: -30, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 30, opacity: 0 }}>
-              <X className="h-6 w-6" />
-            </motion.span>
-          ) : (
-            <motion.span key="open" initial={{ rotate: 30, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -30, opacity: 0 }}>
-              <MessageSquare className="h-6 w-6" />
-              <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-base-100" />
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.button>
+      {/* Floating Toggle Button */}
+      {!isOpen && (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="pointer-events-auto fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-[9999] flex h-12 w-12 items-center justify-center rounded-full text-white shadow-xl transition-all hover:scale-105 active:scale-95 hover:shadow-2xl border border-white/10"
+          style={{ backgroundColor: COLORS.forest }}
+          aria-label="Ouvrir l'assistant IA"
+        >
+          <Bot className="h-6 w-6" />
+        </button>
+      )}
     </div>
   )
 }
-

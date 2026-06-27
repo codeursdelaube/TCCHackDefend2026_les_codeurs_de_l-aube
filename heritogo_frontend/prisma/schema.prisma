@@ -1,0 +1,328 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  tourist
+  guide
+  admin
+  @@map("user_role")
+}
+
+enum GuideStatus {
+  pending
+  under_review
+  approved
+  rejected
+  suspended
+  @@map("guide_status")
+}
+
+enum DocumentType {
+  national_id
+  guide_license
+  certificate
+  photo
+  other
+  @@map("document_type")
+}
+
+enum BookingStatus {
+  quote_requested
+  quote_sent
+  confirmed
+  in_progress
+  completed
+  cancelled
+  disputed
+  @@map("booking_status")
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  refunded
+  failed
+  @@map("payment_status")
+}
+
+enum PaymentMethod {
+  flooz
+  tmoney
+  card
+  cash
+  other
+  @@map("payment_method")
+}
+
+enum MissionType {
+  full_day
+  half_day
+  hourly
+  virtual
+  @@map("mission_type")
+}
+
+enum ReportStatus {
+  open
+  under_review
+  resolved
+  dismissed
+  @@map("report_status")
+}
+
+enum ReportReason {
+  inappropriate_behavior
+  fraud
+  no_show
+  fake_profile
+  other
+  @@map("report_reason")
+}
+
+enum NotificationType {
+  booking
+  review
+  verification
+  system
+  payment
+  @@map("notification_type")
+}
+
+model Profile {
+  id             String    @id @db.Uuid
+  role           UserRole  @default(tourist)
+  full_name      String
+  avatar_url     String?
+  phone          String?
+  nationality    String?
+  bio            String?
+  preferred_lang String?   @default("fr")
+  is_active      Boolean   @default(true)
+  created_at     DateTime  @default(now()) @db.Timestamptz
+  updated_at     DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  guide_profile       GuideProfile?        @relation("ProfileGuide")
+  bookings_as_tourist Booking[]            @relation("TouristBookings")
+  cancelled_bookings  Booking[]            @relation("CancelledBy")
+  reviews_written     Review[]             @relation("ReviewerReviews")
+  tourist_ratings     GuideTouristRating[] @relation("TouristRatings")
+  reports_sent        Report[]             @relation("ReporterReports")
+  notifications       Notification[]
+  guide_reviews_done  GuideProfile[]       @relation("ReviewedBy")
+  documents_verified  GuideDocument[]      @relation("VerifiedBy")
+  admin_logs          AdminLog[]
+  reports_handled     Report[]             @relation("HandledBy")
+
+  @@map("profiles")
+}
+
+model GuideProfile {
+  id               String      @id @default(uuid()) @db.Uuid
+  user_id          String      @unique @db.Uuid
+  status           GuideStatus @default(pending)
+  experience_years Int?        @default(0)
+  specialties      String[]    @default([])
+  languages        String[]    @default([])
+  coverage_zones   String[]    @default([])
+  hourly_rate      Decimal?    @db.Decimal(10, 2)
+  half_day_rate    Decimal?    @db.Decimal(10, 2)
+  full_day_rate    Decimal?    @db.Decimal(10, 2)
+  virtual_rate     Decimal?    @db.Decimal(10, 2)
+  currency         String      @default("XOF")
+  avg_rating       Decimal     @default(0.00) @db.Decimal(3, 2)
+  total_reviews    Int         @default(0)
+  total_missions   Int         @default(0)
+  reviewed_by      String?     @db.Uuid
+  reviewed_at      DateTime?   @db.Timestamptz
+  rejection_reason String?
+  submitted_at     DateTime?   @db.Timestamptz
+  created_at       DateTime    @default(now()) @db.Timestamptz
+  updated_at       DateTime    @default(now()) @updatedAt @db.Timestamptz
+
+  profile         Profile              @relation("ProfileGuide", fields: [user_id], references: [id], onDelete: Cascade)
+  reviewer        Profile?             @relation("ReviewedBy", fields: [reviewed_by], references: [id])
+  documents       GuideDocument[]
+  availability    GuideAvailability[]
+  bookings        Booking[]            @relation("GuideBookings")
+  reviews         Review[]             @relation("GuideReviews")
+  tourist_ratings GuideTouristRating[] @relation("GuideRatings")
+  reports         Report[]             @relation("ReportedGuide")
+
+  @@map("guide_profiles")
+}
+
+model GuideDocument {
+  id          String       @id @default(uuid()) @db.Uuid
+  guide_id    String       @db.Uuid
+  type        DocumentType
+  label       String?
+  file_url    String
+  file_name   String
+  file_size   Int?
+  is_verified Boolean      @default(false)
+  verified_by String?      @db.Uuid
+  verified_at DateTime?    @db.Timestamptz
+  created_at  DateTime     @default(now()) @db.Timestamptz
+
+  guide    GuideProfile @relation(fields: [guide_id], references: [id], onDelete: Cascade)
+  verifier Profile?     @relation("VerifiedBy", fields: [verified_by], references: [id])
+
+  @@map("guide_documents")
+}
+
+model GuideAvailability {
+  id             String   @id @default(uuid()) @db.Uuid
+  guide_id       String   @db.Uuid
+  available_date DateTime @db.Date
+  is_available   Boolean  @default(true)
+  note           String?
+  created_at     DateTime @default(now()) @db.Timestamptz
+
+  guide GuideProfile @relation(fields: [guide_id], references: [id], onDelete: Cascade)
+
+  @@unique([guide_id, available_date])
+  @@map("guide_availability")
+}
+
+model Booking {
+  id                  String        @id @default(uuid()) @db.Uuid
+  tourist_id          String        @db.Uuid
+  guide_id            String        @db.Uuid
+  status              BookingStatus @default(quote_requested)
+  mission_type        MissionType
+  start_date          DateTime      @db.Date
+  end_date            DateTime?     @db.Date
+  start_time          DateTime?     @db.Time
+  duration_hours      Decimal?      @db.Decimal(4, 1)
+  meeting_point       String?
+  destination         String?
+  zone                String?
+  tourist_message     String?
+  group_size          Int           @default(1)
+  special_needs       String?
+  quote_amount        Decimal?      @db.Decimal(10, 2)
+  quote_message       String?
+  quote_sent_at       DateTime?     @db.Timestamptz
+  confirmed_at        DateTime?     @db.Timestamptz
+  cancelled_at        DateTime?     @db.Timestamptz
+  cancellation_reason String?
+  cancelled_by        String?       @db.Uuid
+  payment_status      PaymentStatus @default(pending)
+  payment_method      PaymentMethod?
+  payment_ref         String?
+  paid_at             DateTime?     @db.Timestamptz
+  started_at          DateTime?     @db.Timestamptz
+  completed_at        DateTime?     @db.Timestamptz
+  created_at          DateTime      @default(now()) @db.Timestamptz
+  updated_at          DateTime      @default(now()) @updatedAt @db.Timestamptz
+
+  tourist        Profile       @relation("TouristBookings", fields: [tourist_id], references: [id])
+  guide          GuideProfile  @relation("GuideBookings", fields: [guide_id], references: [id])
+  cancelled_user Profile?      @relation("CancelledBy", fields: [cancelled_by], references: [id])
+  review         Review?
+  tourist_rating GuideTouristRating?
+  reports        Report[]
+
+  @@map("bookings")
+}
+
+model Review {
+  id                   String    @id @default(uuid()) @db.Uuid
+  booking_id           String    @unique @db.Uuid
+  reviewer_id          String    @db.Uuid
+  guide_id             String    @db.Uuid
+  rating_overall       Int
+  rating_punctuality   Int?
+  rating_knowledge     Int?
+  rating_communication Int?
+  comment              String?
+  is_verified          Boolean   @default(true)
+  is_visible_public    Boolean   @default(false)
+  guide_reply          String?
+  guide_replied_at     DateTime? @db.Timestamptz
+  is_hidden            Boolean   @default(false)
+  hidden_reason        String?
+  created_at           DateTime  @default(now()) @db.Timestamptz
+  updated_at           DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  booking  Booking      @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  reviewer Profile      @relation("ReviewerReviews", fields: [reviewer_id], references: [id])
+  guide    GuideProfile @relation("GuideReviews", fields: [guide_id], references: [id])
+
+  @@map("reviews")
+}
+
+model GuideTouristRating {
+  id         String   @id @default(uuid()) @db.Uuid
+  booking_id String   @unique @db.Uuid
+  guide_id   String   @db.Uuid
+  tourist_id String   @db.Uuid
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  booking Booking      @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  guide   GuideProfile @relation("GuideRatings", fields: [guide_id], references: [id])
+  tourist Profile      @relation("TouristRatings", fields: [tourist_id], references: [id])
+
+  @@map("guide_tourist_ratings")
+}
+
+model Report {
+  id              String       @id @default(uuid()) @db.Uuid
+  reporter_id     String       @db.Uuid
+  reported_id     String       @db.Uuid
+  booking_id      String?      @db.Uuid
+  reason          ReportReason
+  description     String
+  status          ReportStatus @default(open)
+  handled_by      String?      @db.Uuid
+  handled_at      DateTime?    @db.Timestamptz
+  resolution_note String?
+  created_at      DateTime     @default(now()) @db.Timestamptz
+  updated_at      DateTime     @default(now()) @updatedAt @db.Timestamptz
+
+  reporter       Profile       @relation("ReporterReports", fields: [reporter_id], references: [id])
+  reported_guide GuideProfile? @relation("ReportedGuide", fields: [reported_id], references: [id])
+  booking        Booking?      @relation(fields: [booking_id], references: [id])
+  handler        Profile?      @relation("HandledBy", fields: [handled_by], references: [id])
+
+  @@map("reports")
+}
+
+model Notification {
+  id         String           @id @default(uuid()) @db.Uuid
+  user_id    String           @db.Uuid
+  type       NotificationType
+  title      String
+  body       String
+  data       Json             @default("{}")
+  is_read    Boolean          @default(false)
+  read_at    DateTime?        @db.Timestamptz
+  created_at DateTime         @default(now()) @db.Timestamptz
+
+  user Profile @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model AdminLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  admin_id    String   @db.Uuid
+  action      String
+  target_type String
+  target_id   String   @db.Uuid
+  details     Json     @default("{}")
+  created_at  DateTime @default(now()) @db.Timestamptz
+
+  admin Profile @relation(fields: [admin_id], references: [id])
+
+  @@map("admin_logs")
+}

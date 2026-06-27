@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { use, useState } from 'react'
 import Image from 'next/image'
@@ -26,32 +26,7 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-function TTSButton({ text, playLabel, stopLabel }: { text: string; playLabel: string; stopLabel: string }) {
-  const locale = useLocale()
-  const [speaking, setSpeaking] = useState(false)
-
-  const toggle = () => {
-    if (speaking) {
-      window.speechSynthesis.cancel()
-      setSpeaking(false)
-      return
-    }
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : locale === 'zh' ? 'zh-CN' : 'fr-FR'
-    utterance.onend = () => setSpeaking(false)
-    utterance.onerror = () => setSpeaking(false)
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(utterance)
-    setSpeaking(true)
-  }
-
-  return (
-    <button type="button" onClick={toggle} className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] px-5 text-sm font-black transition-all active:scale-95 ${speaking ? 'bg-secondary text-secondary-content' : 'bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content'}`}>
-      {speaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-      {speaking ? stopLabel : playLabel}
-    </button>
-  )
-}
+import TextToSpeech from '@/components/TextToSpeech'
 
 function ShareButton({ title, shareLabel, copiedLabel }: { title: string; shareLabel: string; copiedLabel: string }) {
   const [copied, setCopied] = useState(false)
@@ -182,7 +157,7 @@ export default function SiteDetailPage({ params }: PageProps) {
 
         <aside className="h-fit rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
           <div className="space-y-3">
-            <TTSButton text={`${siteName}. ${siteDescription}. ${siteHistory}`} playLabel={t('listen')} stopLabel={t('stop')} />
+            <TextToSpeech text={`${siteName}. ${siteDescription}. ${siteHistory}`} />
             <ShareButton title={siteName} shareLabel={t('share')} copiedLabel={t('copied')} />
             <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
               <Navigation className="h-5 w-5" />

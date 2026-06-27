@@ -14,7 +14,10 @@
     "dark": "深色",
     "tagline": "移动文化遗产",
     "close_settings": "关闭设置",
-    "histoire": "历史"
+    "histoire": "历史",
+    "guides": "导游",
+    "login": "登录",
+    "register": "注册"
   },
   "Accueil": {
     "offline_banner": "离线模式 — 可用缓存数据",
@@ -63,7 +66,11 @@
       "cuisine_title": "烹饪文化遗产",
       "cuisine_desc": "Fufu, Ablo, Tchakpalo… 探索标志性菜肴，找到您附近供应这些美食的当地餐厅。",
       "cuisine_tag": "美味烹饪",
-      "access": "访问"
+      "access": "访问",
+      "scan_badge": "高级版 2,000 FCFA/月",
+      "scan_cta": "立即扫描",
+      "geo_cta": "探索地图",
+      "cuisine_cta": "发现美食"
     },
     "tts_banner": {
       "title": "内置语音合成",
@@ -99,7 +106,81 @@
       "footer_info": "免费 · 无需安装 · 支持离线工作"
     },
     "previous_slide": "上一张图片",
-    "next_slide": "下一张图片"
+    "next_slide": "下一张图片",
+    "features_title": "探索我们的功能",
+    "guides_title": "预订本地认证导游",
+    "subscribe_title": "无限使用 AI 扫描器",
+    "subscribe_price": "2,000 FCFA / 月",
+    "subscribe_cta": "立即订阅",
+    "guides": {
+      "0": {
+        "name": "Kossi Adom",
+        "languages": "法语、埃维语、英语"
+      },
+      "1": {
+        "name": "Elom Afi",
+        "languages": "法语、米纳语、西班牙语"
+      },
+      "2": {
+        "name": "Mawuli Agbo",
+        "languages": "法语、卡比耶语、英语"
+      },
+      "tag": "认证导游",
+      "certified": "已认证",
+      "price": "20,000 FCFA/天",
+      "reserve": "预订",
+      "view_all": "查看所有导游"
+    },
+    "subscription": {
+      "tag": "高级订阅",
+      "features": {
+        "scans": "无限扫描",
+        "audio": "多语言语音导览",
+        "history": "扫描历史",
+        "offline": "离线模式"
+      }
+    },
+    "final_cta": {
+      "tag": "开始旅程",
+      "title": "多哥文化遗产现在就在你的口袋里。",
+      "cta": "探索景点"
+    },
+    "hero_kicker": "多哥文化遗产智能导览",
+    "hero_title": "探索。理解。传承。",
+    "hero_motto": "探索。理解。传承。",
+    "hero_sub": "您的多哥文化遗产智能导览",
+    "cta_scan": "扫描纪念碑",
+    "cta_discover": "发现景点",
+    "go_to_slide": "跳转到第 {index} 张",
+    "ticker": "✦ 我们的遗产连接着过去、现在和未来。用 Heritogo 以全新方式探索多哥 ✦",
+    "categories": {
+      "places": {
+        "label": "景点",
+        "sub": "文化场所"
+      },
+      "cultures": {
+        "label": "文化",
+        "sub": "鲜活传统"
+      },
+      "stories": {
+        "label": "故事",
+        "sub": "多哥记忆"
+      },
+      "events": {
+        "label": "活动",
+        "sub": "本地亮点"
+      },
+      "community": {
+        "label": "社区",
+        "sub": "导游与旅人"
+      }
+    },
+    "stats_short": {
+      "sites": "景点",
+      "regions": "地区",
+      "languages": "语言",
+      "explorers": "探索者"
+    }
   },
   "Scan": {
     "title": "Heritogo 扫描器",
@@ -471,5 +552,38 @@
       "从十九世纪开始，与欧洲列强的接触深刻改变了这一地区。德国殖民统治以及后来的法国和英国行政管理，留下了政治、建筑和社会层面的痕迹。",
       "多哥于1960年4月27日宣布独立，这是国家主权的重要一步。此后，多哥继续在记忆、文化创造和共同未来之间书写自己的历史。"
     ]
+  },
+  "Auth": {
+    "login_title": "登录",
+    "login_subtitle": "访问您的 Heritogo 账户",
+    "register_title": "创建账户",
+    "register_subtitle": "加入 Heritogo 社区",
+    "forgot_title": "忘记密码",
+    "forgot_subtitle": "通过电子邮件接收重置链接",
+    "email": "电子邮件",
+    "password": "密码",
+    "confirm_password": "确认密码",
+    "full_name": "全名",
+    "login_button": "登录",
+    "register_button": "注册",
+    "forgot_button": "发送链接",
+    "forgot_link": "忘记密码？",
+    "no_account": "还没有账户？",
+    "has_account": "已有账户？",
+    "register_link": "注册",
+    "login_link": "登录",
+    "back_home": "返回首页",
+    "role_label": "我注册为",
+    "role_tourist": "游客",
+    "role_tourist_desc": "探索多哥并预订导游",
+    "role_guide": "导游",
+    "role_guide_desc": "向旅行者提供服务",
+    "loading": "加载中...",
+    "error_generic": "发生错误，请重试。",
+    "error_password_match": "密码不匹配。",
+    "error_password_short": "密码至少需要6个字符。",
+    "success_register": "账户已创建！正在跳转...",
+    "success_forgot": "邮件已发送，请检查收件箱。",
+    "check_email": "请检查电子邮件以确认您的账户。"
   }
 }
