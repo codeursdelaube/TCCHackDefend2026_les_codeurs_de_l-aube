@@ -10,6 +10,7 @@ from google import genai
 from haversine import calcul_de_l_haversine 
 from fastapi import Security, Depends
 from fastapi.security import api_key
+from chatbot import router as chatbot_router
 
 
 # ==========================================
@@ -25,13 +26,15 @@ class Settings(BaseSettings):
     api_secret_key: str # Clé secrète requise pour sécuriser l'accès à certaines routes de notre API
     
     # Configuration pour lier Pydantic au fichier physique .env
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Instanciation des paramètres pour une utilisation globale
 settings = Settings()
 
 # Initialisation de l'application FastAPI
 app = FastAPI(title="heritogo_backend")
+
+app.include_router(chatbot_router)
 
 # Initialisation du client de l'API Google GenAI avec la clé récupérée du .env
 Client = genai.Client(api_key=settings.gemini_api_key)
