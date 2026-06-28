@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-router = APIRouter(title=" Chatbot API")
+router = APIRouter(prefix="/chatbot", tags=["Chatbot"])
 
 # Connexion à la base de données
 supabase: Client = create_client(settings.supabase_url, settings.sb_secret_key)
