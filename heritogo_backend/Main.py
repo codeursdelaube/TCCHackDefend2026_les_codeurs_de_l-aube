@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     api_secret_key: str # Clé secrète requise pour sécuriser l'accès à certaines routes de notre API
     
     # Configuration pour lier Pydantic au fichier physique .env
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Instanciation des paramètres pour une utilisation globale
 settings = Settings()
