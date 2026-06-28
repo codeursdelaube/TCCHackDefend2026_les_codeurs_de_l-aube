@@ -8,7 +8,7 @@ from google import genai  # <-- Le nouveau package officiel de Google
 class Settings(BaseSettings):
     supabase_url: str
     sb_secret_key: str
-    gemini_api_key: str
+    gemini_api_key_1: str
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -21,7 +21,7 @@ supabase: Client = create_client(settings.supabase_url, settings.sb_secret_key)
 
 # Initialisation du NOUVEAU client Gemini
 ai_client = genai.Client(
-    api_key=settings.gemini_api_key,
+    api_key=settings.gemini_api_key_1,
     http_options={"api_version": "v1"}
 )
 # Modèles de requêtes
