@@ -6,7 +6,7 @@ import { routing } from './i18n/routing'
 const intlMiddleware = createMiddleware(routing)
 
 export default async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request })
+  const response = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,13 +33,12 @@ export default async function proxy(request: NextRequest) {
     }
   )
 
-  // Rafraîchit le token à chaque requête (session persistante)
-  await supabase.auth.getUser()
+  // UN SEUL appel — rafraîchit le token ET récupère l'user
+  const { data: { user } } = await supabase.auth.getUser()
 
   const locales = ['fr', 'en', 'es', 'zh']
   const pathname = request.nextUrl.pathname
 
-  // Extraire le locale et le path sans locale
   let pathWithoutLocale = pathname
   let currentLocale = 'fr'
   for (const locale of locales) {
@@ -50,59 +49,40 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Routes auth et publiques — laisser passer
-  const publicPaths = [
-    '/auth/login',
-    '/auth/register',
-    '/auth/forgot-password',
-    '/auth/callback',
-    '/auth/confirm',
-    '/auth/reset-password',
-    '/api',
-    '/_next',
-  ]
-
-  const isPublic = publicPaths.some(p => pathWithoutLocale.startsWith(p))
   const isRoot = pathWithoutLocale === '/' || pathWithoutLocale === ''
 
-  // Vérifier si l'utilisateur est connecté
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Si pas connecté ET sur la page d'accueil → redirect inscription
+  // Accueil sans session → page d'inscription
   if (!user && isRoot) {
     return NextResponse.redirect(
       new URL(`/${currentLocale}/auth/register`, request.url)
     )
   }
 
-  // Si connecté ET sur page auth → redirect dashboard
+  // Déjà connecté sur page auth → dashboard
   if (user && pathWithoutLocale.startsWith('/auth/')) {
     return NextResponse.redirect(
       new URL(`/${currentLocale}/dashboard`, request.url)
     )
   }
 
-  // Routes protégées — redirige vers login si pas connecté
+  // Seules ces routes nécessitent une connexion
+  // scan, lieux, cuisine, histoire sont publiques pour les touristes
   const protectedPaths = [
     '/dashboard',
     '/booking',
     '/guides/reserve',
-    '/scan',
-    '/lieux',
-    '/cuisine',
-    '/guides',
-    '/histoire',
-    '/loisirs',
-    '/subscription',
   ]
-  const isProtected = protectedPaths.some(p => pathWithoutLocale.startsWith(p))
+  const isProtected = protectedPaths.some(p =>
+    pathWithoutLocale.startsWith(p)
+  )
 
   if (!user && isProtected) {
-    return NextResponse.redirect(
-      new URL(`/${currentLocale}/auth/login`, request.url)
-    )
+    const loginUrl = new URL(`/${currentLocale}/auth/login`, request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
+  // Appliquer i18n et propager les cookies de session
   const intlResponse = intlMiddleware(request)
 
   response.cookies.getAll().forEach(cookie => {

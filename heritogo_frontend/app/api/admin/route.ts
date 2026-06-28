@@ -116,9 +116,10 @@ export async function GET() {
       reviews,
       adminLogs
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans GET /api/admin:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -291,8 +292,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans POST /api/admin:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

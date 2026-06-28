@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowRight, BadgeCheck, BookOpenText, Building2, BusFront, CalendarDays,
-  Check, Crown, ExternalLink, Hotel, ImageIcon, Landmark, Languages, Mail,
-  MapPin, Megaphone, Palette, Plane, Scan, Star, Users, Utensils, WifiOff,
+  ArrowRight, BadgeCheck, BookOpenText, CalendarDays,
+  Check, Crown, Landmark, Languages, Mail,
+  MapPin, Megaphone, Palette, Scan, Star, Users, Utensils, WifiOff,
   ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'

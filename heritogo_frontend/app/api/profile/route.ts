@@ -19,9 +19,10 @@ export async function GET() {
     })
 
     return NextResponse.json({ profile })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans GET /api/profile:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -48,8 +49,9 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ success: true, profile: updatedProfile })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans POST /api/profile:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

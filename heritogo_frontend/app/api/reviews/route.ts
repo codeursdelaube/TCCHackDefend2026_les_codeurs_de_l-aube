@@ -64,11 +64,12 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ success: true, review })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans POST /api/reviews:', error)
-    if (error.code === 'P2002') {
+    if (error instanceof Error && 'code' in error && error.code === 'P2002') {
       return NextResponse.json({ error: 'Vous avez déjà laissé un avis pour cette réservation' }, { status: 400 })
     }
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

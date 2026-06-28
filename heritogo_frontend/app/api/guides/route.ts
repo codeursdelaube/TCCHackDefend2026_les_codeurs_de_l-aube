@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const zone = searchParams.get('zone')
     const maxPrice = searchParams.get('price')
 
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       status: 'approved'
     }
 
@@ -52,8 +52,9 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json({ guides })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans GET /api/guides:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -210,6 +210,7 @@
     "no_sites": "No tourist sites found",
     "try_other": "Try another spelling or keyword.",
     "regions": {
+      "all": "All",
       "maritime": "Maritime",
       "plateaux": "Plateaux",
       "kara": "Kara",

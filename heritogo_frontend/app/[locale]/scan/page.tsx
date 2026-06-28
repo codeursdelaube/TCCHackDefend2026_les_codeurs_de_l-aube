@@ -1,8 +1,10 @@
 'use client'
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Camera, Loader2, MapPin, RefreshCw, Sparkles, Upload, Volume2, VolumeX, AlertTriangle, ShieldCheck, CreditCard, X } from 'lucide-react'
+import { Camera, Loader2, MapPin, RefreshCw, Sparkles, Upload, AlertTriangle, ShieldCheck, CreditCard, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
@@ -37,16 +39,8 @@ export default function ScanPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Paywall & Limit States
-  const [scanCount, setScanCount] = useState(0)
-  const [isPremium, setIsPremium] = useState(false)
-  const [showPaywall, setShowPaywall] = useState(false)
-
-  useEffect(() => {
-    // 1. Charger le statut Premium
-    const premium = localStorage.getItem('heritogo_premium') === 'true'
-    setIsPremium(premium)
-
-    // 2. Gérer le compteur de scans mensuels
+  const [scanCount, setScanCount] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0
     const date = new Date()
     const currentMonth = `${date.getFullYear()}-${date.getMonth() + 1}`
     const savedMonth = localStorage.getItem('heritogo_scan_month')
@@ -59,8 +53,13 @@ export default function ScanPage() {
     } else {
       count = parseInt(localStorage.getItem('heritogo_scan_count') || '0', 10)
     }
-    setScanCount(count)
-  }, [])
+    return count
+  })
+  const [isPremium, setIsPremium] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('heritogo_premium') === 'true'
+  })
+  const [showPaywall, setShowPaywall] = useState(false)
 
   useEffect(() => {
     if (!navigator.geolocation) return

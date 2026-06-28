@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     // 1. Mettre à jour la table Profile (bio, phone)
     if (bio !== undefined || phone !== undefined) {
-      const profileData: any = {}
+      const profileData: Record<string, unknown> = {}
       if (bio !== undefined) profileData.bio = bio
       if (phone !== undefined) profileData.phone = phone
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     // 2. Mettre à jour la table GuideProfile
-    const guideData: any = {}
+    const guideData: Record<string, unknown> = {}
     if (languages !== undefined) guideData.languages = languages
     if (coverage_zones !== undefined) guideData.coverage_zones = coverage_zones
     if (specialties !== undefined) guideData.specialties = specialties
@@ -88,8 +88,9 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ success: true, guide: updatedGuide })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans POST /api/guide/profile:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

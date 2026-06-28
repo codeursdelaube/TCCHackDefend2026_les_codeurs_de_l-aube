@@ -210,6 +210,7 @@
     "no_sites": "未找到相关旅游景点",
     "try_other": "请尝试其他拼写或关键词。",
     "regions": {
+      "all": "全部",
       "maritime": "滨海区",
       "plateaux": "高原区",
       "kara": "卡拉区",

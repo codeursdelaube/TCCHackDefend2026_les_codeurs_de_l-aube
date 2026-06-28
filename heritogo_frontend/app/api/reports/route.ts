@@ -36,8 +36,9 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ success: true, report })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur dans POST /api/reports:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

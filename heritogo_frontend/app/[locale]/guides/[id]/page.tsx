@@ -1,14 +1,18 @@
 'use client'
 
+/* eslint-disable react/no-unescaped-entities */
+
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
+import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 import { 
-  Star, Compass, Languages, MapPin, ShieldCheck, Heart, 
+  Star, Compass, MapPin, ShieldCheck, Heart, 
   AlertCircle, Loader2, ArrowLeft, Calendar, BadgeCent, 
-  Briefcase, MessageSquare, AlertTriangle, Phone, CheckCircle 
+  Briefcase, AlertTriangle, CheckCircle, 
+  Languages
 } from 'lucide-react'
 import ReportModal from '@/components/ReportModal'
 import TextToSpeech from '@/components/TextToSpeech'
@@ -38,7 +42,6 @@ interface GuideDetail {
 }
 
 export default function GuideDetailPage() {
-  const router = useRouter()
   const params = useParams<{ locale: string; id: string }>()
   const guideId = params?.id
 
@@ -51,7 +54,16 @@ export default function GuideDetailPage() {
   const [reportSuccess, setReportSuccess] = useState(false)
 
   // Favorites
-  const [isFavorite, setIsFavorite] = useState(false)
+  const [isFavorite, setIsFavorite] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      const favs = localStorage.getItem('heritogo_favorites')
+      if (!favs) return false
+      return (JSON.parse(favs) as string[]).includes(guideId || '')
+    } catch {
+      return false
+    }
+  })
 
   useEffect(() => {
     if (!guideId) return
@@ -66,7 +78,7 @@ export default function GuideDetailPage() {
           return
         }
         setGuide(data.guide)
-      } catch (err) {
+      } catch {
         setError('Impossible de charger les détails du guide')
       } finally {
         setLoading(false)
@@ -74,13 +86,6 @@ export default function GuideDetailPage() {
     }
 
     fetchGuideDetails()
-
-    // Check if favorite
-    const favs = localStorage.getItem('heritogo_favorites')
-    if (favs) {
-      const favList = JSON.parse(favs) as string[]
-      setIsFavorite(favList.includes(guideId))
-    }
   }, [guideId])
 
   const toggleFavorite = () => {
@@ -149,9 +154,11 @@ export default function GuideDetailPage() {
               style={{ backgroundColor: COLORS.forest }}
             >
               {guide.profile.avatar_url ? (
-                <img 
-                  src={guide.profile.avatar_url} 
-                  alt={guide.profile.full_name} 
+                <Image
+                  src={guide.profile.avatar_url}
+                  alt={guide.profile.full_name}
+                  width={112}
+                  height={112}
                   className="h-full w-full object-cover rounded-3xl"
                 />
               ) : (

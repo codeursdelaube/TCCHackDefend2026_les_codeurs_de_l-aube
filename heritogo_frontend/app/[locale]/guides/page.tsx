@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+/* eslint-disable react-hooks/set-state-in-effect */
+
+import { useEffect, useState, useCallback } from 'react'
 import { Link } from '@/i18n/navigation'
 import { getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
@@ -31,7 +32,6 @@ const ZONES = ['Lomé', 'Kpalimé', 'Atakpamé', 'Kara', 'Dapaong', 'Aného', 'T
 const LANGUAGES = ['Français', 'English', 'Espagnol', 'Deutsch', 'Éwé', 'Kabyè', 'Mina']
 
 export default function GuidesPage() {
-  const params = useParams<{ locale: string }>()
   const [guides, setGuides] = useState<GuideRow[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -43,9 +43,17 @@ export default function GuidesPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   // Favorites State (Stored in localStorage)
-  const [favIds, setFavIds] = useState<string[]>([])
+  const [favIds, setFavIds] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const favs = localStorage.getItem('heritogo_favorites')
+      return favs ? (JSON.parse(favs) as string[]) : []
+    } catch {
+      return []
+    }
+  })
 
-  const fetchGuides = async () => {
+  const fetchGuides = useCallback(async () => {
     setLoading(true)
     try {
       const url = new URL('/api/guides', window.location.origin)
@@ -66,17 +74,11 @@ export default function GuidesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedZone, selectedLang, maxPrice])
 
   useEffect(() => {
     fetchGuides()
-
-    // Load favorites from localStorage
-    const favs = localStorage.getItem('heritogo_favorites')
-    if (favs) {
-      setFavIds(JSON.parse(favs))
-    }
-  }, [selectedZone, selectedLang, maxPrice])
+  }, [fetchGuides])
 
   const toggleFavorite = (guideId: string) => {
     let updatedFavs = [...favIds]

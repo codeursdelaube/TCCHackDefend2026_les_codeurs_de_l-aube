@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState, startTransition } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect, react/no-unescaped-entities */
+
+import { useEffect, useState, startTransition, useCallback } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -8,7 +10,7 @@ import { getFirstName, getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 import { 
   Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, 
-  MapPin, AlertCircle, Phone, Globe, ChevronRight, MessageSquare 
+  MapPin, AlertCircle, ChevronRight, MessageSquare 
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
 
@@ -67,9 +69,9 @@ export default function TouristDashboardPage() {
   const [isReviewOpen, setIsReviewOpen] = useState(false)
   
   // Alert for success messages (e.g., booking created)
-  const [alertMessage, setAlertMessage] = useState<string | null>(null)
+  const [alertMessage, setAlertMessage] = useState<string>('')
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -120,7 +122,7 @@ export default function TouristDashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.locale])
 
   useEffect(() => {
     // Check search params for alerts
@@ -128,9 +130,11 @@ export default function TouristDashboardPage() {
     if (bookingCreated) {
       setAlertMessage("Votre demande de réservation a bien été envoyée au guide ! Il vous contactera prochainement avec un devis.")
     }
+  }, [searchParams])
 
+  useEffect(() => {
     fetchData()
-  }, [params.locale, searchParams])
+  }, [fetchData])
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

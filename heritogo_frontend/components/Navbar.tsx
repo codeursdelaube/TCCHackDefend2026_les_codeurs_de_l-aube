@@ -7,7 +7,7 @@ import {
   ElementType, useEffect, useState,
 } from 'react'
 import {
-  BookOpenText, Calendar, Compass, Heart, History, Home, Languages,
+  BookOpenText, Calendar, Compass, Heart, History, Home,
   LogOut, Map, Menu, Moon, ScanLine, Settings, Sun, User, UtensilsCrossed, X,
 } from 'lucide-react'
 import Image from 'next/image'

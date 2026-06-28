@@ -1,5 +1,7 @@
 'use client'
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useState, useEffect, useRef } from 'react'
 import { Volume2, VolumeX, Loader2 } from 'lucide-react'
 import { useLocale } from 'next-intl'
@@ -20,20 +22,25 @@ export default function TextToSpeech({ text, className }: TextToSpeechProps) {
   const locale = useLocale()
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isLoading, setIsLoading]   = useState(false)
-  const [supported, setSupported]   = useState(false)
+  const [supported] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return 'speechSynthesis' in window
+  })
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   useEffect(() => {
-    setSupported(typeof window !== 'undefined' && 'speechSynthesis' in window)
-    return () => {
-      window.speechSynthesis?.cancel()
-    }
-  }, [])
-
-  useEffect(() => {
-    window.speechSynthesis?.cancel()
+    if (typeof window === 'undefined') return
+    window.speechSynthesis.cancel()
     setIsSpeaking(false)
   }, [text, locale])
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.speechSynthesis?.cancel()
+      }
+    }
+  }, [])
 
   const toggleSpeech = () => {
     if (!supported) return

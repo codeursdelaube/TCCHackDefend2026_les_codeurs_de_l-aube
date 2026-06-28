@@ -3,12 +3,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, Sparkles, Shield, Zap, ArrowRight, Star } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import { useRouter } from 'next/navigation'
 
 export default function SubscriptionPage() {
-  const t = useTranslations('Subscription') // Assurez-vous d'ajouter ces traductions ou utilisez du texte brut temporaire
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -40,7 +38,7 @@ export default function SubscriptionPage() {
           transition={{ delay: 0.1 }}
           className="mb-6 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl"
         >
-          Débloquez l'expérience complète
+          {"Débloquez l'expérience complète"}
         </motion.h1>
 
         <motion.p
@@ -78,7 +76,7 @@ export default function SubscriptionPage() {
               <Check className="h-5 w-5 text-secondary" /> Consultation basique des lieux
             </li>
             <li className="flex items-center gap-3 text-sm font-semibold text-base-content/40">
-              <Check className="h-5 w-5 opacity-50" /> Pas d'audio-guides complets
+              <Check className="h-5 w-5 opacity-50" /> {"Pas d'audio-guides complets"}
             </li>
             <li className="flex items-center gap-3 text-sm font-semibold text-base-content/40">
               <Check className="h-5 w-5 opacity-50" /> Impossible de réserver un guide
@@ -109,7 +107,7 @@ export default function SubscriptionPage() {
               <Star className="h-6 w-6 text-amber-500 fill-amber-500" />
               Premium
             </h2>
-            <p className="mt-2 text-sm font-medium text-base-content/60">Pour les passionnés d'histoire.</p>
+            <p className="mt-2 text-sm font-medium text-base-content/60">{"Pour les passionnés d'histoire."}</p>
           </div>
           <div className="mb-8">
             <span className="text-5xl font-black">2 500 FCFA</span>
@@ -141,7 +139,7 @@ export default function SubscriptionPage() {
               <span className="loading loading-spinner"></span>
             ) : (
               <>
-                S'abonner maintenant <ArrowRight className="h-5 w-5 ml-2" />
+                {"S'abonner maintenant"} <ArrowRight className="h-5 w-5 ml-2" />
               </>
             )}
           </button>

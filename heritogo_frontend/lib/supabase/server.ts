@@ -1,5 +1,3 @@
-'use server'
-
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -17,14 +15,7 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, {
-                ...options,
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 60 * 60 * 24 * 7, // 7 jours
-                path: '/',
-              })
+              cookieStore.set(name, value, options)
             )
           } catch {}
         },

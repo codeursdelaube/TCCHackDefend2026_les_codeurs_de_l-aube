@@ -3,16 +3,38 @@
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
+import { AuthError } from '@supabase/supabase-js'
 
-export async function registerAction(prevState: any, formData: FormData) {
+function extractErrorMessage(error: AuthError): string {
+  if (error.message && error.message !== '{}') {
+    return error.message
+  }
+
+  // AuthRetryableFetchError — l'objet error.cause est une Error standard
+  const cause = (error as AuthError & { cause?: Error }).cause
+  if (cause?.message) {
+    return `Erreur réseau : ${cause.message}`
+  }
+
+  if (error.name === 'AuthRetryableFetchError') {
+    return 'Impossible de contacter le serveur Supabase. Le projet est peut-être en pause. Allez sur supabase.com pour le réactiver.'
+  }
+
+  return `Erreur Supabase (${error.name})`
+}
+
+export async function registerAction(
+  prevState: { error?: string; success?: string } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: string }> {
   try {
     const supabase = await createClient()
 
     const fullName = formData.get('full_name') as string
-    const email = formData.get('email') as string
+    const email    = formData.get('email') as string
     const password = formData.get('password') as string
-    const role = formData.get('role') as string
-    const locale = formData.get('locale') as string || 'fr'
+    const role     = (formData.get('role') as string) || 'tourist'
+    const locale   = (formData.get('locale') as string) || 'fr'
 
     if (!fullName || !email || !password) {
       return { error: 'Tous les champs sont requis.' }
@@ -28,33 +50,18 @@ export async function registerAction(prevState: any, formData: FormData) {
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: `${siteUrl}/auth/confirm`,
+        emailRedirectTo: `${siteUrl}/fr/auth/confirm`,
         data: {
-          full_name: fullName.trim(),
-          role: role || 'tourist',
-          preferred_lang: locale
+          full_name:      fullName.trim(),
+          role,
+          preferred_lang: locale,
         },
       },
     })
 
     if (error) {
-      console.error('[registerAction] Supabase auth error full object:', JSON.stringify(error, null, 2))
-      console.error('[registerAction] error.message:', error.message)
-      console.error('[registerAction] error.cause:', (error as any).cause)
-      console.error('[registerAction] error.name:', error.name)
-      console.error('[registerAction] error.status:', (error as any).status)
-
-      // Extraire un message lisible même pour AuthRetryableFetchError
-      const errMsg =
-        error.message && error.message !== '{}' && error.message !== '{}'
-          ? error.message
-          : (error as any).cause?.message
-            ? `Erreur réseau : ${(error as any).cause.message}`
-            : error.name === 'AuthRetryableFetchError'
-              ? 'Impossible de contacter le serveur Supabase. Le projet est peut-être en pause. Allez sur supabase.com pour le réactiver.'
-              : `Erreur Supabase (${error.name}) : ${JSON.stringify(error)}`
-
-      return { error: errMsg }
+      console.error('[registerAction] Supabase error:', JSON.stringify(error, null, 2))
+      return { error: extractErrorMessage(error) }
     }
 
     if (!data.user) {
@@ -63,67 +70,81 @@ export async function registerAction(prevState: any, formData: FormData) {
 
     console.log('[registerAction] User created:', data.user.id, '| Session:', !!data.session)
 
-    // Créer le Profile en base si pas encore créé par trigger Supabase
+    // Créer le profil si le trigger Supabase ne l'a pas encore fait
     try {
-      const existingProfile = await prisma.profile.findUnique({
-        where: { id: data.user.id }
+      const existing = await prisma.profile.findUnique({
+        where: { id: data.user.id },
+        select: { id: true },
       })
 
-      if (!existingProfile) {
+      if (!existing) {
         await prisma.profile.create({
           data: {
-            id: data.user.id,
-            full_name: fullName.trim(),
-            role: (role as 'tourist' | 'guide' | 'admin') || 'tourist',
+            id:             data.user.id,
+            full_name:      fullName.trim(),
+            role:           role as 'tourist' | 'guide' | 'admin',
             preferred_lang: locale,
-            is_active: true,
-          }
+            is_active:      true,
+          },
         })
-        console.log('[registerAction] Profile created in DB for user:', data.user.id)
+        console.log('[registerAction] Profile created for:', data.user.id)
       }
-    } catch (dbError: any) {
-      console.error('[registerAction] Failed to create profile:', dbError.message)
-      // Ne pas bloquer l'inscription si la DB échoue
+    } catch (dbError: unknown) {
+      const msg = dbError instanceof Error ? dbError.message : String(dbError)
+      console.error('[registerAction] Failed to create profile:', msg)
+      // Ne bloque pas l'inscription
     }
 
-    // Si le rôle est "guide", créer le GuideProfile
+    // Créer le GuideProfile si rôle = guide
     if (role === 'guide') {
       try {
         const existingGuide = await prisma.guideProfile.findUnique({
-          where: { user_id: data.user.id }
+          where: { user_id: data.user.id },
+          select: { id: true },
         })
+
         if (!existingGuide) {
           await prisma.guideProfile.create({
             data: {
-              user_id: data.user.id,
-              status: 'pending',
+              user_id:         data.user.id,
+              status:          'pending',
               experience_years: 0,
-              specialties: [],
-              languages: [],
-              coverage_zones: []
-            }
+              specialties:     [],
+              languages:       [],
+              coverage_zones:  [],
+            },
           })
-          console.log('[registerAction] GuideProfile created for user:', data.user.id)
+          console.log('[registerAction] GuideProfile created for:', data.user.id)
         }
-      } catch (dbError: any) {
-        console.error('[registerAction] Failed to create guide profile:', dbError.message)
+      } catch (dbError: unknown) {
+        const msg = dbError instanceof Error ? dbError.message : String(dbError)
+        console.error('[registerAction] Failed to create guide profile:', msg)
       }
     }
 
-    // Pas de session = confirmation email requise
+    // Pas de session = email de confirmation requis
     if (!data.session) {
-      return { 
-        success: `Compte créé ! Un email de confirmation a été envoyé à ${email}. Vérifiez votre boîte de réception puis connectez-vous.` 
+      return {
+        success: `Compte créé ! Un email de confirmation a été envoyé à ${email}. Vérifiez votre boîte de réception puis connectez-vous.`,
       }
     }
 
-    // Session active = rediriger vers l'accueil
-    redirect(`/${locale}`)
+    // Session active → redirection
+    redirect(`/${locale}/dashboard`)
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Laisser Next.js gérer ses propres redirections
-    if (err.digest?.startsWith('NEXT_REDIRECT')) throw err
+    if (
+      err instanceof Error &&
+      'digest' in err &&
+      typeof (err as Error & { digest: string }).digest === 'string' &&
+      (err as Error & { digest: string }).digest.startsWith('NEXT_REDIRECT')
+    ) {
+      throw err
+    }
+
+    const msg = err instanceof Error ? err.message : 'Erreur serveur inattendue.'
     console.error('[registerAction] Unexpected error:', err)
-    return { error: err.message || 'Erreur serveur inattendue.' }
+    return { error: msg }
   }
 }

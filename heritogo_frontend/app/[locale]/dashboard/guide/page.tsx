@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState, startTransition } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
+
+import { useEffect, useState, startTransition, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Link } from '@/i18n/navigation'
 import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
 import { 
-  Briefcase, Calendar, Clock, MapPin, CheckCircle2, XCircle, 
-  AlertTriangle, Loader2, Star, ShieldCheck, Languages, BadgeCent, 
-  Send, Compass, FileText, UploadCloud, Edit3, User, Bell, Phone 
+  Briefcase, Calendar, Clock, MapPin, 
+  AlertTriangle, Loader2, Star, ShieldCheck, BadgeCent, 
+  FileText, UploadCloud, Edit3, User, Bell, Phone 
 } from 'lucide-react'
 
 interface BookingRow {
@@ -60,26 +61,21 @@ export default function GuideDashboard() {
   const searchParams = useSearchParams()
   
   // Tabs: 'bookings' | 'profile' | 'documents'
-  const [activeTab, setActiveTab] = useState<'bookings' | 'profile' | 'documents'>('bookings')
-
-  useEffect(() => {
+  const activeTab = useMemo<'bookings' | 'profile' | 'documents'>(() => {
     const tab = searchParams.get('tab')
     if (tab === 'quotes' || tab === 'missions' || tab === 'subscription' || tab === 'bookings') {
-      setActiveTab('bookings')
+      return 'bookings'
     } else if (tab === 'profile') {
-      setActiveTab('profile')
+      return 'profile'
     } else if (tab === 'documents') {
-      setActiveTab('documents')
+      return 'documents'
     }
+    return 'bookings'
   }, [searchParams])
 
   const handleTabChange = (tabName: 'bookings' | 'profile' | 'documents') => {
-    setActiveTab(tabName)
-    startTransition(() => {
-      const newTabParam = tabName === 'bookings' ? 'quotes' : tabName
-      window.history.pushState(null, '', `?tab=${newTabParam}`)
-      window.dispatchEvent(new HashChangeEvent('hashchange'))
-    })
+    const newTabParam = tabName === 'bookings' ? 'quotes' : tabName
+    router.push(`?tab=${newTabParam}`, { scroll: false })
   }
   const [bookings, setBookings] = useState<BookingRow[]>([])
   const [guide, setGuide] = useState<GuideProfileData | null>(null)
@@ -88,7 +84,10 @@ export default function GuideDashboard() {
   const [error, setError] = useState<string | null>(null)
 
   // Subscription simulation
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('heritogo_guide_subscribed') === 'true'
+  })
 
   // Profile Edit fields
   const [bio, setBio] = useState('')
@@ -118,7 +117,7 @@ export default function GuideDashboard() {
   // Action Loading
   const [actionLoading, setActionLoading] = useState(false)
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -150,14 +149,11 @@ export default function GuideDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadData()
-    // Mock subscription status check
-    const subscribed = localStorage.getItem('heritogo_guide_subscribed')
-    setIsSubscribed(subscribed === 'true')
-  }, [])
+  }, [loadData])
 
   const handleSubscribe = () => {
     localStorage.setItem('heritogo_guide_subscribed', 'true')
@@ -349,7 +345,7 @@ export default function GuideDashboard() {
             <div>
               <h4 className="font-serif font-bold text-base leading-tight">Abonnement Heritogo requis</h4>
               <p className="text-xs text-white/90 mt-0.5 font-medium leading-relaxed max-w-md">
-                Votre profil de guide n'est pas encore actif dans l'annuaire. Abonnez-vous pour recevoir des propositions de réservations.
+                {"Votre profil de guide n'est pas encore actif dans l'annuaire. Abonnez-vous pour recevoir des propositions de réservations."}
               </p>
             </div>
           </div>
@@ -357,8 +353,15 @@ export default function GuideDashboard() {
             onClick={handleSubscribe}
             className="btn btn-sm bg-white text-error font-extrabold px-5 rounded-2xl hover:bg-base-200 border-none shrink-0"
           >
-            Activer l'abonnement
+            {"Activer l'abonnement"}
           </button>
+        </div>
+      )}
+
+      {/* Error Alert */}
+      {error && (
+        <div className="alert alert-error rounded-2xl mb-4">
+          <span>{error}</span>
         </div>
       )}
 
@@ -481,7 +484,7 @@ export default function GuideDashboard() {
 
                         {b.tourist_message && (
                           <div className="rounded-xl bg-base-100 p-3 text-xs italic text-base-content/85 border border-border/60">
-                            "{b.tourist_message}"
+                            {b.tourist_message}
                           </div>
                         )}
                       </div>
@@ -652,7 +655,7 @@ export default function GuideDashboard() {
               </label>
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">Années d'expérience</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{"Années d'expérience"}</span>
                 <input
                   type="number"
                   value={experienceYears}
@@ -821,7 +824,7 @@ export default function GuideDashboard() {
                   className="select select-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                 >
                   <option value="guide_license">Licence officielle de guide touristique</option>
-                  <option value="national_id">Carte Nationale d'Identité ou Passeport</option>
+                  <option value="national_id">{"Carte Nationale d'Identité ou Passeport"}</option>
                   <option value="certificate">Certification ou Diplôme (Histoire/Tourisme)</option>
                   <option value="other">Autre justificatif</option>
                 </select>

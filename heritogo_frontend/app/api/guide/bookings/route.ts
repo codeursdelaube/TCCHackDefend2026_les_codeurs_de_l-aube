@@ -13,16 +13,28 @@ export async function GET() {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
-    // Récupérer le GuideProfile
+    // ✅ FIX : include profile + documents
     const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id }
+      where: { user_id: user.id },
+      include: {
+        profile: {
+          select: {
+            full_name: true,
+            bio: true,
+            phone: true,
+            preferred_lang: true,
+          },
+        },
+        documents: {
+          orderBy: { created_at: 'desc' },
+        },
+      },
     })
 
     if (!guideProfile) {
       return NextResponse.json({ error: 'Profil guide introuvable' }, { status: 404 })
     }
 
-    // Récupérer les bookings
     const bookings = await prisma.booking.findMany({
       where: { guide_id: guideProfile.id },
       include: {
@@ -32,24 +44,23 @@ export async function GET() {
             full_name: true,
             avatar_url: true,
             phone: true,
-            preferred_lang: true
-          }
+            preferred_lang: true,
+          },
         },
-        review: true
+        review: true,
       },
-      orderBy: {
-        created_at: 'desc'
-      }
+      orderBy: { created_at: 'desc' },
     })
 
     return NextResponse.json({ success: true, bookings, guideProfile })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
     console.error('Erreur dans GET /api/guide/bookings:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
-// POST: Actions on bookings (send_quote, start_mission, complete_mission, cancel)
+// POST: Actions on bookings
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -59,8 +70,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
+    // Pas besoin de profile ici — juste l'id du guide
     const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id }
+      where: { user_id: user.id },
+      select: { id: true },
     })
 
     if (!guideProfile) {
@@ -74,9 +87,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'bookingId et action sont requis' }, { status: 400 })
     }
 
-    // Récupérer le booking
     const booking = await prisma.booking.findUnique({
-      where: { id: bookingId }
+      where: { id: bookingId },
     })
 
     if (!booking || booking.guide_id !== guideProfile.id) {
@@ -84,7 +96,7 @@ export async function POST(request: Request) {
     }
 
     let updatedStatus: BookingStatus = booking.status
-    let updateData: any = {}
+    let updateData: Record<string, unknown> = {}
     let notifTitle = ''
     let notifBody = ''
 
@@ -97,66 +109,61 @@ export async function POST(request: Request) {
         status: updatedStatus,
         quote_amount: parseFloat(quoteAmount),
         quote_message: quoteMessage || null,
-        quote_sent_at: new Date()
+        quote_sent_at: new Date(),
       }
       notifTitle = 'Nouveau devis reçu'
       notifBody = `Le guide vous a envoyé un devis de ${quoteAmount} XOF.`
+
     } else if (action === 'start_mission') {
       updatedStatus = 'in_progress'
-      updateData = {
-        status: updatedStatus,
-        started_at: new Date()
-      }
+      updateData = { status: updatedStatus, started_at: new Date() }
       notifTitle = 'Mission commencée'
-      notifBody = `Votre visite guidée a commencé.`
+      notifBody = 'Votre visite guidée a commencé.'
+
     } else if (action === 'complete_mission') {
       updatedStatus = 'completed'
-      updateData = {
-        status: updatedStatus,
-        completed_at: new Date()
-      }
-      // Incrémenter les missions du guide
+      updateData = { status: updatedStatus, completed_at: new Date() }
       await prisma.guideProfile.update({
         where: { id: guideProfile.id },
-        data: { total_missions: { increment: 1 } }
+        data: { total_missions: { increment: 1 } },
       })
       notifTitle = 'Mission terminée'
-      notifBody = `La visite guidée est marquée comme terminée. N'hésitez pas à laisser un avis.`
+      notifBody = "La visite guidée est terminée. N'hésitez pas à laisser un avis."
+
     } else if (action === 'cancel') {
       updatedStatus = 'cancelled'
       updateData = {
         status: updatedStatus,
         cancelled_at: new Date(),
         cancelled_by: user.id,
-        cancellation_reason: cancellationReason || 'Annulé par le guide'
+        cancellation_reason: cancellationReason || 'Annulé par le guide',
       }
       notifTitle = 'Réservation annulée'
-      notifBody = `Le guide a annulé votre demande de réservation : "${cancellationReason || 'Aucun motif fourni'}"`
+      notifBody = `Le guide a annulé votre demande : "${cancellationReason || 'Aucun motif fourni'}"`
+
     } else {
       return NextResponse.json({ error: 'Action invalide' }, { status: 400 })
     }
 
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
-      data: updateData
+      data: updateData,
     })
 
-    // Créer une notification pour le touriste
     await prisma.notification.create({
       data: {
         user_id: booking.tourist_id,
         type: 'booking',
         title: notifTitle,
         body: notifBody,
-        data: {
-          booking_id: booking.id
-        }
-      }
+        data: { booking_id: booking.id },
+      },
     })
 
     return NextResponse.json({ success: true, booking: updatedBooking })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur serveur'
     console.error('Erreur dans POST /api/guide/bookings:', error)
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
