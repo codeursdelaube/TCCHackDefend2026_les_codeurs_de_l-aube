@@ -14,7 +14,10 @@
     "dark": "Dark",
     "tagline": "Mobile heritage",
     "close_settings": "Close settings",
-    "histoire": "History"
+    "histoire": "History",
+    "guides": "Guides",
+    "login": "Sign in",
+    "register": "Sign up"
   },
   "Accueil": {
     "offline_banner": "Offline Mode — cached data available",
@@ -63,7 +66,11 @@
       "cuisine_title": "Culinary Heritage",
       "cuisine_desc": "Fufu, Ablo, Tchakpalo… Explore iconic dishes and find the maquis and restaurants serving them near you.",
       "cuisine_tag": "Gastronomy",
-      "access": "Access"
+      "access": "Access",
+      "scan_badge": "Premium 2,000 FCFA/month",
+      "scan_cta": "Scan now",
+      "geo_cta": "Explore the map",
+      "cuisine_cta": "Discover flavors"
     },
     "tts_banner": {
       "title": "Integrated Voice Synthesis",
@@ -99,7 +106,81 @@
       "footer_info": "Free · No installation · Works offline"
     },
     "previous_slide": "Previous image",
-    "next_slide": "Next image"
+    "next_slide": "Next image",
+    "features_title": "Discover our features",
+    "guides_title": "Book a certified local guide",
+    "subscribe_title": "Unlimited access to the AI Scanner",
+    "subscribe_price": "2,000 FCFA / month",
+    "subscribe_cta": "Subscribe now",
+    "guides": {
+      "0": {
+        "name": "Kossi Adom",
+        "languages": "French, Ewe, English"
+      },
+      "1": {
+        "name": "Elom Afi",
+        "languages": "French, Mina, Spanish"
+      },
+      "2": {
+        "name": "Mawuli Agbo",
+        "languages": "French, Kabye, English"
+      },
+      "tag": "Certified guides",
+      "certified": "Certified",
+      "price": "20,000 FCFA/day",
+      "reserve": "Book",
+      "view_all": "View all guides"
+    },
+    "subscription": {
+      "tag": "Premium subscription",
+      "features": {
+        "scans": "Unlimited scans",
+        "audio": "Multilingual audio guide",
+        "history": "Scan history",
+        "offline": "Offline mode"
+      }
+    },
+    "final_cta": {
+      "tag": "Start the journey",
+      "title": "Togolese heritage now fits in your pocket.",
+      "cta": "Explore places"
+    },
+    "hero_kicker": "Smart guide to Togolese heritage",
+    "hero_title": "Explore. Understand. Pass it on.",
+    "hero_motto": "Explore. Understand. Pass it on.",
+    "hero_sub": "Your smart guide to Togolese heritage",
+    "cta_scan": "Scan a monument",
+    "cta_discover": "Discover places",
+    "go_to_slide": "Go to slide {index}",
+    "ticker": "✦ Our heritage is the link between our past, our present and our future. Explore Togo differently with Heritogo ✦",
+    "categories": {
+      "places": {
+        "label": "Places",
+        "sub": "Cultural sites"
+      },
+      "cultures": {
+        "label": "Cultures",
+        "sub": "Living traditions"
+      },
+      "stories": {
+        "label": "Stories",
+        "sub": "Togo memory"
+      },
+      "events": {
+        "label": "Events",
+        "sub": "Local highlights"
+      },
+      "community": {
+        "label": "Community",
+        "sub": "Guides and travelers"
+      }
+    },
+    "stats_short": {
+      "sites": "Sites",
+      "regions": "Regions",
+      "languages": "Languages",
+      "explorers": "Explorers"
+    }
   },
   "Scan": {
     "title": "Heritogo Scanner",
@@ -471,5 +552,38 @@
       "From the nineteenth century onward, contact with European powers deeply transformed the region. German colonial rule, followed by French and British administrations, left political, architectural and social traces.",
       "Togo?s independence, proclaimed on April 27, 1960, marked a major step in national sovereignty. Since then, the country has continued to write its history through memory, cultural creation and a shared future."
     ]
+  },
+  "Auth": {
+    "login_title": "Sign in",
+    "login_subtitle": "Access your Heritogo account",
+    "register_title": "Create account",
+    "register_subtitle": "Join the Heritogo community",
+    "forgot_title": "Forgot password",
+    "forgot_subtitle": "Receive a reset link by email",
+    "email": "Email address",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "full_name": "Full name",
+    "login_button": "Sign in",
+    "register_button": "Sign up",
+    "forgot_button": "Send reset link",
+    "forgot_link": "Forgot password?",
+    "no_account": "Don't have an account?",
+    "has_account": "Already have an account?",
+    "register_link": "Sign up",
+    "login_link": "Sign in",
+    "back_home": "Back to home",
+    "role_label": "I am signing up as",
+    "role_tourist": "Tourist",
+    "role_tourist_desc": "Explore Togo and book guides",
+    "role_guide": "Guide",
+    "role_guide_desc": "Offer your services to travelers",
+    "loading": "Loading...",
+    "error_generic": "Something went wrong. Please try again.",
+    "error_password_match": "Passwords do not match.",
+    "error_password_short": "Password must be at least 6 characters.",
+    "success_register": "Account created! Redirecting...",
+    "success_forgot": "Email sent. Check your inbox.",
+    "check_email": "Check your email to confirm your account."
   }
 }

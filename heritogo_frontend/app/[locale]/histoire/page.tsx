@@ -1,83 +1,36 @@
-﻿'use client'
+'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { BookOpenText, ChevronDown, Clock3, Globe2, Landmark, Pause, Play, ScrollText, Sparkles } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { BookOpenText, ChevronDown, Clock3, Globe2, Landmark, ScrollText, Sparkles } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
+import { useRouter, usePathname } from 'next/navigation'
+import TextToSpeech from '@/components/TextToSpeech'
 
-const TOGO_HISTORY_TEXT = `
-L'histoire du Togo est un récit captivant qui commence bien avant l'arrivée des Européens. Pour en retracer les grandes lignes, j'ai puisé dans différentes sources, et je vais vous la narrer en trois temps : les racines anciennes, la parenthèse coloniale allemande, et enfin le Togo indépendant et ses défis.
-
-🌍 Aux Origines : Un Peuplement Ancien et des Royaumes
-Le territoire du Togo actuel est habité depuis des temps très anciens, comme en témoignent les objets lithiques et les perles de pierre découverts, notamment dans le nord du pays. Dès le VIIIe siècle, la région des Bassar, au centre et au nord, s'impose comme l'un des principaux centres de production métallurgique d'Afrique de l'Ouest, exportant son fer jusqu'à Kano, au Nigeria.
-
-Les vagues de peuplement successives ont façonné le paysage humain :
-Dans le Nord : Des populations comme les Gourma, les Kotokoli et les Tchokossi se sont installées autour de Sokodé et Mango, tandis que les Kabyè et les Tamberma se sont réfugiés dans les montagnes pour résister aux razzias des royaumes voisins.
-Dans le Sud : Les Éwés sont arrivés du Nigéria actuel entre le XVe et le XVIIe siècle. Ils se sont d'abord établis autour de Tado et de Notsé avant de se disperser vers l'ouest, jusqu'à la rive gauche de la Volta.
-Au XVe siècle, les premiers explorateurs portugais accostent sur la côte, qui devient bientôt la "Côte des Esclaves". Ils y fondent des comptoirs pour le commerce, suivi par les Danois, les Hollandais et les Français. Cette région est alors un espace de contact et de rivalité entre le puissant royaume Ashanti (à l'ouest) et le royaume du Dahomey (à l'est).
-
-⚔️ De la Colonie Allemande au Mandat Français (1884-1960)
-La naissance du Togo en tant qu'entité politique est tardive.
-Le Togoland allemand : En 1884, l'explorateur Gustav Nachtigal signe un traité de protectorat avec le chef local Mlapa III sur la plage de Baguida, donnant naissance au "Togoland" allemand. La Conférence de Berlin (1885) officialise la possession allemande. Les Allemands s'emploient à faire de cette colonie leur Musterkolonie, une "colonie modèle", en y développant des infrastructures (le port de Lomé, des voies ferrées, les grandes plantations de cacao et de café). Cependant, cette modernisation se fait au prix de travaux forcés et d'une administration brutale, matant dans le sang les révoltes des Kabyè et des Konkomba.
-
-La Grande Guerre et le partage : La Première Guerre mondiale met fin à la présence allemande. En août 1914, les troupes alliées franco-britanniques envahissent le Togoland, forçant la reddition des Allemands. En 1919, le traité de Versailles entérine le partage du territoire :
-Le Togo oriental (les 2/3, à l'est) est placé sous mandat de la France.
-Le Togo occidental (1/3, à l'ouest) est placé sous mandat du Royaume-Uni, qui le rattachera à la Gold Coast (l'actuel Ghana).
-Après la Seconde Guerre mondiale, la Société des Nations est remplacée par l'ONU, et les mandats deviennent des "tutelles". Le Togo français acquiert le statut de république autonome en 1956, avant d'être mené vers l'indépendance par la figure de Sylvanus Olympio, dont le parti (le Comité de l'unité togolaise, CUT) remporte les élections de 1958.
-
-🇹🇬 Le Togo Indépendant : Entre Espoirs et Turbulences
-Le 27 avril 1960, l'indépendance est proclamée, et Sylvanus Olympio devient le premier président du Togo. Cette période d'indépendance est marquée par une vie politique intense et mouvementée.
-
-Le premier coup d'État et l'ère Eyadéma : Le 13 janvier 1963, le Togo connaît le premier coup d'État militaire de l'Afrique post-indépendance. Le président Olympio est assassiné, et l'instigateur est un sergent-chef originaire du Nord, Étienne Eyadéma. Après un bref intermède, le 13 janvier 1967, Gnassingbé Eyadéma (il a depuis changé ses prénoms) prend le pouvoir et instaure un régime de parti unique avec son parti, le Rassemblement du peuple togolais (RPT). Son règne, de près de 38 ans, est marqué par le culte de la personnalité, une politique d'"authenticité", des nationalisations et une répression féroce de toute opposition, notamment dans les années 1990 lorsque le multipartisme est imposé et que le pays sombre dans une grave crise politique.
-
-La succession et l'ère Faure Gnassingbé : La mort de Gnassingbé Eyadéma en février 2005 ouvre une nouvelle page. L'armée place immédiatement son fils, Faure Gnassingbé, à la tête du pays, ce qui provoque des violences post-électorales. Depuis, Faure Gnassingbé est resté au pouvoir, s'appuyant sur une armée fidèle et un parti dominant, l'Union pour la République (UNIR). Il a par ailleurs modifié la constitution en 2019, ce qui lui permet de se représenter jusqu'en 2030. Son parcours politique illustre une volonté de réconciliation nationale tout en maintenant un contrôle ferme sur l'État.
-
-💎 En résumé
-L'histoire du Togo est marquée par :
-1. Un peuplement ancien et diversifié, avec des royaumes et des migrations internes.
-2. Une parenthèse coloniale d'abord allemande (brève mais intense, d'où le nom du pays), puis française.
-3. Une vie politique post-indépendance singulière, rythmée par l'absence d'alternance démocratique et dominée par la dynastie Gnassingbé, installée par un coup d'État en 1963.
-
-Cette trame historique est essentielle pour comprendre les dynamiques sociales et politiques du Togo contemporain.
-`
-
-const speechLanguages = [
-  { code: 'fr-FR', label: 'FR' },
-  { code: 'en-US', label: 'EN' },
-  { code: 'es-ES', label: 'ES' },
-  { code: 'zh-CN', label: 'ZH' },
-] as const
-
-type SpeechLanguage = (typeof speechLanguages)[number]['code']
+const langues = [
+  { code: 'fr', label: 'FR' },
+  { code: 'en', label: 'EN' },
+  { code: 'es', label: 'ES' },
+  { code: 'zh', label: '中文' },
+]
 
 export default function HistoirePage() {
   const t = useTranslations('Histoire')
-  const [selectedLanguage, setSelectedLanguage] = useState<SpeechLanguage>('fr-FR')
-  const [speaking, setSpeaking] = useState(false)
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
 
-  const translatedParagraphs = t.raw('paragraphs') as string[]
-  const customParagraphs = TOGO_HISTORY_TEXT.trim()
-    ? TOGO_HISTORY_TEXT.trim().split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean)
-    : []
-  const paragraphs = customParagraphs.length > 0 ? customParagraphs : translatedParagraphs
+  // Le contenu vient entièrement de useTranslations pour la synchronisation i18n
+  const paragraphs = t.raw('paragraphs') as string[]
   const historyText = useMemo(() => paragraphs.join('\n\n'), [paragraphs])
 
-  const toggleSpeech = () => {
-    if (speaking) {
-      window.speechSynthesis.cancel()
-      setSpeaking(false)
-      return
-    }
-
-    const utterance = new SpeechSynthesisUtterance(historyText)
-    utterance.lang = selectedLanguage
-    utterance.rate = selectedLanguage === 'zh-CN' ? 0.9 : 0.96
-    utterance.pitch = 1
-    utterance.onend = () => setSpeaking(false)
-    utterance.onerror = () => setSpeaking(false)
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(utterance)
-    setSpeaking(true)
+  const changerLangue = (newLocale: string) => {
+    // Remplace le locale actuel dans le pathname
+    // ex: /fr/histoire → /en/histoire
+    const segments = pathname.split('/')
+    segments[1] = newLocale
+    const newPath = segments.join('/')
+    router.push(newPath)
   }
 
   return (
@@ -111,35 +64,28 @@ export default function HistoirePage() {
             {t('listen_language')}
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {speechLanguages.map((language) => {
-              const active = selectedLanguage === language.code
+            {langues.map((lang) => {
+              const active = locale === lang.code
               return (
                 <button
-                  key={language.code}
+                  key={lang.code}
                   type="button"
-                  onClick={() => setSelectedLanguage(language.code)}
+                  onClick={() => changerLangue(lang.code)}
                   className={`min-h-11 rounded-2xl border text-xs font-black transition-all active:scale-95 ${
                     active
                       ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
                       : 'border-border bg-base-100 text-base-content/65 hover:border-secondary/50'
                   }`}
                 >
-                  {language.label}
+                  {lang.label}
                 </button>
               )
             })}
           </div>
 
-          <button
-            type="button"
-            onClick={toggleSpeech}
-            className={`mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] px-5 text-sm font-black transition-all active:scale-95 ${
-              speaking ? 'bg-secondary text-secondary-content' : 'bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content'
-            }`}
-          >
-            {speaking ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            {speaking ? t('stop') : t('listen')}
-          </button>
+          <div className="mt-4">
+            <TextToSpeech text={historyText} className="w-full justify-center min-h-12 rounded-[20px]" />
+          </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
             <div className="rounded-[22px] border border-border bg-base-100 p-4">
@@ -184,7 +130,7 @@ export default function HistoirePage() {
           <article className="space-y-4">
             {paragraphs.map((paragraph, index) => (
               <motion.section
-                key={`${paragraph.slice(0, 24)}-${index}`}
+                key={`section-${index}`}
                 id={`section-${index + 1}`}
                 variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
                 className="scroll-mt-24 rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7"

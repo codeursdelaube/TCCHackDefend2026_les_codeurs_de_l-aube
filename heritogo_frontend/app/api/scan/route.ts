@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 // Retry automatique optimisé pour le Hackathon (Évite de dépasser les 10s de timeout Vercel)
 async function fetchWithRetry(
@@ -19,6 +20,16 @@ async function fetchWithRetry(
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔐 Vérification d'authentification — seuls les utilisateurs connectés peuvent scanner
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Vous devez être connecté pour utiliser le scanner.' },
+        { status: 401 }
+      )
+    }
+
     // 1. Récupération des données envoyées par le composant ScanPage
     const incomingFormData = await request.formData()
 

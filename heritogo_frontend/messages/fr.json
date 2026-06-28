@@ -14,7 +14,10 @@
     "dark": "Sombre",
     "tagline": "Patrimoine mobile",
     "close_settings": "Fermer les paramètres",
-    "histoire": "Histoire"
+    "histoire": "Histoire",
+    "guides": "Guides",
+    "login": "Se connecter",
+    "register": "S'inscrire"
   },
   "Accueil": {
     "offline_banner": "Mode hors-ligne — données mises en cache disponibles",
@@ -63,7 +66,11 @@
       "cuisine_title": "Patrimoine Culinaire",
       "cuisine_desc": "Fufu, Ablo, Tchakpalo… Explorez les plats emblématiques et trouvez les maquis et restaurants qui les servent près de vous.",
       "cuisine_tag": "Gastronomie",
-      "access": "Accéder"
+      "access": "Accéder",
+      "scan_badge": "Premium 2 000 FCFA/mois",
+      "scan_cta": "Scanner maintenant",
+      "geo_cta": "Explorer la carte",
+      "cuisine_cta": "Découvrir les saveurs"
     },
     "tts_banner": {
       "title": "Synthèse Vocale Intégrée",
@@ -99,7 +106,81 @@
       "footer_info": "Gratuis · Aucune installation · Fonctionne hors-ligne"
     },
     "previous_slide": "Image précédente",
-    "next_slide": "Image suivante"
+    "next_slide": "Image suivante",
+    "features_title": "Découvrez nos fonctionnalités",
+    "guides_title": "Réservez un guide certifié local",
+    "subscribe_title": "Accès illimité au Scanner IA",
+    "subscribe_price": "2 000 FCFA / mois",
+    "subscribe_cta": "S'abonner maintenant",
+    "guides": {
+      "0": {
+        "name": "Kossi Adom",
+        "languages": "Français, Éwé, Anglais"
+      },
+      "1": {
+        "name": "Elom Afi",
+        "languages": "Français, Mina, Espagnol"
+      },
+      "2": {
+        "name": "Mawuli Agbo",
+        "languages": "Français, Kabyè, Anglais"
+      },
+      "tag": "Guides certifiés",
+      "certified": "Certifié",
+      "price": "20 000 FCFA/jour",
+      "reserve": "Réserver",
+      "view_all": "Voir tous les guides"
+    },
+    "subscription": {
+      "tag": "Abonnement Premium",
+      "features": {
+        "scans": "Scans illimités",
+        "audio": "Audio guide multilingue",
+        "history": "Historique des scans",
+        "offline": "Mode hors ligne"
+      }
+    },
+    "final_cta": {
+      "tag": "Commencer le voyage",
+      "title": "Le patrimoine togolais tient maintenant dans votre poche.",
+      "cta": "Explorer les lieux"
+    },
+    "hero_kicker": "Guide intelligent du patrimoine togolais",
+    "hero_title": "Explorez. Comprenez. Transmettez.",
+    "hero_motto": "Explorez. Comprenez. Transmettez.",
+    "hero_sub": "Votre guide intelligent du patrimoine togolais",
+    "cta_scan": "Scanner un monument",
+    "cta_discover": "Découvrir les lieux",
+    "go_to_slide": "Aller au slide {index}",
+    "ticker": "✦ Notre héritage est le lien entre notre passé, notre présent et notre avenir. Explorez le Togo autrement avec Heritogo ✦",
+    "categories": {
+      "places": {
+        "label": "Lieux",
+        "sub": "Sites culturels"
+      },
+      "cultures": {
+        "label": "Cultures",
+        "sub": "Traditions vivantes"
+      },
+      "stories": {
+        "label": "Histoires",
+        "sub": "Mémoire du Togo"
+      },
+      "events": {
+        "label": "Événements",
+        "sub": "Temps forts locaux"
+      },
+      "community": {
+        "label": "Communauté",
+        "sub": "Guides et voyageurs"
+      }
+    },
+    "stats_short": {
+      "sites": "Sites",
+      "regions": "Régions",
+      "languages": "Langues",
+      "explorers": "Explorateurs"
+    }
   },
   "Scan": {
     "title": "Scanner Heritogo",
@@ -471,5 +552,38 @@
       "À partir du XIXe siècle, les contacts avec les puissances européennes transforment profondément la région. La période coloniale allemande, puis les administrations française et britannique, laissent des traces politiques, architecturales et sociales.",
       "L’indépendance du Togo, proclamée le 27 avril 1960, marque une étape majeure de souveraineté nationale. Depuis, le pays continue d’écrire son histoire entre mémoire, création culturelle et construction d’un avenir partagé."
     ]
+  },
+  "Auth": {
+    "login_title": "Connexion",
+    "login_subtitle": "Accédez à votre espace Heritogo",
+    "register_title": "Créer un compte",
+    "register_subtitle": "Rejoignez la communauté Heritogo",
+    "forgot_title": "Mot de passe oublié",
+    "forgot_subtitle": "Recevez un lien de réinitialisation par email",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "full_name": "Nom complet",
+    "login_button": "Se connecter",
+    "register_button": "S'inscrire",
+    "forgot_button": "Envoyer le lien",
+    "forgot_link": "Mot de passe oublié ?",
+    "no_account": "Pas encore de compte ?",
+    "has_account": "Déjà un compte ?",
+    "register_link": "S'inscrire",
+    "login_link": "Se connecter",
+    "back_home": "Retour à l'accueil",
+    "role_label": "Je m'inscris en tant que",
+    "role_tourist": "Touriste",
+    "role_tourist_desc": "Explorer le Togo et réserver des guides",
+    "role_guide": "Guide",
+    "role_guide_desc": "Proposer vos services aux voyageurs",
+    "loading": "Chargement...",
+    "error_generic": "Une erreur est survenue. Réessayez.",
+    "error_password_match": "Les mots de passe ne correspondent pas.",
+    "error_password_short": "Le mot de passe doit contenir au moins 6 caractères.",
+    "success_register": "Compte créé ! Redirection...",
+    "success_forgot": "Email envoyé. Vérifiez votre boîte de réception.",
+    "check_email": "Vérifiez votre email pour confirmer votre compte."
   }
 }
