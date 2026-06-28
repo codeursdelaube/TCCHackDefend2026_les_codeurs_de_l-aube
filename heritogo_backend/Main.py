@@ -10,7 +10,7 @@ from google import genai
 from haversine import calcul_de_l_haversine 
 from fastapi import Security, Depends
 from fastapi.security import api_key
-from chatbot import app as chatbot_app 
+from chatbot import router as chatbot_router
 
 
 # ==========================================
@@ -34,7 +34,7 @@ settings = Settings()
 # Initialisation de l'application FastAPI
 app = FastAPI(title="heritogo_backend")
 
-app.mount("/chatbot", chatbot_app)
+app.include_router(chatbot_router)
 
 # Initialisation du client de l'API Google GenAI avec la clé récupérée du .env
 Client = genai.Client(api_key=settings.gemini_api_key)

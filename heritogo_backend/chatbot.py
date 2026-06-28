@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase import create_client, Client
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-app = FastAPI(title=" Chatbot API")
+router = APIRouter(title=" Chatbot API")
 
 # Connexion à la base de données
 supabase: Client = create_client(settings.supabase_url, settings.sb_secret_key)
@@ -30,7 +30,7 @@ class ChatRequest(BaseModel):
     extracted_location: str  
     extracted_budget: float   
 
-@app.get("/api/v1/models")
+@router.get("/api/v1/models")
 async def list_available_models():
     try:
         # Demande à Google la liste des modèles disponibles pour TA clé API
@@ -39,7 +39,7 @@ async def list_available_models():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/v1/chat")
+@router.post("/api/v1/chat")
 async def chat_tourisme_advisor(payload: ChatRequest):
     try:
         # Étape 1 : Générer l'embedding avec le modèle exact de ta liste (768 dimensions)
