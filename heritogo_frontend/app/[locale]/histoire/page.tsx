@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
@@ -40,7 +40,7 @@ export default function HistoirePage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7 lg:min-h-[22rem]"
+          className="relative overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7 lg:min-h-88"
         >
           <div className="absolute right-5 top-5 hidden h-28 w-28 rounded-full border border-secondary/20 sm:block" />
           <div className="relative z-10">
@@ -57,7 +57,7 @@ export default function HistoirePage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.08, ease: 'easeOut' }}
-          className="h-fit rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-[32px] lg:sticky lg:top-24"
+          className="h-fit rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-4xl lg:sticky lg:top-24"
         >
           <div className="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-wide text-base-content/50">
             <Globe2 className="h-4 w-4 text-secondary" />
@@ -84,7 +84,7 @@ export default function HistoirePage() {
           </div>
 
           <div className="mt-4">
-            <TextToSpeech text={historyText} className="w-full justify-center min-h-12 rounded-[20px]" />
+            <TextToSpeech text={historyText} className="w-full justify-center min-h-12 rounded-2xl" />
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
@@ -133,7 +133,7 @@ export default function HistoirePage() {
                 key={`section-${index}`}
                 id={`section-${index + 1}`}
                 variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-                className="scroll-mt-24 rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7"
+                className="scroll-mt-24 rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7"
               >
                 <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-sm font-black text-secondary-content">
                   {index + 1}
@@ -142,15 +142,6 @@ export default function HistoirePage() {
               </motion.section>
             ))}
 
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-              className="rounded-[28px] border border-secondary/25 bg-secondary/10 p-5 sm:rounded-[32px] sm:p-7"
-            >
-              <div className="flex items-start gap-3">
-                <Sparkles className="mt-1 h-5 w-5 shrink-0 text-secondary" />
-                <p className="m-0 text-sm font-bold leading-7 text-base-content/70">{t('paste_hint')}</p>
-              </div>
-            </motion.div>
           </article>
         </motion.div>
       </section>

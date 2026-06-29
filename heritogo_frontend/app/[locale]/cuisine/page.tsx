@@ -62,7 +62,7 @@ export default function CuisinePage() {
       <section className="mx-auto max-w-7xl">
         <div className="grid gap-4 sm:gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,1.05fr)] lg:items-stretch">
           
-          <div className="overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7 lg:min-h-[18rem]">
+          <div className="overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7 lg:min-h-72">
             <div className="mb-4 inline-flex max-w-full items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:text-[11px]">
               <ChefHat className="h-4 w-4 shrink-0" />
               <span className="truncate">{t('hero_badge')}</span>
@@ -73,8 +73,8 @@ export default function CuisinePage() {
             <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('page_subtitle')}</p>
           </div>
 
-          <div className="rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-[32px] lg:self-end w-full max-w-full overflow-hidden">
-            <label className="relative flex min-h-14 items-center rounded-[22px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15 sm:rounded-[24px]">
+          <div className="rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-4xl lg:self-end w-full max-w-full overflow-hidden">
+            <label className="relative flex min-h-14 items-center rounded-[22px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15 sm:rounded-3xl">
               <Search className="h-5 w-5 shrink-0 text-base-content/40" />
               <input
                 type="search"
@@ -120,14 +120,14 @@ export default function CuisinePage() {
         )}
 
         {selectedCategory !== 'all' && (
-          <section className="mt-5 rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-[32px] sm:p-5">
+          <section className="mt-5 rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-4xl sm:p-5">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-lg font-black tracking-normal">{t('restaurants_available', { count: categoryRestaurants.length })}</h2>
               <span className="w-fit rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content">{getFilterLabel(selectedCategory)}</span>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               {categoryRestaurants.map((resto, index) => (
-                <article key={resto.id} className="rounded-[24px] border border-border bg-base-100 p-4 sm:rounded-[28px]">
+                <article key={resto.id} className="rounded-3xl border border-border bg-base-100 p-4 sm:rounded-[28px]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="line-clamp-2 text-base font-black">{resto.nom}</h3>
@@ -158,7 +158,7 @@ export default function CuisinePage() {
         )}
 
         {filteredPlats.length === 0 ? (
-          <div className="mx-auto mt-8 max-w-md rounded-[28px] border border-border bg-base-200 p-8 text-center shadow-sm sm:rounded-[32px]">
+          <div className="mx-auto mt-8 max-w-md rounded-[28px] border border-border bg-base-200 p-8 text-center shadow-sm sm:rounded-4xl">
             <Sparkles className="mx-auto h-8 w-8 text-secondary" />
             <p className="mt-4 text-lg font-black">{t('no_plats')}</p>
             <p className="mt-2 text-sm font-medium text-base-content/55">{t('try_other')}</p>
@@ -168,11 +168,11 @@ export default function CuisinePage() {
             {filteredPlats.map((plat, index) => {
               const featured = index === 0
               return (
-                <Link key={plat.id} href={`/cuisine/${plat.id}`} className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-[32px] ${featured ? 'lg:col-span-2' : ''}`}>
+                <Link key={plat.id} href={`/cuisine/${plat.id}`} className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-4xl ${featured ? 'lg:col-span-2' : ''}`}>
                   <article className="flex min-w-0 flex-1 flex-col w-full">
                     <figure className={`${featured ? 'h-56 sm:h-72' : 'h-48 sm:h-52'} relative shrink-0 overflow-hidden bg-base-300`}>
                       <Image src={plat.image} alt={tPlats(`${plat.id}.nom`)} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/15 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/72 via-black/15 to-transparent" />
                       <span className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:left-4 sm:top-4">{getCategoryName(plat.catégorie)}</span>
                     </figure>
                     <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
