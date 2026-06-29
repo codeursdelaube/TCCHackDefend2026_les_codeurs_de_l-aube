@@ -1,0 +1,590 @@
+{
+  "Navbar": {
+    "accueil": "首页",
+    "scan": "扫描",
+    "lieux": "景点",
+    "cuisine": "美食",
+    "loisirs": "公园与动物园",
+    "scan_button": "扫描纪念碑",
+    "select_lang": "语言",
+    "settings": "设置",
+    "language": "语言",
+    "theme": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "tagline": "移动文化遗产",
+    "close_settings": "关闭设置",
+    "histoire": "历史",
+    "guides": "导游",
+    "login": "登录",
+    "register": "注册"
+  },
+  "Accueil": {
+    "offline_banner": "离线模式 — 可用缓存数据",
+    "explorers": "{count}+ 探索者",
+    "discover": "发现",
+    "scroll": "滚动",
+    "hackathon_badge": "#TCCHackDefend2026",
+    "slides": {
+      "0": {
+        "title": "Heritogo",
+        "subtitle": "智能旅游指南",
+        "description": "利用 Gemini AI 瞬间识别多哥纪念碑。对准您的相机，探索历史故事。",
+        "buttonText": "扫描纪念碑"
+      },
+      "1": {
+        "title": "探索",
+        "subtitle": "多哥景点",
+        "description": "发现多哥隐藏的宝藏。地理定位实时显示最近的景点。",
+        "buttonText": "探索景点"
+      },
+      "2": {
+        "title": "品尝",
+        "subtitle": "烹饪文化遗产",
+        "description": "Fufu, Ablo, Kom… 发现多哥的地道风味以及传承这些美食的餐厅。",
+        "buttonText": "探索美食"
+      }
+    },
+    "stats": {
+      "lieux": "已收录景点",
+      "regions": "覆盖区域",
+      "explorers": "探索者人数",
+      "rating": "平均评分"
+    },
+    "features_header": {
+      "tag": "多哥国家遗产",
+      "title": "三大工具，<highlight>一种体验</highlight>",
+      "description": "Heritogo 结合 AI 与地理定位，带您沉浸式感受多哥文化与美食的核心魅力。"
+    },
+    "features": {
+      "scan_title": "Gemini AI 扫描器",
+      "scan_desc": "拍摄纪念碑照片。Gemini 2.5 Flash 自动识别并讲述它的历史，支持本地 TTS 语音朗读。",
+      "scan_tag": "Gemini AI",
+      "geo_title": "地理定位与地图",
+      "geo_desc": "您的 GPS 位置通过大圆航线公式计算距离。最近的景点、餐厅和酒店将立即显示。",
+      "geo_tag": "实时定位",
+      "cuisine_title": "烹饪文化遗产",
+      "cuisine_desc": "Fufu, Ablo, Tchakpalo… 探索标志性菜肴，找到您附近供应这些美食的当地餐厅。",
+      "cuisine_tag": "美味烹饪",
+      "access": "访问",
+      "scan_badge": "高级版 2,000 FCFA/月",
+      "scan_cta": "立即扫描",
+      "geo_cta": "探索地图",
+      "cuisine_cta": "发现美食"
+    },
+    "tts_banner": {
+      "title": "内置语音合成",
+      "description": "直接在您的浏览器中收听法语或英语的纪念碑历史，无需安装任何软件。",
+      "button": "立即尝试"
+    },
+    "gamification": {
+      "tag": "游戏化",
+      "title": "探索并<highlight>解锁徽章</highlight>",
+      "description": "访问每个景点或发现每个区域都会解锁徽章奖励。在您的社交网络上分享您的勋章。",
+      "button": "查看我的徽章",
+      "progress_title": "您的进度",
+      "progress_text": "3 / 8 个徽章",
+      "badges": {
+        "explorateur": "探索者",
+        "lomeen": "洛美本地通",
+        "enfant_mer": "大海之子",
+        "decouvreur_nord": "北部发现者",
+        "tour_togo": "环游多哥",
+        "gourmet": "多哥美食家"
+      }
+    },
+    "how_it_works": {
+      "tag": "简单快捷",
+      "title": "它是如何工作的？",
+      "step1_title": "打开应用",
+      "step1_desc": "从浏览器访问 Heritogo。无需安装 — 它是一个 PWA 应用。",
+      "step2_title": "扫描或探索",
+      "step2_desc": "拍摄纪念碑或开启地理定位，发现身边的历史古迹。",
+      "step3_title": "收听历史",
+      "step3_desc": "AI 识别该地点。语音合成将为您讲述它的历史 — 支持法语和英语。",
+      "start": "开始探索旅程",
+      "footer_info": "免费 · 无需安装 · 支持离线工作"
+    },
+    "previous_slide": "上一张图片",
+    "next_slide": "下一张图片",
+    "features_title": "探索我们的功能",
+    "guides_title": "预订本地认证导游",
+    "subscribe_title": "无限使用 AI 扫描器",
+    "subscribe_price": "2,000 FCFA / 月",
+    "subscribe_cta": "立即订阅",
+    "guides": {
+      "0": {
+        "name": "Kossi Adom",
+        "languages": "法语、埃维语、英语"
+      },
+      "1": {
+        "name": "Elom Afi",
+        "languages": "法语、米纳语、西班牙语"
+      },
+      "2": {
+        "name": "Mawuli Agbo",
+        "languages": "法语、卡比耶语、英语"
+      },
+      "tag": "认证导游",
+      "certified": "已认证",
+      "price": "20,000 FCFA/天",
+      "reserve": "预订",
+      "view_all": "查看所有导游"
+    },
+    "subscription": {
+      "tag": "高级订阅",
+      "features": {
+        "scans": "无限扫描",
+        "audio": "多语言语音导览",
+        "history": "扫描历史",
+        "offline": "离线模式"
+      }
+    },
+    "final_cta": {
+      "tag": "开始旅程",
+      "title": "多哥文化遗产现在就在你的口袋里。",
+      "cta": "探索景点"
+    },
+    "hero_kicker": "多哥文化遗产智能导览",
+    "hero_title": "探索。理解。传承。",
+    "hero_motto": "探索。理解。传承。",
+    "hero_sub": "您的多哥文化遗产智能导览",
+    "cta_scan": "扫描纪念碑",
+    "cta_discover": "发现景点",
+    "go_to_slide": "跳转到第 {index} 张",
+    "ticker": "✦ 我们的遗产连接着过去、现在和未来。用 Heritogo 以全新方式探索多哥 ✦",
+    "categories": {
+      "places": {
+        "label": "景点",
+        "sub": "文化场所"
+      },
+      "cultures": {
+        "label": "文化",
+        "sub": "鲜活传统"
+      },
+      "stories": {
+        "label": "故事",
+        "sub": "多哥记忆"
+      },
+      "events": {
+        "label": "活动",
+        "sub": "本地亮点"
+      },
+      "community": {
+        "label": "社区",
+        "sub": "导游与旅人"
+      }
+    },
+    "stats_short": {
+      "sites": "景点",
+      "regions": "地区",
+      "languages": "语言",
+      "explorers": "探索者"
+    }
+  },
+  "Scan": {
+    "title": "Heritogo 扫描器",
+    "subtitle": "拍照或导入文件，瞬间识别多哥的文化珍宝和历史纪念碑。",
+    "change_image": "更换图片",
+    "select_capture": "选择您的照片",
+    "compatible_info": "支持实时相机拍摄及相册图片导入。",
+    "open_gallery": "打开相机 / 相册",
+    "analyzing": "AI 智能分析中",
+    "identify": "识别纪念碑",
+    "tts_stop": "停止朗读",
+    "tts_play": "收听历史故事",
+    "gps_available": "GPS 已启用",
+    "errors": {
+      "unknown": "多哥官方数据库中未收录此纪念碑或物体。",
+      "general": "分析过程中发生错误，请稍后再试。",
+      "server": "无法连接到服务器或双子座 AI 服务。"
+    },
+    "result_label": "已识别的纪念地"
+  },
+  "Lieux": {
+    "all": "全部",
+    "title": "发现多哥",
+    "subtitle": "探索我们宏伟的国家遗产中蕴藏的文化、历史和自然财富。",
+    "search_placeholder": "搜索旅游景点、瀑布...",
+    "results_for": "搜索结果：",
+    "no_sites": "未找到相关旅游景点",
+    "try_other": "请尝试其他拼写或关键词。",
+    "regions": {
+      "all": "全部",
+      "maritime": "滨海区",
+      "plateaux": "高原区",
+      "kara": "卡拉区",
+      "centrale": "中部区",
+      "savanes": "草原区"
+    },
+    "discover": "探索",
+    "back_to_sites": "返回景点列表",
+    "gps_action": "获取路线",
+    "history_title": "历史与传说",
+    "desc_title": "景点介绍",
+    "rating": "评分 ★",
+    "visits_per_year": "年访问量",
+    "distance": "距离",
+    "period_tag": "1905 — 德国殖民时期",
+    "history_btn": "历史",
+    "info_btn": "实用信息",
+    "hotels_nearby": "附近酒店",
+    "listen": "收听",
+    "stop": "停止",
+    "share": "分享",
+    "copied": "已复制！",
+    "hero_badge": "探索附近",
+    "filter_region": "按地区筛选"
+  },
+  "Cuisine": {
+    "title": "多哥风味",
+    "subtitle": "探索我们丰富的烹饪文化遗产。探索多哥最著名的传统菜肴的历史与秘密。",
+    "search_placeholder": "搜索 fufu, ablo, 酱汁...",
+    "results_for": "搜索结果：",
+    "no_plats": "未找到相关传统菜肴",
+    "try_other": "请尝试其他拼写（例如 come, djenkoume）或分类。",
+    "categories": {
+      "accompagnement": "配菜",
+      "plat_principal": "主菜",
+      "street_food": "街头小吃",
+      "sauce": "酱汁"
+    },
+    "know_more": "了解更多",
+    "acc_prefix": "搭配：",
+    "back_to_cuisine": "返回美食列表",
+    "cuisine_title": "烹饪遗产 · 多哥",
+    "find_nearby": "寻找附近餐厅",
+    "origin_tradition": "起源与传统",
+    "ideal_acc": "完美搭配",
+    "where_to_eat": "在哪里品尝这道菜",
+    "address_count": "{count} 个地点",
+    "no_resto": "目前没有收录这道菜的推荐餐厅。",
+    "other_plats": "其他菜肴 · {category}",
+    "sheet_title": "美食名片",
+    "sheet": {
+      "name": "名称",
+      "category": "类别",
+      "origin": "产地",
+      "acc": "建议搭配"
+    },
+    "available_in": "供应于",
+    "resto_in_lome": "洛美的 {count} 家餐厅",
+    "other_restos": "及另外 {count} 家餐厅…",
+    "view_restos": "查看所有餐厅",
+    "navigate": "获取路线",
+    "page_title": "多哥美食",
+    "page_subtitle": "发现多哥的地道风味",
+    "all": "全部",
+    "restaurants_available": "{count} 家餐厅可用",
+    "directions": "路线",
+    "hero_badge": "本地风味",
+    "lome_area": "洛美",
+    "default_hours": "07:00-22:00",
+    "origin_country": "多哥",
+    "filters": {
+      "ayimolou": "Ayimolou",
+      "fufu": "Fufu",
+      "djenkoume": "Djenkoume",
+      "gboma": "Gboma",
+      "akoume": "Akoume"
+    },
+    "filter_category": "按菜品筛选"
+  },
+  "Loisirs": {
+    "tag": "娱乐与生物多样性",
+    "title": "游乐园与动物园",
+    "subtitle": "探索多哥自然野生与城市环境中的休闲空间、水上乐园和野生动物保护区。",
+    "search_placeholder": "搜索公园、动物园（例如 lome, tatapark）...",
+    "no_parcs": "未找到相关场所",
+    "try_other": "请尝试不带声调的拼写或检查文字是否正确。",
+    "regions": {
+      "savanes": "草原区",
+      "kara": "卡拉区",
+      "centrale": "中部区",
+      "plateaux": "高原区",
+      "maritime": "滨海区"
+    },
+    "gps_available": "GPS 已启用",
+    "rejoin": "获取路线"
+  },
+  "Onboarding": {
+    "scan_tooltip": "扫描纪念碑以了解其历史",
+    "lang_tooltip": "在此更改语言",
+    "settings_tooltip": "访问设置",
+    "skip": "跳过",
+    "next": "下一步",
+    "finish": "完成",
+    "welcome": "欢迎使用 Heritogo！",
+    "intro": "了解如何使用应用程序"
+  },
+  "Plats": {
+    "fufu_togolais": {
+      "nom": "Fufu",
+      "description": "多哥菜的主食，通过在研钵中用力捣煮山药制成。",
+      "histoire": "Fufu 是真正的国家传统，通常在周末和节日期间与家人一起食用。其制作需要非凡的体力：将热山药块用大木杵捣至光滑、有弹性和奶油状的糊状。",
+      "accompagnementsIdaux": "清汤（辣）、棕榈果酱、花生或 Arbi（浓缩番茄）配羊肉、牛肉或鸡肉。"
+    },
+    "ablo_togolais": {
+      "nom": "Ablo",
+      "description": "微甜的米糕，蒸制而成，质地柔软、多孔、蓬松。",
+      "histoire": "Ablo 源自多哥南部和贝宁，是沿海街头美食之王。其细腻的发酵使其具有独特的酸甜味道。历史上由妇女在路边和公交车站出售，传统上陪伴洛美或 Aného 海滩的野餐。",
+      "accompagnementsIdaux": "油炸或烤鱼、黑胡椒（干捣黑胡椒或 'Yébéessé Sourou'）和新鲜洋葱番茄沙拉。"
+    },
+    "kom_togolais": {
+      "nom": "Kohm",
+      "description": "一种致密、微酸的发酵玉米面团球，包裹在玉米叶中煮熟。",
+      "histoire": "也称为 'Galo' 或 'Come'，这道源自加（加纳）的菜肴已成为多哥日常饮食的支柱。发酵玉米面团几天的技术使菜肴可以保存很长时间，使其成为海岸渔民的理想食物。",
+      "accompagnementsIdaux": "油炸鱼、新鲜捣碎的青椒、黑胡椒（Shito）和切片洋葱。"
+    },
+    "ayimolou_togolais": {
+      "nom": "Ayimolou",
+      "description": "传统多哥炒饭与豆类一起煮，赋予其特征性的棕色。",
+      "histoire": "Ayimolou 是多哥最受欢迎的菜肴，是洛美居民的最爱早餐。传统上由 'Ayimolou-tché'（街头小贩）清晨出售，其深色特征是在煮米饭和豆类时添加高粱茎或钾碱获得的。",
+      "accompagnementsIdaux": "红色煎炸油（Wagasi）、黑胡椒粉、煮鸡蛋、油炸鱼或意大利面作为配菜。"
+    },
+    "djenkoume_togolais": {
+      "nom": "Djinkoumé",
+      "description": "一种美味的红色玉米面团，直接在辣番茄和肉浓缩汤中煮熟。",
+      "histoire": "Djinkoumé 是多哥南部 Ewé 人民的祖传菜肴，与其他面团不同，因为玉米面粉不是在清水中煮熟，而是直接注入用大蒜、洋葱和生姜调味的炸鸡的烹饪汁中。这是一道味道丰富的庆祝菜肴。",
+      "accompagnementsIdaux": "当地鸡肉（'自行车鸡'）油炸或烤制和新鲜胡椒。"
+    },
+    "gboma_dessi": {
+      "nom": "Gboma Dessi",
+      "description": "一种丰富奶油状的酱汁，以枯萎的绿叶为基础，与各种肉类和熏鱼一起炖煮。",
+      "histoire": "'Dessi' 一词在 Ewé 中意为酱汁，'Gboma' 指的是一种略带苦味的当地菠菜。这种酱汁是多哥好客的象征：它包含的蛋白质种类越多（蟹、干牛肉皮、虾、熏鱼），客人就越受尊敬。",
+      "accompagnementsIdaux": "理想搭配白玉米面团（Akoumé）或白米饭。"
+    },
+    "adzeme_togolais": {
+      "nom": "Adèmè",
+      "description": "一种绿色、粘稠且营养丰富的酱汁，由 corète 叶制成，因其独特的质地而备受推崇。",
+      "histoire": "Adèmè 是多哥海岸最具标志性的酱汁之一。粘稠质地（类似秋葵）是通过用一撮钾碱煮沸 corète 叶获得的。这是一种以其消化特性和铁含量丰富而闻名的舒适菜肴。",
+      "accompagnementsIdaux": "仅与 Ewassa 或 Akoumé（玉米面团）一起食用。"
+    },
+    "koliko_togolais": {
+      "nom": "Koliko",
+      "description": "外脆内融的薯条，切成方块或条状。",
+      "histoire": "Koliko 是洛美、卡拉和 Atakpamé 街头必不可少的夜间小吃。小贩从日落开始在街角设置大锅沸腾油。这是学生和夜间工作者喜欢的快速、热且经济的餐点。",
+      "accompagnementsIdaux": "辣番茄酱、胡椒粉（Kankan）或配炸火鸡或鸡肉块。"
+    },
+    "vebe_togolais": {
+      "nom": "Vèbè（花生酱）",
+      "description": "一种由烤花生酱制成的奶油般丝滑的酱汁，用当地香料调味。",
+      "histoire": "花生酱贯穿多哥的所有地区，从南到北（花生广泛种植）。它展示了多哥烹饪遗产将甜腻风味与强辣椒结合以创造完美平衡的能力。",
+      "accompagnementsIdaux": "白米饭、山药 fufu 或玉米面团。"
+    }
+  },
+  "Monuments": {
+    "grand_marche_lome": {
+      "nom": "Assigamé 大市场",
+      "description": "多哥首都著名的巨大市场，主要的商业中心和文化十字路口。",
+      "histoire": "在 Assigamé 大市场中，人们发现了 Nana Benz，著名的印花布料商，她们标志着国家的经济历史。"
+    },
+    "cathedrale_lome": {
+      "nom": "洛美圣心大教堂",
+      "description": "20世纪初在首都中心建造的哥特式建筑瑰宝。",
+      "histoire": "该哥特式建筑由圣言会传教士在德国殖民时期于1901年至1902年间建造，是多哥首都最重要的建筑和精神地标之一。1985年教皇约翰保罗二世访问后进行了修复。"
+    },
+    "statue_amitie_germano": {
+      "nom": "德国-多哥友谊雕像",
+      "description": "象征第一次外交协定和1884年保护条约的历史纪念碑。",
+      "histoire": "该雕像在 Baguida 竖立，以纪念1884年7月5日德国探险家 Gustav Nachtigal 与 Togoville 国王 Mlapa III 签署的保护条约。该纪念碑象征着多哥与德国之间复杂外交和历史关系的起点。"
+    },
+    "koutamakou": {
+      "nom": "Batammariba 土地（Koutamakou）",
+      "description": "著名的 Batammariba 土地，以其在西非独特的防御建筑而闻名。",
+      "histoire": "在这个地区，房屋是真正的多层农舍堡垒，其防御形式和露台非常独特。设计用于容纳家庭负责人拥有的一切，它们被分组为约十个单位的小村庄，对应一个氏族。"
+    },
+    "kpalime": {
+      "nom": "Kpalimé（绿色天堂）",
+      "description": "咖啡和可可地区，因其非凡的自然景观而被称为多哥的绿色天堂。",
+      "histoire": "Kpalimé 被茂密树林的山丘、绿色高原、丛林和深谷环绕，被郁郁葱葱的自然环绕，那里是 Agou 峰（多哥最高峰）的所在地。它也是该国最重要的手工艺中心，许多木雕师、蜡染艺术家、陶艺家和织工在那里工作。"
+    },
+    "maison_des_esclaves": {
+      "nom": "奴隶之家（Woold Home）",
+      "description": "位于 Agbodrafo 的感人纪念地，奴隶贸易的历史见证。",
+      "histoire": "位于 Agbodrafo，一个被公认为 '奴隶海岸' 组成部分的古老葡萄牙城市，奴隶之家（Woold Home）以及锁链井构成了这个痛苦过去的主要遗迹，情感依然生动。"
+    },
+    "monument_independance": {
+      "nom": "独立纪念碑",
+      "description": "位于多哥首都中心的一个宏伟国家纪念碑。",
+      "histoire": "位于洛美自由广场旁，这座宏伟纪念碑象征着当代历史、重获独立和多哥人民的主权。"
+    },
+    "musee_de_lome": {
+      "nom": "国家艺术博物馆",
+      "description": "致力于保存多哥艺术、工艺和文化的国家机构。",
+      "histoire": "这座位于首都的著名国家博物馆汇集了该国最好的艺术和遗产收藏，追溯了多哥各社区的文化历史和传统。"
+    },
+    "palais_de_lome": {
+      "nom": "洛美宫",
+      "description": "前殖民宫殿转变为海边的著名艺术中心和植物园。",
+      "histoire": "前总督宫由德国殖民者于1905年建造（随后由法国总督占领），这座宏伟建筑于2019年完全翻新，成为国际规模的艺术和文化中心，周围是海洋边缘具有非凡生物多样性的植物园。"
+    },
+    "chateau_vial": {
+      "nom": "Vial 城堡",
+      "description": "一座历史悠久的哥特式住宅，俯瞰 Kloto 山的森林和山谷。",
+      "histoire": "这座哥特式城堡由当时的法国总督于1940年代在 Kpalimé 附近 Kloto 山的翠绿高度上建造，作为国家住所。它提供了与加纳接壤的森林山谷的无遮挡景观。"
+    },
+    "village_artisanal": {
+      "nom": "洛美手工艺市场",
+      "description": "发现当地创作并观察工匠工作的理想场所。",
+      "histoire": "这是购买有价值纪念品的完美场所。访客可以直接观察多哥工匠的创作过程：蜡染工作、木雕、雕刻或传统编织技术。"
+    },
+    "cascade_yikpa": {
+      "nom": "Yikpa 瀑布",
+      "description": "多哥最壮观和最高的瀑布之一，坐落在野生自然中。",
+      "histoire": "也称为 Douala 瀑布，它是多哥最令人印象深刻和最高的瀑布之一。位于 Danyi 高原的最北端，它沿着陡峭的悬崖流入茂密的植被，壮观地标记着与加纳的自然边界。"
+    }
+  },
+  "Parcs": {
+    "africa_park_tata_park": {
+      "nom": "Africa Park (Tata Park)",
+      "description": "多哥最大的游乐园。它设有机动和充气游乐设施、陀螺车、3D电影院、餐厅和酒吧。",
+      "tarif": "入场：1000-2000 FCFA，额外游乐设施（200-500 FCFA）"
+    },
+    "amoukadi_paradis": {
+      "nom": "Amoukadi Paradis",
+      "description": "位于 Adétikopé 的休闲综合体，提供各种服务如游泳池。",
+      "tarif": "游泳池：成人 1500 FCFA，儿童 1000 FCFA"
+    },
+    "espace_aere_aqualand": {
+      "nom": "Aqualand 开放空间",
+      "description": "一个自然宏伟的环境，既是餐厅又是游乐场。为年轻人和老年人提供游乐设施（滑梯、充气游泳池、秋千、桌上足球）。",
+      "tarif": "免费入场，按菜单消费"
+    },
+    "espace_loisirs_nyumba": {
+      "nom": "Nyumba 休闲空间",
+      "description": "适合所有年龄段的休闲空间，提供游乐设施、游戏、娱乐和餐饮服务，在一个安全有趣的环境中。",
+      "tarif": "入场：每人 500 FCFA，付费游乐设施"
+    },
+    "fil_o_parc": {
+      "nom": "Fil O Parc",
+      "description": "一个休闲和放松综合体，包括游乐场、游泳池和餐厅。",
+      "tarif": "游泳池：成人 2000 FCFA，儿童 1500 FCFA"
+    },
+    "funny_park": {
+      "nom": "Funny Park",
+      "description": "一个提供各种游乐设施的游乐园，包括空调游戏室、户外餐厅、水上乐园和小马俱乐部。",
+      "tarif": "水上乐园：每人 2000 FCFA，游乐设施：300-500 FCFA"
+    },
+    "ludi_park": {
+      "nom": "Ludi Park",
+      "description": "一个拥有12洞迷你高尔夫球场和游乐场的游乐园。",
+      "tarif": "入场：1000 FCFA，迷你高尔夫：额外 2000 FCFA"
+    },
+    "olodge": {
+      "nom": "O'Lodge",
+      "description": "位于多哥湖畔的酒店综合体和水上乐园。（目前报告为永久关闭）",
+      "tarif": "关闭 – 无可用价格"
+    },
+    "parc_zoologique_temedja": {
+      "nom": "Témédja 动物园（Zoo Tali N'na）",
+      "description": "位于 Témédja 的野生动物园，提供在安全自然环境中发现各种野生动物的机会。",
+      "tarif": "入场：成人 2000 FCFA，儿童 1000 FCFA"
+    },
+    "zoo_fauna_cultura": {
+      "nom": "Fauna Cultura 动物园",
+      "description": "一个私人迷你动物园和养殖场。在那里可以观察到80多种动物物种。",
+      "tarif": "入场：每人 2000 FCFA，包含导游"
+    },
+    "parc_evou_kpodegbe": {
+      "nom": "Evou-Kpodegbe 公园",
+      "description": "位于 Témédja 动物园附近的动物园。",
+      "tarif": "入场：每人 1500 FCFA"
+    },
+    "o2_zoo": {
+      "nom": "O2 Zoo",
+      "description": "位于 UCAO-UUT 大学附近的动物园。",
+      "tarif": "免费入场（接受捐赠）"
+    },
+    "alea_park": {
+      "nom": "Aléa Park",
+      "description": "一个建在 7,000 平方米面积上的体育和娱乐综合体，提供广泛的活动。",
+      "tarif": "日套餐：5000 FCFA（访问所有活动），按活动减少套餐"
+    },
+    "parc_national_fazao_malfakassa": {
+      "nom": "Fazao-Malfakassa 国家公园",
+      "description": "多哥最大的国家公园，约50头草原大象、水牛、羚羊、疣猪甚至有时黑猩猩的避难所。",
+      "tarif": "入场：根据国籍约 5000-10000 FCFA（强制导游）"
+    },
+    "parc_national_keran": {
+      "nom": "Kéran 国家公园",
+      "description": "位于多哥北部的国家公园，是许多动物物种的避难所，包括大象和羚羊。",
+      "tarif": "入场：居民 5000 FCFA，非居民 10000 FCFA"
+    },
+    "parc_national_fosse_aux_lions": {
+      "nom": "狮子坑国家公园",
+      "description": "三个多哥国家公园中最小的一个，建于1954年。",
+      "tarif": "入场：每人 3000 FCFA"
+    }
+  },
+  "Common": {
+    "listen": "收听",
+    "stop": "停止"
+  },
+  "ChatBot": {
+    "title": "TGO AI",
+    "subtitle": "文化助手",
+    "welcome": "Woezon！我是 TGO AI，你的文化导游，帮助你了解多哥的纪念地、地区和美食。",
+    "fallback_response": "感谢你的提问。我可以帮助你找到旅途中实用的景点、美食和文化体验。",
+    "typing": "TGO AI 正在准备回复...",
+    "placeholder": "询问关于多哥的问题...",
+    "send": "发送",
+    "open": "打开 TGO AI 聊天",
+    "close": "关闭聊天"
+  },
+  "Histoire": {
+    "badge": "国家记忆",
+    "title": "多哥历史",
+    "subtitle": "一个沉浸式阅读页面，用来讲述多哥的起源、王国、交流、抗争和重要阶段。",
+    "listen_language": "朗读语言",
+    "listen": "朗读历史",
+    "stop": "停止朗读",
+    "contents": "目录",
+    "section": "章节",
+    "paste_hint": "把完整文本粘贴到此文件中的 TOGO_HISTORY_TEXT 常量里。用空行分隔段落，即可自动生成带动画的章节。",
+    "stats": {
+      "period": "多哥",
+      "period_label": "叙事",
+      "sections": "章节"
+    },
+    "paragraphs": [
+      "多哥拥有丰富的历史，这段历史由不同民族、语言、迁徙、贸易路线和精神传统共同塑造。本页面是一个编辑基础，用于向游客呈现完整且易读的故事。",
+      "在殖民时期以前，多哥地区有许多围绕酋邦、王国、市场和代代相传知识而组织起来的社群。",
+      "从十九世纪开始，与欧洲列强的接触深刻改变了这一地区。德国殖民统治以及后来的法国和英国行政管理，留下了政治、建筑和社会层面的痕迹。",
+      "多哥于1960年4月27日宣布独立，这是国家主权的重要一步。此后，多哥继续在记忆、文化创造和共同未来之间书写自己的历史。"
+    ]
+  },
+  "Auth": {
+    "login_title": "登录",
+    "login_subtitle": "访问您的 Heritogo 账户",
+    "register_title": "创建账户",
+    "register_subtitle": "加入 Heritogo 社区",
+    "forgot_title": "忘记密码",
+    "forgot_subtitle": "通过电子邮件接收重置链接",
+    "email": "电子邮件",
+    "password": "密码",
+    "confirm_password": "确认密码",
+    "full_name": "全名",
+    "login_button": "登录",
+    "register_button": "注册",
+    "forgot_button": "发送链接",
+    "forgot_link": "忘记密码？",
+    "no_account": "还没有账户？",
+    "has_account": "已有账户？",
+    "register_link": "注册",
+    "login_link": "登录",
+    "back_home": "返回首页",
+    "role_label": "我注册为",
+    "role_tourist": "游客",
+    "role_tourist_desc": "探索多哥并预订导游",
+    "role_guide": "导游",
+    "role_guide_desc": "向旅行者提供服务",
+    "loading": "加载中...",
+    "error_generic": "发生错误，请重试。",
+    "error_password_match": "密码不匹配。",
+    "error_password_short": "密码至少需要6个字符。",
+    "success_register": "账户已创建！正在跳转...",
+    "success_forgot": "邮件已发送，请检查收件箱。",
+    "check_email": "请检查电子邮件以确认您的账户。"
+  }
+}
