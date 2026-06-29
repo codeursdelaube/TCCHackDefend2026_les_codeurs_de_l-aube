@@ -1,0 +1,97 @@
+[
+
+  {
+
+    "id": "1",
+    "nom": "Monument de l'Indépendance",
+    "localite": "Lomé",
+    "region": "Maritime",
+    "histoire": "Inauguré le 27 avril 1960 sous la présidence de Sylvanus Olympio, ce monument célèbre l'accession du Togo à la souveraineté internationale. Conçu par Georges Coustère, sa structure intègre des fresques et des parois massives en béton et pierre taillée ornementale à sa base, entourant la silhouette d'un homme s'arrachant à la matière pour symboliser la liberté.",
+    "latitude": 6.131111,
+    "longitude": 1.215278
+
+  },
+
+  {
+
+    "id": "2",
+    "nom": "Monument de la Colombe de la Paix",
+    "localite": "Lomé",
+    "region": "Maritime",
+    "histoire": "Érigé à l'entrée de Lomé sous la présidence de Gnassingbé Eyadéma, ce monument moderne en maçonnerie sculptée est surmonté d'une immense colombe blanche. Il a été conçu pour symboliser l'attachement du pays à la stabilité politique, à la concorde nationale et à la paix après les périodes de turbulences politiques du début des années 1990.",
+    "latitude": 6.148143,
+    "longitude": 1.218521
+
+  },
+
+  {
+
+    "id": "3",
+    "nom": "Monument de l'Amitié Germano-Togolaise",
+    "localite": "Baguida",
+    "region": "Maritime",
+    "histoire": "Situé à Baguida, première capitale du Togo, ce monument historique en maçonnerie et pierre commémore la signature du traité de protectorat le 5 juillet 1884 entre l'explorateur allemand Gustav Nachtigal et le chef local Mlapa III de Togoville, marquant le début officiel des relations diplomatiques et de l'ère coloniale allemande.",
+    "latitude": 6.162778,
+    "longitude": 1.328333
+
+  },
+
+  {
+
+    "id": "4",
+    "nom": "Les Pavements archéologiques de Dakpodji",
+    "localite": "Notsé",
+    "region": "Maritime",
+    "histoire": "Découvert lors de fouilles archéologiques dans la préfecture de Haho, ce site présente de vastes structures de pavage au sol composées de petites pierres taillées associées à des fragments de poteries anciennes imbriquées. Il s'agit des preuves matérielles d'une civilisation précoloniale avancée maîtrisant l'aménagement du sol urbain.",
+    "latitude": 6.383333,
+    "longitude": 1.250000
+  },
+
+  {
+
+    "id": "5",
+    "nom": "La Faille d'Alédjo",
+    "localite": "Alédjo-Kadara",
+    "region": "Centrale",
+    "histoire": "Cette brèche monumentale a été taillée à vif à travers le massif rocheux de l'Alédjo pendant l'époque coloniale pour faire passer la Route Nationale 1. Percée à l'aide d'outils rudimentaires (pics et barres à mine) par la main-d'œuvre togolaise locale, cette fracture artificielle dans la pierre témoigne de l'histoire douloureuse du travail forcé.",
+    "latitude": 9.252241,
+    "longitude": 1.203925
+
+  },
+
+  {
+
+    "id": "6",
+    "nom": "Cathédrale Sacré-Cœur de Lomé",
+    "localite": "Lomé",
+    "region": "Maritime",
+    "histoire": "Édifiée entre 1901 et 1902 par les missionnaires catholiques allemands (Société du Verbe Divin) au cœur du grand marché d'Assigamé, cette cathédrale de style néo-gothique possède des fondations massives et une architecture de briques et pierres qui en font l'un des plus anciens et remarquables repères spirituels du sud-Togo.",
+    "latitude": 6.123333,
+    "longitude": 1.222500
+
+  },
+
+  {
+
+    "id": "7",
+    "nom": "Château Vial (Palais de Kouma)",
+    "localite": "Kpalimé",
+    "region": "Plateaux",
+    "histoire": "Construit au début des années 1940 par le gouverneur colonial français Jean-François Vial, ce château est un chef-d'œuvre architectural entièrement bâti en pierres de taille sur les hauteurs du mont Kloto. Devenu une résidence présidentielle après l'indépendance, il témoigne du travail des artisans tailleurs de pierre de la région des Plateaux.",
+    "latitude": 6.946389,
+    "longitude": 0.613333
+
+  },
+
+  {
+
+    "id": "8",
+    "nom": "Les Tata Tamberma de Koutamakou",
+    "localite": "Kandé",
+    "region": "Kara",
+    "histoire": "Inscrit au patrimoine mondial de l'UNESCO, le paysage culturel de Koutamakou abrite les 'Takienta' (Tata), des maisons-fortes traditionnelles en terre, bois et soubassements de pierre. Construites par le peuple Batammariba pour se protéger des raids esclavagistes et des bêtes sauvages, elles incarnent une symbiose unique entre l'architecture et la nature.",
+    "latitude": 10.100000,
+    "longitude": 1.016667
+  }
+
+]
