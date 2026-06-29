@@ -13,7 +13,8 @@ interface Message {
   timestamp: Date
 }
 
-const CHAT_API = 'https://heritogo-production.up.railway.app/api/v1/chat'
+// CORRECTION : Ajout du protocole https:// indispensable pour le fetch
+const CHAT_API = 'https://heritogo-production.up.railway.app/chatbot/api/v1/chat/'
 
 export default function ChatBot() {
   const t = useTranslations('ChatBot')
@@ -58,19 +59,22 @@ export default function ChatBot() {
     addMessage('user', content)
     setIsTyping(true)
 
-    // Ajouter le message utilisateur à l'historique
-    historyRef.current = [
+    // Préparation de l'historique mis à jour localement (sans modifier le ref tout de suite)
+    const currentHistory = [
       ...historyRef.current,
-      { role: 'user', content },
+      { role: 'user' as const, content },
     ]
 
     try {
       const response = await fetch(CHAT_API, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
           message: content,
-          history: historyRef.current.slice(-10), // 5 derniers échanges max
+          history: currentHistory.slice(-10), // Prend les 10 derniers messages (5 échanges complets)
         }),
       })
 
@@ -81,7 +85,7 @@ export default function ChatBot() {
         )
       }
 
-      const data = await response.json() as {
+      const data = (await response.json()) as {
         response?: string
         reply?: string
         message?: string
@@ -96,10 +100,10 @@ export default function ChatBot() {
         data.answer ??
         t('fallback_response')
 
-      // Ajouter la réponse IA à l'historique
+      // CORRECTION : On met à jour l'historique global UNIQUEMENT si l'API a répondu avec succès
       historyRef.current = [
-        ...historyRef.current,
-        { role: 'assistant', content: aiText },
+        ...currentHistory,
+        { role: 'assistant' as const, content: aiText },
       ]
 
       addMessage('ai', aiText)
@@ -115,7 +119,7 @@ export default function ChatBot() {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] pointer-events-none">
+    <div className="fixed inset-0 z-9999 pointer-events-none">
       <AnimatePresence mode="wait">
         {isOpen && (
           <motion.div
@@ -131,8 +135,8 @@ export default function ChatBot() {
                        rounded-[28px] border border-border
                        bg-base-200 text-base-content shadow-2xl
                        sm:bottom-24 sm:left-auto sm:right-6 sm:top-auto
-                       sm:h-[min(560px,calc(100dvh-8rem))] sm:w-[390px]
-                       sm:rounded-[32px]"
+                       sm:h-[min(560px,calc(100dvh-8rem))] sm:w-97.5
+                       sm:rounded-4xl"
           >
             {/* Header */}
             <div className="flex shrink-0 items-center justify-between
@@ -140,7 +144,7 @@ export default function ChatBot() {
               <div className="flex items-center gap-3">
                 <div
                   className="relative flex h-10 w-10 shrink-0 items-center
-                              justify-center rounded-2xl text-white sm:h-11 sm:w-11"
+                             justify-center rounded-2xl text-white sm:h-11 sm:w-11"
                   style={{ backgroundColor: COLORS.forest }}
                 >
                   <Bot className="h-5 w-5" />
@@ -200,8 +204,8 @@ export default function ChatBot() {
                       </div>
                     )}
                     <div
-                      className={`min-w-0 overflow-hidden break-words
-                        rounded-[20px] px-3.5 py-3 text-xs font-medium
+                      className={`min-w-0 overflow-hidden wrap-break-words
+                        rounded-2xl px-3.5 py-3 text-xs font-medium
                         leading-relaxed shadow-sm sm:rounded-[22px]
                         ${isAi
                           ? 'rounded-tl-md border border-border bg-base-200 text-base-content'
@@ -286,7 +290,7 @@ export default function ChatBot() {
           onClick={() => setIsOpen(true)}
           className="pointer-events-auto fixed
                      bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4
-                     z-[9999] flex h-12 w-12 items-center justify-center
+                     z-9999 flex h-12 w-12 items-center justify-center
                      rounded-full text-white shadow-xl transition-all
                      hover:scale-105 active:scale-95 hover:shadow-2xl
                      border border-white/10"

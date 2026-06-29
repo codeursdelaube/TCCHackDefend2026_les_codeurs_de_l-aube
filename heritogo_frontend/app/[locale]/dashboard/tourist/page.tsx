@@ -9,8 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 import { getFirstName, getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 import { 
-  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, 
-  MapPin, AlertCircle, ChevronRight, MessageSquare 
+  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare 
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
 
@@ -38,7 +37,7 @@ interface BookingRow {
 interface UserProfile {
   id: string
   full_name: string
-  phone: string | null
+  phone: number | null
   preferred_lang: string | null
   email?: string
 }
@@ -89,6 +88,7 @@ export default function TouristDashboardPage() {
         setFormPhone(profileData.profile.phone || '')
         setFormLang(profileData.profile.preferred_lang || 'fr')
       }
+      
 
       // Bookings query
       const bookingsRes = await fetch('/api/tourist/bookings')
