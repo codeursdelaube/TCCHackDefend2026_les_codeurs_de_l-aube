@@ -100,7 +100,7 @@ model Profile {
   role           UserRole  @default(tourist)
   full_name      String
   avatar_url     String?
-  phone          String?
+  phone          Number?
   nationality    String?
   bio            String?
   preferred_lang String?   @default("fr")
