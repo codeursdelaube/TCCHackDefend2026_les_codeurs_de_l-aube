@@ -40,8 +40,10 @@ export async function GET() {
 
     return NextResponse.json({ bookings })
   } catch (error: unknown) {
-    console.error('Erreur dans GET /api/tourist/bookings:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    console.error('[GET /api/tourist/bookings]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -2,7 +2,7 @@
 
 import { Link, usePathname } from '@/i18n/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import {
   ElementType, useEffect, useState,
 } from 'react'
@@ -41,6 +41,7 @@ export default function Navbar() {
   const pathname = usePathname()
   const locale = useLocale()
   const params = useParams<{ locale: string }>()
+  const router = useRouter()
   const t = useTranslations('Navbar')
   const tAuth = useTranslations('Auth')
   const { toggle, isDark, mounted } = useTheme()
@@ -59,6 +60,7 @@ export default function Navbar() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
           setProfile(null)
+          setAuthLoading(false)
           return
         }
         const { data } = await supabase
@@ -76,12 +78,22 @@ export default function Navbar() {
 
     loadProfile()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      loadProfile()
-    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event: string, session: any) => {
+        if (event === 'SIGNED_OUT') {
+          setProfile(null)
+          setAuthLoading(false)
+          // Force le refresh pour mettre à jour tous les composants qui dépendent de l'auth
+          router.refresh()
+        }
+        if (event === 'SIGNED_IN' && session) {
+          loadProfile()
+        }
+      }
+    )
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [router])
 
   const publicLinks: NavLinkItem[] = [
     { href: '/lieux', label: t('lieux'), icon: Map },

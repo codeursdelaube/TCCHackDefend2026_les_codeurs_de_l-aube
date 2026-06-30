@@ -8,6 +8,8 @@ import { Camera, Loader2, MapPin, RefreshCw, Sparkles, Upload, AlertTriangle, Sh
 import { useLocale, useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
+import { getUserFriendlyError } from '@/lib/utils/errors'
+
 
 interface PredictionResult {
   prediction_status: string
@@ -111,9 +113,9 @@ export default function ScanPage() {
         setResult(data)
         setTranslatedText({ fr: data.data.histoire })
         return null
-      } catch (scanError) {
+      } catch (scanError: unknown) {
         console.error(scanError)
-        return t('errors.server')
+        return getUserFriendlyError(scanError)
       }
     },
     null,

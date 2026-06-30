@@ -431,12 +431,11 @@ export default function AdminDashboardPage() {
                               <a 
                                 key={doc.id}
                                 href={doc.file_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                download={`${doc.label.replace(/\s+/g, '_') || 'document'}.pdf`}
                                 className="badge bg-base-100 border-border text-base-content hover:border-primary py-3 px-3 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-semibold"
                               >
                                 <FileText className="h-3.5 w-3.5 text-base-content/40" />
-                                {doc.label} <ExternalLink className="h-3 w-3 shrink-0 text-base-content/30" />
+                                {doc.label} (Télécharger PDF) <ExternalLink className="h-3 w-3 shrink-0 text-base-content/30" />
                               </a>
                             ))}
                           </div>

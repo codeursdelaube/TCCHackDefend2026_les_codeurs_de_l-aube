@@ -12,6 +12,9 @@ import {
   Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare 
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
+import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
+import { getUserFriendlyError } from '@/lib/utils/errors'
+
 
 interface BookingRow {
   id: string
@@ -37,7 +40,7 @@ interface BookingRow {
 interface UserProfile {
   id: string
   full_name: string
-  phone: number | null
+  phone: string | null
   preferred_lang: string | null
   email?: string
 }
@@ -142,6 +145,21 @@ export default function TouristDashboardPage() {
     setProfileSuccess(false)
     setProfileError(null)
 
+    // Validations côté client
+    const nameError = validateFullName(formName)
+    if (nameError) {
+      setProfileError(nameError)
+      setSavingProfile(false)
+      return
+    }
+
+    const phoneError = validatePhone(formPhone)
+    if (phoneError) {
+      setProfileError(phoneError)
+      setSavingProfile(false)
+      return
+    }
+
     try {
       const response = await fetch('/api/profile', {
         method: 'POST',
@@ -167,8 +185,9 @@ export default function TouristDashboardPage() {
           preferred_lang: formLang
         })
       }
-    } catch {
-      setProfileError('Impossible de mettre à jour le profil')
+    } catch (err: unknown) {
+      console.error(err)
+      setProfileError(getUserFriendlyError(err))
     } finally {
       setSavingProfile(false)
     }
@@ -331,10 +350,13 @@ export default function TouristDashboardPage() {
                   <input
                     type="tel"
                     value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
+                    onChange={(e) => setFormPhone(sanitizePhoneInput(e.target.value))}
                     className="input input-bordered w-full rounded-2xl bg-base-100"
                     placeholder="+228 90 00 00 00"
                   />
+                  {formPhone && validatePhone(formPhone) && (
+                    <span className="text-xs text-error mt-1">{validatePhone(formPhone)}</span>
+                  )}
                 </label>
 
                 <label className="form-control w-full">

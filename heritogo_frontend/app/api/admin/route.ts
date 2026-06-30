@@ -20,6 +20,10 @@ async function checkAdmin() {
     return { error: 'Accès interdit', status: 403 }
   }
 
+  if (!('is_active' in profile) || (profile as { is_active?: boolean }).is_active === false) {
+    return { error: 'Compte inactif', status: 403 }
+  }
+
   return { user, profile }
 }
 
@@ -117,8 +121,10 @@ export async function GET() {
       adminLogs
     })
   } catch (error: unknown) {
-    console.error('Erreur dans GET /api/admin:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    console.error('[GET /api/admin]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -293,8 +299,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
-    console.error('Erreur dans POST /api/admin:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    console.error('[POST /api/admin]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

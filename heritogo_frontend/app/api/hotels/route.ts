@@ -41,8 +41,10 @@ export async function GET(request: NextRequest) {
     const hotels = await response.json()
     return NextResponse.json(Array.isArray(hotels) ? hotels : [])
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Erreur lors de la recherche des hôtels.'
+    console.error('[GET /api/hotels]', error)
+    const message = error instanceof Error && error.message.startsWith('Coordonnee')
+      ? error.message
+      : 'Impossible de récupérer les hôtels proches.'
     return NextResponse.json({ error: message }, { status: 400 })
   }
 }

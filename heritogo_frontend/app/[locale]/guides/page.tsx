@@ -10,6 +10,8 @@ import {
   Star, Compass, Languages, MapPin, Search, SlidersHorizontal,
   UserCheck, ShieldCheck, Heart, AlertCircle, Loader2
 } from 'lucide-react'
+import { getUserFriendlyError } from '@/lib/utils/errors'
+
 
 interface GuideRow {
   id: string
@@ -69,8 +71,9 @@ export default function GuidesPage() {
       }
 
       setGuides(data.guides)
-    } catch {
-      setError('Impossible de charger les guides')
+    } catch (err: unknown) {
+      console.error(err)
+      setError(getUserFriendlyError(err))
     } finally {
       setLoading(false)
     }

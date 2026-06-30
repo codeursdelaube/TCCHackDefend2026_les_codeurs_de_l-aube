@@ -11,6 +11,7 @@ import {
   ArrowLeft, Calendar, Clock, MapPin, Users, MessageSquare, 
   Sparkles, Loader2, AlertCircle, CheckCircle, ShieldCheck, Star 
 } from 'lucide-react'
+import { getUserFriendlyError } from '@/lib/utils/errors'
 
 interface GuideInfo {
   id: string
@@ -112,8 +113,9 @@ export default function BookingPage() {
       setTimeout(() => {
         router.push('/dashboard/tourist?booking_success=true')
       }, 2000)
-    } catch {
-      setSubmitError('Impossible de soumettre la demande de réservation.')
+    } catch (err: unknown) {
+      console.error(err)
+      setSubmitError(getUserFriendlyError(err))
     } finally {
       setSubmitting(false)
     }
@@ -259,14 +261,24 @@ export default function BookingPage() {
 
                 <label className="form-control w-full">
                   <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" /> Nombre de personnes (1 - 20)
+                    <Users className="h-3.5 w-3.5" /> Nombre de personnes (1 - 50)
                   </span>
                   <input
                     type="number"
                     min="1"
-                    max="20"
+                    max="50"
                     value={groupSize}
-                    onChange={(e) => setGroupSize(parseInt(e.target.value, 10) || 1)}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      if (v === '') {
+                        setGroupSize(1)
+                      } else {
+                        const val = parseInt(v, 10)
+                        if (val >= 1 && val <= 50) {
+                          setGroupSize(val)
+                        }
+                      }
+                    }}
                     className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                     required
                   />
