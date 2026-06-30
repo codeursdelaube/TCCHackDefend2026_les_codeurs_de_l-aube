@@ -1,0 +1,272 @@
+[
+  {
+    "id": "1",
+    "nom": "Fufu Bar Mokpôkpô",
+    "quartier": "Bè",
+    "adresse": "Quartier Bè, Lomé",
+    "telephone": "+228 90 00 11 22",
+    "latitude": 6.1280,
+    "longitude": 1.2310,
+    "horaires": "7h – 22h (7j/7)",
+    "budget_fcfa": "1500 – 4000",
+    "plats_ids": ["fufu_togolais", "gboma_dessi", "adzeme_togolais", "vebe_togolais"]
+  },
+  {
+    "id": "2",
+    "nom": "Da Afi Foufou Bar",
+    "quartier": "Bè-Kpota",
+    "adresse": "Près du rond-point de Bè-Kpota, Lomé",
+    "telephone": "+228 91 23 45 67",
+    "latitude": 6.1295,
+    "longitude": 1.2340,
+    "horaires": "8h – 22h (7j/7)",
+    "budget_fcfa": "1500 – 3500",
+    "plats_ids": ["fufu_togolais", "gboma_dessi", "vebe_togolais"]
+  },
+  {
+    "id": "3",
+    "nom": "Fufu Bar Resto Main Divine",
+    "quartier": "Tokoin",
+    "adresse": "Tokoin, Lomé",
+    "telephone": "+228 93 45 67 89",
+    "latitude": 6.1520,
+    "longitude": 1.2270,
+    "horaires": "7h30 – 21h30 (7j/7)",
+    "budget_fcfa": "1500 – 4000",
+    "plats_ids": ["fufu_togolais", "gboma_dessi", "adzeme_togolais"]
+  },
+  {
+    "id": "4",
+    "nom": "Vivi Royal",
+    "quartier": "Centre-ville",
+    "adresse": "Rue des Moussons, 2ème rue en face de la Mairie Centrale, Lomé",
+    "telephone": "+228 99 47 60 53",
+    "latitude": 6.1365,
+    "longitude": 1.2218,
+    "horaires": "11h – 23h (7j/7)",
+    "budget_fcfa": "5000 – 10000",
+    "plats_ids": [
+      "fufu_togolais", "gboma_dessi", "adzeme_togolais",
+      "djenkoume_togolais", "vebe_togolais", "ayimolou_togolais"
+    ]
+  },
+  {
+    "id": "5",
+    "nom": "La Marmite du Terroir",
+    "quartier": "Totsi",
+    "adresse": "Totsi, en face d'Ecobank, à côté de la pharmacie de la Nation, Lomé",
+    "telephone": "+228 90 17 75 75",
+    "latitude": 6.1610,
+    "longitude": 1.2190,
+    "horaires": "11h – 23h (Lun–Sam)",
+    "budget_fcfa": "5000 – 15000",
+    "plats_ids": [
+      "fufu_togolais", "djenkoume_togolais", "gboma_dessi",
+      "adzeme_togolais", "ayimolou_togolais", "vebe_togolais"
+    ]
+  },
+  {
+    "id": "6",
+    "nom": "La Suite de Cika",
+    "quartier": "Nukafu",
+    "adresse": "Nukafu, Boulevard Jean Paul II, en face de la station T-Oil, Lomé",
+    "telephone": "+228 70 54 38 94",
+    "latitude": 6.1680,
+    "longitude": 1.2150,
+    "horaires": "Mar–Dim 11h30–14h30 et 18h30–00h00 | Lun 18h30–00h00",
+    "budget_fcfa": "3000 – 15000",
+    "plats_ids": [
+      "fufu_togolais", "djenkoume_togolais", "gboma_dessi",
+      "adzeme_togolais", "koliko_togolais", "vebe_togolais"
+    ]
+  },
+  {
+    "id": "7",
+    "nom": "Namiélé",
+    "quartier": "Adidogomé",
+    "adresse": "Adidogomé, Lomé",
+    "telephone": "+228 90 56 78 90",
+    "latitude": 6.1880,
+    "longitude": 1.2060,
+    "horaires": "11h – 22h (7j/7)",
+    "budget_fcfa": "4000 – 12000",
+    "plats_ids": [
+      "gboma_dessi", "adzeme_togolais", "djenkoume_togolais",
+      "fufu_togolais", "vebe_togolais"
+    ]
+  },
+  {
+    "id": "8",
+    "nom": "Bar La Fierté",
+    "quartier": "Agoè",
+    "adresse": "Agoè, Lomé",
+    "telephone": "+228 99 88 77 66",
+    "latitude": 6.2050,
+    "longitude": 1.2100,
+    "horaires": "9h – 23h (7j/7)",
+    "budget_fcfa": "1500 – 6000",
+    "plats_ids": [
+      "ayimolou_togolais", "koliko_togolais", "adzeme_togolais",
+      "gboma_dessi", "vebe_togolais"
+    ]
+  },
+  {
+    "id": "9",
+    "nom": "Chez Wiyao",
+    "quartier": "Hedzranawoé",
+    "adresse": "Hedzranawoé, derrière l'ambassade du Gabon, Lomé",
+    "telephone": "+228 90 12 34 56",
+    "latitude": 6.1730,
+    "longitude": 1.2420,
+    "horaires": "Lun–Dim 10h – 22h",
+    "budget_fcfa": "500 – 2500",
+    "plats_ids": ["ayimolou_togolais", "koliko_togolais"]
+  },
+  {
+    "id": "10",
+    "nom": "Congotô",
+    "quartier": "Bè-Kpota",
+    "adresse": "Bè-Kpota, en face de la Pharmacie 2000, Lomé",
+    "telephone": "+228 93 11 22 33",
+    "latitude": 6.1305,
+    "longitude": 1.2355,
+    "horaires": "7h – 14h (7j/7)",
+    "budget_fcfa": "500 – 2000",
+    "plats_ids": ["ayimolou_togolais"]
+  },
+  {
+    "id": "11",
+    "nom": "Mama Locoh Donou",
+    "quartier": "Nyékonakpoé",
+    "adresse": "Nyékonakpoé, en face du laboratoire Locoh Donou, Lomé",
+    "telephone": "+228 91 55 44 33",
+    "latitude": 6.1440,
+    "longitude": 1.2260,
+    "horaires": "9h – 12h (Lun–Sam)",
+    "budget_fcfa": "500 – 1500",
+    "plats_ids": ["ayimolou_togolais"]
+  },
+  {
+    "id": "12",
+    "nom": "Maguinon Ayimolou (Maman Maggi)",
+    "quartier": "Avedji",
+    "adresse": "Rue de l'Ogou, face au Lycée Français de Lomé, Avedji",
+    "telephone": "+228 90 33 44 55",
+    "latitude": 6.1780,
+    "longitude": 1.2080,
+    "horaires": "6h30 – 13h (matin : ayimolou) | 18h – 22h (soir : koliko)",
+    "budget_fcfa": "500 – 2000",
+    "plats_ids": ["ayimolou_togolais", "koliko_togolais"]
+  },
+  {
+    "id": "13",
+    "nom": "Chez Madjo",
+    "quartier": "Tokoin Hôpital",
+    "adresse": "Tokoin Hôpital, Lomé",
+    "telephone": "+228 92 66 77 88",
+    "latitude": 6.1560,
+    "longitude": 1.2240,
+    "horaires": "7h – 14h (7j/7)",
+    "budget_fcfa": "500 – 2000",
+    "plats_ids": ["ayimolou_togolais"]
+  },
+  {
+    "id": "14",
+    "nom": "Koliko Palace",
+    "quartier": "Agoè-Nyivé",
+    "adresse": "Agoè-Nyivé, Lomé",
+    "telephone": "+228 90 44 55 66",
+    "latitude": 6.2100,
+    "longitude": 1.2080,
+    "horaires": "17h – 23h (7j/7)",
+    "budget_fcfa": "1000 – 3500",
+    "plats_ids": ["koliko_togolais", "ayimolou_togolais"]
+  },
+  {
+    "id": "15",
+    "nom": "Mama Ramco",
+    "quartier": "Tokoin Ramco",
+    "adresse": "Sens interdit de Tokoin Ramco, Lomé",
+    "telephone": "+228 93 77 88 99",
+    "latitude": 6.1590,
+    "longitude": 1.2200,
+    "horaires": "19h – 23h (7j/7)",
+    "budget_fcfa": "500 – 2000",
+    "plats_ids": ["ayimolou_togolais", "koliko_togolais"]
+  },
+  {
+    "id": "16",
+    "nom": "Chez Bèrè",
+    "quartier": "Kotokoli Zongo",
+    "adresse": "Kotokoli Zongo, Lomé",
+    "telephone": "+228 91 99 00 11",
+    "lat": 6.1420,
+    "lng": 1.2300,
+    "horaires": "7h – 13h (Lun–Sam)",
+    "budget_fcfa": "500 – 1500",
+    "plats_ids": ["ayimolou_togolais"]
+  },
+  {
+    "id": "17",
+    "nom": "Maquis Chez Afovi",
+    "quartier": "Baguida",
+    "adresse": "Baguida, bord de mer, Lomé",
+    "telephone": "+228 90 22 11 00",
+    "latitude": 6.1050,
+    "longitude": 1.3100,
+    "horaires": "9h – 22h (7j/7)",
+    "budget_fcfa": "1000 – 4000",
+    "plats_ids": ["ablo_togolais", "kom_togolais", "fufu_togolais"]
+  },
+  {
+    "id": "18",
+    "nom": "Maquis La Côtière",
+    "quartier": "Aného",
+    "adresse": "Boulevard Maritime, Aného, Togo",
+    "telephone": "+228 90 33 22 11",
+    "latitude": 6.2280,
+    "longitude": 1.5960,
+    "horaires": "8h – 22h (7j/7)",
+    "budget_fcfa": "1000 – 3500",
+    "plats_ids": ["ablo_togolais", "kom_togolais"]
+  },
+  {
+    "id": "19",
+    "nom": "Maquis Chez Kossivi",
+    "quartier": "Aflao Road",
+    "adresse": "Route d'Aflao, Lomé",
+    "telephone": "+228 91 44 33 22",
+    "latitude": 6.1220,
+    "longitude": 1.2050,
+    "horaires": "10h – 22h (7j/7)",
+    "budget_fcfa": "1000 – 3000",
+    "plats_ids": ["kom_togolais", "ablo_togolais", "fufu_togolais"]
+  },
+  {
+    "id": "20",
+    "nom": "Maquis Ewé Saveurs",
+    "quartier": "Agbalépédogan",
+    "adresse": "Agbalépédogan, Lomé",
+    "telephone": "+228 92 55 66 77",
+    "latitude": 6.1480,
+    "longitude": 1.2380,
+    "horaires": "11h – 22h (7j/7)",
+    "budget_fcfa": "2000 – 6000",
+    "plats_ids": ["djenkoume_togolais", "fufu_togolais", "gboma_dessi", "vebe_togolais"]
+  },
+  {
+    "id": "21",
+    "nom": "La Pirogue",
+    "quartier": "Lomé Centre",
+    "adresse": "Lomé, près du port",
+    "telephone": "+228 22 20 00 00",
+    "latitude": 6.1300,
+    "longitude": 1.2200,
+    "horaires": "12h – 23h (7j/7)",
+    "budget_fcfa": "3000 – 10000",
+    "plats": [
+      "fufu_togolais", "vebe_togolais", "gboma_dessi",
+      "adzeme_togolais", "ablo_togolais"
+    ]
+  }
+]
