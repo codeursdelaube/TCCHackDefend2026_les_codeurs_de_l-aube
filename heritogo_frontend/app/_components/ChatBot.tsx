@@ -16,7 +16,7 @@ interface Message {
 }
 
 // CORRECTION : Ajout du protocole https:// indispensable pour le fetch
-const CHAT_API = 'https://heritogo-production.up.railway.app/api/v1/chat/'
+const CHAT_API = 'https://heritogo-production.up.railway.app/chatbot/api/v1/chat/'
 
 export default function ChatBot() {
   const t = useTranslations('ChatBot')

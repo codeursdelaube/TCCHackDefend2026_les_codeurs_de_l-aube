@@ -10,7 +10,6 @@ import {
   ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
 import AuthGuardLink from '@/components/AuthGuardLink'
 
 /* ─── Types ─────────────────────────────────────────────── */
@@ -235,7 +234,7 @@ export default function AccueilPage() {
               <Scan className="h-5 w-5" />
               {t('cta_scan')}
             </AuthGuardLink>
-            <Link
+            <AuthGuardLink
               href="/lieux"
               className="inline-flex min-h-[52px] items-center justify-center gap-2
                          rounded-lg border border-white/80 px-7 py-3 text-sm font-black
@@ -244,7 +243,7 @@ export default function AccueilPage() {
             >
               <MapPin className="h-5 w-5" />
               {t('cta_discover')}
-            </Link>
+            </AuthGuardLink>
           </div>
         </div>
 
@@ -293,7 +292,7 @@ export default function AccueilPage() {
           {categories.map(cat => {
             const Icon = cat.icon
             return (
-              <Link
+              <AuthGuardLink
                 key={cat.label}
                 href={cat.href}
                 className="group flex min-h-[88px] items-center gap-3 border-b-2
@@ -314,7 +313,7 @@ export default function AccueilPage() {
                     {cat.sub}
                   </span>
                 </span>
-              </Link>
+              </AuthGuardLink>
             )
           })}
         </div>
@@ -383,10 +382,8 @@ export default function AccueilPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {featureCards.map(card => {
               const Icon = card.icon
-              const isScan = card.href === '/scan'
-              const CardWrapper = isScan ? AuthGuardLink : Link
               return (
-                <CardWrapper
+                <AuthGuardLink
                   key={card.href}
                   href={card.href}
                   className="group flex min-h-[340px] flex-col rounded-xl border border-border
@@ -435,7 +432,7 @@ export default function AccueilPage() {
                     {card.cta}
                     <ArrowRight className="h-4 w-4" />
                   </span>
-                </CardWrapper>
+                </AuthGuardLink>
               )
             })}
           </div>
@@ -553,7 +550,7 @@ export default function AccueilPage() {
                   </li>
                 ))}
               </ul>
-              <Link
+              <AuthGuardLink
                 href="/subscription"
                 className="mt-6 inline-flex min-h-[52px] w-full items-center justify-center
                            rounded-lg text-sm font-black text-white transition-all
@@ -561,7 +558,7 @@ export default function AccueilPage() {
                 style={{ background: C.rust }}
               >
                 {t('subscribe_cta')}
-              </Link>
+              </AuthGuardLink>
             </div>
           </div>
         </section>
@@ -583,7 +580,7 @@ export default function AccueilPage() {
                 {t('final_cta.title')}
               </h2>
             </div>
-            <Link
+            <AuthGuardLink
               href="/lieux"
               className="inline-flex shrink-0 items-center gap-2 rounded-lg px-7 py-4
                          text-sm font-black transition-all
@@ -592,7 +589,7 @@ export default function AccueilPage() {
             >
               {t('final_cta.cta')}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </AuthGuardLink>
           </div>
         </section>
 
