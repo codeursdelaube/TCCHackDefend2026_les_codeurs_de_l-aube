@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
 
@@ -11,6 +11,9 @@ import {
   AlertTriangle, Loader2, Star, ShieldCheck, BadgeCent, 
   FileText, UploadCloud, Edit3, User, Bell, Phone 
 } from 'lucide-react'
+import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
+import { getUserFriendlyError } from '@/lib/utils/errors'
+
 
 interface BookingRow {
   id: string
@@ -108,6 +111,7 @@ export default function GuideDashboard() {
   const [docType, setDocType] = useState('guide_license')
   const [docLabel, setDocLabel] = useState('')
   const [docUrl, setDocUrl] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   // Quote Modal State
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null)
@@ -163,6 +167,35 @@ export default function GuideDashboard() {
   // Update profile handler
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+
+    // Validations côté client
+    const phoneErr = validatePhone(phone)
+    if (phoneErr) {
+      setError(phoneErr)
+      return
+    }
+
+    if (experienceYears < 0 || experienceYears > 60) {
+      setError("Les années d'expérience doivent être comprises entre 0 et 60.")
+      return
+    }
+
+    const rates = [
+      { val: hourlyRate, name: 'Tarif horaire' },
+      { val: halfDayRate, name: 'Tarif demi-journée' },
+      { val: fullDayRate, name: 'Tarif journée complète' },
+      { val: virtualRate, name: 'Tarif virtuel' }
+    ]
+
+    for (const r of rates) {
+      const err = validatePositiveNumber(r.val, r.name)
+      if (err) {
+        setError(err)
+        return
+      }
+    }
+
     setActionLoading(true)
     try {
       const response = await fetch('/api/guide/profile', {
@@ -184,13 +217,13 @@ export default function GuideDashboard() {
 
       const data = await response.json()
       if (!response.ok) {
-        alert(data.error || 'Erreur lors de la mise à jour')
+        setError(data.error || 'Erreur lors de la mise à jour')
         return
       }
       setGuide(data.guide)
       alert('Profil mis à jour avec succès !')
-    } catch {
-      alert('Erreur réseau lors de la mise à jour.')
+    } catch (err: unknown) {
+      setError(getUserFriendlyError(err))
     } finally {
       setActionLoading(false)
     }
@@ -199,12 +232,23 @@ export default function GuideDashboard() {
   // Handle document submission
   const handleUploadDocument = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!docUrl) {
-      alert('Veuillez spécifier une URL de document de démonstration.')
+    setError(null)
+    if (!selectedFile) {
+      setError('Veuillez sélectionner un fichier PDF.')
       return
     }
     setActionLoading(true)
+
     try {
+      // Lire le fichier en base64
+      const reader = new FileReader()
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = (err) => reject(err)
+      })
+      reader.readAsDataURL(selectedFile)
+      const base64Data = await base64Promise
+
       const response = await fetch('/api/guide/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -212,24 +256,24 @@ export default function GuideDashboard() {
           document: {
             type: docType,
             label: docLabel || 'Document de vérification',
-            file_url: docUrl,
-            file_name: docUrl.split('/').pop() || 'document.pdf',
-            file_size: 1048576 // Mock 1MB
+            file_url: base64Data,
+            file_name: selectedFile.name,
+            file_size: selectedFile.size
           }
         })
       })
 
       const data = await response.json()
       if (!response.ok) {
-        alert(data.error || 'Erreur lors de la soumission du document')
+        setError(data.error || 'Erreur lors de la soumission du document')
         return
       }
       setGuide(data.guide)
-      setDocUrl('')
       setDocLabel('')
+      setSelectedFile(null)
       alert('Document soumis avec succès ! Votre statut passe en examen.')
-    } catch {
-      alert('Erreur réseau lors de la soumission.')
+    } catch (err: unknown) {
+      setError(getUserFriendlyError(err))
     } finally {
       setActionLoading(false)
     }
@@ -238,6 +282,14 @@ export default function GuideDashboard() {
   // Booking action handlers (quotes, mission state)
   const handleSendQuote = async () => {
     if (!selectedBooking || !quoteAmount) return
+    setError(null)
+
+    const quoteErr = validatePositiveNumber(quoteAmount, 'Le montant du devis')
+    if (quoteErr) {
+      setError(quoteErr)
+      return
+    }
+
     setActionLoading(true)
     try {
       const response = await fetch('/api/guide/bookings', {
@@ -253,7 +305,7 @@ export default function GuideDashboard() {
 
       const data = await response.json()
       if (!response.ok) {
-        alert(data.error || 'Erreur de transmission du devis')
+        setError(data.error || 'Erreur de transmission du devis')
         return
       }
 
@@ -262,8 +314,8 @@ export default function GuideDashboard() {
       setQuoteMessage('')
       await loadData()
       alert('Devis envoyé avec succès au touriste !')
-    } catch {
-      alert('Erreur réseau.')
+    } catch (err: unknown) {
+      setError(getUserFriendlyError(err))
     } finally {
       setActionLoading(false)
     }
@@ -648,18 +700,33 @@ export default function GuideDashboard() {
                 <input
                   type="text"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
                   placeholder="+228 90 00 00 00"
                   className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                 />
+                {phone && validatePhone(phone) && (
+                  <span className="text-xs text-error mt-1">{validatePhone(phone)}</span>
+                )}
               </label>
 
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{"Années d'expérience"}</span>
                 <input
                   type="number"
+                  min="0"
+                  max="60"
                   value={experienceYears}
-                  onChange={(e) => setExperienceYears(parseInt(e.target.value, 10) || 0)}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (v === '') {
+                      setExperienceYears(0)
+                    } else {
+                      const val = parseInt(v, 10)
+                      if (val >= 0 && val <= 60) {
+                        setExperienceYears(val)
+                      }
+                    }
+                  }}
                   className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                 />
               </label>
@@ -684,8 +751,15 @@ export default function GuideDashboard() {
                   <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Journée complète</span>
                   <input
                     type="number"
+                    min="0"
+                    step="0.5"
                     value={fullDayRate}
-                    onChange={(e) => setFullDayRate(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      if (v === '' || parseFloat(v) >= 0) {
+                        setFullDayRate(v)
+                      }
+                    }}
                     className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
                   />
                 </label>
@@ -693,8 +767,15 @@ export default function GuideDashboard() {
                   <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Demi-journée</span>
                   <input
                     type="number"
+                    min="0"
+                    step="0.5"
                     value={halfDayRate}
-                    onChange={(e) => setHalfDayRate(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      if (v === '' || parseFloat(v) >= 0) {
+                        setHalfDayRate(v)
+                      }
+                    }}
                     className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
                   />
                 </label>
@@ -702,17 +783,31 @@ export default function GuideDashboard() {
                   <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Tarif horaire</span>
                   <input
                     type="number"
+                    min="0"
+                    step="0.5"
                     value={hourlyRate}
-                    onChange={(e) => setHourlyRate(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      if (v === '' || parseFloat(v) >= 0) {
+                        setHourlyRate(v)
+                      }
+                    }}
                     className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
                   />
                 </label>
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Virtuelle (Optionnel)</span>
+                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/65">Virtuelle (Optionnel)</span>
                   <input
                     type="number"
+                    min="0"
+                    step="0.5"
                     value={virtualRate}
-                    onChange={(e) => setVirtualRate(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      if (v === '' || parseFloat(v) >= 0) {
+                        setVirtualRate(v)
+                      }
+                    }}
                     className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
                   />
                 </label>
@@ -844,21 +939,36 @@ export default function GuideDashboard() {
 
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                  <UploadCloud className="h-3.5 w-3.5" /> URL du fichier (Démo)
+                  <UploadCloud className="h-3.5 w-3.5" /> Fichier justificatif (PDF uniquement)
                 </span>
                 <input
-                  type="url"
-                  value={docUrl}
-                  onChange={(e) => setDocUrl(e.target.value)}
-                  placeholder="Ex: https://exemple.com/licence.pdf"
-                  className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      if (file.type !== 'application/pdf') {
+                        setError('Seuls les fichiers PDF sont autorisés.')
+                        setSelectedFile(null)
+                        return
+                      }
+                      if (file.size > 5 * 1024 * 1024) {
+                        setError('Le fichier ne doit pas dépasser 5 Mo.')
+                        setSelectedFile(null)
+                        return
+                      }
+                      setError(null)
+                      setSelectedFile(file)
+                    }
+                  }}
+                  className="file-input file-input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                   required
                 />
               </label>
 
               <div className="rounded-2xl bg-base-100 p-4 border border-border/60">
                 <p className="text-xs text-base-content/60 leading-5">
-                  📁 Dans un environnement réel, ces fichiers sont hébergés de manière sécurisée. Pour la démonstration du Hackathon, veuillez renseigner une URL valide ou simulée.
+                  📁 Veuillez uploader un fichier officiel au format PDF (max. 5 Mo). Le document sera directement accessible et téléchargeable pour validation par l'équipe d'administration.
                 </p>
               </div>
 
@@ -925,8 +1035,15 @@ export default function GuideDashboard() {
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">Montant proposé (XOF)</span>
                 <input
                   type="number"
+                  min="0"
+                  step="0.5"
                   value={quoteAmount}
-                  onChange={(e) => setQuoteAmount(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (v === '' || parseFloat(v) >= 0) {
+                      setQuoteAmount(v)
+                    }
+                  }}
                   className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                   required
                 />

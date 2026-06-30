@@ -53,8 +53,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ guides })
   } catch (error: unknown) {
-    console.error('Erreur dans GET /api/guides:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    console.error('[GET /api/guides]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { COLORS } from '@/lib/constants/colors'
@@ -29,6 +29,8 @@ export default function LoginPage() {
   const t = useTranslations('Auth')
   const params = useParams<{ locale: string }>()
   const locale = params.locale
+  const searchParams = useSearchParams()
+  const redirectParam = searchParams.get('redirect') || ''
 
   const [state, formAction] = useActionState(loginAction, null)
 
@@ -48,6 +50,7 @@ export default function LoginPage() {
       <form action={formAction} className="space-y-4">
         {/* Hidden inputs to pass state to server action */}
         <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="redirect" value={redirectParam} />
 
         <label className="form-control w-full">
           <span className="label-text mb-1 text-sm font-semibold">{t('email')}</span>

@@ -54,8 +54,10 @@ export async function GET() {
 
     return NextResponse.json({ success: true, bookings, guideProfile })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
-    console.error('Erreur dans GET /api/guide/bookings:', error)
+    console.error('[GET /api/guide/bookings]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -162,8 +164,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, booking: updatedBooking })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
-    console.error('Erreur dans POST /api/guide/bookings:', error)
+    console.error('[POST /api/guide/bookings]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

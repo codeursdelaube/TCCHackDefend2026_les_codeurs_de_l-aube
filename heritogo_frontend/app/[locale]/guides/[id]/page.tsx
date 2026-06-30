@@ -16,6 +16,8 @@ import {
 } from 'lucide-react'
 import ReportModal from '@/components/ReportModal'
 import TextToSpeech from '@/components/TextToSpeech'
+import { getUserFriendlyError } from '@/lib/utils/errors'
+
 interface GuideDetail {
   id: string
   user_id: string
@@ -78,8 +80,9 @@ export default function GuideDetailPage() {
           return
         }
         setGuide(data.guide)
-      } catch {
-        setError('Impossible de charger les détails du guide')
+      } catch (err: unknown) {
+        console.error(err)
+        setError(getUserFriendlyError(err))
       } finally {
         setLoading(false)
       }

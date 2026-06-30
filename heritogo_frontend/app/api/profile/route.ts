@@ -20,8 +20,10 @@ export async function GET() {
 
     return NextResponse.json({ profile })
   } catch (error: unknown) {
-    console.error('Erreur dans GET /api/profile:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    console.error('[GET /api/profile]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -50,8 +52,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, profile: updatedProfile })
   } catch (error: unknown) {
-    console.error('Erreur dans POST /api/profile:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
+    console.error('[POST /api/profile]', error)
+    const message = error instanceof Error && error.message.includes('P1001')
+      ? 'Erreur de chargement. Vérifiez votre connexion.'
+      : 'Une erreur est survenue. Veuillez réessayer.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

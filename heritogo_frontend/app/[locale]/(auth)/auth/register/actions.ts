@@ -3,25 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { AuthError } from '@supabase/supabase-js'
+import { getSafeAuthErrorMessage } from '@/lib/utils/errors'
 
-function extractErrorMessage(error: AuthError): string {
-  if (error.message && error.message !== '{}') {
-    return error.message
-  }
 
-  // AuthRetryableFetchError — l'objet error.cause est une Error standard
-  const cause = (error as AuthError & { cause?: Error }).cause
-  if (cause?.message) {
-    return `Erreur réseau : ${cause.message}`
-  }
-
-  if (error.name === 'AuthRetryableFetchError') {
-    return 'Impossible de contacter le serveur Supabase. Le projet est peut-être en pause. Allez sur supabase.com pour le réactiver.'
-  }
-
-  return `Erreur Supabase (${error.name})`
-}
 
 export async function registerAction(
   prevState: { error?: string; success?: string } | null,
@@ -40,8 +24,8 @@ export async function registerAction(
       return { error: 'Tous les champs sont requis.' }
     }
 
-    if (password.length < 6) {
-      return { error: 'Le mot de passe doit contenir au moins 6 caractères.' }
+    if (password.length < 8) {
+      return { error: 'Le mot de passe doit contenir au moins 8 caractères.' }
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -61,7 +45,8 @@ export async function registerAction(
 
     if (error) {
       console.error('[registerAction] Supabase error:', JSON.stringify(error, null, 2))
-      return { error: extractErrorMessage(error) }
+      // Message sécurisé — jamais le message brut Supabase
+      return { error: getSafeAuthErrorMessage(error) }
     }
 
     if (!data.user) {

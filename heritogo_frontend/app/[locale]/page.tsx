@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import AuthGuardLink from '@/components/AuthGuardLink'
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface SlideItem {
@@ -223,7 +224,7 @@ export default function AccueilPage() {
 
           {/* Boutons CTA */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
+            <AuthGuardLink
               href="/scan"
               className="inline-flex min-h-[52px] items-center justify-center gap-2
                          rounded-lg px-7 py-3 text-sm font-black uppercase tracking-wider
@@ -233,7 +234,7 @@ export default function AccueilPage() {
             >
               <Scan className="h-5 w-5" />
               {t('cta_scan')}
-            </Link>
+            </AuthGuardLink>
             <Link
               href="/lieux"
               className="inline-flex min-h-[52px] items-center justify-center gap-2
@@ -382,8 +383,10 @@ export default function AccueilPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {featureCards.map(card => {
               const Icon = card.icon
+              const isScan = card.href === '/scan'
+              const CardWrapper = isScan ? AuthGuardLink : Link
               return (
-                <Link
+                <CardWrapper
                   key={card.href}
                   href={card.href}
                   className="group flex min-h-[340px] flex-col rounded-xl border border-border
@@ -432,7 +435,7 @@ export default function AccueilPage() {
                     {card.cta}
                     <ArrowRight className="h-4 w-4" />
                   </span>
-                </Link>
+                </CardWrapper>
               )
             })}
           </div>
@@ -452,7 +455,7 @@ export default function AccueilPage() {
                 {t('guides_title')}
               </h2>
             </div>
-            <Link
+            <AuthGuardLink
               href="/guides"
               className="inline-flex items-center gap-2 text-sm font-black
                          transition-all hover:gap-3"
@@ -460,7 +463,7 @@ export default function AccueilPage() {
             >
               {t('guides.view_all')}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </AuthGuardLink>
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -505,7 +508,7 @@ export default function AccueilPage() {
                   {t('guides.price')}
                 </p>
 
-                <Link
+                <AuthGuardLink
                   href="/guides"
                   className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center
                              rounded-lg text-sm font-black text-white transition-all
@@ -513,7 +516,7 @@ export default function AccueilPage() {
                   style={{ background: C.forest }}
                 >
                   {t('guides.reserve')}
-                </Link>
+                </AuthGuardLink>
               </article>
             ))}
           </div>

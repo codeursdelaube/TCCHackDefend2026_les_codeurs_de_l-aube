@@ -1,10 +1,12 @@
-﻿'use client'
+'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bot, Send, Sparkles, X, AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
+import { getUserFriendlyError } from '@/lib/utils/errors'
+
 
 interface Message {
   id: string
@@ -14,15 +16,15 @@ interface Message {
 }
 
 // CORRECTION : Ajout du protocole https:// indispensable pour le fetch
-const CHAT_API = 'https://heritogo-production.up.railway.app/chatbot/api/v1/chat/'
+const CHAT_API = 'https://heritogo-production.up.railway.app/api/v1/chat/'
 
 export default function ChatBot() {
   const t = useTranslations('ChatBot')
 
-  const [isOpen, setIsOpen]       = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
-  const [isTyping, setIsTyping]   = useState(false)
-  const [apiError, setApiError]   = useState<string | null>(null)
+  const [isTyping, setIsTyping] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -68,7 +70,7 @@ export default function ChatBot() {
     try {
       const response = await fetch(CHAT_API, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -109,9 +111,8 @@ export default function ChatBot() {
       addMessage('ai', aiText)
 
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erreur réseau'
-      console.error('[ChatBot] API error:', msg)
-      setApiError(msg)
+      console.error('[ChatBot] API error:', err)
+      setApiError(getUserFriendlyError(err))
       addMessage('ai', t('fallback_response'))
     } finally {
       setIsTyping(false)
