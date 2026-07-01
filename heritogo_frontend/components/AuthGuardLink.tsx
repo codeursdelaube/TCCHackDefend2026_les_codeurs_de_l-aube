@@ -37,9 +37,9 @@ export default function AuthGuardLink({
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      // Redirige vers login avec paramètre de retour
+      // Redirige vers register avec paramètre de retour
       const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
-      router.push(`/${locale}/auth/login?redirect=${encodeURIComponent(targetPath)}`)
+      router.push(`/${locale}/auth/register?redirect=${encodeURIComponent(targetPath)}`)
       return
     }
 
