@@ -172,7 +172,10 @@ export async function POST(request: Request) {
       ])
       
       // Récupérer le guide_profile pour avoir le user_id de la notification
-      const guideProfile = await prisma.guideProfile.findUnique({ where: { id: targetId } })
+      const guideProfile = await prisma.guideProfile.findUnique({
+        where: { id: targetId },
+        include: { profile: true }
+      })
       if (guideProfile) {
         await prisma.notification.create({
           data: {
@@ -182,6 +185,32 @@ export async function POST(request: Request) {
             body: 'Félicitations, vos documents ont été validés ! Votre profil est maintenant public.'
           }
         })
+
+        // Chercher l'email de l'utilisateur de Supabase Auth
+        const supabase = await createClient()
+        const { data: userData } = await supabase.auth.admin.getUserById(guideProfile.user_id)
+        const guideEmail = userData?.user?.email
+
+        if (guideEmail) {
+          const { sendEmail } = await import('@/lib/utils/email')
+          await sendEmail({
+            to: guideEmail,
+            subject: 'HériTogo — Votre compte de guide a été approuvé !',
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 12px;">
+                <h2 style="color: #004D40; font-family: serif;">Félicitations ${guideProfile.profile.full_name} !</h2>
+                <p>Nous avons le plaisir de vous annoncer que vos documents justificatifs ont été validés avec succès par l'équipe administrative de HériTogo.</p>
+                <p><strong>Votre profil de guide est désormais approuvé et actif dans notre annuaire.</strong></p>
+                <p>Les touristes visitant la plateforme peuvent dorénavant vous trouver, consulter vos spécialités, tarifs, et vous envoyer des demandes de réservation directes.</p>
+                <p>Pensez à maintenir vos tarifs et vos zones de couverture à jour depuis votre espace tableau de bord pour maximiser vos opportunités.</p>
+                <br />
+                <p>Nous sommes ravis de vous compter parmi les ambassadeurs du patrimoine togolais sur HériTogo !</p>
+                <br />
+                <p style="font-size: 12px; color: #6b7280;">L'équipe HériTogo.</p>
+              </div>
+            `
+          })
+        }
       }
     } else if (action === 'reject_guide') {
       const reason = details?.reason || 'Non conforme aux critères'

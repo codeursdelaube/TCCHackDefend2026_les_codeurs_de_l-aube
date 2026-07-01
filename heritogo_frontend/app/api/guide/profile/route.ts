@@ -59,6 +59,7 @@ export async function POST(request: Request) {
     if (virtual_rate !== undefined) guideData.virtual_rate = virtual_rate ? parseFloat(virtual_rate) : null
 
     // 3. Ajouter un document de vérification
+    let shouldSendDocEmail = false
     if (document && document.file_url && document.type) {
       await prisma.guideDocument.create({
         data: {
@@ -75,6 +76,7 @@ export async function POST(request: Request) {
       if (guideProfile.status === 'pending' || guideProfile.status === 'rejected') {
         guideData.status = 'under_review'
         guideData.submitted_at = new Date()
+        shouldSendDocEmail = true
       }
     }
 
@@ -86,6 +88,26 @@ export async function POST(request: Request) {
         documents: true
       }
     })
+
+    // Envoi de l'email si le statut passe en examen/traitement
+    if (shouldSendDocEmail && user.email) {
+      const { sendEmail } = await import('@/lib/utils/email')
+      await sendEmail({
+        to: user.email,
+        subject: 'HériTogo — Documents de vérification bien reçus',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 12px;">
+            <h2 style="color: #004D40; font-family: serif;">Bonjour ${updatedGuide.profile.full_name},</h2>
+            <p>Nous vous informons que vos documents justificatifs ont bien été soumis sur votre espace Guide HériTogo.</p>
+            <p><strong>Statut actuel :</strong> En cours de traitement par notre équipe de modération.</p>
+            <p>Nous vérifions vos pièces d'identité et accréditations professionnelles afin de garantir la sécurité de notre communauté. Cette validation prend généralement moins de 48 heures.</p>
+            <p>Dès approbation, vous recevrez un email de confirmation et votre profil deviendra visible publiquement dans notre annuaire.</p>
+            <br />
+            <p style="font-size: 12px; color: #6b7280;">L'équipe HériTogo.</p>
+          </div>
+        `
+      })
+    }
 
     return NextResponse.json({ success: true, guide: updatedGuide })
   } catch (error: unknown) {
