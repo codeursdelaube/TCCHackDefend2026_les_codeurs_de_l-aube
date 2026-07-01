@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "@/app/globals.css";
 import Navbar from "@/app/_components/Navbar";
 import ServiceWorkerRegister from '@/app/_components/ServiceWorkerRegister';
 import OnboardingTooltip from '@/app/_components/OnboardingTooltip';
+import CookieConsentBanner from '@/app/_components/CookieConsentBanner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -48,14 +50,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
     >
       <head>
         {/*
-          Script de détection thème — s'exécute AVANT le premier paint.
-          Évite le flash blanc vers sombre au chargement.
-          suppressHydrationWarning sur html permet à React d'ignorer
-          la différence entre le className serveur et client.
+          Script de detection theme - s'execute AVANT le premier paint.
+          Evite le flash blanc vers sombre au chargement.
+          suppressHydrationWarning sur html permet a React d'ignorer
+          la difference entre le className serveur et client.
         */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
+        <Script id="heritogo-theme-init" strategy="beforeInteractive">
+          {`
               (function() {
                 try {
                   var cookie = document.cookie.match(/heritogo_theme=([^;]+)/);
@@ -72,9 +73,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
                   }
                 } catch(e) {}
               })();
-            `,
-          }}
-        />
+          `}
+        </Script>
         <meta name="theme-color" content="#004D40" />
         <link rel="shortcut icon" href="/icons/icon-192x192.png" />
       </head>
@@ -87,6 +87,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
             <ServiceWorkerRegister />
             <Navbar />
             <OnboardingTooltip />
+            <CookieConsentBanner />
             {children}
             <footer>
               <ChatBot />

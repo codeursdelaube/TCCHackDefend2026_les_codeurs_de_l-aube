@@ -14,7 +14,7 @@ interface AuthGuardLinkProps {
 
 /**
  * Wrapper de lien qui vérifie l'authentification avant la navigation.
- * Si l'utilisateur n'est pas connecté, redirige vers la page login
+ * Si l'utilisateur n'est pas connecté, redirige vers la page register
  * avec un paramètre redirect pour retourner à la page demandée après connexion.
  */
 export default function AuthGuardLink({
@@ -37,7 +37,7 @@ export default function AuthGuardLink({
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      // Redirige vers register avec paramètre de retour
+      // Redirige vers register avec parametre de retour
       const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
       router.push(`/${locale}/auth/register?redirect=${encodeURIComponent(targetPath)}`)
       return

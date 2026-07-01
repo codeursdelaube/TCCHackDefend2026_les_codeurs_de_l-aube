@@ -14,6 +14,7 @@ import Image from 'next/image'
 import { useTheme } from '@/hooks/useTheme'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
+import type { Session, User as SupabaseUser } from '@supabase/supabase-js'
 import { getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 
@@ -37,17 +38,29 @@ const languages = [
 
 const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/forgot-password']
 
+function profileFromUser(user: SupabaseUser): ProfileRow {
+  const metadata = user.user_metadata as { full_name?: string; role?: string }
+  const role = metadata.role === 'admin' || metadata.role === 'guide' || metadata.role === 'tourist'
+    ? metadata.role
+    : 'tourist'
+
+  return {
+    full_name: metadata.full_name || user.email?.split('@')[0] || 'Compte Heritogo',
+    role,
+  }
+}
+
 export default function Navbar() {
   const pathname = usePathname()
   const locale = useLocale()
   const params = useParams<{ locale: string }>()
   const router = useRouter()
   const t = useTranslations('Navbar')
-  const tAuth = useTranslations('Auth')
   const { toggle, isDark, mounted } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [profile, setProfile] = useState<ProfileRow | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
 
   const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p))
@@ -56,21 +69,33 @@ export default function Navbar() {
     const supabase = createClient()
 
     const loadProfile = async () => {
+      let authUser: SupabaseUser | null = null
+
       try {
         const { data: { user } } = await supabase.auth.getUser()
+        authUser = user
         if (!user) {
+          setIsAuthenticated(false)
           setProfile(null)
           setAuthLoading(false)
           return
         }
+
+        setIsAuthenticated(true)
         const { data } = await supabase
           .from('profiles')
           .select('full_name, role')
           .eq('id', user.id)
-          .single()
-        if (data) setProfile(data as ProfileRow)
+          .maybeSingle()
+        setProfile(data ? data as ProfileRow : profileFromUser(user))
       } catch {
-        setProfile(null)
+        if (authUser) {
+          setIsAuthenticated(true)
+          setProfile(profileFromUser(authUser))
+        } else {
+          setIsAuthenticated(false)
+          setProfile(null)
+        }
       } finally {
         setAuthLoading(false)
       }
@@ -79,8 +104,9 @@ export default function Navbar() {
     loadProfile()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: string, session: any) => {
+      (event: string, session: Session | null) => {
         if (event === 'SIGNED_OUT') {
+          setIsAuthenticated(false)
           setProfile(null)
           setAuthLoading(false)
           // Force le refresh pour mettre à jour tous les composants qui dépendent de l'auth
@@ -183,7 +209,7 @@ export default function Navbar() {
           )}
 
           <div className="flex items-center gap-2">
-            {!authLoading && !profile && (
+            {!authLoading && !isAuthenticated && (
               <>
                 <Link
                   href="/auth/login"
@@ -201,7 +227,7 @@ export default function Navbar() {
               </>
             )}
 
-            {!authLoading && profile && (
+            {!authLoading && isAuthenticated && profile && (
               <button
                 type="button"
                 onClick={() => setDrawerOpen(true)}
@@ -218,7 +244,7 @@ export default function Navbar() {
               </button>
             )}
 
-            {profile && (
+            {isAuthenticated && profile && (
               <Link
                 href="/scan"
                 className="hidden items-center gap-2 rounded-2xl bg-secondary px-4 py-2 text-xs font-black uppercase tracking-wide text-secondary-content shadow-sm transition-all hover:-translate-y-0.5 sm:inline-flex"
@@ -341,7 +367,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {profile && (
+      {isAuthenticated && profile && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl">
           <div className="mx-auto max-w-md px-3 pb-2 pt-2">
             <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
