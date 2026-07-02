@@ -26,14 +26,14 @@
 
   {
 
-    "id": "3",
-    "nom": "Monument de l'Amitié Germano-Togolaise",
-    "localite": "Baguida",
+    "id": "17",
+    "nom": "Monument des Deux Lions",
+    "localite": "Agoè",
     "region": "Maritime",
-    "histoire": "Situé à Baguida, première capitale du Togo, ce monument historique en maçonnerie et pierre commémore la signature du traité de protectorat le 5 juillet 1884 entre l'explorateur allemand Gustav Nachtigal et le chef local Mlapa III de Togoville, marquant le début officiel des relations diplomatiques et de l'ère coloniale allemande.",
-    "latitude": 6.162778,
-    "longitude": 1.328333
-
+    "histoire": "Réalisé en 2014 par l'artiste togolais Benoît Fuss, formé pendant huit ans auprès du grand plasticien Paul Ahyi, ce monument haut de 5 mètres se dresse au carrefour d'Agoè, aujourd'hui rebaptisé 'Carrefour Deux Lions' en son honneur. Sculpté en béton blanc sur une charpente métallique, il représente deux lions jeunes et vigoureux, debout et adossés, tenant chacun un arc et une flèche à la manière des armoiries de la République togolaise. Ces lions symbolisent la vigilance et la force du peuple togolais, montant la garde sur l'indépendance du pays du levant au couchant, et le monument est devenu un point de repère et de ralliement incontournable pour les habitants de Lomé.",
+    "latitude": 6.192000,
+    "longitude": 1.198000
+    
   },
 
   {
@@ -188,7 +188,18 @@
     "histoire": "Construit par l'administration coloniale allemande au tout début du XXe siècle, ce premier pont d'embarquement métallique s'avançait sur plusieurs centaines de mètres dans l'océan Atlantique pour permettre le chargement des marchandises en l'absence de port en eau profonde. Aujourd'hui partiellement détruit, les piliers métalliques restants émergeant de l'eau constituent un témoignage évocateur de l'ingénierie coloniale et du commerce maritime de l'époque.",
     "latitude": 6.126944,
     "longitude": 1.223056
-    
+
+  },
+
+  {
+
+    "id": "17",
+    "nom": "Monument des Deux Lions",
+    "localite": "Agoè",
+    "region": "Maritime",
+    "histoire": "Réalisé en 2014 par l'artiste togolais Benoît Fuss, formé pendant huit ans auprès du grand plasticien Paul Ahyi, ce monument haut de 5 mètres se dresse au carrefour d'Agoè, aujourd'hui rebaptisé 'Carrefour Deux Lions' en son honneur. Sculpté en béton blanc sur une charpente métallique, il représente deux lions jeunes et vigoureux, debout et adossés, tenant chacun un arc et une flèche à la manière des armoiries de la République togolaise. Ces lions symbolisent la vigilance et la force du peuple togolais, montant la garde sur l'indépendance du pays du levant au couchant, et le monument est devenu un point de repère et de ralliement incontournable pour les habitants de Lomé.",
+    "latitude": 6.192000,
+    "longitude": 1.198000
   }
 
 ]
