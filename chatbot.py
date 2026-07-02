@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase import create_client, Client
 from google import genai  # <-- Package officiel google-genai
+from google.genai import types # <-- Pour la configuration des dimensions
 from typing import Optional
 
 # Configuration centrale via Pydantic Settings
@@ -43,58 +44,56 @@ async def list_available_models():
 
 
 # =========================================================================
-# 🔥 NOUVELLE ROUTE : Initialisation automatique des Embeddings des monuments
+# 🔥 ROUTE : Initialisation automatique des Embeddings (CORRIGÉE)
 # =========================================================================
 @router.post("/api/v1/init-embeddings")
 async def initialize_monument_embeddings():
     """
-    Cette route récupère tous les monuments de la table 'places', génère leurs 
-    embeddings sémantiques via Gemini et les sauvegarde dans Supabase.
-    À exécuter une seule fois après avoir inséré de nouveaux monuments !
+    Cette route récupère tous les monuments, génère leurs embeddings 
+    sécurisés à 768 dimensions et les sauvegarde dans Supabase.
     """
     try:
-        # 1. Récupérer les monuments existants (colonnes de la table d'origine)
         response = supabase.table("places").select("id", "name", "description").execute()
         monuments = response.data
 
         if not monuments:
-            return {"message": "Aucun monument trouvé dans la table public.places. Pensez à lancer le script SQL d'insertion d'abord."}
+            return {"message": "Aucun monument trouvé dans la table public.places."}
 
         counter = 0
-        # 2. Boucler sur chaque monument pour calculer son vecteur IA
         for m in monuments:
-            # On combine le nom et la description pour donner un contexte riche à l'IA
             text_to_embed = f"Monument: {m['name']}. Description: {m['description']}"
             
-            # Appel à Gemini pour générer le vecteur de 768 dimensions
+            # Utilisation de text-embedding-004 + forçage à 768 dimensions
             embedding_response = ai_client.models.embed_content(
-                model="gemini-embedding-001",
-                contents=text_to_embed
+                model="text-embedding-004",
+                contents=text_to_embed,
+                config=types.EmbedContentConfig(output_dimensionality=768)
             )
             query_vector = embedding_response.embeddings[0].values
             
-            # 3. Sauvegarde du vecteur dans la colonne 'embedding' de la ligne correspondante
+            # Sauvegarde du vecteur dans Supabase
             supabase.table("places").update({"embedding": query_vector}).eq("id", m["id"]).execute()
             counter += 1
 
         return {
             "status": "success",
-            "message": f"Génération terminée avec succès ! {counter} monuments ont maintenant leurs embeddings IA activés."
+            "message": f"Génération terminée ! {counter} monuments mis à jour avec des embeddings à 768 dimensions."
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'initialisation : {str(e)}")
 
 
 # =========================================================================
-# 💬 ROUTE DU CHATBOT (Filtre Sémantique + Budget)
+# 💬 ROUTE DU CHATBOT (CORRIGÉE)
 # =========================================================================
 @router.post("/api/v1/chat")
 async def chat_tourisme_advisor(payload: ChatRequest):
     try:
-        # Étape 1 : Générer l'embedding du message utilisateur
+        # Étape 1 : Générer l'embedding avec le même modèle et la même dimension (768)
         embedding_response = ai_client.models.embed_content(
-            model="gemini-embedding-001",  
-            contents=payload.message
+            model="text-embedding-004",  
+            contents=payload.message,
+            config=types.EmbedContentConfig(output_dimensionality=768)
         )
         query_vector = embedding_response.embeddings[0].values
 
@@ -114,7 +113,7 @@ async def chat_tourisme_advisor(payload: ChatRequest):
         if not places_found:
             return {"response": f"Aucune activité trouvée pour {payload.extracted_budget} FCFA à {payload.extracted_location}."}
 
-        # Étape 3 : Construction du contexte (Clés synchronisées en Français avec le RPC)
+        # Étape 3 : Construction du contexte
         context_data = "".join([
             f"- {p['nom']} ({p['categorie']}) : {p['histoire']} | Prix: {p['prix']} FCFA\n" 
             for p in places_found
