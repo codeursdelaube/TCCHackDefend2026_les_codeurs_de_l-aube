@@ -45,6 +45,7 @@
     "histoire": "Découvert lors de fouilles archéologiques dans la préfecture de Haho, ce site présente de vastes structures de pavage au sol composées de petites pierres taillées associées à des fragments de poteries anciennes imbriquées. Il s'agit des preuves matérielles d'une civilisation précoloniale avancée maîtrisant l'aménagement du sol urbain.",
     "latitude": 6.383333,
     "longitude": 1.250000
+
   },
 
   {
@@ -92,6 +93,102 @@
     "histoire": "Inscrit au patrimoine mondial de l'UNESCO, le paysage culturel de Koutamakou abrite les 'Takienta' (Tata), des maisons-fortes traditionnelles en terre, bois et soubassements de pierre. Construites par le peuple Batammariba pour se protéger des raids esclavagistes et des bêtes sauvages, elles incarnent une symbiose unique entre l'architecture et la nature.",
     "latitude": 10.100000,
     "longitude": 1.016667
+  },
+
+  {
+
+    "id": "9",
+    "nom": "Les Pierres d'Evalo",
+    "localite": "Farandé",
+    "region": "Kara",
+    "histoire": "Situées dans le canton de Farandé au nord du pays, ces pierres taillées naturellement forment un ensemble rocheux unique en son genre : frappées avec un maillet de bois, elles résonnent comme de véritables instruments de musique traditionnels. Utilisées lors de cérémonies rituelles et de fêtes communautaires, elles témoignent d'un savoir sonore et spirituel transmis de génération en génération par les populations locales.",
+    "latitude": 9.633889,
+    "longitude": 1.150000
+
+  },
+
+  {
+
+    "id": "10",
+    "nom": "Les Structures en pierre de Danyi",
+    "localite": "Plateau de Danyi",
+    "region": "Plateaux",
+    "histoire": "Perchés sur le plateau de Danyi, ces vestiges archéologiques préhistoriques comprennent des cercles d'habitats et des fondations entièrement bâties en pierre sèche. Ces structures témoignent d'une occupation humaine ancienne et organisée, antérieure à la période coloniale, et constituent l'un des rares témoins matériels de l'architecture domestique précoloniale de la région des Plateaux.",
+    "latitude": 7.066667,
+    "longitude": 0.666667
+
+  },
+
+  {
+
+    "id": "11",
+    "nom": "Cathédrale Notre-Dame du Lac",
+    "localite": "Togoville",
+    "region": "Maritime",
+    "histoire": "Édifiée en 1910 au bord du lac Togo, cette église historique demeure l'un des symboles les plus forts de l'histoire coloniale allemande et de l'implantation du catholicisme au Togo. Lieu de pèlerinage marial important, elle incarne également la rencontre entre la spiritualité chrétienne et les traditions vaudou locales, Togoville étant considérée comme le berceau spirituel du pays.",
+    "latitude": 6.283333,
+    "longitude": 1.516667
+
+  },
+
+  {
+
+    "id": "12",
+    "nom": "Les Vestiges de Kamina",
+    "localite": "Atakpamé",
+    "region": "Plateaux",
+    "histoire": "Ces ruines impressionnantes en béton armé et pierre sont les restes d'une puissante station de radio-émettrice construite par les Allemands au début du XXe siècle, alors la plus puissante d'Afrique. Elle permettait de communiquer directement avec Berlin et fut détruite en 1914 par l'armée allemande elle-même pour éviter qu'elle ne tombe aux mains des troupes franco-britanniques au début de la Première Guerre mondiale.",
+    "latitude": 7.531389,
+    "longitude": 1.131944
+
+  },
+
+  {
+
+    "id": "13",
+    "nom": "Palais de Lomé",
+    "localite": "Lomé",
+    "region": "Maritime",
+    "histoire": "Ancien palais des gouverneurs coloniaux construit au bord de l'océan Atlantique, cet édifice a été entièrement réhabilité en un somptueux centre d'art et d'expositions au cœur d'un grand parc botanique de sept hectares. Symbole de la reconversion de l'héritage colonial en espace culturel contemporain, il accueille aujourd'hui des expositions consacrées à l'art et à l'histoire togolaise et ouest-africaine.",
+    "latitude": 6.129444,
+    "longitude": 1.215556
+
+  },
+
+  {
+
+    "id": "14",
+    "nom": "Maison des Esclaves (Wood Home)",
+    "localite": "Agbodrafo",
+    "region": "Maritime",
+    "histoire": "Cette demeure historique, construite par le négociant afro-brésilien Woodward Kwasi Bruce, servait de lieu de transit pour les captifs avant leur déportation vers les Amériques via la côte togolaise. Aujourd'hui transformée en lieu de mémoire, elle permet de comprendre la douloureuse histoire de la traite négrière transatlantique et son impact durable sur les sociétés côtières du golfe de Guinée.",
+    "latitude": 6.150000,
+    "longitude": 1.483333
+
+  },
+
+  {
+
+    "id": "15",
+    "nom": "Les Murailles d'Agbogbo",
+    "localite": "Notsé",
+    "region": "Maritime",
+    "histoire": "Ces vestiges préservés de fortifications en terre battue constituent les anciens remparts défensifs du royaume historique d'Agbogbo, capitale du peuple Éwé avant sa dispersion vers le sud du Togo au XVIIe siècle. Symbole fondateur de l'identité éwé, ces murailles rappellent l'organisation politique et militaire sophistiquée de ce royaume précolonial.",
+    "latitude": 6.983333,
+    "longitude": 1.150000
+
+  },
+
+  {
+
+    "id": "16",
+    "nom": "Le Wharf de Lomé",
+    "localite": "Lomé",
+    "region": "Maritime",
+    "histoire": "Construit par l'administration coloniale allemande au tout début du XXe siècle, ce premier pont d'embarquement métallique s'avançait sur plusieurs centaines de mètres dans l'océan Atlantique pour permettre le chargement des marchandises en l'absence de port en eau profonde. Aujourd'hui partiellement détruit, les piliers métalliques restants émergeant de l'eau constituent un témoignage évocateur de l'ingénierie coloniale et du commerce maritime de l'époque.",
+    "latitude": 6.126944,
+    "longitude": 1.223056
+    
   }
 
 ]
