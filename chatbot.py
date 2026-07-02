@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase import create_client, Client
-from google import genai  # <-- Package officiel google-genai
+from google import genai  # Package officiel google-genai
 from google.genai import types 
 from typing import Optional
 
@@ -21,7 +21,7 @@ router = APIRouter(tags=["Chatbot"])
 # Connexion à la base de données
 supabase: Client = create_client(settings.supabase_url, settings.sb_secret_key)
 
-# 🔥 CORRECTION : On supprime http_options pour laisser le SDK gérer nativement les versions d'API
+# Initialisation propre du client Gemini (sans http_options pour éviter les conflits)
 ai_client = genai.Client(api_key=settings.gemini_api_key_1)
 
 
@@ -42,13 +42,13 @@ async def list_available_models():
 
 
 # =========================================================================
-# 🔄 ROUTE : Initialisation automatique des Embeddings
+# 🔥 ROUTE : Initialisation automatique des Embeddings (CORRIGÉE & SÛRE)
 # =========================================================================
 @router.post("/api/v1/init-embeddings")
 async def initialize_monument_embeddings():
     """
-    Cette route récupère tous les monuments, génère leurs embeddings 
-    sécurisés à 768 dimensions et les sauvegarde dans Supabase.
+    Cette route utilise le modèle fonctionnel 'gemini-embedding-001'
+    en forçant sa dimension à 768 pour correspondre parfaitement à Supabase.
     """
     try:
         response = supabase.table("places").select("id", "name", "description").execute()
@@ -61,9 +61,9 @@ async def initialize_monument_embeddings():
         for m in monuments:
             text_to_embed = f"Monument: {m['name']}. Description: {m['description']}"
             
-            # Utilisation de text-embedding-004 avec configuration de dimensionnalité
+            # On utilise le modèle fonctionnel MAIS bridé à 768 dimensions
             embedding_response = ai_client.models.embed_content(
-                model="text-embedding-004",
+                model="gemini-embedding-001",
                 contents=text_to_embed,
                 config=types.EmbedContentConfig(output_dimensionality=768)
             )
@@ -82,14 +82,14 @@ async def initialize_monument_embeddings():
 
 
 # =========================================================================
-# 💬 ROUTE DU CHATBOT
+# 💬 ROUTE DU CHATBOT (SYNCHRONISÉE)
 # =========================================================================
 @router.post("/api/v1/chat")
 async def chat_tourisme_advisor(payload: ChatRequest):
     try:
         # Étape 1 : Générer l'embedding avec le même modèle et la même dimension (768)
         embedding_response = ai_client.models.embed_content(
-            model="text-embedding-004",  
+            model="gemini-embedding-001",  
             contents=payload.message,
             config=types.EmbedContentConfig(output_dimensionality=768)
         )
