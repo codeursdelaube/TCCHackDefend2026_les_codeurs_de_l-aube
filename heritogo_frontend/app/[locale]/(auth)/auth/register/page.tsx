@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useActionState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { COLORS } from '@/lib/constants/colors'
@@ -35,6 +35,8 @@ export default function RegisterPage() {
   const t = useTranslations('Auth')
   const params = useParams<{ locale: string }>()
   const locale = params.locale
+  const searchParams = useSearchParams()
+  const redirectParam = searchParams.get('redirect') || ''
   
   const [role, setRole] = useState<RegisterRole>('tourist')
   const [password, setPassword] = useState('')
@@ -66,6 +68,7 @@ export default function RegisterPage() {
         {/* Hidden inputs to pass state to server action */}
         <input type="hidden" name="role" value={role} />
         <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="redirect" value={redirectParam} />
 
         <label className="form-control w-full">
           <span className="label-text mb-1 text-sm font-semibold">{t('full_name')}</span>

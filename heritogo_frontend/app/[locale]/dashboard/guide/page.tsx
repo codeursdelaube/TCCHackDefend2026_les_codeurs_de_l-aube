@@ -86,11 +86,6 @@ export default function GuideDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Subscription simulation
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem('heritogo_guide_subscribed') === 'true'
-  })
 
   // Profile Edit fields
   const [bio, setBio] = useState('')
@@ -159,10 +154,6 @@ export default function GuideDashboard() {
     loadData()
   }, [loadData])
 
-  const handleSubscribe = () => {
-    localStorage.setItem('heritogo_guide_subscribed', 'true')
-    setIsSubscribed(true)
-  }
 
   // Update profile handler
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -389,26 +380,6 @@ export default function GuideDashboard() {
   return (
     <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-base-content sm:px-6 lg:px-8 bg-base-100">
       
-      {/* Red Subscription Banner if inactive */}
-      {!isSubscribed && (
-        <div className="alert alert-error rounded-3xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shadow-md border-none animate-pulse">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="h-6 w-6 shrink-0 text-white" />
-            <div>
-              <h4 className="font-serif font-bold text-base leading-tight">Abonnement Heritogo requis</h4>
-              <p className="text-xs text-white/90 mt-0.5 font-medium leading-relaxed max-w-md">
-                {"Votre profil de guide n'est pas encore actif dans l'annuaire. Abonnez-vous pour recevoir des propositions de réservations."}
-              </p>
-            </div>
-          </div>
-          <button 
-            onClick={handleSubscribe}
-            className="btn btn-sm bg-white text-error font-extrabold px-5 rounded-2xl hover:bg-base-200 border-none shrink-0"
-          >
-            {"Activer l'abonnement"}
-          </button>
-        </div>
-      )}
 
       {/* Error Alert */}
       {error && (

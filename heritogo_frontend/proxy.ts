@@ -51,10 +51,10 @@ export default async function proxy(request: NextRequest) {
 
   const isRoot = pathWithoutLocale === '/' || pathWithoutLocale === ''
 
-  // Accueil sans session → page d'inscription
-  if (!user && isRoot) {
+  // Accueil avec session -> profil/dashboard, accueil public sinon
+  if (user && isRoot) {
     return NextResponse.redirect(
-      new URL(`/${currentLocale}/auth/register`, request.url)
+      new URL(`/${currentLocale}/dashboard`, request.url)
     )
   }
 
@@ -93,9 +93,8 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/',
-    '/(fr|en|es|zh)/:path*',
-    '/((?!api|_next|_vercel|.*\\..*).*)'
-  ]
+ 
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+
+
 }

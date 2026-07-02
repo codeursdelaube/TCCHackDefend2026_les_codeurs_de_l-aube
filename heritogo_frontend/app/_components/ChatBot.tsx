@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bot, Send, Sparkles, X, AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import { getUserFriendlyError } from '@/lib/utils/errors'
-
 
 interface Message {
   id: string
@@ -15,11 +15,18 @@ interface Message {
   timestamp: Date
 }
 
-// CORRECTION : Ajout du protocole https:// indispensable pour le fetch
-const CHAT_API = 'https://heritogo-production.up.railway.app/api/v1/chat/'
+// CORRECTION : Suppression du slash '/' à la fin pour éviter la 404 de FastAPI
+const CHAT_API = 'https://heritogo-production.up.railway.app/chatbot/api/v1/chat'
+
+// Pages sur lesquelles le ChatBot ne doit pas apparaître
+const AUTH_PATH_SEGMENTS = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/confirm']
 
 export default function ChatBot() {
   const t = useTranslations('ChatBot')
+  const pathname = usePathname()
+
+  // Cacher le ChatBot sur les pages d'authentification
+  const isAuthPage = AUTH_PATH_SEGMENTS.some(seg => pathname?.includes(seg))
 
   const [isOpen, setIsOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
@@ -35,9 +42,8 @@ export default function ChatBot() {
     },
   ])
 
-  // Historique pour le contexte multi-tour envoyé à l'API
+  // L'historique local reste utile pour l'affichage de l'UI
   const historyRef = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([])
-
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -61,7 +67,6 @@ export default function ChatBot() {
     addMessage('user', content)
     setIsTyping(true)
 
-    // Préparation de l'historique mis à jour localement (sans modifier le ref tout de suite)
     const currentHistory = [
       ...historyRef.current,
       { role: 'user' as const, content },
@@ -74,9 +79,11 @@ export default function ChatBot() {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
+        // CORRECTION : Structure du JSON nettoyée pour coller au BaseModel de FastAPI
         body: JSON.stringify({
           message: content,
-          history: currentHistory.slice(-10), // Prend les 10 derniers messages (5 échanges complets)
+          extracted_location: "Lomé", // Optionnel (prendra Lomé par défaut si tu l'enlèves)
+          extracted_budget: 0.0       // Optionnel (prendra 0.0 par défaut si tu l'enlèves)
         }),
       })
 
@@ -94,7 +101,6 @@ export default function ChatBot() {
         answer?: string
       }
 
-      // Supporte plusieurs formats de réponse possibles de l'API
       const aiText =
         data.response ??
         data.reply ??
@@ -102,7 +108,6 @@ export default function ChatBot() {
         data.answer ??
         t('fallback_response')
 
-      // CORRECTION : On met à jour l'historique global UNIQUEMENT si l'API a répondu avec succès
       historyRef.current = [
         ...currentHistory,
         { role: 'assistant' as const, content: aiText },
@@ -118,6 +123,9 @@ export default function ChatBot() {
       setIsTyping(false)
     }
   }
+
+  // Ne pas afficher le chatbot sur les pages d'authentification
+  if (isAuthPage) return null
 
   return (
     <div className="fixed inset-0 z-9999 pointer-events-none">

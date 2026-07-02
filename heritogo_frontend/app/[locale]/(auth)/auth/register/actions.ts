@@ -19,6 +19,7 @@ export async function registerAction(
     const password = formData.get('password') as string
     const role     = (formData.get('role') as string) || 'tourist'
     const locale   = (formData.get('locale') as string) || 'fr'
+    const redirectTo = (formData.get('redirect') as string) || ''
 
     if (!fullName || !email || !password) {
       return { error: 'Tous les champs sont requis.' }
@@ -115,7 +116,8 @@ export async function registerAction(
     }
 
     // Session active → redirection
-    redirect(`/${locale}/dashboard`)
+    const safeRedirect = redirectTo.startsWith(`/${locale}/`) ? redirectTo : `/${locale}/dashboard`
+    redirect(safeRedirect)
 
   } catch (err: unknown) {
     // Laisser Next.js gérer ses propres redirections
