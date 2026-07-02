@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase import create_client, Client
-from google import genai  
+from google import genai  # <-- Package officiel google-genai
 from typing import Optional
 
 # Configuration centrale via Pydantic Settings
@@ -32,6 +32,7 @@ class ChatRequest(BaseModel):
     extracted_location: Optional[str] = "Lomé" 
     extracted_budget: Optional[float] = 0.0
 
+
 @router.get("/api/v1/models")
 async def list_available_models():
     try:
@@ -40,6 +41,53 @@ async def list_available_models():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# =========================================================================
+# 🔥 NOUVELLE ROUTE : Initialisation automatique des Embeddings des monuments
+# =========================================================================
+@router.post("/api/v1/init-embeddings")
+async def initialize_monument_embeddings():
+    """
+    Cette route récupère tous les monuments de la table 'places', génère leurs 
+    embeddings sémantiques via Gemini et les sauvegarde dans Supabase.
+    À exécuter une seule fois après avoir inséré de nouveaux monuments !
+    """
+    try:
+        # 1. Récupérer les monuments existants (colonnes de la table d'origine)
+        response = supabase.table("places").select("id", "name", "description").execute()
+        monuments = response.data
+
+        if not monuments:
+            return {"message": "Aucun monument trouvé dans la table public.places. Pensez à lancer le script SQL d'insertion d'abord."}
+
+        counter = 0
+        # 2. Boucler sur chaque monument pour calculer son vecteur IA
+        for m in monuments:
+            # On combine le nom et la description pour donner un contexte riche à l'IA
+            text_to_embed = f"Monument: {m['name']}. Description: {m['description']}"
+            
+            # Appel à Gemini pour générer le vecteur de 768 dimensions
+            embedding_response = ai_client.models.embed_content(
+                model="gemini-embedding-001",
+                contents=text_to_embed
+            )
+            query_vector = embedding_response.embeddings[0].values
+            
+            # 3. Sauvegarde du vecteur dans la colonne 'embedding' de la ligne correspondante
+            supabase.table("places").update({"embedding": query_vector}).eq("id", m["id"]).execute()
+            counter += 1
+
+        return {
+            "status": "success",
+            "message": f"Génération terminée avec succès ! {counter} monuments ont maintenant leurs embeddings IA activés."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'initialisation : {str(e)}")
+
+
+# =========================================================================
+# 💬 ROUTE DU CHATBOT (Filtre Sémantique + Budget)
+# =========================================================================
 @router.post("/api/v1/chat")
 async def chat_tourisme_advisor(payload: ChatRequest):
     try:
@@ -50,7 +98,7 @@ async def chat_tourisme_advisor(payload: ChatRequest):
         )
         query_vector = embedding_response.embeddings[0].values
 
-        # Étape 2 : Appel Supabase RPC
+        # Étape 2 : Appel Supabase RPC (match_places)
         supabase_response = supabase.rpc(
             "match_places",
             {
@@ -66,7 +114,7 @@ async def chat_tourisme_advisor(payload: ChatRequest):
         if not places_found:
             return {"response": f"Aucune activité trouvée pour {payload.extracted_budget} FCFA à {payload.extracted_location}."}
 
-        # Étape 3 : Construction du contexte (🔥 Clés corrigées en Français !)
+        # Étape 3 : Construction du contexte (Clés synchronisées en Français avec le RPC)
         context_data = "".join([
             f"- {p['nom']} ({p['categorie']}) : {p['histoire']} | Prix: {p['prix']} FCFA\n" 
             for p in places_found
@@ -90,7 +138,7 @@ async def chat_tourisme_advisor(payload: ChatRequest):
             f"   'Pour découvrir nos spécialités, je vous invite à regarder le menu en bas de votre écran : vous y trouverez l'onglet \"Cuisine\"...'\n"
         )
 
-        # Étape 5 : Génération de la réponse (🔥 Source_used corrigée en Français !)
+        # Étape 5 : Génération de la réponse finale
         ai_response = ai_client.models.generate_content(
             model='gemini-2.5-flash',
             contents=system_prompt,
