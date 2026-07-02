@@ -7,10 +7,10 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
+import { useTranslations } from 'next-intl'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
-  CheckCircle, XCircle, Loader2, FileText, Ban, Trash2, ArrowLeft,
-  Calendar, EyeOff, Eye, Search, ExternalLink 
+  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink 
 } from 'lucide-react'
 
 interface PendingGuide {
@@ -89,6 +89,7 @@ export default function AdminDashboardPage() {
   const params = useParams<{ locale: string }>()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('Dashboard')
 
   const [activeTab, setActiveTab] = useState<'pending' | 'reports' | 'reviews' | 'logs'>('pending')
 
@@ -170,7 +171,7 @@ export default function AdminDashboardPage() {
   }, [params.locale])
 
   const handleApproveGuide = async (guideId: string) => {
-    if (!confirm('Approuver ce guide et valider ses documents ?')) return
+    if (!confirm(t('admin.confirm_approve'))) return
     setActionLoading(true)
     try {
       const res = await fetch('/api/admin', {
@@ -181,10 +182,10 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         await loadAdminData()
       } else {
-        alert('Erreur lors de l\'approbation')
+        alert(t('admin.error_approve'))
       }
     } catch {
-      alert('Erreur réseau')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -208,17 +209,17 @@ export default function AdminDashboardPage() {
         setRejectionReason('')
         await loadAdminData()
       } else {
-        alert('Erreur lors du rejet')
+        alert(t('admin.error_reject'))
       }
     } catch {
-      alert('Erreur réseau')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
   }
 
   const handleSuspendGuide = async (guideId: string) => {
-    if (!confirm('Suspendre ce guide de la plateforme ?')) return
+    if (!confirm(t('admin.confirm_suspend'))) return
     setActionLoading(true)
     try {
       const res = await fetch('/api/admin', {
@@ -229,17 +230,19 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         await loadAdminData()
       } else {
-        alert('Erreur lors de la suspension')
+        alert(t('admin.error_suspend'))
       }
     } catch {
-      alert('Erreur réseau')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
   }
 
   const handleResolveReport = async (reportId: string, resolution: 'resolved' | 'dismissed') => {
-    const note = prompt('Note de résolution :') || 'Traité par l\'admin'
+    const promptText = t('admin.resolve_prompt')
+    const defaultText = t('admin.resolve_default')
+    const note = prompt(promptText) || defaultText
     setActionLoading(true)
     try {
       const res = await fetch('/api/admin', {
@@ -254,10 +257,10 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         await loadAdminData()
       } else {
-        alert('Erreur lors du traitement du signalement')
+        alert(t('admin.error_resolve'))
       }
     } catch {
-      alert('Erreur réseau')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -281,10 +284,10 @@ export default function AdminDashboardPage() {
         setHideReviewReason('')
         await loadAdminData()
       } else {
-        alert('Erreur lors du changement de visibilité de l\'avis')
+        alert(t('admin.error_toggle_hidden'))
       }
     } catch {
-      alert('Erreur réseau')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -306,7 +309,7 @@ export default function AdminDashboardPage() {
         await loadAdminData()
       }
     } catch {
-      alert('Erreur réseau')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -317,7 +320,7 @@ export default function AdminDashboardPage() {
       <div className="flex min-h-screen items-center justify-center bg-base-100">
         <div className="text-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" style={{ color: COLORS.forest }} />
-          <p className="text-sm font-semibold text-base-content/60">Vérification des droits d'administration...</p>
+          <p className="text-sm font-semibold text-base-content/60">{t('common.loading_rights')}</p>
         </div>
       </div>
     )
@@ -332,36 +335,36 @@ export default function AdminDashboardPage() {
           className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white"
           style={{ backgroundColor: COLORS.rust }}
         >
-          Console Admin
+          {t('admin.console_title')}
         </span>
         <h1 className="mt-3 font-serif text-3xl font-bold sm:text-4xl text-base-content">
-          Administration Générale
+          {t('admin.general_admin')}
         </h1>
         <p className="mt-2 text-xs text-base-content/65 leading-5 max-w-2xl font-semibold">
-          Validation des guides certifiés, traitement des signalements de la communauté, et modération des avis.
+          {t('admin.admin_subtitle')}
         </p>
       </div>
 
       {/* Grid Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="rounded-2xl bg-base-200 border border-border p-4 shadow-xs">
-          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">Guides en examen</p>
+          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.stat_exam')}</p>
           <p className="text-2xl font-black text-base-content mt-1">
             {pendingGuides.filter(g => g.status === 'under_review').length}
           </p>
         </div>
         <div className="rounded-2xl bg-base-200 border border-border p-4 shadow-xs">
-          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">Signalements Ouverts</p>
+          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.stat_reports')}</p>
           <p className="text-2xl font-black text-error mt-1">
             {reports.filter(r => r.status === 'open').length}
           </p>
         </div>
         <div className="rounded-2xl bg-base-200 border border-border p-4 shadow-xs">
-          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">Avis soumis</p>
+          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.stat_reviews')}</p>
           <p className="text-2xl font-black text-base-content mt-1">{reviews.length}</p>
         </div>
         <div className="rounded-2xl bg-base-200 border border-border p-4 shadow-xs">
-          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">Total des guides</p>
+          <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.stat_total')}</p>
           <p className="text-2xl font-black text-base-content mt-1">{allGuides.length}</p>
         </div>
       </div>
@@ -369,25 +372,25 @@ export default function AdminDashboardPage() {
       {/* Tab Switcher */}
       <div className="flex border-b border-border mb-8 overflow-x-auto gap-4">
         {[
-          { id: 'pending', label: 'Validation des Guides', icon: ShieldCheck },
-          { id: 'reports', label: 'Signalements', icon: AlertTriangle },
-          { id: 'reviews', label: 'Modération des Avis', icon: MessageSquare },
-          { id: 'logs', label: 'Journal des Activités', icon: History }
-        ].map((t) => {
-          const Icon = t.icon
+          { id: 'pending', label: t('admin.tab_validation'), icon: ShieldCheck },
+          { id: 'reports', label: t('admin.tab_reports'), icon: AlertTriangle },
+          { id: 'reviews', label: t('admin.tab_reviews'), icon: MessageSquare },
+          { id: 'logs', label: t('admin.tab_logs'), icon: History }
+        ].map((tabItem) => {
+          const Icon = tabItem.icon
           return (
             <button
-              key={t.id}
-              onClick={() => handleTabChange(t.id as any)}
+              key={tabItem.id}
+              onClick={() => handleTabChange(tabItem.id as any)}
               className={`flex items-center gap-2 pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors ${
-                activeTab === t.id 
+                activeTab === tabItem.id 
                   ? 'border-primary text-primary font-black' 
                   : 'border-transparent text-base-content/60 hover:text-base-content'
               }`}
-              style={{ borderBottomColor: activeTab === t.id ? COLORS.forest : undefined, color: activeTab === t.id ? COLORS.forest : undefined }}
+              style={{ borderBottomColor: activeTab === tabItem.id ? COLORS.forest : undefined, color: activeTab === tabItem.id ? COLORS.forest : undefined }}
             >
               <Icon className="h-4.5 w-4.5" />
-              {t.label}
+              {tabItem.label}
             </button>
           )
         })}
@@ -400,11 +403,11 @@ export default function AdminDashboardPage() {
         {activeTab === 'pending' && (
           <div className="space-y-8">
             <div>
-              <h3 className="font-serif text-lg font-bold mb-4">Demandes en attente d'approbation</h3>
+              <h3 className="font-serif text-lg font-bold mb-4">{t('admin.pending_title')}</h3>
               
               {pendingGuides.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border bg-base-200 p-8 text-center text-base-content/50 font-semibold">
-                  Aucun guide en attente de vérification.
+                  {t('admin.no_pending')}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -418,14 +421,14 @@ export default function AdminDashboardPage() {
                           <div>
                             <h4 className="font-bold text-base-content text-sm">{g.profile.full_name}</h4>
                             <p className="text-[10px] text-base-content/65 font-bold">
-                              {g.experience_years} ans d'exp • Statut : <span className="text-amber-600 font-extrabold uppercase">{g.status}</span>
+                              {t('admin.exp_status_label', { years: g.experience_years })}<span className="text-amber-600 font-extrabold uppercase">{g.status}</span>
                             </p>
                           </div>
                         </div>
 
                         {/* Documents list */}
                         <div className="space-y-2 border-t border-border/55 pt-3">
-                          <span className="block text-[10px] font-black uppercase text-base-content/40 tracking-wider">Justificatifs fournis :</span>
+                          <span className="block text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.docs_provided')}</span>
                           <div className="flex flex-wrap gap-2">
                             {g.documents.map(doc => (
                               <a 
@@ -435,7 +438,7 @@ export default function AdminDashboardPage() {
                                 className="badge bg-base-100 border-border text-base-content hover:border-primary py-3 px-3 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-semibold"
                               >
                                 <FileText className="h-3.5 w-3.5 text-base-content/40" />
-                                {doc.label} (Télécharger PDF) <ExternalLink className="h-3 w-3 shrink-0 text-base-content/30" />
+                                {doc.label} ({t('admin.download_pdf')}) <ExternalLink className="h-3 w-3 shrink-0 text-base-content/30" />
                               </a>
                             ))}
                           </div>
@@ -447,14 +450,14 @@ export default function AdminDashboardPage() {
                           onClick={() => setRejectionGuideId(g.id)}
                           className="btn btn-outline btn-error btn-sm rounded-xl flex-1 md:flex-initial text-xs font-bold"
                         >
-                          Rejeter
+                          {t('common.reject')}
                         </button>
                         <button
                           onClick={() => handleApproveGuide(g.id)}
                           className="btn btn-sm text-white rounded-xl border-none font-bold flex-1 md:flex-initial"
                           style={{ backgroundColor: COLORS.forest }}
                         >
-                          Approuver
+                          {t('common.approve')}
                         </button>
                       </div>
                     </div>
@@ -465,16 +468,16 @@ export default function AdminDashboardPage() {
 
             {/* List of all guides */}
             <div className="border-t border-border/55 pt-6">
-              <h3 className="font-serif text-lg font-bold mb-4">Gérer tous les guides</h3>
+              <h3 className="font-serif text-lg font-bold mb-4">{t('admin.manage_guides')}</h3>
               <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
                 <table className="table w-full text-xs font-semibold">
                   <thead>
                     <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
-                      <th className="p-4 rounded-tl-[24px]">Nom</th>
-                      <th className="p-4">Statut actuel</th>
-                      <th className="p-4">Note globale</th>
-                      <th className="p-4">Missions</th>
-                      <th className="p-4 rounded-tr-[24px] text-right">Actions</th>
+                      <th className="p-4 rounded-tl-[24px]">{t('admin.table_name')}</th>
+                      <th className="p-4">{t('admin.table_status')}</th>
+                      <th className="p-4">{t('admin.table_rating')}</th>
+                      <th className="p-4">{t('admin.table_missions')}</th>
+                      <th className="p-4 rounded-tr-[24px] text-right">{t('admin.table_actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -498,7 +501,7 @@ export default function AdminDashboardPage() {
                               onClick={() => handleSuspendGuide(g.id)}
                               className="text-xs text-error font-bold flex items-center gap-1 ml-auto hover:underline"
                             >
-                              <Ban className="h-3.5 w-3.5" /> Suspendre
+                              <Ban className="h-3.5 w-3.5" /> {t('admin.suspend')}
                             </button>
                           )}
                           {g.status === 'suspended' && (
@@ -507,7 +510,7 @@ export default function AdminDashboardPage() {
                               className="text-xs text-primary font-bold ml-auto hover:underline"
                               style={{ color: COLORS.forest }}
                             >
-                              Réactiver
+                              {t('admin.reactivate')}
                             </button>
                           )}
                         </td>
@@ -523,11 +526,11 @@ export default function AdminDashboardPage() {
         {/* Tab 2: Reports */}
         {activeTab === 'reports' && (
           <div className="space-y-4">
-            <h3 className="font-serif text-lg font-bold mb-2">Signalements de la communauté</h3>
+            <h3 className="font-serif text-lg font-bold mb-2">{t('admin.reports_title')}</h3>
             
             {reports.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border bg-base-200 p-8 text-center text-base-content/50 font-semibold">
-                Aucun signalement déposé.
+                {t('admin.no_reports')}
               </div>
             ) : (
               <div className="space-y-4">
@@ -542,21 +545,21 @@ export default function AdminDashboardPage() {
                             {r.status}
                           </span>
                           <h4 className="font-bold text-base-content text-base mt-1">
-                            Motif : {r.reason}
+                            {t('admin.report_reason', { reason: r.reason })}
                           </h4>
                         </div>
                         <span className="text-[10px] text-base-content/40 font-bold">{new Date(r.created_at).toLocaleDateString()}</span>
                       </div>
 
                       <div className="text-xs text-base-content/75 font-semibold space-y-1">
-                        <p>Signaleur : <span className="text-base-content">{r.reporter.full_name}</span></p>
+                        <p>{t('admin.reporter')}<span className="text-base-content">{r.reporter.full_name}</span></p>
                         {r.reported_guide && (
-                          <p>Guide concerné : <span className="text-error">{r.reported_guide.profile.full_name}</span></p>
+                          <p>{t('admin.reported_guide')}<span className="text-error">{r.reported_guide.profile.full_name}</span></p>
                         )}
                       </div>
 
                       <div className="rounded-2xl bg-base-100 border border-border/60 p-3.5 text-xs text-base-content/85">
-                        <span className="block font-black text-[9px] uppercase tracking-wider text-base-content/40 mb-1">Description :</span>
+                        <span className="block font-black text-[9px] uppercase tracking-wider text-base-content/40 mb-1">{t('admin.description_label')}</span>
                         "{r.description}"
                       </div>
                     </div>
@@ -567,13 +570,13 @@ export default function AdminDashboardPage() {
                           onClick={() => handleResolveReport(r.id, 'dismissed')}
                           className="btn btn-outline btn-sm rounded-xl text-xs font-bold flex-1 sm:flex-initial"
                         >
-                          Rejeter le signalement
+                          {t('admin.reject_report')}
                         </button>
                         <button
                           onClick={() => handleResolveReport(r.id, 'resolved')}
                           className="btn btn-sm text-white rounded-xl border-none font-bold flex-1 sm:flex-initial bg-success hover:bg-success-content"
                         >
-                          Marquer comme résolu
+                          {t('admin.resolve_report')}
                         </button>
                       </div>
                     )}
@@ -587,11 +590,11 @@ export default function AdminDashboardPage() {
         {/* Tab 3: Reviews moderation */}
         {activeTab === 'reviews' && (
           <div className="space-y-4">
-            <h3 className="font-serif text-lg font-bold mb-2">Modération des Avis touristiques</h3>
+            <h3 className="font-serif text-lg font-bold mb-2">{t('admin.reviews_title')}</h3>
             
             {reviews.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border bg-base-200 p-8 text-center text-base-content/50 font-semibold">
-                Aucun avis pour le moment.
+                {t('admin.no_reviews')}
               </div>
             ) : (
               <div className="space-y-4">
@@ -606,21 +609,21 @@ export default function AdminDashboardPage() {
                         </div>
                         <span className="text-[10px] text-base-content/40 font-bold">{new Date(r.created_at).toLocaleDateString()}</span>
                         {r.is_hidden && (
-                          <span className="badge badge-error badge-xs py-2 text-[8px] font-extrabold uppercase rounded-md text-white">Masqué</span>
+                          <span className="badge badge-error badge-xs py-2 text-[8px] font-extrabold uppercase rounded-md text-white">{t('admin.hidden')}</span>
                         )}
                       </div>
 
                       <p className="text-xs text-base-content/65 font-bold">
-                        De {r.reviewer.full_name} pour le guide <span className="text-base-content">{r.guide.profile.full_name}</span>
+                        {t('admin.review_author', { reviewer: r.reviewer.full_name, guide: r.guide.profile.full_name })}
                       </p>
 
                       <div className="rounded-2xl bg-base-100 border border-border/60 p-3 text-xs text-base-content italic">
-                        "{r.comment || 'Aucun commentaire écrit.'}"
+                        "{r.comment || t('admin.no_comment')}"
                       </div>
 
                       {r.is_hidden && r.hidden_reason && (
                         <p className="text-[10px] font-bold text-error">
-                          Motif de masquage : {r.hidden_reason}
+                          {t('admin.hidden_reason_label', { reason: r.hidden_reason })}
                         </p>
                       )}
                     </div>
@@ -631,7 +634,7 @@ export default function AdminDashboardPage() {
                           onClick={() => quickToggleReview(r.id)}
                           className="btn btn-outline btn-sm rounded-xl text-xs font-bold gap-1"
                         >
-                          <Eye className="h-4 w-4" /> Rendre public
+                          <ShieldCheck className="h-4 w-4" /> {t('admin.make_public')}
                         </button>
                       ) : (
                         <button
@@ -640,7 +643,7 @@ export default function AdminDashboardPage() {
                           }}
                           className="btn btn-outline btn-error btn-sm rounded-xl text-xs font-bold gap-1"
                         >
-                          <EyeOff className="h-4 w-4" /> Masquer l'avis
+                          <EyeOff className="h-4 w-4" /> {t('admin.hide_review')}
                         </button>
                       )}
                     </div>
@@ -654,17 +657,17 @@ export default function AdminDashboardPage() {
         {/* Tab 4: Logs */}
         {activeTab === 'logs' && (
           <div className="space-y-4">
-            <h3 className="font-serif text-lg font-bold mb-2">Journal des actions administratives</h3>
+            <h3 className="font-serif text-lg font-bold mb-2">{t('admin.logs_title')}</h3>
             
             <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
               <table className="table w-full text-xs font-semibold">
                 <thead>
                   <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
-                    <th className="p-4 rounded-tl-[24px]">Date</th>
-                    <th className="p-4">Administrateur</th>
-                    <th className="p-4">Action</th>
-                    <th className="p-4">Cible</th>
-                    <th className="p-4 rounded-tr-[24px]">Détails</th>
+                    <th className="p-4 rounded-tl-[24px]">{t('admin.table_date')}</th>
+                    <th className="p-4">{t('admin.table_admin')}</th>
+                    <th className="p-4">{t('admin.table_action')}</th>
+                    <th className="p-4">{t('admin.table_target')}</th>
+                    <th className="p-4 rounded-tr-[24px]">{t('admin.table_details')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -679,7 +682,7 @@ export default function AdminDashboardPage() {
                   ))}
                   {logs.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="p-6 text-center text-base-content/50">Aucune activité enregistrée.</td>
+                      <td colSpan={5} className="p-6 text-center text-base-content/50">{t('admin.no_logs')}</td>
                     </tr>
                   )}
                 </tbody>
@@ -694,14 +697,14 @@ export default function AdminDashboardPage() {
       {rejectionGuideId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
           <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-4">
-            <h3 className="font-serif text-xl font-bold text-base-content">Motif du rejet</h3>
+            <h3 className="font-serif text-xl font-bold text-base-content">{t('admin.reject_modal_title')}</h3>
             <p className="text-xs text-base-content/60">
-              Veuillez renseigner le motif pour lequel les justificatifs de ce guide ne sont pas acceptés. Ce message lui sera notifié.
+              {t('admin.reject_modal_subtitle')}
             </p>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="Ex: Document flou ou non lisible. Licence expirée."
+              placeholder={t('admin.reject_modal_placeholder')}
               className="textarea textarea-bordered h-24 w-full rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
               required
             />
@@ -713,7 +716,7 @@ export default function AdminDashboardPage() {
                 }}
                 className="btn btn-outline flex-1 rounded-2xl text-xs font-bold"
               >
-                Annuler
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleRejectGuide}
@@ -721,7 +724,7 @@ export default function AdminDashboardPage() {
                 className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
                 style={{ backgroundColor: COLORS.rust }}
               >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Rejeter le guide'}
+                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('admin.reject_guide_btn')}
               </button>
             </div>
           </div>
@@ -732,14 +735,14 @@ export default function AdminDashboardPage() {
       {hideReviewId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
           <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-4">
-            <h3 className="font-serif text-xl font-bold text-base-content">Masquer l'avis</h3>
+            <h3 className="font-serif text-xl font-bold text-base-content">{t('admin.hide_modal_title')}</h3>
             <p className="text-xs text-base-content/60">
-              Renseignez le motif de modération pour justifier le masquage de cet avis de la vue du public.
+              {t('admin.hide_modal_subtitle')}
             </p>
             <textarea
               value={hideReviewReason}
               onChange={(e) => setHideReviewReason(e.target.value)}
-              placeholder="Ex: Commentaire contenant des insultes ou propos déplacés."
+              placeholder={t('admin.hide_modal_placeholder')}
               className="textarea textarea-bordered h-24 w-full rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
               required
             />
@@ -751,7 +754,7 @@ export default function AdminDashboardPage() {
                 }}
                 className="btn btn-outline flex-1 rounded-2xl text-xs font-bold"
               >
-                Annuler
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleToggleReviewHidden}
@@ -759,7 +762,7 @@ export default function AdminDashboardPage() {
                 className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
                 style={{ backgroundColor: COLORS.rust }}
               >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Masquer l\'avis'}
+                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('admin.hide_review')}
               </button>
             </div>
           </div>

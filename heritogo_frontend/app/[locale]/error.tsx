@@ -1,7 +1,8 @@
-'use client'
+﻿'use client'
 
 import { useEffect } from 'react'
 import { WifiOff, RefreshCw, Home } from 'lucide-react'
+import { Link } from '@/i18n/navigation'
 
 export default function Error({
   error,
@@ -65,16 +66,19 @@ export default function Error({
             <RefreshCw className="h-4 w-4" />
             Réessayer
           </button>
-          <a
+          <Link
             href="/"
             className="btn flex-1 rounded-2xl border border-border bg-base-100 font-black gap-2"
           >
             <Home className="h-4 w-4" />
             Accueil
-          </a>
+          </Link>
         </div>
 
       </div>
     </div>
   )
 }
+
+
+

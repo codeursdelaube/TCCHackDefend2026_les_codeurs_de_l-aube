@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { useGeolocation } from '@/hooks/useGeolocation'
 
 
 interface PredictionResult {
@@ -63,13 +64,15 @@ export default function ScanPage() {
   })
   const [showPaywall, setShowPaywall] = useState(false)
 
+  const { position: geoPosition } = useGeolocation()
+
   useEffect(() => {
-    if (!navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition(
-      (position) => setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude }),
-      () => setUserLocation(null),
-    )
-  }, [])
+    if (geoPosition) {
+      setUserLocation(geoPosition)
+    } else {
+      setUserLocation(null)
+    }
+  }, [geoPosition])
 
   useEffect(() => {
     return () => window.speechSynthesis.cancel()
@@ -223,9 +226,19 @@ export default function ScanPage() {
         {/* Left Control Card */}
         <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
           <div className="flex justify-between items-center mb-5">
-            <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
-              <Sparkles className="h-4 w-4" />
-              {userLocation ? t('gps_available') : t('select_capture')}
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
+                <Sparkles className="h-4 w-4" />
+                {userLocation ? t('gps_available') : t('select_capture')}
+              </div>
+              {userLocation && (
+                <div 
+                  className="p-1.5 rounded-full bg-base-100 border border-border flex items-center justify-center animate-pulse" 
+                  title="GPS Actif"
+                >
+                  <MapPin className="h-3.5 w-3.5" style={{ color: COLORS.forest }} />
+                </div>
+              )}
             </div>
 
             {/* Quota Indicator */}

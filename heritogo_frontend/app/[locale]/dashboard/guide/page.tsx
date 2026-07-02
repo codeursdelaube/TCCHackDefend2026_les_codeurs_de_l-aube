@@ -6,6 +6,7 @@ import { useEffect, useState, startTransition, useMemo, useCallback } from 'reac
 import { useRouter, useSearchParams } from 'next/navigation'
 import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
+import { useTranslations } from 'next-intl'
 import { 
   Briefcase, Calendar, Clock, MapPin, 
   AlertTriangle, Loader2, Star, ShieldCheck, BadgeCent, 
@@ -13,7 +14,6 @@ import {
 } from 'lucide-react'
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
-
 
 interface BookingRow {
   id: string
@@ -62,6 +62,7 @@ const AVAILABLE_LANGUAGES = ['Français', 'English', 'Espagnol', 'Deutsch', 'Éw
 export default function GuideDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('Dashboard')
   
   // Tabs: 'bookings' | 'profile' | 'documents'
   const activeTab = useMemo<'bookings' | 'profile' | 'documents'>(() => {
@@ -85,7 +86,6 @@ export default function GuideDashboard() {
   
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
 
   // Profile Edit fields
   const [bio, setBio] = useState('')
@@ -123,7 +123,7 @@ export default function GuideDashboard() {
       const response = await fetch('/api/guide/bookings')
       const data = await response.json()
       if (!response.ok) {
-        setError(data.error || 'Erreur lors de la récupération des données')
+        setError(data.error || t('guide.error_load_data'))
         return
       }
       setBookings(data.bookings)
@@ -144,16 +144,15 @@ export default function GuideDashboard() {
         setVirtualRate(gp.virtual_rate || '')
       }
     } catch {
-      setError('Impossible de communiquer avec le serveur.')
+      setError(t('common.error_server'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadData()
   }, [loadData])
-
 
   // Update profile handler
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -168,15 +167,15 @@ export default function GuideDashboard() {
     }
 
     if (experienceYears < 0 || experienceYears > 60) {
-      setError("Les années d'expérience doivent être comprises entre 0 et 60.")
+      setError(t('guide.error_exp_bounds'))
       return
     }
 
     const rates = [
-      { val: hourlyRate, name: 'Tarif horaire' },
-      { val: halfDayRate, name: 'Tarif demi-journée' },
-      { val: fullDayRate, name: 'Tarif journée complète' },
-      { val: virtualRate, name: 'Tarif virtuel' }
+      { val: hourlyRate, name: t('guide.rate_hour') },
+      { val: halfDayRate, name: t('guide.rate_half') },
+      { val: fullDayRate, name: t('guide.rate_full') },
+      { val: virtualRate, name: t('guide.rate_virtual') }
     ]
 
     for (const r of rates) {
@@ -208,11 +207,11 @@ export default function GuideDashboard() {
 
       const data = await response.json()
       if (!response.ok) {
-        setError(data.error || 'Erreur lors de la mise à jour')
+        setError(data.error || t('common.error_update'))
         return
       }
       setGuide(data.guide)
-      alert('Profil mis à jour avec succès !')
+      alert(t('common.success_update'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
     } finally {
@@ -225,7 +224,7 @@ export default function GuideDashboard() {
     e.preventDefault()
     setError(null)
     if (!selectedFile) {
-      setError('Veuillez sélectionner un fichier PDF.')
+      setError(t('guide.error_pdf_required'))
       return
     }
     setActionLoading(true)
@@ -256,13 +255,13 @@ export default function GuideDashboard() {
 
       const data = await response.json()
       if (!response.ok) {
-        setError(data.error || 'Erreur lors de la soumission du document')
+        setError(data.error || t('guide.error_doc_submit'))
         return
       }
       setGuide(data.guide)
       setDocLabel('')
       setSelectedFile(null)
-      alert('Document soumis avec succès ! Votre statut passe en examen.')
+      alert(t('guide.success_doc_submit'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
     } finally {
@@ -275,7 +274,7 @@ export default function GuideDashboard() {
     if (!selectedBooking || !quoteAmount) return
     setError(null)
 
-    const quoteErr = validatePositiveNumber(quoteAmount, 'Le montant du devis')
+    const quoteErr = validatePositiveNumber(quoteAmount, t('guide.proposed_amount'))
     if (quoteErr) {
       setError(quoteErr)
       return
@@ -296,7 +295,7 @@ export default function GuideDashboard() {
 
       const data = await response.json()
       if (!response.ok) {
-        setError(data.error || 'Erreur de transmission du devis')
+        setError(data.error || t('guide.error_quote_send'))
         return
       }
 
@@ -304,7 +303,7 @@ export default function GuideDashboard() {
       setQuoteAmount('')
       setQuoteMessage('')
       await loadData()
-      alert('Devis envoyé avec succès au touriste !')
+      alert(t('guide.success_quote_send'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
     } finally {
@@ -313,7 +312,7 @@ export default function GuideDashboard() {
   }
 
   const handleUpdateBookingStatus = async (bookingId: string, action: 'start_mission' | 'complete_mission' | 'cancel', reason?: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir effectuer cette action ?')) return
+    if (!confirm(t('guide.confirm_action'))) return
     setActionLoading(true)
     try {
       const response = await fetch('/api/guide/bookings', {
@@ -328,12 +327,12 @@ export default function GuideDashboard() {
 
       const data = await response.json()
       if (!response.ok) {
-        alert(data.error || 'Erreur lors du changement de statut')
+        alert(data.error || t('guide.error_status_change'))
         return
       }
       await loadData()
     } catch {
-      alert('Erreur réseau.')
+      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -371,16 +370,28 @@ export default function GuideDashboard() {
       <div className="flex min-h-screen items-center justify-center bg-base-100">
         <div className="text-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" style={{ color: COLORS.forest }} />
-          <p className="text-sm font-semibold text-base-content/60 font-sans">Chargement de votre espace guide...</p>
+          <p className="text-sm font-semibold text-base-content/60 font-sans">{t('common.loading_guide')}</p>
         </div>
       </div>
     )
   }
 
+  const getGuideStatusText = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return t('guide.status_approved')
+      case 'under_review':
+        return t('guide.status_under_review')
+      case 'rejected':
+        return t('guide.status_rejected')
+      default:
+        return t('guide.status_waiting')
+    }
+  }
+
   return (
     <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-base-content sm:px-6 lg:px-8 bg-base-100">
       
-
       {/* Error Alert */}
       {error && (
         <div className="alert alert-error rounded-2xl mb-4">
@@ -405,23 +416,21 @@ export default function GuideDashboard() {
             </div>
             
             <div className="space-y-1">
-              <h2 className="font-serif text-2xl font-bold tracking-tight">Bonjour, {guide.profile.full_name}</h2>
+              <h2 className="font-serif text-2xl font-bold tracking-tight">{t('guide.greeting', { name: guide.profile.full_name })}</h2>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 text-xs text-base-content/65 font-bold">
                 <span className="flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
-                  {Number(guide.avg_rating).toFixed(1)} ({guide.total_reviews} avis)
+                  {Number(guide.avg_rating).toFixed(1)} ({guide.total_reviews} {(t('Navbar.guides').toLowerCase())})
                 </span>
                 <span>•</span>
-                <span>Statut : 
+                <span>{t('common.status')} : 
                   <span className={`ml-1 font-extrabold uppercase text-[10px] px-2 py-0.5 rounded-lg ${
                     guide.status === 'approved' ? 'bg-success/20 text-success' :
                     guide.status === 'under_review' ? 'bg-amber-500/20 text-amber-600' :
                     guide.status === 'rejected' ? 'bg-error/20 text-error' :
                     'bg-neutral/20 text-neutral-content'
                   }`}>
-                    {guide.status === 'approved' ? 'Approuvé' :
-                     guide.status === 'under_review' ? 'En examen' :
-                     guide.status === 'rejected' ? 'Rejeté' : 'En attente de documents'}
+                    {getGuideStatusText(guide.status)}
                   </span>
                 </span>
               </div>
@@ -430,11 +439,11 @@ export default function GuideDashboard() {
 
           <div className="grid grid-cols-2 gap-4 w-full md:w-auto text-center font-semibold">
             <div className="bg-base-100 rounded-2xl p-3 border border-border/60">
-              <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">Missions</p>
+              <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('guide.missions_stat')}</p>
               <p className="text-xl font-black text-base-content mt-0.5">{guide.total_missions}</p>
             </div>
             <div className="bg-base-100 rounded-2xl p-3 border border-border/60">
-              <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">Note globale</p>
+              <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('guide.rating_stat')}</p>
               <p className="text-xl font-black text-base-content mt-0.5">{Number(guide.avg_rating).toFixed(1)}</p>
             </div>
           </div>
@@ -444,24 +453,24 @@ export default function GuideDashboard() {
       {/* Tabs Switcher */}
       <div className="flex border-b border-border mb-8 overflow-x-auto gap-4">
         {[
-          { id: 'bookings', label: 'Demandes & Missions', icon: Briefcase },
-          { id: 'profile', label: 'Éditer mon profil public', icon: Edit3 },
-          { id: 'documents', label: 'Vérification de documents', icon: FileText }
-        ].map((t) => {
-          const Icon = t.icon
+          { id: 'bookings', label: t('guide.tab_bookings'), icon: Briefcase },
+          { id: 'profile', label: t('guide.tab_profile'), icon: Edit3 },
+          { id: 'documents', label: t('guide.tab_documents'), icon: FileText }
+        ].map((tabItem) => {
+          const Icon = tabItem.icon
           return (
             <button
-              key={t.id}
-              onClick={() => handleTabChange(t.id as any)}
+              key={tabItem.id}
+              onClick={() => handleTabChange(tabItem.id as any)}
               className={`flex items-center gap-2 pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors ${
-                activeTab === t.id 
+                activeTab === tabItem.id 
                   ? 'border-primary text-primary font-black' 
                   : 'border-transparent text-base-content/60 hover:text-base-content'
               }`}
-              style={{ borderBottomColor: activeTab === t.id ? COLORS.forest : undefined, color: activeTab === t.id ? COLORS.forest : undefined }}
+              style={{ borderBottomColor: activeTab === tabItem.id ? COLORS.forest : undefined, color: activeTab === tabItem.id ? COLORS.forest : undefined }}
             >
               <Icon className="h-4.5 w-4.5" />
-              {t.label}
+              {tabItem.label}
             </button>
           )
         })}
@@ -478,12 +487,12 @@ export default function GuideDashboard() {
             <div>
               <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
                 <Bell className="h-5 w-5 text-amber-500" />
-                Nouvelles demandes de devis
+                {t('guide.new_quotes_title')}
               </h3>
               
               {bookings.filter(b => b.status === 'quote_requested').length === 0 ? (
                 <div className="rounded-[24px] border border-dashed border-border bg-base-200 p-8 text-center">
-                  <p className="text-sm font-semibold text-base-content/50">Aucune nouvelle demande de devis.</p>
+                  <p className="text-sm font-semibold text-base-content/50">{t('guide.no_quotes')}</p>
                 </div>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
@@ -492,7 +501,7 @@ export default function GuideDashboard() {
                       <div className="space-y-3">
                         <div className="flex justify-between items-start">
                           <div>
-                            <span className="badge badge-warning badge-sm font-bold text-white uppercase text-[8px] rounded-lg">Devis requis</span>
+                            <span className="badge badge-warning badge-sm font-bold text-white uppercase text-[8px] rounded-lg">{t('guide.status_quote_required')}</span>
                             <h4 className="font-bold text-base-content text-base mt-1">{b.tourist.full_name}</h4>
                           </div>
                           <span className="text-[10px] text-base-content/40 font-bold">{new Date(b.created_at).toLocaleDateString()}</span>
@@ -501,8 +510,8 @@ export default function GuideDashboard() {
                         <div className="space-y-1.5 text-xs text-base-content/75 font-semibold">
                           <p className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-base-content/40" /> {new Date(b.start_date).toLocaleDateString()}</p>
                           {b.start_time && <p className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-base-content/40" /> Début à {new Date(b.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>}
-                          {b.meeting_point && <p className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-base-content/40" /> RDV : {b.meeting_point}</p>}
-                          <p className="flex items-center gap-1.5"><User className="h-4 w-4 text-base-content/40" /> Groupe : {b.group_size} pers.</p>
+                          {b.meeting_point && <p className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-base-content/40" /> {t('guide.meeting_point', { point: b.meeting_point })}</p>}
+                          <p className="flex items-center gap-1.5"><User className="h-4 w-4 text-base-content/40" /> {t('guide.group_size', { size: b.group_size })}</p>
                         </div>
 
                         {b.tourist_message && (
@@ -517,7 +526,7 @@ export default function GuideDashboard() {
                           onClick={() => handleUpdateBookingStatus(b.id, 'cancel', 'Refusé par le guide')}
                           className="btn btn-outline btn-error btn-sm rounded-xl flex-1 text-xs font-bold"
                         >
-                          Refuser
+                          {t('guide.refuse')}
                         </button>
                         <button
                           onClick={() => {
@@ -527,7 +536,7 @@ export default function GuideDashboard() {
                           className="btn btn-sm text-white rounded-xl border-none font-bold flex-1"
                           style={{ backgroundColor: COLORS.forest }}
                         >
-                          Envoyer un devis
+                          {t('guide.send_quote_btn')}
                         </button>
                       </div>
                     </div>
@@ -540,12 +549,12 @@ export default function GuideDashboard() {
             <div className="border-t border-border/55 pt-6">
               <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-emerald-600" />
-                Missions confirmées et en cours
+                {t('guide.confirmed_missions_title')}
               </h3>
 
               {bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status)).length === 0 ? (
                 <div className="rounded-[24px] border border-dashed border-border bg-base-200 p-8 text-center">
-                  <p className="text-sm font-semibold text-base-content/50">Aucune mission en cours ou confirmée.</p>
+                  <p className="text-sm font-semibold text-base-content/50">{t('guide.no_active_missions')}</p>
                 </div>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
@@ -555,7 +564,7 @@ export default function GuideDashboard() {
                         <div className="flex justify-between items-start">
                           <div>
                             <span className={`badge badge-sm font-bold text-white uppercase text-[8px] rounded-lg ${b.status === 'in_progress' ? 'bg-primary' : 'bg-success'}`}>
-                              {b.status === 'in_progress' ? 'En cours' : 'Confirmé'}
+                              {b.status === 'in_progress' ? t('guide.status_in_progress') : t('guide.status_confirmed')}
                             </span>
                             <h4 className="font-bold text-base-content text-base mt-1">{b.tourist.full_name}</h4>
                           </div>
@@ -563,17 +572,17 @@ export default function GuideDashboard() {
                         </div>
 
                         <div className="space-y-1.5 text-xs text-base-content/75 font-semibold">
-                          <p className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-base-content/40" /> Date : {new Date(b.start_date).toLocaleDateString()}</p>
+                          <p className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-base-content/40" /> {t('common.date')} : {new Date(b.start_date).toLocaleDateString()}</p>
                           {b.quote_amount && (
                             <p className="flex items-center gap-1.5 text-base-content font-bold">
                               <BadgeCent className="h-4 w-4 text-emerald-600" />
-                              Budget : {Number(b.quote_amount).toLocaleString()} XOF
+                              {t('guide.budget_label', { amount: Number(b.quote_amount).toLocaleString() })}
                             </p>
                           )}
                           {b.tourist.phone && (
                             <p className="flex items-center gap-1.5 text-base-content">
                               <Phone className="h-4 w-4 text-base-content/40" />
-                              Contact : <span className="font-bold underline">{b.tourist.phone}</span>
+                              {t('guide.contact_label')}<span className="font-bold underline">{b.tourist.phone}</span>
                             </p>
                           )}
                         </div>
@@ -586,14 +595,14 @@ export default function GuideDashboard() {
                             className="btn btn-sm text-white rounded-xl border-none font-bold w-full"
                             style={{ backgroundColor: COLORS.rust }}
                           >
-                            Démarrer la visite guidée
+                            {t('guide.start_mission')}
                           </button>
                         ) : (
                           <button
                             onClick={() => handleUpdateBookingStatus(b.id, 'complete_mission')}
                             className="btn btn-sm text-white rounded-xl border-none font-bold w-full bg-success hover:bg-success-content"
                           >
-                            Marquer comme terminée
+                            {t('guide.complete_mission')}
                           </button>
                         )}
                       </div>
@@ -605,16 +614,16 @@ export default function GuideDashboard() {
 
             {/* History */}
             <div className="border-t border-border/55 pt-6">
-              <h3 className="font-serif text-lg font-bold mb-4">Historique des missions</h3>
+              <h3 className="font-serif text-lg font-bold mb-4">{t('guide.missions_history')}</h3>
               <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
                 <table className="table w-full text-xs font-semibold">
                   <thead>
                     <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
-                      <th className="p-4 rounded-tl-[24px]">Touriste</th>
-                      <th className="p-4">Date</th>
-                      <th className="p-4">Montant</th>
-                      <th className="p-4">Statut</th>
-                      <th className="p-4 rounded-tr-[24px]">Action / Note</th>
+                      <th className="p-4 rounded-tl-[24px]">{t('guide.table_tourist')}</th>
+                      <th className="p-4">{t('common.date')}</th>
+                      <th className="p-4">{t('common.amount')}</th>
+                      <th className="p-4">{t('guide.table_status')}</th>
+                      <th className="p-4 rounded-tr-[24px]">{t('guide.table_action')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -629,8 +638,8 @@ export default function GuideDashboard() {
                             b.status === 'cancelled' ? 'bg-error/20 text-error' :
                             'bg-neutral/20 text-neutral-content'
                           }`}>
-                            {b.status === 'completed' ? 'Terminé' :
-                             b.status === 'cancelled' ? 'Annulé' : 'Devis envoyé'}
+                            {b.status === 'completed' ? t('guide.history_completed') :
+                             b.status === 'cancelled' ? t('guide.history_cancelled') : t('guide.history_quote_sent')}
                           </span>
                         </td>
                         <td className="p-4">
@@ -639,17 +648,17 @@ export default function GuideDashboard() {
                               onClick={() => handleUpdateBookingStatus(b.id, 'cancel', 'Annulé par le guide')}
                               className="text-xs text-error hover:underline"
                             >
-                              Annuler le devis
+                              {t('guide.cancel_quote')}
                             </button>
                           )}
-                          {b.status === 'completed' && b.quote_amount && 'Mission payée'}
-                          {b.status === 'cancelled' && 'Annulé'}
+                          {b.status === 'completed' && b.quote_amount && t('guide.mission_paid')}
+                          {b.status === 'cancelled' && t('guide.history_cancelled')}
                         </td>
                       </tr>
                     ))}
                     {bookings.filter(b => ['completed', 'cancelled', 'quote_sent'].includes(b.status)).length === 0 && (
                       <tr>
-                        <td colSpan={5} className="p-6 text-center text-base-content/50">Aucun historique.</td>
+                        <td colSpan={5} className="p-6 text-center text-base-content/50">{t('guide.no_history')}</td>
                       </tr>
                     )}
                   </tbody>
@@ -663,11 +672,11 @@ export default function GuideDashboard() {
         {/* Tab 2: Edit Profile */}
         {activeTab === 'profile' && (
           <form onSubmit={handleUpdateProfile} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
-            <h3 className="font-serif text-xl font-bold border-b border-border pb-3">Éditer votre profil public</h3>
+            <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.tab_profile')}</h3>
             
             <div className="grid gap-6 sm:grid-cols-2">
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">Numéro de téléphone</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.phone_label')}</span>
                 <input
                   type="text"
                   value={phone}
@@ -681,7 +690,7 @@ export default function GuideDashboard() {
               </label>
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{"Années d'expérience"}</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.exp_label')}</span>
                 <input
                   type="number"
                   min="0"
@@ -705,21 +714,21 @@ export default function GuideDashboard() {
 
             {/* Bio */}
             <label className="form-control w-full">
-              <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">Biographie publique</span>
+              <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.bio_label')}</span>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="Racontez votre parcours, votre amour du Togo, vos circuits préférés..."
+                placeholder={t('guide.bio_placeholder')}
                 className="textarea textarea-bordered h-28 rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
               />
             </label>
 
             {/* Rates Grid */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">Tarification (XOF)</span>
+              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.rates_title')}</span>
               <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Journée complète</span>
+                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">{t('guide.rate_full')}</span>
                   <input
                     type="number"
                     min="0"
@@ -735,7 +744,7 @@ export default function GuideDashboard() {
                   />
                 </label>
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Demi-journée</span>
+                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">{t('guide.rate_half')}</span>
                   <input
                     type="number"
                     min="0"
@@ -751,7 +760,7 @@ export default function GuideDashboard() {
                   />
                 </label>
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">Tarif horaire</span>
+                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">{t('guide.rate_hour')}</span>
                   <input
                     type="number"
                     min="0"
@@ -767,7 +776,7 @@ export default function GuideDashboard() {
                   />
                 </label>
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/65">Virtuelle (Optionnel)</span>
+                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/65">{t('guide.rate_virtual')}</span>
                   <input
                     type="number"
                     min="0"
@@ -787,7 +796,7 @@ export default function GuideDashboard() {
 
             {/* Languages Selector */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">Langues maîtrisées</span>
+              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.langs_title')}</span>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_LANGUAGES.map((l) => {
                   const active = selectedLangs.includes(l)
@@ -811,7 +820,7 @@ export default function GuideDashboard() {
 
             {/* Zones Selector */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">Zones de couverture</span>
+              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.zones_title')}</span>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_ZONES.map((z) => {
                   const active = selectedZones.includes(z)
@@ -835,13 +844,13 @@ export default function GuideDashboard() {
 
             {/* Specialties Manager */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">Vos Spécialités</span>
+              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.specs_title')}</span>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={newSpecialty}
                   onChange={(e) => setNewSpecialty(e.target.value)}
-                  placeholder="Ex: Écotourisme, Randonnées forestières"
+                  placeholder={t('guide.spec_placeholder')}
                   className="input input-bordered rounded-2xl bg-base-100 text-sm flex-1 focus:border-primary focus:outline-none"
                 />
                 <button
@@ -850,7 +859,7 @@ export default function GuideDashboard() {
                   className="btn text-white rounded-2xl border-none font-bold"
                   style={{ backgroundColor: COLORS.forest }}
                 >
-                  Ajouter
+                  {t('guide.add_spec')}
                 </button>
               </div>
               <div className="flex flex-wrap gap-1.5 pt-1">
@@ -869,7 +878,7 @@ export default function GuideDashboard() {
               className="btn btn-block text-white rounded-2xl border-none font-bold mt-4"
               style={{ backgroundColor: COLORS.forest }}
             >
-              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enregistrer les modifications'}
+              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save_changes')}
             </button>
           </form>
         )}
@@ -880,29 +889,29 @@ export default function GuideDashboard() {
             
             {/* Upload form */}
             <form onSubmit={handleUploadDocument} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-5">
-              <h3 className="font-serif text-xl font-bold border-b border-border pb-3">Soumettre un document</h3>
+              <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.submit_doc_title')}</h3>
               
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">Type de document</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.doc_type')}</span>
                 <select
                   value={docType}
                   onChange={(e) => setDocType(e.target.value)}
                   className="select select-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                 >
-                  <option value="guide_license">Licence officielle de guide touristique</option>
-                  <option value="national_id">{"Carte Nationale d'Identité ou Passeport"}</option>
-                  <option value="certificate">Certification ou Diplôme (Histoire/Tourisme)</option>
-                  <option value="other">Autre justificatif</option>
+                  <option value="guide_license">{t('guide.doc_license')}</option>
+                  <option value="national_id">{t('guide.doc_id')}</option>
+                  <option value="certificate">{t('guide.doc_cert')}</option>
+                  <option value="other">{t('guide.doc_other')}</option>
                 </select>
               </label>
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">Libellé / Titre</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.doc_title_label')}</span>
                 <input
                   type="text"
                   value={docLabel}
                   onChange={(e) => setDocLabel(e.target.value)}
-                  placeholder="Ex: Licence Ministère du Tourisme 2026"
+                  placeholder={t('guide.doc_title_placeholder')}
                   className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                   required
                 />
@@ -910,7 +919,7 @@ export default function GuideDashboard() {
 
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                  <UploadCloud className="h-3.5 w-3.5" /> Fichier justificatif (PDF uniquement)
+                  <UploadCloud className="h-3.5 w-3.5" /> {t('guide.doc_file_label')}
                 </span>
                 <input
                   type="file"
@@ -939,7 +948,7 @@ export default function GuideDashboard() {
 
               <div className="rounded-2xl bg-base-100 p-4 border border-border/60">
                 <p className="text-xs text-base-content/60 leading-5">
-                  📁 Veuillez uploader un fichier officiel au format PDF (max. 5 Mo). Le document sera directement accessible et téléchargeable pour validation par l'équipe d'administration.
+                  {t('guide.doc_upload_hint')}
                 </p>
               </div>
 
@@ -949,17 +958,17 @@ export default function GuideDashboard() {
                 className="btn btn-block text-white rounded-2xl border-none font-bold"
                 style={{ backgroundColor: COLORS.forest }}
               >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Soumettre pour vérification'}
+                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('guide.submit_for_verification')}
               </button>
             </form>
 
             {/* List of submitted docs */}
             <div className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-4 h-fit">
-              <h3 className="font-serif text-lg font-bold">Documents soumis</h3>
+              <h3 className="font-serif text-lg font-bold">{t('guide.docs_submitted_title')}</h3>
               
               {(guide as any)?.documents?.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border bg-base-100 p-6 text-center text-base-content/50">
-                  Aucun document soumis pour le moment.
+                  {t('guide.no_docs')}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -968,17 +977,17 @@ export default function GuideDashboard() {
                       <div className="space-y-1">
                         <p className="text-xs font-extrabold text-base-content">{doc.label}</p>
                         <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">
-                          Type : {doc.type}
+                          {t('common.status')} : {doc.type}
                         </p>
                         <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="inline-block text-[10px] font-bold text-primary underline">
-                          Ouvrir le document
+                          {t('guide.open_doc')}
                         </a>
                       </div>
 
                       <span className={`badge badge-sm font-extrabold uppercase text-[8px] py-2.5 px-2 rounded-lg ${
                         doc.is_verified ? 'bg-success/20 text-success' : 'bg-amber-500/20 text-amber-600'
                       }`}>
-                        {doc.is_verified ? 'Vérifié' : 'En cours'}
+                        {doc.is_verified ? t('guide.doc_verified') : t('guide.doc_pending')}
                       </span>
                     </div>
                   ))}
@@ -997,13 +1006,13 @@ export default function GuideDashboard() {
           <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-5">
             
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-serif text-xl font-bold text-base-content">Proposer un devis</h3>
+              <h3 className="font-serif text-xl font-bold text-base-content">{t('guide.propose_quote_title')}</h3>
               <button onClick={() => setSelectedBooking(null)} className="btn btn-ghost btn-circle btn-xs font-extrabold">×</button>
             </div>
 
             <div className="space-y-4">
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">Montant proposé (XOF)</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">{t('guide.proposed_amount')}</span>
                 <input
                   type="number"
                   min="0"
@@ -1021,11 +1030,11 @@ export default function GuideDashboard() {
               </label>
 
               <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">Message explicatif</span>
+                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">{t('guide.message_explan')}</span>
                 <textarea
                   value={quoteMessage}
                   onChange={(e) => setQuoteMessage(e.target.value)}
-                  placeholder="Expliquez ce qui est inclus dans le tarif (transport, repas, frais d'entrée aux sites)..."
+                  placeholder={t('guide.message_placeholder')}
                   className="textarea textarea-bordered h-24 rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
                 />
               </label>
@@ -1036,7 +1045,7 @@ export default function GuideDashboard() {
                 onClick={() => setSelectedBooking(null)}
                 className="btn btn-outline flex-1 rounded-2xl text-xs font-bold"
               >
-                Annuler
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSendQuote}
@@ -1044,7 +1053,7 @@ export default function GuideDashboard() {
                 className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
                 style={{ backgroundColor: COLORS.forest }}
               >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Envoyer le devis'}
+                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('guide.send_quote')}
               </button>
             </div>
 
