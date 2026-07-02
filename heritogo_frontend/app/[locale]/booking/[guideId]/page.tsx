@@ -3,7 +3,7 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
@@ -31,7 +31,6 @@ interface GuideInfo {
 }
 
 export default function BookingPage() {
-  const router = useRouter()
   const params = useParams<{ locale: string; guideId: string }>()
   const guideId = params?.guideId
 
@@ -111,7 +110,7 @@ export default function BookingPage() {
 
       setSuccess(true)
       setTimeout(() => {
-        router.push('/dashboard/tourist?booking_success=true')
+        window.location.href = `/${params.locale}/dashboard/tourist?booking_created=true`
       }, 2000)
     } catch (err: unknown) {
       console.error(err)

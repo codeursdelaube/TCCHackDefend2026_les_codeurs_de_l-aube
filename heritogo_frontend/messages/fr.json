@@ -199,7 +199,18 @@
       "general": "Une erreur est survenue lors de l'analyse.",
       "server": "Impossible de joindre le serveur ou le service Gemini."
     },
-    "result_label": "Monument identifié"
+    "result_label": "Monument identifié",
+    "gps_active": "GPS actif",
+    "premium_active": "Premium actif",
+    "quota": "Quota : {count}/3 scans",
+    "default_location": "Lomé, Togo",
+    "limit_title": "Limite gratuite atteinte",
+    "limit_desc": "Vous avez utilisé vos 3 scans gratuits de monuments togolais pour ce mois-ci. Passez au Premium pour scanner en illimité et soutenir le tourisme local !",
+    "premium_scan": "Scans de monuments en illimité",
+    "premium_tts": "Audio guide TTS haute qualité multi-langues",
+    "premium_history": "Historique de visites persistant",
+    "premium_cta": "Passer au Premium (Simulé)",
+    "free_continue": "Continuer en version gratuite"
   },
   "Lieux": {
     "title": "Découvrir le Togo",
@@ -607,7 +618,10 @@
       "date": "Date",
       "amount": "Montant",
       "action": "Action",
-      "details": "Détails"
+      "details": "Détails",
+      "guest_name": "Ami",
+      "not_available": "N/A",
+      "default_country": "Togo"
     },
     "tourist": {
       "greeting": "Bonjour, {name} 👋",
@@ -727,7 +741,15 @@
       "message_explan": "Message explicatif",
       "message_placeholder": "Expliquez ce qui est inclus dans le tarif (transport, repas, frais d'entrée aux sites)...",
       "send_quote": "Envoyer le devis",
-      "confirm_action": "Êtes-vous sûr de vouloir effectuer cette action ?"
+      "confirm_action": "Êtes-vous sûr de vouloir effectuer cette action ?",
+      "review_count_label": "avis",
+      "start_at": "Début à {time}",
+      "default_doc_label": "Document de vérification",
+      "cancel_reason_refused": "Refusé par le guide",
+      "cancel_reason_guide": "Annulé par le guide",
+      "pdf_only": "Seuls les fichiers PDF sont autorisés.",
+      "pdf_too_large": "Le fichier ne doit pas dépasser 5 Mo.",
+      "remove": "Retirer"
     },
     "admin": {
       "console_title": "Console Admin",
@@ -792,7 +814,9 @@
       "reject_guide_btn": "Rejeter le guide",
       "hide_modal_title": "Masquer l'avis",
       "hide_modal_subtitle": "Renseignez le motif de modération pour justifier le masquage de cet avis de la vue du public.",
-      "hide_modal_placeholder": "Ex: Commentaire contenant des insultes ou propos déplacés."
+      "hide_modal_placeholder": "Ex: Commentaire contenant des insultes ou propos déplacés.",
+      "load_error": "Erreur lors du chargement des données admin.",
+      "quick_action_reason": "Action rapide modérateur"
     },
     "share": {
       "title": "Partager mon itinéraire",
@@ -802,8 +826,8 @@
       "whatsapp": "Partager sur WhatsApp",
       "no_items": "Aucun élément à partager",
       "share_btn": "Partager",
-      "share_gps": "GPS :"
+      "share_gps": "GPS :",
+      "discover_app": "Découvrez sur Heritogo :"
     }
   }
 }
-

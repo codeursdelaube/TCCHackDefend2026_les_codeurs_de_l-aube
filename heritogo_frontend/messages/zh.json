@@ -199,7 +199,18 @@
       "general": "分析过程中发生错误，请稍后再试。",
       "server": "无法连接到服务器或双子座 AI 服务。"
     },
-    "result_label": "已识别的纪念地"
+    "result_label": "已识别的纪念地",
+    "gps_active": "GPS 已启用",
+    "premium_active": "高级版已启用",
+    "quota": "额度：{count}/3 次扫描",
+    "default_location": "洛美，多哥",
+    "limit_title": "已达到免费额度",
+    "limit_desc": "你本月已使用 3 次免费的多哥古迹扫描。升级到高级版即可无限扫描，并支持当地旅游。",
+    "premium_scan": "无限古迹扫描",
+    "premium_tts": "高质量多语言 TTS 语音导览",
+    "premium_history": "持久保存访问历史",
+    "premium_cta": "升级到高级版（模拟）",
+    "free_continue": "继续使用免费版"
   },
   "Lieux": {
     "all": "全部",
@@ -608,7 +619,10 @@
       "date": "日期",
       "amount": "金额",
       "action": "操作",
-      "details": "详情"
+      "details": "详情",
+      "guest_name": "朋友",
+      "not_available": "N/A",
+      "default_country": "多哥"
     },
     "tourist": {
       "greeting": "你好，{name} 👋",
@@ -728,7 +742,15 @@
       "message_explan": "说明留言",
       "message_placeholder": "说明该报价包含的项目 (交通、餐饮、景点门票等)...",
       "send_quote": "发送报价",
-      "confirm_action": "您确定要执行此操作吗？"
+      "confirm_action": "您确定要执行此操作吗？",
+      "review_count_label": "评价",
+      "start_at": "开始时间 {time}",
+      "default_doc_label": "验证文件",
+      "cancel_reason_refused": "导游已拒绝",
+      "cancel_reason_guide": "导游已取消",
+      "pdf_only": "只允许上传 PDF 文件。",
+      "pdf_too_large": "文件不得超过 5 MB。",
+      "remove": "移除"
     },
     "admin": {
       "console_title": "管理后台",
@@ -793,7 +815,9 @@
       "reject_guide_btn": "拒绝导游",
       "hide_modal_title": "隐藏评价",
       "hide_modal_subtitle": "请输入隐藏此评价的原因以作记录。",
-      "hide_modal_placeholder": "例如：评价包含辱骂或不当言论。"
+      "hide_modal_placeholder": "例如：评价包含辱骂或不当言论。",
+      "load_error": "加载管理数据时出错。",
+      "quick_action_reason": "管理员快速操作"
     },
     "share": {
       "title": "分享我的行程",
@@ -803,7 +827,8 @@
       "whatsapp": "分享到 WhatsApp",
       "no_items": "没有可分享的项目",
       "share_btn": "分享",
-      "share_gps": "GPS:"
+      "share_gps": "GPS:",
+      "discover_app": "在 Heritogo 上发现："
     }
   }
 }

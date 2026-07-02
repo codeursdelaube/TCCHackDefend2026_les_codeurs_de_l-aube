@@ -245,7 +245,7 @@ export default function GuideDashboard() {
         body: JSON.stringify({
           document: {
             type: docType,
-            label: docLabel || 'Document de vérification',
+            label: docLabel || t('guide.default_doc_label'),
             file_url: base64Data,
             file_name: selectedFile.name,
             file_size: selectedFile.size
@@ -420,7 +420,7 @@ export default function GuideDashboard() {
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 text-xs text-base-content/65 font-bold">
                 <span className="flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
-                  {Number(guide.avg_rating).toFixed(1)} ({guide.total_reviews} {(t('Navbar.guides').toLowerCase())})
+                  {Number(guide.avg_rating).toFixed(1)} ({guide.total_reviews} {t('guide.review_count_label')})
                 </span>
                 <span>•</span>
                 <span>{t('common.status')} : 
@@ -509,7 +509,7 @@ export default function GuideDashboard() {
 
                         <div className="space-y-1.5 text-xs text-base-content/75 font-semibold">
                           <p className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-base-content/40" /> {new Date(b.start_date).toLocaleDateString()}</p>
-                          {b.start_time && <p className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-base-content/40" /> Début à {new Date(b.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>}
+                          {b.start_time && <p className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-base-content/40" /> {t('guide.start_at', { time: new Date(b.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}</p>}
                           {b.meeting_point && <p className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-base-content/40" /> {t('guide.meeting_point', { point: b.meeting_point })}</p>}
                           <p className="flex items-center gap-1.5"><User className="h-4 w-4 text-base-content/40" /> {t('guide.group_size', { size: b.group_size })}</p>
                         </div>
@@ -523,7 +523,7 @@ export default function GuideDashboard() {
 
                       <div className="mt-5 flex gap-2 border-t border-border/60 pt-4">
                         <button
-                          onClick={() => handleUpdateBookingStatus(b.id, 'cancel', 'Refusé par le guide')}
+                          onClick={() => handleUpdateBookingStatus(b.id, 'cancel', t('guide.cancel_reason_refused'))}
                           className="btn btn-outline btn-error btn-sm rounded-xl flex-1 text-xs font-bold"
                         >
                           {t('guide.refuse')}
@@ -645,7 +645,7 @@ export default function GuideDashboard() {
                         <td className="p-4">
                           {b.status === 'quote_sent' && (
                             <button 
-                              onClick={() => handleUpdateBookingStatus(b.id, 'cancel', 'Annulé par le guide')}
+                              onClick={() => handleUpdateBookingStatus(b.id, 'cancel', t('guide.cancel_reason_guide'))}
                               className="text-xs text-error hover:underline"
                             >
                               {t('guide.cancel_quote')}
@@ -928,12 +928,12 @@ export default function GuideDashboard() {
                     const file = e.target.files?.[0]
                     if (file) {
                       if (file.type !== 'application/pdf') {
-                        setError('Seuls les fichiers PDF sont autorisés.')
+                        setError(t('guide.pdf_only'))
                         setSelectedFile(null)
                         return
                       }
                       if (file.size > 5 * 1024 * 1024) {
-                        setError('Le fichier ne doit pas dépasser 5 Mo.')
+                        setError(t('guide.pdf_too_large'))
                         setSelectedFile(null)
                         return
                       }

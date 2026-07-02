@@ -17,7 +17,7 @@ export default function ShareItinerary({ items }: ShareItineraryProps) {
     const intro = t('share.text_intro')
     const itemStrings = items.map((item, index) => `${index + 1}. ${item.name}${item.details ? ` (${item.details})` : ''}`).join('\n')
     const appLink = typeof window !== 'undefined' ? window.location.origin : 'https://heritogo.com'
-    return `${intro}\n\n${itemStrings}\n\nDécouvrez sur Heritogo : ${appLink}`
+    return `${intro}\n\n${itemStrings}\n\n${t('share.discover_app')} ${appLink}`
   }
 
   const handleShare = async () => {

@@ -199,7 +199,18 @@
       "general": "An error occurred during analysis.",
       "server": "Unable to reach the server or Gemini service."
     },
-    "result_label": "Identified monument"
+    "result_label": "Identified monument",
+    "gps_active": "GPS active",
+    "premium_active": "Premium active",
+    "quota": "Quota: {count}/3 scans",
+    "default_location": "Lome, Togo",
+    "limit_title": "Free limit reached",
+    "limit_desc": "You have used your 3 free Togolese monument scans for this month. Upgrade to Premium for unlimited scans and to support local tourism!",
+    "premium_scan": "Unlimited monument scans",
+    "premium_tts": "High-quality multilingual TTS audio guide",
+    "premium_history": "Persistent visit history",
+    "premium_cta": "Upgrade to Premium (Simulated)",
+    "free_continue": "Continue with the free version"
   },
   "Lieux": {
     "all": "All",
@@ -608,7 +619,10 @@
       "date": "Date",
       "amount": "Amount",
       "action": "Action",
-      "details": "Details"
+      "details": "Details",
+      "guest_name": "Friend",
+      "not_available": "N/A",
+      "default_country": "Togo"
     },
     "tourist": {
       "greeting": "Hello, {name} 👋",
@@ -728,7 +742,15 @@
       "message_explan": "Explanatory message",
       "message_placeholder": "Explain what is included in the rate (transportation, meals, entrance fees to sites)...",
       "send_quote": "Send quote",
-      "confirm_action": "Are you sure you want to perform this action?"
+      "confirm_action": "Are you sure you want to perform this action?",
+      "review_count_label": "reviews",
+      "start_at": "Starts at {time}",
+      "default_doc_label": "Verification document",
+      "cancel_reason_refused": "Refused by the guide",
+      "cancel_reason_guide": "Cancelled by the guide",
+      "pdf_only": "Only PDF files are allowed.",
+      "pdf_too_large": "The file must not exceed 5 MB.",
+      "remove": "Remove"
     },
     "admin": {
       "console_title": "Admin Console",
@@ -793,7 +815,9 @@
       "reject_guide_btn": "Reject guide",
       "hide_modal_title": "Hide review",
       "hide_modal_subtitle": "Provide the moderation reason to justify hiding this review from public view.",
-      "hide_modal_placeholder": "E.g.: Comment containing insults or inappropriate remarks."
+      "hide_modal_placeholder": "E.g.: Comment containing insults or inappropriate remarks.",
+      "load_error": "Error loading admin data.",
+      "quick_action_reason": "Quick moderator action"
     },
     "share": {
       "title": "Share my itinerary",
@@ -803,7 +827,8 @@
       "whatsapp": "Share on WhatsApp",
       "no_items": "No items to share",
       "share_btn": "Share",
-      "share_gps": "GPS:"
+      "share_gps": "GPS:",
+      "discover_app": "Discover on Heritogo:"
     }
   }
 }

@@ -4,24 +4,23 @@ import { useEffect, useState } from 'react'
 
 interface Position {
   lat: number
-  long: number
+  lng: number
 }
 
 export function useGeolocation() {
   const [position, setPosition] = useState<Position | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => typeof window !== 'undefined' && !!navigator.geolocation)
   const [denied, setDenied] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      setLoading(false)
       return
     }
 
     const handleSuccess = (pos: GeolocationPosition) => {
       setPosition({
         lat: pos.coords.latitude,
-        long: pos.coords.longitude
+        lng: pos.coords.longitude
       })
       setLoading(false)
       setDenied(false)

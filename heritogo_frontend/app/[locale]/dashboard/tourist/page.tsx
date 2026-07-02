@@ -248,7 +248,7 @@ export default function TouristDashboardPage() {
           </div>
           <div>
             <h1 className="font-serif text-2xl font-bold">
-              {t('tourist.greeting', { name: profile ? getFirstName(profile.full_name) : 'Ami' })}
+              {t('tourist.greeting', { name: profile ? getFirstName(profile.full_name) : t('common.guest_name') })}
             </h1>
             <p className="text-xs text-base-content/50 mt-1">{t('tourist.subtitle')}</p>
           </div>
@@ -530,8 +530,8 @@ export default function TouristDashboardPage() {
                       </div>
 
                       <div className="mt-4 space-y-1.5 text-xs text-base-content/70">
-                        <p>🗣️ <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || 'N/A'}</p>
-                        <p>📍 <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || 'N/A'}</p>
+                        <p>🗣️ <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
+                        <p>📍 <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
                         <p className="font-bold text-base-content mt-3">
                           {t('tourist.rate_label')} {Number(guide.full_day_rate).toLocaleString()} XOF/jour
                         </p>
@@ -605,7 +605,7 @@ export default function TouristDashboardPage() {
 
                     <div className="border-t border-border/60 p-4 bg-base-300/30 flex justify-between items-center">
                       <span className="text-xs font-semibold text-base-content/60">
-                        📍 {scan.localite || 'Togo'}
+                        📍 {scan.localite || t('common.default_country')}
                       </span>
                       <Link 
                         href="/scan"
