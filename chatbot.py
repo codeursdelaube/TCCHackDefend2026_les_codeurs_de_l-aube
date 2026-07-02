@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-router = APIRouter(prefix="/chatbot", tags=["Chatbot"])
+router = APIRouter(tags=["Chatbot"])
 
 # Connexion à la base de données
 supabase: Client = create_client(settings.supabase_url, settings.sb_secret_key)
@@ -27,19 +27,7 @@ ai_client = genai.Client(
     http_options={"api_version": "v1"}
 )
 
-# ==========================================
-# 2. CONFIGURATION DU MIDDLEWARE (CORS)
-# ==========================================
 
-# Configuration du CORS (Cross-Origin Resource Sharing) pour permettre au Frontend 
-# (situé sur un autre domaine/port) d'interroger cette API sans blocage de sécurité navigateur.
-router.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"], # Autorise toutes les origines (utile en Hackathon, à restreindre en prod)
-    allow_credentials=True, # Autorise l'envoi de cookies ou de headers d'authentification
-    allow_methods=["*"], # Autorise toutes les méthodes HTTP (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"], # Autorise tous les en-têtes HTTP de requêtes
-)
 
 
 # Modèles de requêtes
