@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase import create_client, Client
 from google import genai  # <-- Package officiel google-genai
-from google.genai import types # <-- Pour la configuration des dimensions
+from google.genai import types 
 from typing import Optional
 
 # Configuration centrale via Pydantic Settings
@@ -21,11 +21,9 @@ router = APIRouter(tags=["Chatbot"])
 # Connexion à la base de données
 supabase: Client = create_client(settings.supabase_url, settings.sb_secret_key)
 
-# Initialisation du client Gemini
-ai_client = genai.Client(
-    api_key=settings.gemini_api_key_1,
-    http_options={"api_version": "v1"}
-)
+# 🔥 CORRECTION : On supprime http_options pour laisser le SDK gérer nativement les versions d'API
+ai_client = genai.Client(api_key=settings.gemini_api_key_1)
+
 
 # Modèles de requêtes
 class ChatRequest(BaseModel):
@@ -44,7 +42,7 @@ async def list_available_models():
 
 
 # =========================================================================
-# 🔥 ROUTE : Initialisation automatique des Embeddings (CORRIGÉE)
+# 🔄 ROUTE : Initialisation automatique des Embeddings
 # =========================================================================
 @router.post("/api/v1/init-embeddings")
 async def initialize_monument_embeddings():
@@ -63,7 +61,7 @@ async def initialize_monument_embeddings():
         for m in monuments:
             text_to_embed = f"Monument: {m['name']}. Description: {m['description']}"
             
-            # Utilisation de text-embedding-004 + forçage à 768 dimensions
+            # Utilisation de text-embedding-004 avec configuration de dimensionnalité
             embedding_response = ai_client.models.embed_content(
                 model="text-embedding-004",
                 contents=text_to_embed,
@@ -84,7 +82,7 @@ async def initialize_monument_embeddings():
 
 
 # =========================================================================
-# 💬 ROUTE DU CHATBOT (CORRIGÉE)
+# 💬 ROUTE DU CHATBOT
 # =========================================================================
 @router.post("/api/v1/chat")
 async def chat_tourisme_advisor(payload: ChatRequest):
