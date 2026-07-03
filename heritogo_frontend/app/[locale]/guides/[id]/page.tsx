@@ -12,7 +12,7 @@ import {
   Star, Compass, MapPin, ShieldCheck, Heart, 
   AlertCircle, Loader2, ArrowLeft, Calendar, BadgeCent, 
   Briefcase, AlertTriangle, CheckCircle, 
-  Languages
+  Languages, Share2
 } from 'lucide-react'
 import ReportModal from '@/components/ReportModal'
 import TextToSpeech from '@/components/TextToSpeech'
@@ -106,6 +106,19 @@ export default function GuideDetailPage() {
     localStorage.setItem('heritogo_favorites', JSON.stringify(favList))
   }
 
+  const shareGuide = () => {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({
+        title: `Guide ${guide?.profile.full_name} — Heritogo`,
+        text: `Je vous recommande ce guide certifié sur Heritogo !`,
+        url,
+      }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(url)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-base-100">
@@ -119,18 +132,23 @@ export default function GuideDetailPage() {
 
   if (error || !guide) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-32 text-center bg-base-100">
-        <AlertCircle className="mx-auto h-12 w-12 text-error mb-4" />
-        <h2 className="font-serif text-2xl font-bold mb-2">Guide introuvable</h2>
-        <p className="text-sm text-base-content/60 mb-6">{error || 'Le guide demandé n\'existe pas ou a été désactivé.'}</p>
-        <Link 
-          href="/guides"
-          className="btn btn-primary rounded-2xl text-white border-none font-bold"
-          style={{ backgroundColor: COLORS.forest }}
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-24 text-center">
+        <div className="text-4xl">😕</div>
+        <h2 className="font-serif text-xl font-bold text-foreground">
+          Guide momentanément indisponible
+        </h2>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Erreur de chargement. Vérifiez votre connexion internet
+          et réessayez dans quelques instants.
+        </p>
+        <a
+          href="javascript:history.back()"
+          className="btn btn-sm rounded-xl text-white font-bold border-none mt-2"
+          style={{ backgroundColor: '#004D40' }}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Retour à l'annuaire
-        </Link>
-      </div>
+          ← Retour à l'annuaire
+        </a>
+      </main>
     )
   }
 
@@ -211,6 +229,13 @@ export default function GuideDetailPage() {
             >
               <Heart className={`h-4.5 w-4.5 transition-colors ${isFavorite ? 'fill-red-500 stroke-red-500' : ''}`} />
               {isFavorite ? 'Favori' : 'Ajouter aux favoris'}
+            </button>
+            <button
+              onClick={shareGuide}
+              className="btn btn-outline rounded-2xl flex-1 sm:flex-initial text-xs font-bold gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Partager
             </button>
             <Link
               href={`/booking/${guide.id}`}

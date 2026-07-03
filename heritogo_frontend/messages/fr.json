@@ -829,5 +829,45 @@
       "share_gps": "GPS :",
       "discover_app": "Découvrez sur Heritogo :"
     }
+  },
+  "Booking": {
+    "loading": "Chargement du formulaire...",
+    "error_fetching_guide": "Erreur de récupération des infos du guide",
+    "error_loading_guide": "Impossible de charger les données du guide",
+    "guide_not_found": "Guide introuvable",
+    "guide_not_available": "Ce guide n'est pas disponible pour la réservation.",
+    "back_to_directory": "Retour à l'annuaire",
+    "back_to_profile": "Retour au profil du guide",
+    "booking_request": "Demande de réservation",
+    "form_subtitle": "Remplissez ce formulaire pour envoyer une demande de devis à {name}.",
+    "request_sent": "Demande envoyée !",
+    "success_message": "Votre demande de réservation a été transmise avec succès. Redirection vers votre tableau de bord...",
+    "error_start_date": "Veuillez sélectionner une date de début.",
+    "error_generic": "Une erreur est survenue lors de la réservation.",
+    "mission_type_label": "Type de visite / mission",
+    "types": {
+      "full_day": { "label": "Journée", "desc": "Complète" },
+      "half_day": { "label": "Demi-Journée", "desc": "Matin/Aprem" },
+      "hourly": { "label": "Horaire", "desc": "Par heure" },
+      "virtual": { "label": "Virtuelle", "desc": "En visioconférence" }
+    },
+    "date_label": "Date prévue",
+    "start_time_label": "Heure de début",
+    "meeting_point_label": "Point de rendez-vous",
+    "meeting_point_placeholder": "Ex: Hall de l'Hôtel du 2 Février, Lomé",
+    "group_size_label": "Nombre de personnes (1 - 50)",
+    "message_label": "Détails de votre itinéraire / Message",
+    "message_placeholder": "Décrivez brièvement ce que vous souhaitez visiter, vos centres d'intérêt (histoire, gastronomie, nature)...",
+    "special_needs_label": "Besoins ou contraintes spécifiques (Optionnel)",
+    "special_needs_placeholder": "Ex: Mobilité réduite, allergies alimentaires, enfants en bas âge...",
+    "send_request": "Envoyer la demande de réservation",
+    "sidebar_guide": "Votre Guide",
+    "certified": "Certifié",
+    "pricing_title": "Tarifs indicatifs",
+    "full_day": "Journée complète :",
+    "half_day": "Demi-journée :",
+    "hourly": "Horaire :",
+    "virtual": "Visite virtuelle :",
+    "warning_text": "⚠️ Après validation de ce formulaire, le guide analysera votre demande et vous enverra un devis personnalisé. Vous serez invité à payer uniquement après votre acceptation du devis."
   }
 }

@@ -10,7 +10,7 @@ import { getFirstName, getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 import { useTranslations } from 'next-intl'
 import { 
-  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare 
+  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2 
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
 import ShareItinerary from '@/components/ShareItinerary'
@@ -455,13 +455,32 @@ export default function TouristDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 self-end md:self-center shrink-0">
+                  <div className="flex gap-2 self-end md:self-center shrink-0 flex-wrap">
                     <Link
                       href={`/guides/${booking.guide.id}`}
                       className="btn btn-sm btn-ghost rounded-xl text-xs font-bold"
                     >
                       {t('tourist.view_guide')}
                     </Link>
+
+                    {['confirmed', 'in_progress'].includes(booking.status) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const text = `Je visite le Togo avec ${booking.guide.profile.full_name} ` +
+                            `le ${new Date(booking.start_date).toLocaleDateString('fr-FR')} — Heritogo`
+                          if (navigator.share) {
+                            navigator.share({ title: 'Mon itinéraire Heritogo', text, url: window.location.origin }).catch(() => {})
+                          } else {
+                            navigator.clipboard.writeText(text)
+                          }
+                        }}
+                        className="btn btn-sm btn-outline rounded-xl text-xs font-bold gap-1"
+                      >
+                        <Share2 className="h-3.5 w-3.5" />
+                        Partager
+                      </button>
+                    )}
 
                     {booking.status === 'completed' && !booking.review && (
                       <button

@@ -830,5 +830,45 @@
       "share_gps": "GPS:",
       "discover_app": "Descubre en Heritogo:"
     }
+  },
+  "Booking": {
+    "loading": "Cargando formulario...",
+    "error_fetching_guide": "Error al obtener los detalles del guía",
+    "error_loading_guide": "No se pudieron cargar los datos del guía",
+    "guide_not_found": "Guía no encontrado",
+    "guide_not_available": "Este guía no está disponible para reservar.",
+    "back_to_directory": "Volver al directorio",
+    "back_to_profile": "Volver al perfil del guía",
+    "booking_request": "Solicitud de reserva",
+    "form_subtitle": "Complete este formulario para enviar una solicitud de presupuesto a {name}.",
+    "request_sent": "¡Solicitud enviada!",
+    "success_message": "Su solicitud de reserva ha sido enviada con éxito. Redirigiendo a su panel de control...",
+    "error_start_date": "Por favor seleccione una fecha de inicio.",
+    "error_generic": "Ocurrió un error durante la reserva.",
+    "mission_type_label": "Tipo de visita / misión",
+    "types": {
+      "full_day": { "label": "Día completo", "desc": "Completo" },
+      "half_day": { "label": "Medio día", "desc": "Mañana/Tarde" },
+      "hourly": { "label": "Por hora", "desc": "Por hora" },
+      "virtual": { "label": "Virtual", "desc": "Por videoconferencia" }
+    },
+    "date_label": "Fecha prevista",
+    "start_time_label": "Hora de inicio",
+    "meeting_point_label": "Punto de encuentro",
+    "meeting_point_placeholder": "Ej: Vestíbulo del Hotel du 2 Février, Lomé",
+    "group_size_label": "Número de personas (1 - 50)",
+    "message_label": "Detalles de su itinerario / Mensaje",
+    "message_placeholder": "Describa brevemente lo que desea visitar, sus intereses (historia, gastronomía, naturaleza)...",
+    "special_needs_label": "Necesidades o limitaciones específicas (Opcional)",
+    "special_needs_placeholder": "Ej: Movilidad reducida, alergias alimentarias, niños pequeños...",
+    "send_request": "Enviar solicitud de reserva",
+    "sidebar_guide": "Su Guía",
+    "certified": "Certificado",
+    "pricing_title": "Tarifas indicativas",
+    "full_day": "Día completo:",
+    "half_day": "Medio día:",
+    "hourly": "Por hora:",
+    "virtual": "Visita virtual:",
+    "warning_text": "⚠️ Tras validar este formulario, el guía analizará su solicitud y le enviará un presupuesto personalizado. Solo pagará después de aceptar el presupuesto."
   }
 }

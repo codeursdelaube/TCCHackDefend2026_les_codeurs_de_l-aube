@@ -20,7 +20,7 @@ interface GuideRow {
   specialties: string[]
   languages: string[]
   coverage_zones: string[]
-  full_day_rate: string
+  full_day_rate: string | null
   avg_rating: string
   total_reviews: number
   profile: {
@@ -58,10 +58,11 @@ export default function GuidesPage() {
   const fetchGuides = useCallback(async () => {
     setLoading(true)
     try {
+      setError(null)
       const url = new URL('/api/guides', window.location.origin)
       if (selectedZone) url.searchParams.append('zone', selectedZone)
       if (selectedLang) url.searchParams.append('lang', selectedLang)
-      if (maxPrice) url.searchParams.append('price', maxPrice)
+      if (maxPrice !== '100000') url.searchParams.append('price', maxPrice)
 
       const response = await fetch(url.toString())
       const data = await response.json()
@@ -233,12 +234,20 @@ export default function GuidesPage() {
                   <div>
                     <div className="flex justify-between items-start gap-3">
                       <div className="flex items-center gap-3">
-                        <div
-                          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-sm font-black text-white"
-                          style={{ backgroundColor: COLORS.forest }}
-                        >
-                          {getInitials(guide.profile.full_name)}
-                        </div>
+                        {guide.profile.avatar_url ? (
+                          <img
+                            src={guide.profile.avatar_url}
+                            alt={guide.profile.full_name}
+                            className="h-14 w-14 rounded-2xl object-cover shrink-0"
+                          />
+                        ) : (
+                          <div
+                            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-sm font-black text-white"
+                            style={{ backgroundColor: COLORS.forest }}
+                          >
+                            {getInitials(guide.profile.full_name)}
+                          </div>
+                        )}
                         <div>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <h4 className="font-bold text-base-content text-base leading-tight group-hover:text-primary transition-colors">
@@ -296,7 +305,7 @@ export default function GuidesPage() {
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-base-content/40">Tarif Journalier</p>
                       <p className="text-lg font-black text-base-content">
-                        {Number(guide.full_day_rate).toLocaleString()} <span className="text-xs font-bold text-base-content/60">XOF/jour</span>
+                        {guide.full_day_rate ? Number(guide.full_day_rate).toLocaleString() : 'N/A'} <span className="text-xs font-bold text-base-content/60">{guide.full_day_rate ? 'XOF/jour' : ''}</span>
                       </p>
                     </div>
                     <div className="flex gap-2">

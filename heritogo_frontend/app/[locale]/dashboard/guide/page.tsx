@@ -51,6 +51,7 @@ interface GuideProfileData {
   total_missions: number
   profile: {
     full_name: string
+    avatar_url?: string
     bio?: string
     phone?: string
   }
@@ -102,6 +103,11 @@ export default function GuideDashboard() {
   const [fullDayRate, setFullDayRate] = useState('')
   const [virtualRate, setVirtualRate] = useState('')
 
+  // Avatar upload
+  const [avatarUrl, setAvatarUrl] = useState<string>('')
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
+
   // Document Upload fields
   const [docType, setDocType] = useState('guide_license')
   const [docLabel, setDocLabel] = useState('')
@@ -142,6 +148,7 @@ export default function GuideDashboard() {
         setHalfDayRate(gp.half_day_rate || '')
         setFullDayRate(gp.full_day_rate || '')
         setVirtualRate(gp.virtual_rate || '')
+        setAvatarUrl(gp.profile?.avatar_url || '')
       }
     } catch {
       setError(t('common.error_server'))
@@ -216,6 +223,35 @@ export default function GuideDashboard() {
       setError(getUserFriendlyError(err))
     } finally {
       setActionLoading(false)
+    }
+  }
+
+  // Handle avatar upload
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setAvatarError(null)
+    setAvatarUploading(true)
+
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    try {
+      const res = await fetch('/api/upload/avatar', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setAvatarError(data.error || 'Erreur upload')
+        return
+      }
+      setAvatarUrl(data.avatar_url)
+    } catch {
+      setAvatarError("Erreur de connexion lors de l'upload")
+    } finally {
+      setAvatarUploading(false)
     }
   }
 
@@ -404,12 +440,24 @@ export default function GuideDashboard() {
         <div className="rounded-[36px] bg-base-200 border border-border p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs mb-8">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div 
-              className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-xl font-black text-white relative shadow-sm"
-              style={{ backgroundColor: COLORS.forest }}
+              className="h-20 w-20 shrink-0 rounded-2xl relative shadow-sm overflow-visible"
             >
-              {getInitials(guide.profile.full_name)}
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={guide.profile.full_name}
+                  className="h-full w-full object-cover rounded-2xl border border-border"
+                />
+              ) : (
+                <div
+                  className="flex h-full w-full items-center justify-center rounded-2xl text-xl font-black text-white"
+                  style={{ backgroundColor: COLORS.forest }}
+                >
+                  {getInitials(guide.profile.full_name)}
+                </div>
+              )}
               {guide.status === 'approved' && (
-                <div className="absolute -bottom-1 -right-1 bg-success text-white p-0.5 rounded-lg border-2 border-base-200">
+                <div className="absolute -bottom-1 -right-1 bg-success text-white p-0.5 rounded-lg border-2 border-base-200 z-10">
                   <ShieldCheck className="h-4 w-4" />
                 </div>
               )}
@@ -673,7 +721,50 @@ export default function GuideDashboard() {
         {activeTab === 'profile' && (
           <form onSubmit={handleUpdateProfile} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
             <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.tab_profile')}</h3>
-            
+
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-3 mb-6">
+              <div className="relative">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Photo de profil"
+                    className="h-24 w-24 rounded-2xl object-cover border-2 border-border shadow"
+                  />
+                ) : (
+                  <div
+                    className="h-24 w-24 rounded-2xl flex items-center justify-center text-2xl font-black text-white border-2 border-border"
+                    style={{ backgroundColor: COLORS.forest }}
+                  >
+                    {getInitials(guide?.profile?.full_name ?? '')}
+                  </div>
+                )}
+                {/* Badge upload */}
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full flex items-center justify-center cursor-pointer text-white shadow-lg border-2 border-white"
+                  style={{ backgroundColor: COLORS.rust }}
+                >
+                  {avatarUploading
+                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    : <UploadCloud className="h-3.5 w-3.5" />
+                  }
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                  disabled={avatarUploading}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground opacity-60">JPG, PNG ou WEBP — max 5MB</span>
+              {avatarError && (
+                <span className="text-xs text-error font-semibold">{avatarError}</span>
+              )}
+            </div>
+
             <div className="grid gap-6 sm:grid-cols-2">
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.phone_label')}</span>

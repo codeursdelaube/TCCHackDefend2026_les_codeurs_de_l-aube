@@ -39,7 +39,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
     <main className="min-h-screen bg-base-100 pb-28 text-base-content">
       <section className="relative min-h-[62vh] overflow-hidden">
         <Image src={plat.image} alt={platName} fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/25 to-black/40" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/78 via-black/25 to-black/40" />
 
         <div className="absolute left-4 right-4 top-20 z-10 mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/cuisine" className="inline-flex min-h-12 items-center gap-2 rounded-[20px] bg-white/90 px-4 text-sm font-black text-stone-950 shadow-sm transition-all hover:bg-white active:scale-95">
@@ -62,29 +62,29 @@ export default async function PlatDetailPage({ params }: PageProps) {
 
       <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_22rem] lg:px-8">
         <div className="space-y-5">
-          <div className="flex flex-wrap gap-3 rounded-[32px] border border-border bg-base-200 p-5 shadow-sm">
+          <div className="flex flex-wrap gap-3 rounded-4xl border border-border bg-base-200 p-5 shadow-sm">
             <TTSButton text={`${platName}. ${platDescription}. ${platHistory}`} />
-            <a href="#restaurants" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
+            <a href="#restaurants" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
               <Utensils className="h-5 w-5" />
               {t('find_nearby')}
             </a>
           </div>
 
-          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+          <article className="rounded-4xl border border-border bg-base-200 p-5 shadow-sm sm:p-7">
             <p className="m-0 text-lg font-bold leading-8 text-base-content/75">{platDescription}</p>
           </article>
 
-          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+          <article className="rounded-4xl border border-border bg-base-200 p-5 shadow-sm sm:p-7">
             <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><Soup className="h-5 w-5 text-secondary" />{t('origin_tradition')}</h2>
             <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/68">{platHistory}</p>
           </article>
 
-          <article className="rounded-[32px] border border-secondary/25 bg-secondary/10 p-5 shadow-sm sm:p-7">
+          <article className="rounded-4xl border border-secondary/25 bg-secondary/10 p-5 shadow-sm sm:p-7">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wide text-secondary"><Flame className="h-5 w-5" />{t('ideal_acc')}</h2>
             <p className="m-0 text-sm font-semibold leading-7 text-base-content/70">{platAcc}</p>
           </article>
 
-          <article id="restaurants" className="scroll-mt-24 rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+          <article id="restaurants" className="scroll-mt-24 rounded-4xl border border-border bg-base-200 p-5 shadow-sm sm:p-7">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <h2 className="flex items-center gap-2 text-xl font-black tracking-normal"><Utensils className="h-5 w-5 text-secondary" />{t('where_to_eat')}</h2>
               <span className="rounded-2xl border border-border bg-base-100 px-3 py-2 text-xs font-black text-base-content/60">{t('address_count', { count: nearbyRestaurants.length })}</span>
@@ -122,11 +122,11 @@ export default async function PlatDetailPage({ params }: PageProps) {
           </article>
 
           {suggestions.length > 0 && (
-            <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+            <article className="rounded-4xl border border-border bg-base-200 p-5 shadow-sm sm:p-7">
               <h2 className="mb-4 text-sm font-black uppercase tracking-wide text-base-content/50">{t('other_plats', { category: getCategoryName(plat.catégorie) })}</h2>
               <div className="grid gap-3 sm:grid-cols-3">
                 {suggestions.map((suggestion) => (
-                  <Link key={suggestion.id} href={`/cuisine/${suggestion.id}`} className="group overflow-hidden rounded-[24px] border border-border bg-base-100 transition-all hover:-translate-y-1 hover:shadow-md">
+                  <Link key={suggestion.id} href={`/cuisine/${suggestion.id}`} className="group overflow-hidden rounded-3xl border border-border bg-base-100 transition-all hover:-translate-y-1 hover:shadow-md">
                     <figure className="relative h-28 overflow-hidden bg-base-300">
                       <Image src={suggestion.image} alt={tPlats(`${suggestion.id}.nom`)} fill sizes="240px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
                     </figure>
@@ -141,7 +141,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
           )}
         </div>
 
-        <aside className="h-fit rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
+        <aside className="h-fit rounded-4xl border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
           <h2 className="mb-4 text-xs font-black uppercase tracking-wide text-base-content/50">{t('sheet_title')}</h2>
           <div className="space-y-3">
             {[
@@ -156,7 +156,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
               </div>
             ))}
           </div>
-          <a href="#restaurants" className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
+          <a href="#restaurants" className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
             <Utensils className="h-5 w-5" />
             {t('view_restos')}
           </a>

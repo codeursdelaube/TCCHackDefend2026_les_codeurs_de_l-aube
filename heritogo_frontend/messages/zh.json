@@ -829,6 +829,46 @@
       "share_btn": "分享",
       "share_gps": "GPS:",
       "discover_app": "在 Heritogo 上发现："
+    },
+    "Booking": {
+      "loading": "正在加载表单...",
+      "error_fetching_guide": "获取导游信息时出错",
+      "error_loading_guide": "无法加载导游数据",
+      "guide_not_found": "找不到导游",
+      "guide_not_available": "该导游目前不可预订。",
+      "back_to_directory": "返回名录",
+      "back_to_profile": "返回导游个人主页",
+      "booking_request": "预订申请",
+      "form_subtitle": "填写此表单向 {name} 发送报价申请。",
+      "request_sent": "申请已发送！",
+      "success_message": "您的预订申请已成功传送。正在重定向到您的仪表板...",
+      "error_start_date": "请选择开始日期。",
+      "error_generic": "预订时发生错误。",
+      "mission_type_label": "服务/任务类型",
+      "types": {
+        "full_day": { "label": "全天", "desc": "完整行程" },
+        "half_day": { "label": "半天", "desc": "上午/下午" },
+        "hourly": { "label": "按小时", "desc": "按小时计费" },
+        "virtual": { "label": "线上虚拟", "desc": "视频通话服务" }
+      },
+      "date_label": "预定日期",
+      "start_time_label": "开始时间",
+      "meeting_point_label": "集合地点",
+      "meeting_point_placeholder": "例如：洛美2月2日酒店大堂",
+      "group_size_label": "出行人数 (1 - 50)",
+      "message_label": "行程详情 / 留言",
+      "message_placeholder": "简要描述您想参观的景点、您的兴趣爱好（历史、美食、自然等）...",
+      "special_needs_label": "特殊需求或限制（选填）",
+      "special_needs_placeholder": "例如：行动不便、食物过敏、有婴幼儿同行等...",
+      "send_request": "发送预订申请",
+      "sidebar_guide": "您的导游",
+      "certified": "已认证",
+      "pricing_title": "参考价格",
+      "full_day": "全天服务：",
+      "half_day": "半天服务：",
+      "hourly": "按小时服务：",
+      "virtual": "线上服务：",
+      "warning_text": "⚠️ 提交此表单后，导游将审核您的需求并发送个性化报价。只有在您接受报价后才需要付款。"
     }
   }
 }

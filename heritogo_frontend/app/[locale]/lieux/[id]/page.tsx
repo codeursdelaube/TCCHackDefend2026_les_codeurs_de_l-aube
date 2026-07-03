@@ -126,6 +126,12 @@ export default function SiteDetailPage({ params }: PageProps) {
 
       <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_22rem] lg:px-8">
         <div className="space-y-5">
+          {/* TTS + Share — juste sous le titre, avant la description */}
+          <div className="flex flex-wrap items-center gap-3">
+            <TextToSpeech text={`${siteName}. ${siteDescription}. ${siteHistory}`} />
+            <ShareButton title={siteName} shareLabel={t('share')} copiedLabel={t('copied')} />
+          </div>
+
           <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
             <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BookOpen className="h-5 w-5 text-secondary" />{t('desc_title')}</h2>
             <p className="m-0 text-sm font-medium leading-7 text-base-content/68">{siteDescription}</p>
@@ -157,8 +163,6 @@ export default function SiteDetailPage({ params }: PageProps) {
 
         <aside className="h-fit rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
           <div className="space-y-3">
-            <TextToSpeech text={`${siteName}. ${siteDescription}. ${siteHistory}`} />
-            <ShareButton title={siteName} shareLabel={t('share')} copiedLabel={t('copied')} />
             <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
               <Navigation className="h-5 w-5" />
               {t('gps_action')}

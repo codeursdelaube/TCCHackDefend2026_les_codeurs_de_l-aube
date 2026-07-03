@@ -43,8 +43,16 @@ export async function GET(
 
     return NextResponse.json({ guide })
   } catch (error: unknown) {
-    console.error('Erreur dans GET /api/guides/[id]:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[GET /api/guides/[id]]', error)
+    const isDbError = error instanceof Error &&
+      (error.message.includes('P1001') || error.message.toLowerCase().includes("can't reach"))
+    return NextResponse.json(
+      {
+        error: isDbError
+          ? 'Erreur de chargement. Vérifiez votre connexion.'
+          : 'Une erreur est survenue. Réessayez.'
+      },
+      { status: 500 }
+    )
   }
 }

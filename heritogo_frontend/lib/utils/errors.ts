@@ -1,4 +1,4 @@
-﻿/**
+/**
  * lib/utils/errors.ts
  * Mapper universel d'erreurs techniques vers des messages lisibles pour l'utilisateur.
  */
@@ -11,7 +11,16 @@ export function getUserFriendlyError(error: unknown): string {
   if (error instanceof Error) {
     const msg = error.message.toLowerCase()
 
-    if (msg.includes('failed to fetch') || msg.includes('network') || msg.includes('networkerror')) {
+    if (
+      msg.includes("can't reach") ||
+      msg.includes('p1001') ||
+      msg.includes('p1002') ||
+      msg.includes('connection') ||
+      msg.includes('econnrefused') ||
+      msg.includes('failed to fetch') ||
+      msg.includes('network') ||
+      msg.includes('networkerror')
+    ) {
       return 'Erreur de chargement. Vérifiez votre connexion internet.'
     }
     if (msg.includes('timeout') || msg.includes('timed out')) {
@@ -23,22 +32,17 @@ export function getUserFriendlyError(error: unknown): string {
     if (msg.includes('forbidden') || msg.includes('403')) {
       return "Vous n'avez pas les droits pour cette action."
     }
-    if (msg.includes('not found') || msg.includes('404')) {
+    if (msg.includes('not found') || msg.includes('404') || msg.includes('p2025')) {
       return 'Élément introuvable.'
     }
-    if (
-      msg.includes('database') ||
-      msg.includes('prisma') ||
-      msg.includes('p1001') ||
-      msg.includes('p1002')
-    ) {
+    if (msg.includes('database') || msg.includes('prisma')) {
       return 'Erreur de chargement. Vérifiez votre connexion.'
     }
     if (msg.includes('authretryablefetcherror') || msg.includes('supabase')) {
       return 'Erreur de connexion au service. Réessayez dans quelques instants.'
     }
   }
-  return 'Erreur de chargement. Vérifiez votre connexion.'
+  return 'Une erreur est survenue. Réessayez ou vérifiez votre connexion.'
 }
 
 /**

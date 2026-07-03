@@ -830,5 +830,45 @@
       "share_gps": "GPS:",
       "discover_app": "Discover on Heritogo:"
     }
+  },
+  "Booking": {
+    "loading": "Loading form...",
+    "error_fetching_guide": "Error fetching guide details",
+    "error_loading_guide": "Unable to load guide data",
+    "guide_not_found": "Guide not found",
+    "guide_not_available": "This guide is not available for booking.",
+    "back_to_directory": "Back to directory",
+    "back_to_profile": "Back to guide profile",
+    "booking_request": "Booking request",
+    "form_subtitle": "Fill out this form to send a quote request to {name}.",
+    "request_sent": "Request sent!",
+    "success_message": "Your booking request has been successfully transmitted. Redirecting to your dashboard...",
+    "error_start_date": "Please select a start date.",
+    "error_generic": "An error occurred during booking.",
+    "mission_type_label": "Type of visit / mission",
+    "types": {
+      "full_day": { "label": "Full Day", "desc": "Complete" },
+      "half_day": { "label": "Half Day", "desc": "Morning/Afternoon" },
+      "hourly": { "label": "Hourly", "desc": "Per hour" },
+      "virtual": { "label": "Virtual", "desc": "Via video call" }
+    },
+    "date_label": "Planned date",
+    "start_time_label": "Start time",
+    "meeting_point_label": "Meeting point",
+    "meeting_point_placeholder": "E.g., Lobby of Hotel du 2 Fevrier, Lome",
+    "group_size_label": "Number of people (1 - 50)",
+    "message_label": "Details of your itinerary / Message",
+    "message_placeholder": "Briefly describe what you wish to visit, your interests (history, gastronomy, nature)...",
+    "special_needs_label": "Specific needs or constraints (Optional)",
+    "special_needs_placeholder": "E.g., Reduced mobility, food allergies, small children...",
+    "send_request": "Send booking request",
+    "sidebar_guide": "Your Guide",
+    "certified": "Certified",
+    "pricing_title": "Indicative rates",
+    "full_day": "Full day:",
+    "half_day": "Half day:",
+    "hourly": "Hourly:",
+    "virtual": "Virtual visit:",
+    "warning_text": "⚠️ After submitting this form, the guide will review your request and send a custom quote. You will only pay after accepting the quote."
   }
 }
