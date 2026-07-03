@@ -20,6 +20,7 @@ export async function registerAction(
     const role     = (formData.get('role') as string) || 'tourist'
     const locale   = (formData.get('locale') as string) || 'fr'
     const redirectTo = (formData.get('redirect') as string) || ''
+    const privacyAccepted = formData.get('privacy_accepted') as string
 
     if (!fullName || !email || !password) {
       return { error: 'Tous les champs sont requis.' }
@@ -27,6 +28,10 @@ export async function registerAction(
 
     if (password.length < 8) {
       return { error: 'Le mot de passe doit contenir au moins 8 caractères.' }
+    }
+
+    if (privacyAccepted !== 'true') {
+      return { error: 'Vous devez accepter la politique de confidentialité.' }
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
