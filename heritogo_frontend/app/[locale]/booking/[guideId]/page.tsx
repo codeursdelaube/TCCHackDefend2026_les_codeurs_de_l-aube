@@ -13,6 +13,7 @@ import {
   Sparkles, Loader2, AlertCircle, CheckCircle, ShieldCheck, Star 
 } from 'lucide-react'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface GuideInfo {
   id: string
@@ -59,15 +60,14 @@ export default function BookingPage() {
     const fetchGuide = async () => {
       setLoadingGuide(true)
       try {
-        const response = await fetch(`/api/guides/${guideId}`)
-        const data = await response.json()
-        if (!response.ok) {
-          setGuideError(data.error || t('error_fetching_guide'))
+        const result = await apiFetch<{ guide?: GuideInfo }>(`/api/guides/${guideId}`)
+        if (!result.ok || !result.data?.guide) {
+          setGuideError(result.error || t('error_fetching_guide'))
           return
         }
-        setGuide(data.guide)
-      } catch {
-        setGuideError(t('error_loading_guide'))
+        setGuide(result.data.guide)
+      } catch (err: unknown) {
+        setGuideError(getUserFriendlyError(err))
       } finally {
         setLoadingGuide(false)
       }
@@ -89,7 +89,7 @@ export default function BookingPage() {
     setSubmitError(null)
 
     try {
-      const response = await fetch('/api/bookings', {
+      const result = await apiFetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -104,9 +104,8 @@ export default function BookingPage() {
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        setSubmitError(data.error || t('error_generic'))
+      if (!result.ok) {
+        setSubmitError(result.error || t('error_generic'))
         return
       }
 

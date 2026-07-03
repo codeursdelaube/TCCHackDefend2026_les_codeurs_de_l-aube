@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
+import { apiFetch } from '@/lib/utils/http'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
   Loader2, FileText, Ban, EyeOff, Eye, ExternalLink 
@@ -150,20 +151,45 @@ export default function AdminDashboardPage() {
 
   const loadAdminData = async () => {
     try {
-      const response = await fetch('/api/admin')
-      const data = await response.json()
-      if (response.ok) {
-        setPendingGuides(data.pendingGuides || [])
-        setAllGuides(data.allGuides || [])
-        setReports(data.reports || [])
-        setReviews(data.reviews || [])
-        setLogs(data.adminLogs || [])
+      const result = await apiFetch<{
+        pendingGuides?: PendingGuide[]
+        allGuides?: AllGuideRow[]
+        reports?: ReportRow[]
+        reviews?: ReviewRow[]
+        adminLogs?: AdminLog[]
+      }>('/api/admin')
+
+      if (result.ok && result.data) {
+        setPendingGuides(result.data.pendingGuides || [])
+        setAllGuides(result.data.allGuides || [])
+        setReports(result.data.reports || [])
+        setReviews(result.data.reviews || [])
+        setLogs(result.data.adminLogs || [])
+      } else if (result.error) {
+        alert(result.error)
       }
     } catch (err) {
       console.error('Erreur lors du chargement des données admin:', err)
+      alert(t('common.error_network'))
     } finally {
       setLoading(false)
     }
+  }
+
+  const runAdminAction = async (payload: Record<string, unknown>, fallbackError: string) => {
+    const result = await apiFetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!result.ok) {
+      alert(result.error || fallbackError)
+      return false
+    }
+
+    await loadAdminData()
+    return true
   }
 
   useEffect(() => {
@@ -174,16 +200,7 @@ export default function AdminDashboardPage() {
     if (!confirm(t('admin.confirm_approve'))) return
     setActionLoading(true)
     try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve_guide', targetId: guideId })
-      })
-      if (res.ok) {
-        await loadAdminData()
-      } else {
-        alert(t('admin.error_approve'))
-      }
+      await runAdminAction({ action: 'approve_guide', targetId: guideId }, t('admin.error_approve'))
     } catch {
       alert(t('common.error_network'))
     } finally {
@@ -195,21 +212,14 @@ export default function AdminDashboardPage() {
     if (!rejectionGuideId || !rejectionReason.trim()) return
     setActionLoading(true)
     try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'reject_guide', 
-          targetId: rejectionGuideId,
-          details: { reason: rejectionReason }
-        })
-      })
-      if (res.ok) {
+      const ok = await runAdminAction({
+        action: 'reject_guide',
+        targetId: rejectionGuideId,
+        details: { reason: rejectionReason }
+      }, t('admin.error_reject'))
+      if (ok) {
         setRejectionGuideId(null)
         setRejectionReason('')
-        await loadAdminData()
-      } else {
-        alert(t('admin.error_reject'))
       }
     } catch {
       alert(t('common.error_network'))
@@ -222,16 +232,7 @@ export default function AdminDashboardPage() {
     if (!confirm(t('admin.confirm_suspend'))) return
     setActionLoading(true)
     try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'suspend_guide', targetId: guideId })
-      })
-      if (res.ok) {
-        await loadAdminData()
-      } else {
-        alert(t('admin.error_suspend'))
-      }
+      await runAdminAction({ action: 'suspend_guide', targetId: guideId }, t('admin.error_suspend'))
     } catch {
       alert(t('common.error_network'))
     } finally {
@@ -245,20 +246,11 @@ export default function AdminDashboardPage() {
     const note = prompt(promptText) || defaultText
     setActionLoading(true)
     try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'resolve_report', 
-          targetId: reportId,
-          details: { resolution, note }
-        })
-      })
-      if (res.ok) {
-        await loadAdminData()
-      } else {
-        alert(t('admin.error_resolve'))
-      }
+      await runAdminAction({
+        action: 'resolve_report',
+        targetId: reportId,
+        details: { resolution, note }
+      }, t('admin.error_resolve'))
     } catch {
       alert(t('common.error_network'))
     } finally {
@@ -270,21 +262,14 @@ export default function AdminDashboardPage() {
     if (!hideReviewId) return
     setActionLoading(true)
     try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'toggle_review_hidden', 
-          targetId: hideReviewId,
-          details: { reason: hideReviewReason }
-        })
-      })
-      if (res.ok) {
+      const ok = await runAdminAction({
+        action: 'toggle_review_hidden',
+        targetId: hideReviewId,
+        details: { reason: hideReviewReason }
+      }, t('admin.error_toggle_hidden'))
+      if (ok) {
         setHideReviewId(null)
         setHideReviewReason('')
-        await loadAdminData()
-      } else {
-        alert(t('admin.error_toggle_hidden'))
       }
     } catch {
       alert(t('common.error_network'))
@@ -296,18 +281,11 @@ export default function AdminDashboardPage() {
   const quickToggleReview = async (reviewId: string) => {
     setActionLoading(true)
     try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'toggle_review_hidden', 
-          targetId: reviewId,
-          details: { reason: 'Action rapide modérateur' }
-        })
-      })
-      if (res.ok) {
-        await loadAdminData()
-      }
+      await runAdminAction({
+        action: 'toggle_review_hidden',
+        targetId: reviewId,
+        details: { reason: 'Action rapide modérateur' }
+      }, t('admin.error_toggle_hidden'))
     } catch {
       alert(t('common.error_network'))
     } finally {

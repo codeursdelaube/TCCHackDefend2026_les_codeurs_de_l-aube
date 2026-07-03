@@ -11,6 +11,7 @@ import {
   UserCheck, ShieldCheck, Heart, AlertCircle, Loader2
 } from 'lucide-react'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 
 
 interface GuideRow {
@@ -64,14 +65,13 @@ export default function GuidesPage() {
       if (selectedLang) url.searchParams.append('lang', selectedLang)
       if (maxPrice !== '100000') url.searchParams.append('price', maxPrice)
 
-      const response = await fetch(url.toString())
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || 'Erreur lors de la récupération des guides')
+      const result = await apiFetch<{ guides?: GuideRow[] }>(url.toString())
+      if (!result.ok || !result.data) {
+        setError(result.error || 'Erreur lors de la récupération des guides')
         return
       }
 
-      setGuides(data.guides)
+      setGuides(result.data.guides || [])
     } catch (err: unknown) {
       console.error(err)
       setError(getUserFriendlyError(err))
@@ -214,6 +214,7 @@ export default function GuidesPage() {
           ) : error ? (
             <div className="alert alert-error rounded-2xl p-4 font-bold text-white flex items-center gap-2 border-none">
               <AlertCircle className="h-5 w-5" />
+              <span>{error}</span>
             </div>
           ) : filteredGuides?.length === 0 ? (
             <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-12 text-center">
