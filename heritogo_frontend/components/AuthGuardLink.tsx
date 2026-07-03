@@ -33,7 +33,7 @@ export default function AuthGuardLink({
     e.preventDefault()
 
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }))
 
     if (!user) {
       // Redirige vers register avec parametre de retour

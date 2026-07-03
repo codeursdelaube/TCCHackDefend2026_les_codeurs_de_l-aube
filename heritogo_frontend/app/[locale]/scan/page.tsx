@@ -10,6 +10,7 @@ import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 import { useGeolocation } from '@/hooks/useGeolocation'
 
 
@@ -47,21 +48,21 @@ export default function ScanPage() {
     if (typeof window === 'undefined') return 0
     const date = new Date()
     const currentMonth = `${date.getFullYear()}-${date.getMonth() + 1}`
-    const savedMonth = localStorage.getItem('heritogo_scan_month')
+    const savedMonth = safeLocalStorageGet('heritogo_scan_month')
 
     let count = 0
     if (savedMonth !== currentMonth) {
-      localStorage.setItem('heritogo_scan_month', currentMonth)
-      localStorage.setItem('heritogo_scan_count', '0')
+      safeLocalStorageSet('heritogo_scan_month', currentMonth)
+      safeLocalStorageSet('heritogo_scan_count', '0')
       count = 0
     } else {
-      count = parseInt(localStorage.getItem('heritogo_scan_count') || '0', 10)
+      count = parseInt(safeLocalStorageGet('heritogo_scan_count') || '0', 10)
     }
     return count
   })
   const [isPremium, setIsPremium] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false
-    return localStorage.getItem('heritogo_premium') === 'true'
+    return safeLocalStorageGet('heritogo_premium') === 'true'
   })
   const [showPaywall, setShowPaywall] = useState(false)
 
@@ -83,21 +84,23 @@ export default function ScanPage() {
   useEffect(() => {
     if (result && result.data) {
       // 1. Incrémenter le compteur
-      const currentCount = parseInt(localStorage.getItem('heritogo_scan_count') || '0', 10)
+      const currentCount = parseInt(safeLocalStorageGet('heritogo_scan_count') || '0', 10)
       const newCount = currentCount + 1
-      localStorage.setItem('heritogo_scan_count', newCount.toString())
+      safeLocalStorageSet('heritogo_scan_count', newCount.toString())
       setScanCount(newCount)
 
       // 2. Enregistrer dans l'historique
-      const historyRaw = localStorage.getItem('heritogo_scans')
-      const history = historyRaw ? JSON.parse(historyRaw) : []
+      const history = safeJsonParse<Record<string, unknown>[]>(
+        safeLocalStorageGet('heritogo_scans'),
+        [],
+      )
       const newScan = {
         monument: result.data.monument,
         histoire: result.data.histoire,
         date: new Date().toISOString(),
         localite: userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : t('default_location')
       }
-      localStorage.setItem('heritogo_scans', JSON.stringify([newScan, ...history]))
+      safeLocalStorageSet('heritogo_scans', JSON.stringify([newScan, ...history]))
     }
   }, [result])
 
@@ -221,7 +224,7 @@ export default function ScanPage() {
   }
 
   const handleActivatePremium = () => {
-    localStorage.setItem('heritogo_premium', 'true')
+    safeLocalStorageSet('heritogo_premium', 'true')
     setIsPremium(true)
     setShowPaywall(false)
   }

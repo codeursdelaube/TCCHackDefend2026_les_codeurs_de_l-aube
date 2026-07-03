@@ -18,6 +18,7 @@ import ReportModal from '@/components/ReportModal'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 
 interface GuideDetail {
   id: string
@@ -59,13 +60,7 @@ export default function GuideDetailPage() {
   // Favorites
   const [isFavorite, setIsFavorite] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false
-    try {
-      const favs = localStorage.getItem('heritogo_favorites')
-      if (!favs) return false
-      return (JSON.parse(favs) as string[]).includes(guideId || '')
-    } catch {
-      return false
-    }
+    return safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), []).includes(guideId || '')
   })
 
   useEffect(() => {
@@ -93,8 +88,7 @@ export default function GuideDetailPage() {
 
   const toggleFavorite = () => {
     if (!guideId) return
-    const favs = localStorage.getItem('heritogo_favorites')
-    let favList: string[] = favs ? JSON.parse(favs) : []
+    let favList = safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), [])
     
     if (favList.includes(guideId)) {
       favList = favList.filter(id => id !== guideId)
@@ -103,7 +97,7 @@ export default function GuideDetailPage() {
       favList.push(guideId)
       setIsFavorite(true)
     }
-    localStorage.setItem('heritogo_favorites', JSON.stringify(favList))
+    safeLocalStorageSet('heritogo_favorites', JSON.stringify(favList))
   }
 
   const shareGuide = () => {

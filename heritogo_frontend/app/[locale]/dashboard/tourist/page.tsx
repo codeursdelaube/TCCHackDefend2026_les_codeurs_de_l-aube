@@ -17,6 +17,7 @@ import ShareItinerary from '@/components/ShareItinerary'
 import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { safeJsonParse, safeLocalStorageGet } from '@/lib/utils/storage'
 
 interface BookingRow {
   id: string
@@ -100,8 +101,7 @@ export default function TouristDashboardPage() {
         setBookings(bookingsResult.data.bookings)
       }
 
-      const favIdsRaw = localStorage.getItem('heritogo_favorites')
-      const favIds = favIdsRaw ? JSON.parse(favIdsRaw) as string[] : []
+      const favIds = safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), [])
       if (favIds.length > 0) {
         const guidesResult = await apiFetch<{ guides?: any[] }>('/api/guides')
         if (guidesResult.ok && guidesResult.data?.guides) {
@@ -112,8 +112,7 @@ export default function TouristDashboardPage() {
         setFavorites([])
       }
 
-      const scansRaw = localStorage.getItem('heritogo_scans')
-      const scans = scansRaw ? JSON.parse(scansRaw) : []
+      const scans = safeJsonParse<any[]>(safeLocalStorageGet('heritogo_scans'), [])
       setScanHistory(scans)
     } catch (e: unknown) {
       console.error(e)

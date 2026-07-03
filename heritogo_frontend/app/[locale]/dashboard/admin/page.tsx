@@ -9,6 +9,7 @@ import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/utils/http'
+import { getUserFriendlyError } from '@/lib/utils/errors'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
   Loader2, FileText, Ban, EyeOff, Eye, ExternalLink 
@@ -134,19 +135,37 @@ export default function AdminDashboardPage() {
 
   const checkAccess = async () => {
     setLoading(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      window.location.href = `/${params.locale}/auth/login`
-      return
+    try {
+      const supabase = createClient()
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        window.location.href = `/${params.locale}/auth/login`
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError) {
+        alert(getUserFriendlyError(profileError))
+        setLoading(false)
+        return
+      }
+
+      if (profile?.role !== 'admin') {
+        window.location.href = `/${params.locale}/dashboard`
+        return
+      }
+      setIsAdmin(true)
+      await loadAdminData()
+    } catch (err: unknown) {
+      console.error('Erreur acces admin:', err)
+      alert(getUserFriendlyError(err))
+      setLoading(false)
     }
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (profile?.role !== 'admin') {
-      window.location.href = `/${params.locale}/dashboard`
-      return
-    }
-    setIsAdmin(true)
-    await loadAdminData()
   }
 
   const loadAdminData = async () => {

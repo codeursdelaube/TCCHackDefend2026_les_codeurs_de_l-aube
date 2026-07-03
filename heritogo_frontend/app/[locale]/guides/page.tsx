@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 
 
 interface GuideRow {
@@ -48,12 +49,7 @@ export default function GuidesPage() {
   // Favorites State (Stored in localStorage)
   const [favIds, setFavIds] = useState<string[]>(() => {
     if (typeof window === 'undefined') return []
-    try {
-      const favs = localStorage.getItem('heritogo_favorites')
-      return favs ? (JSON.parse(favs) as string[]) : []
-    } catch {
-      return []
-    }
+    return safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), [])
   })
 
   const fetchGuides = useCallback(async () => {
@@ -92,7 +88,7 @@ export default function GuidesPage() {
       updatedFavs.push(guideId)
     }
     setFavIds(updatedFavs)
-    localStorage.setItem('heritogo_favorites', JSON.stringify(updatedFavs))
+    safeLocalStorageSet('heritogo_favorites', JSON.stringify(updatedFavs))
   }
 
   // Client side search filter

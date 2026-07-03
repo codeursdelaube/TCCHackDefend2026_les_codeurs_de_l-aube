@@ -1,5 +1,6 @@
-﻿'use client'
+'use client'
 import { useEffect, useState } from 'react'
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 
 type Theme = 'light' | 'dark'
 const KEY = 'heritogo_theme'
@@ -10,7 +11,7 @@ export function useTheme() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const saved = localStorage.getItem(KEY) as Theme | null
+      const saved = safeLocalStorageGet(KEY) as Theme | null
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const initial = saved ?? (prefersDark ? 'dark' : 'light')
       setTheme(initial)
@@ -23,7 +24,7 @@ export function useTheme() {
   const toggle = () => {
     const next: Theme = theme === 'light' ? 'dark' : 'light'
     setTheme(next)
-    localStorage.setItem(KEY, next)
+    safeLocalStorageSet(KEY, next)
     if (next === 'dark') {
       document.documentElement.classList.add('dark')
     } else {

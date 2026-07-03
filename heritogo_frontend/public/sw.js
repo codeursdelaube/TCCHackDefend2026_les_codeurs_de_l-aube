@@ -1,69 +1,87 @@
-﻿const CACHE_NAME = 'heritogo-v3';
+const CACHE_NAME = 'heritogo-v4';
 const LOCALES = ['fr', 'en', 'es', 'zh'];
 
-const STATIC_ASSETS = LOCALES.flatMap((l) => [
-  `/${l}`,
-  `/${l}/lieux`,
-  `/${l}/cuisine`,
-  `/${l}/scan`,
-  `/${l}/loisirs`,
-]).concat(['/manifest.json', '/offline.html']);
+const STATIC_ASSETS = LOCALES.flatMap((locale) => [
+  `/${locale}`,
+  `/${locale}/lieux`,
+  `/${locale}/cuisine`,
+  `/${locale}/scan`,
+  `/${locale}/loisirs`,
+]).concat([
+  '/manifest.json',
+  '/offline.html',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+]);
 
-// Endpoints qui ne doivent JAMAIS être mis en cache (action en temps réel)
-const NEVER_CACHE = ['/api/scan', '/api/chatbot', '/api/booking', '/api/guides/reserve', '/api/auth'];
+function shouldBypassCache(requestUrl) {
+  return requestUrl.origin !== self.location.origin || requestUrl.pathname.startsWith('/api');
+}
+
+async function cacheStaticAssets() {
+  const cache = await caches.open(CACHE_NAME);
+  await Promise.allSettled(STATIC_ASSETS.map((url) => cache.add(url)));
+}
+
+async function deleteOldCaches() {
+  const keys = await caches.keys();
+  await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+}
+
+async function networkFirstNavigation(request) {
+  const cache = await caches.open(CACHE_NAME);
+
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request);
+    return cached || caches.match('/offline.html');
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cached = await caches.match(request);
+  const network = fetch(request)
+    .then(async (response) => {
+      if (response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => cached || Response.error());
+
+  return cached || network;
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(STATIC_ASSETS.map((url) => cache.add(url)))
-      // allSettled : une URL en échec ne bloque plus les autres
-    )
-  );
-  self.skipWaiting();
+  event.waitUntil(cacheStaticAssets());
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil(deleteOldCaches().then(() => self.clients.claim()));
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
   if (event.request.method !== 'GET') return;
 
-  // Jamais caché : actions temps réel
-  if (NEVER_CACHE.some((p) => url.pathname.startsWith(p))) {
+  const url = new URL(event.request.url);
+  if (shouldBypassCache(url)) return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(networkFirstNavigation(event.request));
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request)
-        .then((response) => {
-          if (response.ok && url.origin === self.location.origin) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => {
-          if (cached) return cached;
-
-          if (event.request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-
-          return Response.error();
-        });
-
-      // Stale-while-revalidate : sers le cache tout de suite si dispo, sinon attends le réseau
-      return cached || network;
-    })
-  );
+  event.respondWith(staleWhileRevalidate(event.request));
 });
-

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Check, Sparkles, Shield, Zap, ArrowRight, Star } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
 import { useRouter } from 'next/navigation'
+import { safeLocalStorageSet } from '@/lib/utils/storage'
 
 export default function SubscriptionPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -14,7 +15,7 @@ export default function SubscriptionPage() {
     setIsLoading(true)
     // Simulation d'une redirection vers une API de paiement (ex: FedaPay, Paystack)
     setTimeout(() => {
-      localStorage.setItem('heritogo_premium', 'true')
+      safeLocalStorageSet('heritogo_premium', 'true')
       setIsLoading(false)
       router.push('/dashboard/tourist')
     }, 1500)
