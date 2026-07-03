@@ -146,7 +146,7 @@ def get_points_interet_proches(lat: float, long: float):
 
     # 1. Filtrage des hôtels proches
     for h in BASE_HOTEL:
-        dist = calcul_de_l_haversine(lat, long, h["lat"], h["lng"])
+        dist = calcul_de_l_haversine(lat, long, h["lat"], h["long"])
         if dist <= 5.0: # Rayon de 5 km
             h_data = h.copy()
             h_data["distance_km"] = dist
