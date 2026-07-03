@@ -73,10 +73,18 @@ export async function loginAction(prevState: any, formData: FormData) {
       `/${locale}/dashboard/tourist`
 
     redirect(targetDashboard)
-  } catch (error: any) {
-    if (error.digest && error.digest.startsWith('NEXT_REDIRECT')) {
-      throw error // Re-jeter la redirection Next.js pour qu'elle fonctionne
+  } catch (err: unknown) {
+    if (
+      err instanceof Error &&
+      'digest' in err &&
+      typeof (err as Error & { digest: string }).digest === 'string' &&
+      (err as Error & { digest: string }).digest.startsWith('NEXT_REDIRECT')
+    ) {
+      throw err
     }
-    return { error: 'Erreur serveur. Veuillez réessayer.' }
+
+    const msg = err instanceof Error ? err.message : 'Erreur inattendue'
+    console.error('[loginAction]', msg)
+    return { error: 'Une erreur est survenue. Réessayez.' }
   }
 }

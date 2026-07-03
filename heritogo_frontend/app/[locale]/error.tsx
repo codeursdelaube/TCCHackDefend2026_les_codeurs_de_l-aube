@@ -1,84 +1,96 @@
-﻿'use client'
+'use client'
 
-import { useEffect } from 'react'
-import { WifiOff, RefreshCw, Home } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { AlertCircle, RefreshCw, Home, Wifi, WifiOff } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const params = useParams<{ locale: string }>()
+  const locale = params?.locale || 'fr'
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator === 'undefined' ? true : navigator.onLine
+  )
+
   useEffect(() => {
-    console.error('[HériTogo] Erreur applicative:', error)
+    console.error('[error.tsx]', error)
+
+    const update = () => setIsOnline(navigator.onLine)
+    window.addEventListener('online', update)
+    window.addEventListener('offline', update)
+
+    return () => {
+      window.removeEventListener('online', update)
+      window.removeEventListener('offline', update)
+    }
   }, [error])
 
-  const isNetworkError =
-    error?.message?.toLowerCase().includes('fetch') ||
-    error?.message?.toLowerCase().includes('network') ||
-    error?.message?.toLowerCase().includes('failed') ||
-    !navigator.onLine
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-base-100 px-4 text-base-content">
-      <div className="w-full max-w-md rounded-3xl border border-border bg-base-200 p-8 shadow-xl text-center space-y-6">
-
-        {/* Icône */}
+    <div className="flex min-h-screen items-center justify-center bg-base-100 px-4 pb-32 pt-20 text-base-content">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-border bg-base-200 p-8 text-center shadow-xl">
         <div
-          className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl text-white shadow-md"
-          style={{ background: isNetworkError ? '#BF360C' : '#004D40' }}
+          className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-white"
+          style={{ backgroundColor: '#004D40' }}
         >
-          {isNetworkError
-            ? <WifiOff className="h-9 w-9" />
-            : <span className="text-4xl font-black">!</span>
-          }
+          <AlertCircle className="h-8 w-8" />
         </div>
 
-        {/* Titre */}
         <div className="space-y-2">
-          <h1 className="font-serif text-2xl font-bold">
-            {isNetworkError
-              ? 'Connexion introuvable'
-              : 'Une erreur est survenue'}
-          </h1>
-          <p className="text-sm text-base-content/60 leading-6 font-medium">
-            {isNetworkError
-              ? "Impossible de charger cette page. Vérifiez votre connexion internet et réessayez."
-              : "Cette page n'a pas pu s'afficher correctement. Notre équipe a été notifiée."}
+          <h2 className="font-serif text-xl font-bold italic text-base-content">
+            Une erreur est survenue
+          </h2>
+          <p className="text-sm leading-6 text-base-content/60">
+            {isOnline
+              ? "Cette page n'a pas pu s'afficher correctement. Notre équipe a été notifiée."
+              : 'Vous semblez être hors ligne. Vérifiez votre connexion internet.'}
           </p>
         </div>
 
-        {/* Statut réseau */}
-        <div className="rounded-2xl bg-base-100 border border-border/60 p-4 text-xs font-bold text-base-content/50 flex items-center justify-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${navigator.onLine ? 'bg-success' : 'bg-error animate-pulse'}`} />
-          {navigator.onLine ? 'Réseau disponible' : 'Hors ligne — pas de connexion'}
+        <div
+          className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium ${
+            isOnline ? 'bg-base-100' : 'bg-error/10'
+          }`}
+        >
+          {isOnline ? (
+            <>
+              <Wifi className="h-4 w-4 text-green-500" />
+              <span className="text-base-content">Réseau disponible</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="h-4 w-4 text-error" />
+              <span className="text-error">Pas de connexion</span>
+            </>
+          )}
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="space-y-3">
           <button
-            onClick={reset}
-            className="btn flex-1 rounded-2xl border-none text-white font-black gap-2"
-            style={{ background: '#004D40' }}
+            type="button"
+            onClick={() => reset()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all hover:opacity-90"
+            style={{ backgroundColor: '#004D40' }}
           >
             <RefreshCw className="h-4 w-4" />
             Réessayer
           </button>
+
           <Link
             href="/"
-            className="btn flex-1 rounded-2xl border border-border bg-base-100 font-black gap-2"
+            locale={locale}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-base-100 py-3 text-sm font-bold text-base-content transition-all hover:bg-base-300"
           >
             <Home className="h-4 w-4" />
             Accueil
           </Link>
         </div>
-
       </div>
     </div>
   )
 }
-
-
-
