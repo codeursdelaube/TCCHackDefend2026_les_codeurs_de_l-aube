@@ -223,7 +223,7 @@ async def predict_monument(
 
         # 5. Appel de l'API Gemini 1.5 Flash
         response = Client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.5-flash',
             contents=[image, prompt]
         )
 
