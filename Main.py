@@ -5,7 +5,7 @@ import json
 import io
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image
+from PIL import Image, ImageOps
 from google import genai
 from haversine import calcul_de_l_haversine 
 from fastapi import Security, Depends
@@ -19,7 +19,7 @@ from chatbot import router as chatbot_router
 
 class Settings(BaseSettings):
     """
-    Gestion centralisée des variables de configuration avec   Pydantic Settings.
+    Gestion centralisée des variables de configuration avec Pydantic Settings.
     Charge automatiquement les variables stockées dans le fichier '.env'.
     """
     gemini_api_key: str # Clé secrète pour s'authentifier auprès de l'API Google Gemini
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # Configuration pour lier Pydantic au fichier physique .env
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    # Instanciation des paramètres pour une utilisation globale
+# Instanciation des paramètres pour une utilisation globale
 settings = Settings()
 
 # Initialisation de l'application FastAPI
@@ -43,8 +43,6 @@ Client = genai.Client(api_key=settings.gemini_api_key)
 # 2. CONFIGURATION DU MIDDLEWARE (CORS)
 # ==========================================
 
-# Configuration du CORS (Cross-Origin Resource Sharing) pour permettre au Frontend 
-# (situé sur un autre domaine/port) d'interroger cette API sans blocage de sécurité navigateur.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # Autorise toutes les origines (utile en Hackathon, à restreindre en prod)
@@ -57,7 +55,7 @@ app.add_middleware(
 # 3. SÉCURISATION DES ROUTES (API KEY)
 # ==========================================
 
-cle_api = "herit" # Nom de l'en-tête (Header) attendu dans la requête HTTP (ex: herit: votre_cle_api)
+cle_api = "herit" # NE PAS CHANGER : Nom de l'en-tête (Header) attendu dans la requête HTTP
 api_key_header = api_key.APIKeyHeader(name=cle_api, auto_error=False)
 
 def verifier_cle_api(api_key_recue: str = Depends(api_key_header)):
@@ -67,7 +65,7 @@ def verifier_cle_api(api_key_recue: str = Depends(api_key_header)):
     """
     if api_key_recue == settings.api_secret_key:
         return api_key_recue
-# Si la clé est incorrecte ou absente, on bloque immédiatement la requête
+    # Si la clé est incorrecte ou absente, on bloque immédiatement la requête
     raise HTTPException(
         status_code=403,
         detail="Accès interdit: Clé API invalide ou manquante"
@@ -77,15 +75,12 @@ def verifier_cle_api(api_key_recue: str = Depends(api_key_header)):
 # 4. CHARGEMENT DES BASES DE DONNÉES LOCALES (JSON)
 # ==========================================
 
-# Chargement en mémoire au démarrage de l'API de la liste officielle des monuments du Togo
 with open("monument.json", "r", encoding="utf-8") as fichier:
     BASE_MONUMENT = json.load(fichier)
 
-# Chargement en mémoire de la liste des hôtels répertoriés au Togo
 with open("hotel.json", "r", encoding="utf-8") as fichier_hotel:
     BASE_HOTEL = json.load(fichier_hotel)
 
-# À ajouter sous le chargement de hotel.json
 with open("resto.json", "r", encoding="utf-8") as fichier_resto:
     BASE_RESTO = json.load(fichier_resto)
 
@@ -97,7 +92,6 @@ CACHE_MONUMENTS_TEXTE = {}
 # ==========================================
 
 class Monument(BaseModel):
-    """ Modèle de validation pour la structure d'un Monument """
     id: int
     nom: str
     localite: str
@@ -107,7 +101,6 @@ class Monument(BaseModel):
     longitude: float
 
 class hotel(BaseModel):
-    """ Modèle de validation pour la structure d'un Hôtel """
     nom: str
     latitude: float
     longitude: float
@@ -129,25 +122,18 @@ class resto(BaseModel):
     budget_fcfa: int
     plats: str
 
-
-
 @app.get("/monument", response_model=List[Monument])
 def get_Monument():
-    """ Récupère la liste complète des monuments du Togo stockés en local """
     return BASE_MONUMENT
 
 @app.get("/nearby")
 def get_points_interet_proches(lat: float, long: float):
-    """
-    Parcourt les hôtels et les restaurants pour renvoyer tout ce qui se trouve 
-    à moins de 5 kilomètres de l'utilisateur ou du monument.
-    """
     decouvertes = []
 
     # 1. Filtrage des hôtels proches
     for h in BASE_HOTEL:
         dist = calcul_de_l_haversine(lat, long, h["lat"], h["long"])
-        if dist <= 5.0: # Rayon de 5 km
+        if dist <= 5.0:
             h_data = h.copy()
             h_data["distance_km"] = dist
             h_data["type"] = "hotel"
@@ -162,29 +148,23 @@ def get_points_interet_proches(lat: float, long: float):
             r_data["type"] = "restaurant"
             decouvertes.append(r_data)
 
-    # Tri global du plus proche au plus lointain
     return sorted(decouvertes, key=lambda x: x["distance_km"])
 
 @app.post("/predict", dependencies=[Depends(verifier_cle_api)])
-async def predict_monument(file: UploadFile = File(..., description="photo prise par le touriste"), lat: Optional[float] = Query(None, description="Latitude actuelle du touriste"), long: Optional[float] = Query(None, description="Longitude actuelle du touriste")):
-    """
-    Reçoit l'image envoyée par un utilisateur, l'analyse avec l'IA Google Gemini,
-    et tente de faire correspondre le monument détecté avec notre base de données locale.
-    Cette route est protégée par notre dépendance de clé API (verifier_cle_api).
-    """
-    # 1. Validation du type de fichier (uniquement des images)
+async def predict_monument(
+    file: UploadFile = File(..., description="photo prise par le touriste"), 
+    lat: Optional[float] = Query(None, description="Latitude actuelle du touriste"), 
+    long: Optional[float] = Query(None, description="Longitude actuelle du touriste")
+):
     if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="le fichier doit etre une image")
+        raise HTTPException(status_code=400, detail="Le fichier doit être une image")
 
     try:
-
         # ----------------========================================
         # BOUCLIER 1 : FILTRAGE GÉOGRAPHIQUE GPS (Zéro Appel IA)
         # ----------------========================================
-
         if lat is not None and long is not None:
             for m in BASE_MONUMENT:
-              # Si l'appareil est à moins de 300 mètres (0.3 km) d'un monument de notre JSON 
                 distance_user_monument = calcul_de_l_haversine(lat, long, m["latitude"], m["longitude"])
                 if distance_user_monument <= 0.3:
                     return {
@@ -203,58 +183,57 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         # Lecture du flux de données binaires de l'image
         image_bytes = await file.read()
 
-        # 2. Sécurité : Validation de la taille maximale (10 Mo) pour éviter les saturations mémoire
+        # 2. Sécurité : Validation de la taille maximale (10 Mo)
         max_file_size = 10 * 1024 * 1024
         if len(image_bytes) > max_file_size:
-            raise HTTPException(status_code=413, detail="L'image est trop lourd, la taille maximale est 10 Mo")
+            raise HTTPException(status_code=413, detail="L'image est trop lourde, la taille maximale est 10 Mo")
 
-        # Conversion des octets binaires en un objet Image    manipulable par Pillow
+        # Conversion et redressement automatique de l'orientation EXIF de l'image (Crucial pour smartphones)
         image = Image.open(io.BytesIO(image_bytes))
+        image = ImageOps.exif_transpose(image)
 
-        # 3. Optimisation : Redimensionnement de l'image (max 1024px) pour accélérer l'envoi vers Gemini
+        # 3. Optimisation : Redimensionnement de l'image (max 1024px)
         max_size = 1024
         image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
 
         # ----------------========================================
-        # INJECTION DE TA BASE JSON DANS LE PROMPT (GROUNDING)
+        # INJECTION DE TA BASE JSON DANS LE PROMPT (GROUNDING OPTIMISÉ)
         # ----------------========================================
-
-        # On crée une version texte simplifiée de ton JSON pour ne pas surcharger le prompt
-
-        catalogue_officiel = [{"nom": m["nom"], "localite": m["localite"]} for m in BASE_MONUMENT]
+        # CORRECTION HISTOIRE : On inclut l'histoire/description pour donner des indices visuels à Gemini !
+        catalogue_officiel = [{
+            "nom": m["nom"], 
+            "localite": m["localite"], 
+            "indices_visuels": m["histoire"]
+        } for m in BASE_MONUMENT]
         catalogue_str = json.dumps(catalogue_officiel, ensure_ascii=False)
 
         prompt = f"""
-        Tu es un expert en reconnaissance du patrimoine togolais. 
-        Ton unique mission est de vérifier si l'image correspond STRICTEMENT à l'un des monuments de cette liste officielle :
+        Tu es un expert en reconnaissance du patrimoine architectural et culturel togolais. 
+        Ton unique mission est de vérifier si l'image correspond à l'un des monuments de cette liste officielle :
         {catalogue_str}
 
         RÈGLES DE SÉCURITÉ INVIOLABLES :
-        1. Compare l'image avec les noms de la liste officielle fournie.
-        2. Si l'image correspond à un monument de la liste, renvoie "est_monument": true et le "nom_probable" exact de la liste.
-        3. Si le monument visible n'est PAS dans la liste fournie, ou si l'image montre autre chose (objet, personne, lieu étranger), tu dois impérativement répondre : {{"est_monument": false, "nom_probable": ""}}.
-        4. INTERDICTION FORMELLE d'utiliser tes connaissances externes sur d'autres monuments mondiaux. Ne réponds que si c'est dans la liste.
-        5. Réponds uniquement en JSON brut, sans balises markdown.
+        1. Analyse les formes de la structure, les statues, les textures de pierre ou béton décrits dans les "indices_visuels". Tolère les variations d'angles, d'ombres ou de reflets propres aux caméras de smartphones.
+        2. Si l'image correspond à un monument de la liste, renvoie "est_monument": true et le "nom_probable" exact correspondant dans la liste.
+        3. Si le monument visible n'est absolument PAS dans la liste fournie, ou si l'image montre autre chose d'anondin (objet interne, selfie, animal sans rapport), réponds impérativement : {{"est_monument": false, "nom_probable": ""}}.
+        4. Réponds uniquement en JSON brut valide, sans balises markdown ni texte décoratif.
 
-        Format : {{"est_monument": bool, "nom_probable": "nom exact du catalogue"}}
+        Format attendu : {{"est_monument": bool, "nom_probable": "nom exact du catalogue"}}
         """
 
-        # 5. Appel de l'API Gemini avec le modèle multimédia léger et performant gemini-2.5-flash
-
+        # 5. Appel de l'API Gemini 1.5 Flash
         response = Client.models.generate_content(
             model='gemini-1.5-flash',
             contents=[image, prompt]
         )
 
-        # 6. Nettoyage de la réponse IA pour enlever d'éventuels blocs de code Markdown (```json ... ```)
-
+        # 6. Nettoyage de la réponse IA
         texte_brut = response.text.strip()
         if texte_brut.startswith("```json"):
             texte_brut = texte_brut.replace("```json", "").replace("```", "").strip()
         elif texte_brut.startswith("```"):
             texte_brut = texte_brut.replace("```", "").strip()
 
-        # Conversion de la chaîne de texte nettoyée en un dictionnaire Python
         data_touristique = json.loads(texte_brut)
 
         # Validation immédiate de la réponse de l'IA
@@ -269,7 +248,6 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
         # ----------------========================================
         # BOUCLIER 3 : TEXT-BASED CACHING (Performance accrue)
         # ----------------========================================
-
         if data_tour in CACHE_MONUMENTS_TEXTE:
             return {
                 "prediction_status": "success",
@@ -278,11 +256,9 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
 
         donnees_finales = None
 
-         # 7. Algorithme de réconciliation : Recherche si le monument trouvé par l'IA existe dans notre JSON local
-
+        # 7. Algorithme de réconciliation
         for m in BASE_MONUMENT:
-         # Vérification croisée par inclusion de chaînes (insensible à la casse)
-             if data_tour in m["nom"].lower() or m["nom"].lower() in data_tour:
+            if data_tour in m["nom"].lower() or m["nom"].lower() in data_tour:
                 donnees_finales = {
                     "monument": m["nom"],
                     "histoire": m["histoire"],
@@ -290,28 +266,25 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
                     "region": m["region"],
                     "latitude": m["latitude"],
                     "longitude": m["longitude"],
-                    "source": "local_database" # Indique que la donnée vient du fichier local sûr
+                    "source": "local_database"
                 }
                 break
+
         if not donnees_finales:
             return {"prediction_status": "unknown"}
 
-        # Sauvegarde du résultat dans notre cache textuel global
+        # Sauvegarde du résultat dans le cache textuel global
         CACHE_MONUMENTS_TEXTE[data_tour] = donnees_finales
 
         return {
-                "prediction_status": "success",
-                "data": donnees_finales
+            "prediction_status": "success",
+            "data": donnees_finales
         }
-    
-    
-        # Gestion des exceptions spécifiques
+
     except json.JSONDecodeError:
-        # Erreur levée si Gemini renvoie du texte standard au lieu du format JSON demandé
-        raise HTTPException(status_code=500, detail="Format JSON invalide gemini ne peut pas le renvoyé")
+        raise HTTPException(status_code=500, detail="Format JSON invalide retourné par le moteur d'analyse.")
     except Exception as e:
         error_msg = str(e)
         if "429" in error_msg or "RessourceExhausted" in error_msg:
-            raise HTTPException(status_code=429, detail="Serveurs d'analyse est très sollicité. Veuillez réessayer dans quelques instants.")
-        # Capture de toute autre erreur (problème réseau, API Key expirée, erreur Pillow...)
+            raise HTTPException(status_code=429, detail="Le serveur d'analyse est très sollicité. Veuillez réessayer.")
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'analyse : {str(e)}")
