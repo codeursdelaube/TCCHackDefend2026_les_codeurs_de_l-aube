@@ -312,6 +312,6 @@ async def predict_monument(file: UploadFile = File(..., description="photo prise
     except Exception as e:
         error_msg = str(e)
         if "429" in error_msg or "RessourceExhausted" in error_msg:
-            raise HTTPException(status_code=429, detail="Serveurs d'analyse saturés.")
+            raise HTTPException(status_code=429, detail="Serveurs d'analyse est très sollicité. Veuillez réessayer dans quelques instants.")
         # Capture de toute autre erreur (problème réseau, API Key expirée, erreur Pillow...)
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'analyse : {str(e)}")
