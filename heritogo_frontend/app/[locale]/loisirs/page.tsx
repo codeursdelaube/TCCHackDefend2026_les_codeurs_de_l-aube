@@ -1,6 +1,6 @@
-﻿'use client'
+'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { Banknote, Info, Navigation, Phone, Search, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -14,10 +14,12 @@ export default function ParcsZoosPage() {
 
   const normalizeText = (text: string): string => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-  const filteredParcs = parcs.filter((parc: Parc) => {
+  const filteredParcs = useMemo(() => {
     const search = normalizeText(searchInput)
-    return normalizeText(tParcs(`${parc.id}.nom`)).includes(search) || normalizeText(tParcs(`${parc.id}.description`)).includes(search)
-  })
+    return parcs.filter((parc: Parc) =>
+      normalizeText(tParcs(`${parc.id}.nom`)).includes(search) || normalizeText(tParcs(`${parc.id}.description`)).includes(search)
+    )
+  }, [searchInput, tParcs])
 
   const getRegion = (lat: number): string => {
     if (lat > 10) return t('regions.savanes')

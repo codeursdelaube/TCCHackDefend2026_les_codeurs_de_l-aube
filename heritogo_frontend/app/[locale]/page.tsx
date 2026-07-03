@@ -68,15 +68,15 @@ export default function AccueilPage() {
   ], [t])
 
   /* ── Données statiques ── */
-  const categories = [
+  const categories = useMemo(() => [
     { icon: Landmark,     label: t('categories.places.label'),    sub: t('categories.places.sub'),    href: '/lieux' },
     { icon: Palette,      label: t('categories.cultures.label'),  sub: t('categories.cultures.sub'),  href: '/histoire' },
     { icon: BookOpenText, label: t('categories.stories.label'),   sub: t('categories.stories.sub'),   href: '/histoire' },
     { icon: CalendarDays, label: t('categories.events.label'),    sub: t('categories.events.sub'),    href: '/lieux' },
     { icon: Users,        label: t('categories.community.label'), sub: t('categories.community.sub'), href: '/guides' },
-  ]
+  ], [t])
 
-  const featureCards = [
+  const featureCards = useMemo(() => [
     {
       href: '/scan', icon: Scan, isPremium: true,
       title:       t('features.scan_title'),
@@ -99,27 +99,27 @@ export default function AccueilPage() {
       tag:         t('features.cuisine_tag'),
       cta:         t('features.cuisine_cta'),
     },
-  ]
+  ], [t])
 
-  const guides = [
+  const guides = useMemo(() => [
     { initials: 'KA', name: t('guides.0.name'), rating: '4.8', languages: t('guides.0.languages'), bg: C.forest },
     { initials: 'EA', name: t('guides.1.name'), rating: '4.9', languages: t('guides.1.languages'), bg: C.rust   },
     { initials: 'MA', name: t('guides.2.name'), rating: '5.0', languages: t('guides.2.languages'), bg: C.gold   },
-  ]
+  ], [t])
 
-  const subFeatures = [
+  const subFeatures = useMemo(() => [
     t('subscription.features.scans'),
     t('subscription.features.audio'),
     t('subscription.features.history'),
     t('subscription.features.offline'),
-  ]
+  ], [t])
 
-  const stats = [
+  const stats = useMemo(() => [
     { value: '120+', label: t('stats_short.sites') },
     { value: '7',    label: t('stats_short.regions') },
     { value: '4',    label: t('stats_short.languages') },
     { value: '500+', label: t('stats_short.explorers') },
-  ]
+  ], [t])
 
   /* ── Effets ── */
   useEffect(() => {

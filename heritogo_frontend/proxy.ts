@@ -59,26 +59,24 @@ export default async function proxy(request: NextRequest) {
   }
 
 
-  const publicAuthPaths = [
+  // Pages login/register : rediriger vers dashboard si déjà connecté
+  const loginRegisterPaths = [
     '/auth/login',
     '/auth/register',
     '/auth/forgot-password',
-    '/auth/callback',
-    '/auth/confirm',
-    '/auth/reset-password',
   ]
-
-  const isPublicAuthPath = publicAuthPaths.some(p =>
+  const isLoginOrRegister = loginRegisterPaths.some(p =>
     pathWithoutLocale === p || pathWithoutLocale.startsWith(`${p}/`)
   )
 
-  // Déjà connecté sur page auth classique → dashboard.
-  // Les callbacks/confirm/reset restent publics pour éviter les boucles auth.
-  if (user && pathWithoutLocale.startsWith('/auth/') && !isPublicAuthPath) {
+  // Connecté sur login/register → dashboard
+  if (user && isLoginOrRegister) {
     return NextResponse.redirect(
       new URL(`/${currentLocale}/dashboard`, request.url)
     )
   }
+  // /auth/callback, /auth/confirm, /auth/reset-password restent
+  // toujours accessibles (pas de redirection) pour éviter les boucles.
 
   // Seules ces routes nécessitent une connexion
   // scan, lieux, cuisine, histoire sont publiques pour les touristes

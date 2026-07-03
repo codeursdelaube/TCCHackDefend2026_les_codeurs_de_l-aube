@@ -3,6 +3,7 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { COLORS } from '@/lib/constants/colors'
@@ -346,7 +347,7 @@ export default function BookingPage() {
                 style={{ backgroundColor: COLORS.forest }}
               >
                 {guide.profile.avatar_url ? (
-                  <img src={guide.profile.avatar_url} alt={guide.profile.full_name} className="h-full w-full object-cover rounded-2xl" />
+                  <Image src={guide.profile.avatar_url} alt={guide.profile.full_name} width={48} height={48} className="h-full w-full object-cover rounded-2xl" />
                 ) : (
                   getInitials(guide.profile.full_name)
                 )}

@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { RefreshCw, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export default function ServiceWorkerRegister() {
+  const t = useTranslations('Update')
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null)
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false)
 
@@ -69,9 +71,9 @@ export default function ServiceWorkerRegister() {
           <RefreshCw className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-black">Mise a jour disponible</p>
+          <p className="text-sm font-black">{t('title')}</p>
           <p className="mt-1 text-xs font-medium leading-5 text-base-content/65">
-            Une nouvelle version de Heritogo est prete. Installez-la pour profiter des derniers correctifs.
+            {t('desc')}
           </p>
           <div className="mt-3 flex gap-2">
             <button
@@ -79,14 +81,14 @@ export default function ServiceWorkerRegister() {
               onClick={installUpdate}
               className="btn btn-sm rounded-xl border-none bg-primary px-4 text-xs font-bold text-primary-content"
             >
-              Installer
+              {t('install')}
             </button>
             <button
               type="button"
               onClick={() => setShowUpdatePrompt(false)}
               className="btn btn-ghost btn-sm rounded-xl px-3 text-xs font-bold"
             >
-              Plus tard
+              {t('later')}
             </button>
           </div>
         </div>

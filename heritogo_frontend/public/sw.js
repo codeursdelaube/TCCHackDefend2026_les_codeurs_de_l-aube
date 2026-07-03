@@ -7,6 +7,8 @@ const STATIC_ASSETS = LOCALES.flatMap((locale) => [
   `/${locale}/cuisine`,
   `/${locale}/scan`,
   `/${locale}/loisirs`,
+  `/${locale}/histoire`,
+  `/${locale}/guides`,
 ]).concat([
   '/manifest.json',
   '/offline.html',
