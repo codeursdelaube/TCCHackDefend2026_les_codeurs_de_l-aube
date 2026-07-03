@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Star, X, Loader2 } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface ReviewModalProps {
   bookingId: string
@@ -24,7 +25,7 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/reviews', {
+      const result = await apiFetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,9 +35,8 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || 'Erreur lors de la soumission')
+      if (!result.ok) {
+        setError(result.error || 'Erreur lors de la soumission')
         return
       }
 

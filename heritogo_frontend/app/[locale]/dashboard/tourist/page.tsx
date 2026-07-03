@@ -16,6 +16,7 @@ import ReviewModal from '@/components/ReviewModal'
 import ShareItinerary from '@/components/ShareItinerary'
 import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface BookingRow {
   id: string
@@ -78,52 +79,45 @@ export default function TouristDashboardPage() {
   const fetchData = useCallback(async () => {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
         window.location.href = `/${params.locale}/auth/login`
         return
       }
 
-      // Profile query
-      const profileRes = await fetch('/api/profile')
-      const profileData = await profileRes.json()
-      if (profileData.profile) {
-        setProfile({ ...profileData.profile, email: user.email })
-        setFormName(profileData.profile.full_name)
-        setFormPhone(profileData.profile.phone || '')
-        setFormLang(profileData.profile.preferred_lang || 'fr')
-      }
-      
-
-      // Bookings query
-      const bookingsRes = await fetch('/api/tourist/bookings')
-      const bookingsData = await bookingsRes.json()
-      if (bookingsData.bookings) {
-        setBookings(bookingsData.bookings)
+      const profileResult = await apiFetch<{ profile?: UserProfile }>('/api/profile')
+      if (profileResult.ok && profileResult.data?.profile) {
+        setProfile({ ...profileResult.data.profile, email: user.email })
+        setFormName(profileResult.data.profile.full_name)
+        setFormPhone(profileResult.data.profile.phone || '')
+        setFormLang(profileResult.data.profile.preferred_lang || 'fr')
+      } else if (profileResult.error) {
+        setProfileError(profileResult.error)
       }
 
-      // Favorites from localStorage
+      const bookingsResult = await apiFetch<{ bookings?: BookingRow[] }>('/api/tourist/bookings')
+      if (bookingsResult.ok && bookingsResult.data?.bookings) {
+        setBookings(bookingsResult.data.bookings)
+      }
+
       const favIdsRaw = localStorage.getItem('heritogo_favorites')
-      const favIds = favIdsRaw ? JSON.parse(favIdsRaw) : []
+      const favIds = favIdsRaw ? JSON.parse(favIdsRaw) as string[] : []
       if (favIds.length > 0) {
-        // Fetch guide info for favorites
-        const guidesRes = await fetch('/api/guides')
-        const guidesData = await guidesRes.json()
-        if (guidesData.guides) {
-          const filteredFavs = guidesData.guides.filter((g: any) => favIds.includes(g.id))
+        const guidesResult = await apiFetch<{ guides?: any[] }>('/api/guides')
+        if (guidesResult.ok && guidesResult.data?.guides) {
+          const filteredFavs = guidesResult.data.guides.filter((g: any) => favIds.includes(g.id))
           setFavorites(filteredFavs)
         }
       } else {
         setFavorites([])
       }
 
-      // Scans from localStorage
       const scansRaw = localStorage.getItem('heritogo_scans')
       const scans = scansRaw ? JSON.parse(scansRaw) : []
       setScanHistory(scans)
-
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e)
+      setProfileError(getUserFriendlyError(e))
     } finally {
       setLoading(false)
     }
@@ -163,7 +157,7 @@ export default function TouristDashboardPage() {
     }
 
     try {
-      const response = await fetch('/api/profile', {
+      const result = await apiFetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -172,9 +166,8 @@ export default function TouristDashboardPage() {
           preferred_lang: formLang
         })
       })
-      const data = await response.json()
-      if (!response.ok) {
-        setProfileError(data.error || t('common.error_update'))
+      if (!result.ok) {
+        setProfileError(result.error || t('common.error_update'))
         return
       }
 

@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 import { useGeolocation } from '@/hooks/useGeolocation'
 
 
@@ -103,18 +104,21 @@ export default function ScanPage() {
   const [error, submitScanAction, loading] = useActionState<string | null, FormData>(
     async (_previousState, formData) => {
       try {
-        const response = await fetch('/api/scan', { method: 'POST', body: formData })
-        const data = await response.json()
+        const result = await apiFetch<PredictionResult & { error?: string; detail?: string }>('/api/scan', {
+          method: 'POST',
+          body: formData,
+          timeoutMs: 70000,
+        })
 
-        if (!response.ok) return data.error || t('errors.general')
-        if (data.prediction_status === 'unknown') {
+        if (!result.ok || !result.data) return result.error || t('errors.general')
+        if (result.data.prediction_status === 'unknown') {
           setResult(null)
           setTranslatedText({})
-          return data.detail || t('errors.unknown')
+          return result.data.detail || t('errors.unknown')
         }
 
-        setResult(data)
-        setTranslatedText({ fr: data.data.histoire })
+        setResult(result.data)
+        setTranslatedText({ fr: result.data.data.histoire })
         return null
       } catch (scanError: unknown) {
         console.error(scanError)
@@ -157,9 +161,12 @@ export default function ScanPage() {
     if (translatedText[targetLang]) return translatedText[targetLang]
     setIsTranslating(true)
     try {
-      const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`)
-      const data: [GoogleTranslateItem[]] = await response.json()
-      const translated = data[0].map((item) => item[0]).join('')
+      const result = await apiFetch<[GoogleTranslateItem[]]>(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`, {
+        timeoutMs: 20000,
+      })
+      const translated = result.ok && result.data
+        ? result.data[0].map((item) => item[0]).join('')
+        : text
       setTranslatedText((current) => ({ ...current, [targetLang]: translated }))
       return translated
     } catch (translateError) {

@@ -17,6 +17,7 @@ import {
 import ReportModal from '@/components/ReportModal'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface GuideDetail {
   id: string
@@ -73,13 +74,12 @@ export default function GuideDetailPage() {
     const fetchGuideDetails = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/guides/${guideId}`)
-        const data = await response.json()
-        if (!response.ok) {
-          setError(data.error || 'Erreur lors de la récupération du guide')
+        const result = await apiFetch<{ guide?: GuideDetail }>(`/api/guides/${guideId}`)
+        if (!result.ok || !result.data?.guide) {
+          setError(result.error || 'Erreur lors de la récupération du guide')
           return
         }
-        setGuide(data.guide)
+        setGuide(result.data.guide)
       } catch (err: unknown) {
         console.error(err)
         setError(getUserFriendlyError(err))

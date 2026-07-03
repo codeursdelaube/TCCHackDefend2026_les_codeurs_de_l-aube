@@ -7,6 +7,7 @@ import { Bot, Send, Sparkles, X, AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface Message {
   id: string
@@ -73,12 +74,18 @@ export default function ChatBot() {
     ]
 
     try {
-      const response = await fetch(CHAT_API, {
+      const result = await apiFetch<{
+        response?: string
+        reply?: string
+        message?: string
+        answer?: string
+      }>(CHAT_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
+        timeoutMs: 45000,
         // CORRECTION : Structure du JSON nettoyée pour coller au BaseModel de FastAPI
         body: JSON.stringify({
           message: content,
@@ -87,19 +94,11 @@ export default function ChatBot() {
         }),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(
-          errorData?.detail || errorData?.error || `Erreur ${response.status}`
-        )
+      if (!result.ok || !result.data) {
+        throw new Error(result.error || t('fallback_response'))
       }
 
-      const data = (await response.json()) as {
-        response?: string
-        reply?: string
-        message?: string
-        answer?: string
-      }
+      const data = result.data
 
       const aiText =
         data.response ??

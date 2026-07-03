@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AlertTriangle, X, Loader2 } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface ReportModalProps {
   reportedId: string // Le guide_profile.id
@@ -37,7 +38,7 @@ export default function ReportModal({ reportedId, bookingId, isOpen, onClose, on
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/reports', {
+      const result = await apiFetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -48,9 +49,8 @@ export default function ReportModal({ reportedId, bookingId, isOpen, onClose, on
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || 'Erreur lors de la soumission')
+      if (!result.ok) {
+        setError(result.error || 'Erreur lors de la soumission')
         return
       }
 

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { apiFetch } from '@/lib/utils/http'
 
 interface BookingRow {
   id: string
@@ -126,18 +127,17 @@ export default function GuideDashboard() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/guide/bookings')
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || t('guide.error_load_data'))
+      const result = await apiFetch<{ bookings?: BookingRow[]; guideProfile?: GuideProfileData }>('/api/guide/bookings')
+      if (!result.ok || !result.data) {
+        setError(result.error || t('guide.error_load_data'))
         return
       }
-      setBookings(data.bookings)
-      setGuide(data.guideProfile)
+      setBookings(result.data.bookings || [])
+      setGuide(result.data.guideProfile || null)
 
       // Initialize form fields
-      if (data.guideProfile) {
-        const gp = data.guideProfile
+      if (result.data.guideProfile) {
+        const gp = result.data.guideProfile
         setBio(gp.profile.bio || '')
         setPhone(gp.profile.phone || '')
         setExperienceYears(gp.experience_years || 0)
@@ -195,7 +195,7 @@ export default function GuideDashboard() {
 
     setActionLoading(true)
     try {
-      const response = await fetch('/api/guide/profile', {
+      const result = await apiFetch<{ guide?: GuideProfileData }>('/api/guide/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -212,12 +212,11 @@ export default function GuideDashboard() {
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || t('common.error_update'))
+      if (!result.ok || !result.data) {
+        setError(result.error || t('common.error_update'))
         return
       }
-      setGuide(data.guide)
+      if (result.data.guide) setGuide(result.data.guide)
       alert(t('common.success_update'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
@@ -229,7 +228,23 @@ export default function GuideDashboard() {
   // Handle avatar upload
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setAvatarError('Format invalide. JPG, PNG ou WEBP uniquement.')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError('Image trop lourde. Maximum 5MB.')
+      return
+    }
+
+    if (file.size === 0) {
+      setAvatarError('Le fichier est vide.')
+      return
+    }
 
     setAvatarError(null)
     setAvatarUploading(true)
@@ -238,18 +253,27 @@ export default function GuideDashboard() {
     formData.append('avatar', file)
 
     try {
-      const res = await fetch('/api/upload/avatar', {
+      const result = await apiFetch<{ avatar_url?: string }>('/api/upload/avatar', {
         method: 'POST',
         body: formData,
+        timeoutMs: 45000,
       })
-      const data = await res.json()
-      if (!res.ok) {
-        setAvatarError(data.error || 'Erreur upload')
+      const data = result.data
+      if (!result.ok) {
+        setAvatarError(result.error || "Erreur lors de l'envoi de la photo. Réessayez.")
+        return
+      }
+      if (!data?.avatar_url) {
+        setAvatarError('Photo envoyée, mais la réponse du serveur est incomplète.')
         return
       }
       setAvatarUrl(data.avatar_url)
-    } catch {
-      setAvatarError("Erreur de connexion lors de l'upload")
+      setGuide((current) => current
+        ? { ...current, profile: { ...current.profile, avatar_url: data.avatar_url } }
+        : current
+      )
+    } catch (err: unknown) {
+      setAvatarError(getUserFriendlyError(err))
     } finally {
       setAvatarUploading(false)
     }
@@ -275,7 +299,7 @@ export default function GuideDashboard() {
       reader.readAsDataURL(selectedFile)
       const base64Data = await base64Promise
 
-      const response = await fetch('/api/guide/profile', {
+      const result = await apiFetch<{ guide?: GuideProfileData }>('/api/guide/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -289,12 +313,11 @@ export default function GuideDashboard() {
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || t('guide.error_doc_submit'))
+      if (!result.ok || !result.data) {
+        setError(result.error || t('guide.error_doc_submit'))
         return
       }
-      setGuide(data.guide)
+      if (result.data.guide) setGuide(result.data.guide)
       setDocLabel('')
       setSelectedFile(null)
       alert(t('guide.success_doc_submit'))
@@ -318,7 +341,7 @@ export default function GuideDashboard() {
 
     setActionLoading(true)
     try {
-      const response = await fetch('/api/guide/bookings', {
+      const result = await apiFetch('/api/guide/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -329,9 +352,8 @@ export default function GuideDashboard() {
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        setError(data.error || t('guide.error_quote_send'))
+      if (!result.ok) {
+        setError(result.error || t('guide.error_quote_send'))
         return
       }
 
@@ -351,7 +373,7 @@ export default function GuideDashboard() {
     if (!confirm(t('guide.confirm_action'))) return
     setActionLoading(true)
     try {
-      const response = await fetch('/api/guide/bookings', {
+      const result = await apiFetch('/api/guide/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -361,9 +383,8 @@ export default function GuideDashboard() {
         })
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        alert(data.error || t('guide.error_status_change'))
+      if (!result.ok) {
+        alert(result.error || t('guide.error_status_change'))
         return
       }
       await loadData()

@@ -24,6 +24,7 @@ export async function GET() {
         profile: {
           select: {
             full_name: true,
+            avatar_url: true,
             bio: true,
             phone: true,
             preferred_lang: true,
