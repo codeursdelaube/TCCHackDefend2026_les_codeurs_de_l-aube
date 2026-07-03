@@ -3,11 +3,15 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { BookingStatus } from '@prisma/client'
 
+async function getAuthenticatedUser() {
+  const supabase = await createClient()
+  return supabase.auth.getUser()
+}
+
 // GET: Fetch bookings for the logged-in guide
 export async function GET() {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getAuthenticatedUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
@@ -65,8 +69,7 @@ export async function GET() {
 // POST: Actions on bookings
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getAuthenticatedUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
@@ -138,7 +141,7 @@ export async function POST(request: Request) {
         status: updatedStatus,
         cancelled_at: new Date(),
         cancelled_by: user.id,
-        cancellation_reason: cancellationReason || 'Annulé par le guide',
+        cancellation_reason: cancellationReason || 'Annule par le guide',
       }
       notifTitle = 'Réservation annulée'
       notifBody = `Le guide a annulé votre demande : "${cancellationReason || 'Aucun motif fourni'}"`

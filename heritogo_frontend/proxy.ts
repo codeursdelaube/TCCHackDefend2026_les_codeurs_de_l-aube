@@ -58,8 +58,23 @@ export default async function proxy(request: NextRequest) {
     )
   }
 
-  // Déjà connecté sur page auth → dashboard
-  if (user && pathWithoutLocale.startsWith('/auth/')) {
+
+  const publicAuthPaths = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/forgot-password',
+    '/auth/callback',
+    '/auth/confirm',
+    '/auth/reset-password',
+  ]
+
+  const isPublicAuthPath = publicAuthPaths.some(p =>
+    pathWithoutLocale === p || pathWithoutLocale.startsWith(`${p}/`)
+  )
+
+  // Déjà connecté sur page auth classique → dashboard.
+  // Les callbacks/confirm/reset restent publics pour éviter les boucles auth.
+  if (user && pathWithoutLocale.startsWith('/auth/') && !isPublicAuthPath) {
     return NextResponse.redirect(
       new URL(`/${currentLocale}/dashboard`, request.url)
     )

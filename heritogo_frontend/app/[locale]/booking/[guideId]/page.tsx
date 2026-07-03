@@ -3,10 +3,11 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
+import { useTranslations } from 'next-intl'
 import { 
   ArrowLeft, Calendar, Clock, MapPin, Users, MessageSquare, 
   Sparkles, Loader2, AlertCircle, CheckCircle, ShieldCheck, Star 
@@ -31,7 +32,7 @@ interface GuideInfo {
 }
 
 export default function BookingPage() {
-  const router = useRouter()
+  const t = useTranslations('Booking')
   const params = useParams<{ locale: string; guideId: string }>()
   const guideId = params?.guideId
 
@@ -61,12 +62,12 @@ export default function BookingPage() {
         const response = await fetch(`/api/guides/${guideId}`)
         const data = await response.json()
         if (!response.ok) {
-          setGuideError(data.error || 'Erreur de récupération des infos du guide')
+          setGuideError(data.error || t('error_fetching_guide'))
           return
         }
         setGuide(data.guide)
       } catch {
-        setGuideError('Impossible de charger les données du guide')
+        setGuideError(t('error_loading_guide'))
       } finally {
         setLoadingGuide(false)
       }
@@ -80,7 +81,7 @@ export default function BookingPage() {
     if (!guideId) return
 
     if (!startDate) {
-      setSubmitError('Veuillez sélectionner une date de début.')
+      setSubmitError(t('error_start_date'))
       return
     }
 
@@ -105,13 +106,13 @@ export default function BookingPage() {
 
       const data = await response.json()
       if (!response.ok) {
-        setSubmitError(data.error || 'Une erreur est survenue lors de la réservation.')
+        setSubmitError(data.error || t('error_generic'))
         return
       }
 
       setSuccess(true)
       setTimeout(() => {
-        router.push('/dashboard/tourist?booking_success=true')
+        window.location.href = `/${params.locale}/dashboard/tourist?booking_created=true`
       }, 2000)
     } catch (err: unknown) {
       console.error(err)
@@ -126,7 +127,7 @@ export default function BookingPage() {
       <div className="flex min-h-screen items-center justify-center bg-base-100">
         <div className="text-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" style={{ color: COLORS.forest }} />
-          <p className="text-sm font-semibold text-base-content/60">Chargement du formulaire...</p>
+          <p className="text-sm font-semibold text-base-content/60">{t('loading')}</p>
         </div>
       </div>
     )
@@ -136,14 +137,14 @@ export default function BookingPage() {
     return (
       <div className="mx-auto max-w-xl px-4 py-32 text-center bg-base-100">
         <AlertCircle className="mx-auto h-12 w-12 text-error mb-4" />
-        <h2 className="font-serif text-2xl font-bold mb-2">Guide introuvable</h2>
-        <p className="text-sm text-base-content/60 mb-6">{guideError || 'Ce guide n\'est pas disponible pour la réservation.'}</p>
+        <h2 className="font-serif text-2xl font-bold mb-2">{t('guide_not_found')}</h2>
+        <p className="text-sm text-base-content/60 mb-6">{guideError || t('guide_not_available')}</p>
         <Link 
           href="/guides"
           className="btn rounded-2xl text-white border-none font-bold"
           style={{ backgroundColor: COLORS.forest }}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Retour à l'annuaire
+          <ArrowLeft className="h-4 w-4 mr-2" /> {t('back_to_directory')}
         </Link>
       </div>
     )
@@ -158,7 +159,7 @@ export default function BookingPage() {
           className="inline-flex items-center gap-2 text-xs font-bold text-base-content/60 hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Retour au profil du guide
+          {t('back_to_profile')}
         </Link>
       </div>
 
@@ -168,10 +169,10 @@ export default function BookingPage() {
         <div className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
           <div className="mb-6 border-b border-border pb-4">
             <h1 className="font-serif text-2xl font-bold sm:text-3xl text-base-content">
-              Demande de réservation
+              {t('booking_request')}
             </h1>
             <p className="text-xs text-base-content/60 mt-1">
-              Remplissez ce formulaire pour envoyer une demande de devis à {guide.profile.full_name}.
+              {t('form_subtitle', { name: guide.profile.full_name })}
             </p>
           </div>
 
@@ -180,9 +181,9 @@ export default function BookingPage() {
               <div className="rounded-full bg-success/15 p-4 text-success animate-bounce">
                 <CheckCircle className="h-12 w-12" />
               </div>
-              <h3 className="font-serif text-2xl font-bold">Demande envoyée !</h3>
+              <h3 className="font-serif text-2xl font-bold">{t('request_sent')}</h3>
               <p className="text-sm text-base-content/65 max-w-sm">
-                Votre demande de réservation a été transmise avec succès. Redirection vers votre tableau de bord...
+                {t('success_message')}
               </p>
             </div>
           ) : (
@@ -190,26 +191,26 @@ export default function BookingPage() {
               
               {/* Type de mission */}
               <div>
-                <label className="block text-xs font-black uppercase tracking-wider text-base-content/60 mb-2">Type de visite / mission</label>
+                <label className="block text-xs font-black uppercase tracking-wider text-base-content/60 mb-2">{t('mission_type_label')}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
-                    { value: 'full_day', label: 'Journée', desc: 'Complète' },
-                    { value: 'half_day', label: 'Demi-Journée', desc: 'Matin/Aprem' },
-                    { value: 'hourly', label: 'Horaire', desc: 'Par heure' },
-                    { value: 'virtual', label: 'Virtuelle', desc: 'En visioconférence' }
-                  ].map((t) => (
+                    { value: 'full_day', label: t('types.full_day.label'), desc: t('types.full_day.desc') },
+                    { value: 'half_day', label: t('types.half_day.label'), desc: t('types.half_day.desc') },
+                    { value: 'hourly', label: t('types.hourly.label'), desc: t('types.hourly.desc') },
+                    { value: 'virtual', label: t('types.virtual.label'), desc: t('types.virtual.desc') }
+                  ].map((item) => (
                     <button
-                      key={t.value}
+                      key={item.value}
                       type="button"
-                      onClick={() => setMissionType(t.value)}
+                      onClick={() => setMissionType(item.value)}
                       className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all ${
-                        missionType === t.value 
+                        missionType === item.value 
                           ? 'border-primary bg-primary/5 shadow-xs scale-98' 
                           : 'border-border bg-base-100 hover:border-base-content/25'
                       }`}
                     >
-                      <span className="text-xs font-bold text-base-content">{t.label}</span>
-                      <span className="text-[10px] text-base-content/50 mt-0.5">{t.desc}</span>
+                      <span className="text-xs font-bold text-base-content">{item.label}</span>
+                      <span className="text-[10px] text-base-content/50 mt-0.5">{item.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -219,7 +220,7 @@ export default function BookingPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="form-control w-full">
                   <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" /> Date prévue
+                    <Calendar className="h-3.5 w-3.5" /> {t('date_label')}
                   </span>
                   <input
                     type="date"
@@ -232,7 +233,7 @@ export default function BookingPage() {
 
                 <label className="form-control w-full">
                   <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" /> Heure de début
+                    <Clock className="h-3.5 w-3.5" /> {t('start_time_label')}
                   </span>
                   <input
                     type="time"
@@ -248,20 +249,20 @@ export default function BookingPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="form-control w-full">
                   <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5" /> Point de rendez-vous
+                    <MapPin className="h-3.5 w-3.5" /> {t('meeting_point_label')}
                   </span>
                   <input
                     type="text"
                     value={meetingPoint}
                     onChange={(e) => setMeetingPoint(e.target.value)}
-                    placeholder="Ex: Hall de l'Hôtel du 2 Février, Lomé"
+                    placeholder={t('meeting_point_placeholder')}
                     className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                   />
                 </label>
 
                 <label className="form-control w-full">
                   <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" /> Nombre de personnes (1 - 50)
+                    <Users className="h-3.5 w-3.5" /> {t('group_size_label')}
                   </span>
                   <input
                     type="number"
@@ -288,12 +289,12 @@ export default function BookingPage() {
               {/* Message */}
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                  <MessageSquare className="h-3.5 w-3.5" /> Détails de votre itinéraire / Message
+                  <MessageSquare className="h-3.5 w-3.5" /> {t('message_label')}
                 </span>
                 <textarea
                   value={touristMessage}
                   onChange={(e) => setTouristMessage(e.target.value)}
-                  placeholder="Décrivez brièvement ce que vous souhaitez visiter, vos centres d'intérêt (histoire, gastronomie, nature)..."
+                  placeholder={t('message_placeholder')}
                   className="textarea textarea-bordered h-24 rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
                 />
               </label>
@@ -301,13 +302,13 @@ export default function BookingPage() {
               {/* Besoins spécifiques */}
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5" /> Besoins ou contraintes spécifiques (Optionnel)
+                  <Sparkles className="h-3.5 w-3.5" /> {t('special_needs_label')}
                 </span>
                 <input
                   type="text"
                   value={specialNeeds}
                   onChange={(e) => setSpecialNeeds(e.target.value)}
-                  placeholder="Ex: Mobilité réduite, allergies alimentaires, enfants en bas âge..."
+                  placeholder={t('special_needs_placeholder')}
                   className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
                 />
               </label>
@@ -328,7 +329,7 @@ export default function BookingPage() {
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  'Envoyer la demande de réservation'
+                  t('send_request')
                 )}
               </button>
             </form>
@@ -339,7 +340,7 @@ export default function BookingPage() {
         <div className="space-y-6">
           {/* Guide Card Mini */}
           <div className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm space-y-4">
-            <h3 className="font-serif text-sm font-black uppercase tracking-wider text-base-content/50">Votre Guide</h3>
+            <h3 className="font-serif text-sm font-black uppercase tracking-wider text-base-content/50">{t('sidebar_guide')}</h3>
             <div className="flex items-center gap-3">
               <div 
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xs font-black text-white"
@@ -355,7 +356,7 @@ export default function BookingPage() {
                 <h4 className="font-bold text-base-content text-sm">{guide.profile.full_name}</h4>
                 <div className="flex items-center gap-1 text-[10px] font-semibold text-base-content/60">
                   <ShieldCheck className="h-3 w-3 text-success shrink-0" />
-                  <span>Certifié</span>
+                  <span>{t('certified')}</span>
                   <span className="text-base-content/30">•</span>
                   <Star className="h-3 w-3 fill-current text-amber-500 shrink-0" />
                   <span className="font-bold text-base-content">{Number(guide.avg_rating).toFixed(1)}</span>
@@ -366,30 +367,30 @@ export default function BookingPage() {
 
           {/* Pricing Info */}
           <div className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm space-y-4">
-            <h3 className="font-serif text-sm font-black uppercase tracking-wider text-base-content/50">Tarifs indicatifs</h3>
+            <h3 className="font-serif text-sm font-black uppercase tracking-wider text-base-content/50">{t('pricing_title')}</h3>
             
             <div className="space-y-2 text-xs">
               <div className="flex justify-between font-semibold">
-                <span className="text-base-content/65">Journée complète :</span>
+                <span className="text-base-content/65">{t('full_day')}</span>
                 <span>{guide.full_day_rate ? `${Number(guide.full_day_rate).toLocaleString()} XOF` : 'N/A'}</span>
               </div>
               <div className="flex justify-between font-semibold">
-                <span className="text-base-content/65">Demi-journée :</span>
+                <span className="text-base-content/65">{t('half_day')}</span>
                 <span>{guide.half_day_rate ? `${Number(guide.half_day_rate).toLocaleString()} XOF` : 'N/A'}</span>
               </div>
               <div className="flex justify-between font-semibold">
-                <span className="text-base-content/65">Horaire :</span>
+                <span className="text-base-content/65">{t('hourly')}</span>
                 <span>{guide.hourly_rate ? `${Number(guide.hourly_rate).toLocaleString()} XOF` : 'N/A'}</span>
               </div>
               <div className="flex justify-between font-semibold">
-                <span className="text-base-content/65">Visite virtuelle :</span>
+                <span className="text-base-content/65">{t('virtual')}</span>
                 <span>{guide.virtual_rate ? `${Number(guide.virtual_rate).toLocaleString()} XOF` : 'N/A'}</span>
               </div>
             </div>
             
             <div className="border-t border-border/55 pt-3">
               <p className="text-[10px] text-base-content/50 leading-4">
-                ⚠️ Après validation de ce formulaire, le guide analysera votre demande et vous enverra un devis personnalisé. Vous serez invité à payer uniquement après votre acceptation du devis.
+                {t('warning_text')}
               </p>
             </div>
           </div>

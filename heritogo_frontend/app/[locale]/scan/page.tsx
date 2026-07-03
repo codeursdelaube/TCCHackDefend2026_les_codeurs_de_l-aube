@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
+import { useGeolocation } from '@/hooks/useGeolocation'
 
 
 interface PredictionResult {
@@ -37,7 +38,7 @@ export default function ScanPage() {
   const [selectedLang, setSelectedLang] = useState<LanguageCode>(() => languageCodes.includes(locale as LanguageCode) ? (locale as LanguageCode) : 'fr')
   const [translatedText, setTranslatedText] = useState<Partial<Record<LanguageCode, string>>>({})
   const [isTranslating, setIsTranslating] = useState(false)
-  const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Paywall & Limit States
@@ -63,13 +64,15 @@ export default function ScanPage() {
   })
   const [showPaywall, setShowPaywall] = useState(false)
 
+  const { position: geoPosition } = useGeolocation()
+
   useEffect(() => {
-    if (!navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition(
-      (position) => setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude }),
-      () => setUserLocation(null),
-    )
-  }, [])
+    if (geoPosition) {
+      setUserLocation(geoPosition)
+    } else {
+      setUserLocation(null)
+    }
+  }, [geoPosition])
 
   useEffect(() => {
     return () => window.speechSynthesis.cancel()
@@ -91,7 +94,7 @@ export default function ScanPage() {
         monument: result.data.monument,
         histoire: result.data.histoire,
         date: new Date().toISOString(),
-        localite: userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.long.toFixed(4)}` : 'Lomé, Togo'
+        localite: userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : t('default_location')
       }
       localStorage.setItem('heritogo_scans', JSON.stringify([newScan, ...history]))
     }
@@ -145,7 +148,7 @@ export default function ScanPage() {
     formData.append('image', image)
     if (userLocation) {
       formData.append('lat', userLocation.lat.toString())
-      formData.append('long', userLocation.long.toString())
+      formData.append('long', userLocation.lng.toString())
     }
     startTransition(() => submitScanAction(formData))
   }
@@ -223,19 +226,29 @@ export default function ScanPage() {
         {/* Left Control Card */}
         <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
           <div className="flex justify-between items-center mb-5">
-            <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
-              <Sparkles className="h-4 w-4" />
-              {userLocation ? t('gps_available') : t('select_capture')}
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
+                <Sparkles className="h-4 w-4" />
+                {userLocation ? t('gps_available') : t('select_capture')}
+              </div>
+              {userLocation && (
+                <div 
+                  className="p-1.5 rounded-full bg-base-100 border border-border flex items-center justify-center animate-pulse" 
+                  title={t('gps_active')}
+                >
+                  <MapPin className="h-3.5 w-3.5" style={{ color: COLORS.forest }} />
+                </div>
+              )}
             </div>
 
             {/* Quota Indicator */}
             {isPremium ? (
               <span className="badge bg-amber-500 text-white font-extrabold gap-1 border-none py-3 px-3 rounded-xl text-[10px] uppercase shadow-sm">
-                ✨ Premium Actif
+                {t('premium_active')}
               </span>
             ) : (
               <span className="badge bg-base-100 border-border text-base-content/75 font-bold py-3 px-3 rounded-xl text-[10px] uppercase">
-                Quota : {scanCount}/3 scans
+                {t('quota', { count: scanCount })}
               </span>
             )}
           </div>
@@ -364,10 +377,9 @@ export default function ScanPage() {
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-serif text-2xl font-bold tracking-tight">Limite gratuite atteinte</h3>
+              <h3 className="font-serif text-2xl font-bold tracking-tight">{t('limit_title')}</h3>
               <p className="text-xs text-base-content/70 leading-relaxed font-semibold">
-                Vous avez utilisé vos 3 scans gratuits de monuments togolais pour ce mois-ci. 
-                Passez au Premium pour scanner en illimité et soutenir le tourisme local !
+                {t('limit_desc')}
               </p>
             </div>
 
@@ -375,15 +387,15 @@ export default function ScanPage() {
             <div className="rounded-2xl bg-base-100 p-4 border border-border/70 text-left text-xs font-bold space-y-2">
               <p className="flex items-center gap-2 text-base-content/85">
                 <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                Scans de monuments en illimité
+                {t('premium_scan')}
               </p>
               <p className="flex items-center gap-2 text-base-content/85">
                 <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                Audio guide TTS haute qualité multi-langues
+                {t('premium_tts')}
               </p>
               <p className="flex items-center gap-2 text-base-content/85">
                 <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                Historique de visites persistant
+                {t('premium_history')}
               </p>
             </div>
 
@@ -393,13 +405,13 @@ export default function ScanPage() {
                 className="btn btn-block text-white rounded-2xl border-none font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                 style={{ backgroundColor: COLORS.forest }}
               >
-                <CreditCard className="h-4 w-4" /> Passer au Premium (Simulé)
+                <CreditCard className="h-4 w-4" /> {t('premium_cta')}
               </button>
               <button
                 onClick={() => setShowPaywall(false)}
                 className="btn btn-block btn-ghost rounded-2xl text-xs font-bold"
               >
-                Continuer en version gratuite
+                {t('free_continue')}
               </button>
             </div>
           </div>

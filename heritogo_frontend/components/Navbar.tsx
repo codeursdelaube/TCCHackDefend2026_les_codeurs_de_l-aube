@@ -129,7 +129,7 @@ export default function Navbar() {
   ]
 
   const bottomLinks: NavLinkItem[] = [
-    { href: '/', label: t('accueil'), icon: Home },
+    { href: '/accueil', label: t('accueil'), icon: Home },
     { href: '/lieux', label: t('lieux'), icon: Map },
     { href: '/histoire', label: t('histoire'), icon: BookOpenText },
     { href: '/scan', label: t('scan'), icon: ScanLine },

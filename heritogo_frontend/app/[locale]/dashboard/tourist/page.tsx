@@ -8,13 +8,14 @@ import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { getFirstName, getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
+import { useTranslations } from 'next-intl'
 import { 
-  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare 
+  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2 
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
+import ShareItinerary from '@/components/ShareItinerary'
 import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
-
 
 interface BookingRow {
   id: string
@@ -49,6 +50,7 @@ export default function TouristDashboardPage() {
   const params = useParams<{ locale: string }>()
   const searchParams = useSearchParams()
   const activeTab = searchParams.get('tab') || 'profile'
+  const t = useTranslations('Dashboard')
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -131,9 +133,9 @@ export default function TouristDashboardPage() {
     // Check search params for alerts
     const bookingCreated = searchParams.get('booking_created')
     if (bookingCreated) {
-      setAlertMessage("Votre demande de réservation a bien été envoyée au guide ! Il vous contactera prochainement avec un devis.")
+      setAlertMessage(t('common.success_booking_sent'))
     }
-  }, [searchParams])
+  }, [searchParams, t])
 
   useEffect(() => {
     fetchData()
@@ -172,7 +174,7 @@ export default function TouristDashboardPage() {
       })
       const data = await response.json()
       if (!response.ok) {
-        setProfileError(data.error || 'Erreur lors de la mise à jour')
+        setProfileError(data.error || t('common.error_update'))
         return
       }
 
@@ -201,17 +203,17 @@ export default function TouristDashboardPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'quote_requested':
-        return <span className="badge badge-warning text-xs font-bold gap-1 rounded-lg py-3 px-3"><Clock className="h-3.5 w-3.5" /> Devis demandé</span>
+        return <span className="badge badge-warning text-xs font-bold gap-1 rounded-lg py-3 px-3"><Clock className="h-3.5 w-3.5" /> {t('tourist.status_quote_requested')}</span>
       case 'quote_sent':
-        return <span className="badge badge-info text-xs font-bold gap-1 rounded-lg py-3 px-3"><MessageSquare className="h-3.5 w-3.5" /> Devis reçu</span>
+        return <span className="badge badge-info text-xs font-bold gap-1 rounded-lg py-3 px-3"><MessageSquare className="h-3.5 w-3.5" /> {t('tourist.status_quote_sent')}</span>
       case 'confirmed':
-        return <span className="badge badge-success text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><CheckCircle className="h-3.5 w-3.5" /> Confirmé</span>
+        return <span className="badge badge-success text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><CheckCircle className="h-3.5 w-3.5" /> {t('tourist.status_confirmed')}</span>
       case 'in_progress':
-        return <span className="badge badge-primary text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><Clock className="h-3.5 w-3.5" /> En cours</span>
+        return <span className="badge badge-primary text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><Clock className="h-3.5 w-3.5" /> {t('tourist.status_in_progress')}</span>
       case 'completed':
-        return <span className="badge bg-neutral text-neutral-content text-xs font-bold gap-1 rounded-lg py-3 px-3 border-none"><CheckCircle className="h-3.5 w-3.5" /> Terminé</span>
+        return <span className="badge bg-neutral text-neutral-content text-xs font-bold gap-1 rounded-lg py-3 px-3 border-none"><CheckCircle className="h-3.5 w-3.5" /> {t('tourist.status_completed')}</span>
       case 'cancelled':
-        return <span className="badge badge-error text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><AlertCircle className="h-3.5 w-3.5" /> Annulé</span>
+        return <span className="badge badge-error text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><AlertCircle className="h-3.5 w-3.5" /> {t('tourist.status_cancelled')}</span>
       default:
         return <span className="badge badge-ghost text-xs font-bold gap-1 rounded-lg py-3 px-3">{status}</span>
     }
@@ -221,7 +223,7 @@ export default function TouristDashboardPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 pt-24 bg-base-100">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-base-content/60">Chargement de votre espace...</p>
+        <p className="text-sm text-base-content/60">{t('common.loading_space')}</p>
       </div>
     )
   }
@@ -246,9 +248,9 @@ export default function TouristDashboardPage() {
           </div>
           <div>
             <h1 className="font-serif text-2xl font-bold">
-              Bonjour, {profile ? getFirstName(profile.full_name) : 'Ami'} 👋
+              {t('tourist.greeting', { name: profile ? getFirstName(profile.full_name) : t('common.guest_name') })}
             </h1>
-            <p className="text-xs text-base-content/50 mt-1">Espace Voyageur Heritogo</p>
+            <p className="text-xs text-base-content/50 mt-1">{t('tourist.subtitle')}</p>
           </div>
         </div>
 
@@ -258,13 +260,13 @@ export default function TouristDashboardPage() {
             className="btn btn-sm rounded-xl text-white font-bold border-none"
             style={{ backgroundColor: COLORS.rust }}
           >
-            Nouveau scan
+            {t('tourist.new_scan')}
           </Link>
           <Link
             href="/guides"
             className="btn btn-sm btn-outline rounded-xl font-bold"
           >
-            Trouver un guide
+            {t('tourist.find_guide')}
           </Link>
         </div>
       </div>
@@ -279,10 +281,10 @@ export default function TouristDashboardPage() {
       {/* Tabs Navigation */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-border pb-3">
         {[
-          { id: 'profile', label: 'Mon profil', icon: User },
-          { id: 'bookings', label: 'Mes réservations', icon: Calendar },
-          { id: 'favorites', label: 'Mes favoris', icon: Heart },
-          { id: 'scans', label: 'Historique scans', icon: History }
+          { id: 'profile', label: t('tourist.tab_profile'), icon: User },
+          { id: 'bookings', label: t('tourist.tab_bookings'), icon: Calendar },
+          { id: 'favorites', label: t('tourist.tab_favorites'), icon: Heart },
+          { id: 'scans', label: t('tourist.tab_scans'), icon: History }
         ].map((tab) => {
           const Icon = tab.icon
           const active = activeTab === tab.id
@@ -310,32 +312,32 @@ export default function TouristDashboardPage() {
         {activeTab === 'profile' && (
           <div className="grid gap-6 md:grid-cols-[1fr_1.8fr]">
             <div className="rounded-[28px] border border-border bg-base-200 p-6">
-              <h3 className="font-serif text-lg font-bold mb-4">Informations</h3>
+              <h3 className="font-serif text-lg font-bold mb-4">{t('tourist.info_title')}</h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">Nom complet</span>
+                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.full_name')}</span>
                   <span className="font-bold text-base-content">{profile?.full_name}</span>
                 </div>
                 <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">Email</span>
+                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.email')}</span>
                   <span className="font-bold text-base-content">{profile?.email}</span>
                 </div>
                 <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">Téléphone</span>
-                  <span className="font-bold text-base-content">{profile?.phone || 'Non renseigné'}</span>
+                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.phone')}</span>
+                  <span className="font-bold text-base-content">{profile?.phone || t('common.not_specified')}</span>
                 </div>
                 <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">Langue préférée</span>
+                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.preferred_lang')}</span>
                   <span className="font-bold text-base-content uppercase">{profile?.preferred_lang || 'fr'}</span>
                 </div>
               </div>
             </div>
 
             <div className="rounded-[28px] border border-border bg-base-200 p-6">
-              <h3 className="font-serif text-lg font-bold mb-4">Modifier mon profil</h3>
+              <h3 className="font-serif text-lg font-bold mb-4">{t('tourist.edit_profile')}</h3>
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-sm font-semibold">Nom complet</span>
+                  <span className="label-text mb-1 text-sm font-semibold">{t('tourist.full_name')}</span>
                   <input
                     type="text"
                     required
@@ -346,7 +348,7 @@ export default function TouristDashboardPage() {
                 </label>
 
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-sm font-semibold">Téléphone</span>
+                  <span className="label-text mb-1 text-sm font-semibold">{t('tourist.phone')}</span>
                   <input
                     type="tel"
                     value={formPhone}
@@ -360,22 +362,22 @@ export default function TouristDashboardPage() {
                 </label>
 
                 <label className="form-control w-full">
-                  <span className="label-text mb-1 text-sm font-semibold">Langue préférée</span>
+                  <span className="label-text mb-1 text-sm font-semibold">{t('tourist.preferred_lang')}</span>
                   <select
                     value={formLang}
                     onChange={(e) => setFormLang(e.target.value)}
                     className="select select-bordered w-full rounded-2xl bg-base-100"
                   >
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="zh">中文 (Chinois)</option>
+                    <option value="fr">{t('tourist.lang_fr')}</option>
+                    <option value="en">{t('tourist.lang_en')}</option>
+                    <option value="es">{t('tourist.lang_es')}</option>
+                    <option value="zh">{t('tourist.lang_zh')}</option>
                   </select>
                 </label>
 
                 {profileSuccess && (
                   <div className="rounded-xl border border-success/30 bg-success/10 px-4 py-2 text-xs font-bold text-success">
-                    Profil mis à jour avec succès !
+                    {t('common.success_update')}
                   </div>
                 )}
 
@@ -391,7 +393,7 @@ export default function TouristDashboardPage() {
                   className="btn text-white rounded-2xl px-6 border-none"
                   style={{ backgroundColor: COLORS.forest }}
                 >
-                  {savingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enregistrer'}
+                  {savingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save')}
                 </button>
               </form>
             </div>
@@ -404,16 +406,16 @@ export default function TouristDashboardPage() {
             {bookings.length === 0 ? (
               <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
                 <Calendar className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-                <h4 className="font-serif text-lg font-bold">Aucune réservation</h4>
+                <h4 className="font-serif text-lg font-bold">{t('tourist.no_bookings')}</h4>
                 <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                  Découvrez nos guides togolais agréés et planifiez votre prochaine aventure culturelle !
+                  {t('tourist.no_bookings_desc')}
                 </p>
                 <Link
                   href="/guides"
                   className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
                   style={{ backgroundColor: COLORS.forest }}
                 >
-                  Explorer les guides
+                  {t('tourist.explore_guides')}
                 </Link>
               </div>
             ) : (
@@ -436,12 +438,12 @@ export default function TouristDashboardPage() {
                       </div>
                       <p className="text-xs text-base-content/60 mt-1.5 flex items-center gap-3">
                         <span>🗓️ {new Date(booking.start_date).toLocaleDateString()}</span>
-                        <span>🎒 Type : {booking.mission_type.replace('_', ' ')}</span>
+                        <span>{t('tourist.booking_type', { type: booking.mission_type.replace('_', ' ') })}</span>
                       </p>
                       
                       {booking.quote_amount && (
                         <p className="text-xs font-bold text-base-content mt-2">
-                          Offre : {Number(booking.quote_amount).toLocaleString()} FCFA
+                          {t('tourist.offer_label', { amount: Number(booking.quote_amount).toLocaleString() })}
                         </p>
                       )}
 
@@ -453,13 +455,32 @@ export default function TouristDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 self-end md:self-center shrink-0">
+                  <div className="flex gap-2 self-end md:self-center shrink-0 flex-wrap">
                     <Link
                       href={`/guides/${booking.guide.id}`}
                       className="btn btn-sm btn-ghost rounded-xl text-xs font-bold"
                     >
-                      Voir guide
+                      {t('tourist.view_guide')}
                     </Link>
+
+                    {['confirmed', 'in_progress'].includes(booking.status) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const text = `Je visite le Togo avec ${booking.guide.profile.full_name} ` +
+                            `le ${new Date(booking.start_date).toLocaleDateString('fr-FR')} — Heritogo`
+                          if (navigator.share) {
+                            navigator.share({ title: 'Mon itinéraire Heritogo', text, url: window.location.origin }).catch(() => {})
+                          } else {
+                            navigator.clipboard.writeText(text)
+                          }
+                        }}
+                        className="btn btn-sm btn-outline rounded-xl text-xs font-bold gap-1"
+                      >
+                        <Share2 className="h-3.5 w-3.5" />
+                        Partager
+                      </button>
+                    )}
 
                     {booking.status === 'completed' && !booking.review && (
                       <button
@@ -468,13 +489,13 @@ export default function TouristDashboardPage() {
                         className="btn btn-sm rounded-xl text-white font-bold border-none"
                         style={{ backgroundColor: COLORS.forest }}
                       >
-                        Laisser un avis
+                        {t('tourist.leave_review')}
                       </button>
                     )}
 
                     {booking.status === 'completed' && booking.review && (
                       <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/20 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-                        <Star className="h-3.5 w-3.5 fill-current" /> Avis laissé ({booking.review.rating_overall}/5)
+                        <Star className="h-3.5 w-3.5 fill-current" /> {t('tourist.review_left', { rating: booking.review.rating_overall })}
                       </span>
                     )}
                   </div>
@@ -486,72 +507,82 @@ export default function TouristDashboardPage() {
 
         {/* 3. FAVORITES TAB */}
         {activeTab === 'favorites' && (
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {favorites.length === 0 ? (
-              <div className="col-span-full rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
-                <Heart className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-                <h4 className="font-serif text-lg font-bold">Aucun guide favori</h4>
-                <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                  Ajoutez des guides à vos favoris depuis la liste publique pour les retrouver plus rapidement.
-                </p>
-                <Link
-                  href="/guides"
-                  className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
-                  style={{ backgroundColor: COLORS.forest }}
-                >
-                  Voir les guides
-                </Link>
-              </div>
-            ) : (
-              favorites.map((guide) => (
-                <div 
-                  key={guide.id}
-                  className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="flex h-10 w-10 items-center justify-center rounded-xl text-xs font-black text-white"
-                        style={{ backgroundColor: COLORS.forest }}
-                      >
-                        {getInitials(guide.profile.full_name)}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-base-content">{guide.profile.full_name}</h4>
-                        <div className="flex items-center gap-1 mt-0.5 text-xs">
-                          <Star className="h-3 w-3 fill-current text-amber-500" />
-                          <span className="font-bold">{Number(guide.avg_rating).toFixed(1)}</span>
-                          <span className="text-base-content/40">({guide.total_reviews})</span>
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {favorites.length === 0 ? (
+                <div className="col-span-full rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
+                  <Heart className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
+                  <h4 className="font-serif text-lg font-bold">{t('tourist.no_favorites')}</h4>
+                  <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
+                    {t('tourist.no_favorites_desc')}
+                  </p>
+                  <Link
+                    href="/guides"
+                    className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
+                    style={{ backgroundColor: COLORS.forest }}
+                  >
+                    {t('tourist.view_guides')}
+                  </Link>
+                </div>
+              ) : (
+                favorites.map((guide) => (
+                  <div 
+                    key={guide.id}
+                    className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="flex h-10 w-10 items-center justify-center rounded-xl text-xs font-black text-white"
+                          style={{ backgroundColor: COLORS.forest }}
+                        >
+                          {getInitials(guide.profile.full_name)}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-base-content">{guide.profile.full_name}</h4>
+                          <div className="flex items-center gap-1 mt-0.5 text-xs">
+                            <Star className="h-3 w-3 fill-current text-amber-500" />
+                            <span className="font-bold">{Number(guide.avg_rating).toFixed(1)}</span>
+                            <span className="text-base-content/40">({guide.total_reviews})</span>
+                          </div>
                         </div>
                       </div>
+
+                      <div className="mt-4 space-y-1.5 text-xs text-base-content/70">
+                        <p>🗣️ <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
+                        <p>📍 <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
+                        <p className="font-bold text-base-content mt-3">
+                          {t('tourist.rate_label')} {Number(guide.full_day_rate).toLocaleString()} XOF/jour
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="mt-4 space-y-1.5 text-xs text-base-content/70">
-                      <p>🗣️ <span className="font-semibold">Langues :</span> {guide.languages?.join(', ') || 'N/A'}</p>
-                      <p>📍 <span className="font-semibold">Zones :</span> {guide.coverage_zones?.join(', ') || 'N/A'}</p>
-                      <p className="font-bold text-base-content mt-3">
-                        Tarif : {Number(guide.full_day_rate).toLocaleString()} XOF/jour
-                      </p>
+                    <div className="mt-5 flex gap-2">
+                      <Link
+                        href={`/guides/${guide.id}`}
+                        className="btn btn-xs btn-outline rounded-lg flex-1"
+                      >
+                        {t('tourist.details')}
+                      </Link>
+                      <Link
+                        href={`/booking/${guide.id}`}
+                        className="btn btn-xs text-white rounded-lg flex-1 border-none"
+                        style={{ backgroundColor: COLORS.forest }}
+                      >
+                        {t('tourist.book')}
+                      </Link>
                     </div>
                   </div>
-
-                  <div className="mt-5 flex gap-2">
-                    <Link
-                      href={`/guides/${guide.id}`}
-                      className="btn btn-xs btn-outline rounded-lg flex-1"
-                    >
-                      Détails
-                    </Link>
-                    <Link
-                      href={`/booking/${guide.id}`}
-                      className="btn btn-xs text-white rounded-lg flex-1 border-none"
-                      style={{ backgroundColor: COLORS.forest }}
-                    >
-                      Réserver
-                    </Link>
-                  </div>
-                </div>
-              ))
+                ))
+              )}
+            </div>
+            {favorites.length > 0 && (
+              <ShareItinerary
+                items={favorites.map(g => ({
+                  name: g.profile.full_name,
+                  details: g.coverage_zones?.join(', ')
+                }))}
+              />
             )}
           </div>
         )}
@@ -562,16 +593,16 @@ export default function TouristDashboardPage() {
             {scanHistory.length === 0 ? (
               <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
                 <History className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-                <h4 className="font-serif text-lg font-bold">Aucun scan enregistré</h4>
+                <h4 className="font-serif text-lg font-bold">{t('tourist.no_scans')}</h4>
                 <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                  Découvrez l'histoire des richesses du Togo en photographiant les monuments.
+                  {t('tourist.no_scans_desc')}
                 </p>
                 <Link
                   href="/scan"
                   className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
                   style={{ backgroundColor: COLORS.rust }}
                 >
-                  Ouvrir le scanner
+                  {t('tourist.open_scanner')}
                 </Link>
               </div>
             ) : (
@@ -583,7 +614,7 @@ export default function TouristDashboardPage() {
                   >
                     <div className="p-5">
                       <span className="text-[10px] text-base-content/50 font-bold">
-                        {scan.date ? new Date(scan.date).toLocaleDateString() : 'Date inconnue'}
+                        {scan.date ? new Date(scan.date).toLocaleDateString() : t('tourist.date_unknown')}
                       </span>
                       <h4 className="font-serif text-lg font-bold text-base-content mt-1">{scan.monument}</h4>
                       <p className="text-xs text-base-content/70 mt-2 line-clamp-3 leading-5">
@@ -593,14 +624,14 @@ export default function TouristDashboardPage() {
 
                     <div className="border-t border-border/60 p-4 bg-base-300/30 flex justify-between items-center">
                       <span className="text-xs font-semibold text-base-content/60">
-                        📍 {scan.localite || 'Togo'}
+                        📍 {scan.localite || t('common.default_country')}
                       </span>
                       <Link 
                         href="/scan"
                         className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
                         style={{ color: COLORS.forest }}
                       >
-                        Scanner à nouveau <ChevronRight className="h-3 w-3" />
+                        {t('tourist.scan_again')} <ChevronRight className="h-3 w-3" />
                       </Link>
                     </div>
                   </div>

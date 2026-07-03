@@ -1,7 +1,7 @@
 'use client'
 
 import { type ReactNode, type CSSProperties } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 interface AuthGuardLinkProps {
@@ -26,7 +26,6 @@ export default function AuthGuardLink({
 }: AuthGuardLinkProps) {
   const params = useParams<{ locale: string }>()
   const locale = params?.locale || 'fr'
-  const router = useRouter()
 
   const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!requireAuth) return
@@ -39,13 +38,13 @@ export default function AuthGuardLink({
     if (!user) {
       // Redirige vers register avec parametre de retour
       const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
-      router.push(`/${locale}/auth/register?redirect=${encodeURIComponent(targetPath)}`)
+      window.location.href = `/${locale}/auth/register?redirect=${encodeURIComponent(targetPath)}`
       return
     }
 
     // Naviguer vers la destination avec le bon préfixe locale
     const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
-    router.push(targetPath)
+    window.location.href = targetPath
   }
 
   const fullHref = href.startsWith('/') ? `/${locale}${href}` : href
