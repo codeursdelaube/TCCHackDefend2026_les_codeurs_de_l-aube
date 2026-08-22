@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
@@ -54,6 +54,7 @@ export default function ToutPage() {
             <h1 className="max-w-3xl text-2xl sm:text-4xl lg:text-6xl font-black leading-tight tracking-normal text-base-content">
               {t('title')}
             </h1>
+            <span className="heritage-weave" />
             <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('subtitle')}</p>
           </div>
 
@@ -118,10 +119,10 @@ export default function ToutPage() {
                 <Link
                   key={site.id}
                   href={`/lieux/${site.id}`}
-                  className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-[32px] ${featured ? 'lg:col-span-2 lg:row-span-2' : ''}`}
+                  className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-[32px] ${featured ? 'lg:col-span-2' : ''}`}
                 >
                   <article className="flex min-w-0 flex-1 flex-col w-full">
-                    <figure className={`${featured ? 'h-56 sm:h-72 lg:h-[28rem]' : 'h-48 sm:h-52'} relative shrink-0 overflow-hidden bg-base-300`}>
+                    <figure className={`${featured ? 'h-56 sm:h-72' : 'h-48 sm:h-52'} relative shrink-0 overflow-hidden bg-base-300`}>
                       <Image 
                         src={site.image} 
                         alt={tMonuments(`${site.id}.nom`)} 

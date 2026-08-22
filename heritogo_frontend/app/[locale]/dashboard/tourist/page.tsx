@@ -10,7 +10,7 @@ import { getFirstName, getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 import { useTranslations } from 'next-intl'
 import { 
-  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2 
+  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2, Languages, MapPin
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
 import ShareItinerary from '@/components/ShareItinerary'
@@ -429,7 +429,7 @@ export default function TouristDashboardPage() {
                         {getStatusBadge(booking.status)}
                       </div>
                       <p className="text-xs text-base-content/60 mt-1.5 flex items-center gap-3">
-                        <span>🗓️ {new Date(booking.start_date).toLocaleDateString()}</span>
+                        <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5 text-secondary" /> {new Date(booking.start_date).toLocaleDateString()}</span>
                         <span>{t('tourist.booking_type', { type: booking.mission_type.replace('_', ' ') })}</span>
                       </p>
                       
@@ -541,8 +541,8 @@ export default function TouristDashboardPage() {
                       </div>
 
                       <div className="mt-4 space-y-1.5 text-xs text-base-content/70">
-                        <p>🗣️ <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
-                        <p>📍 <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
+                        <p className="flex items-center gap-1.5"><Languages className="h-3.5 w-3.5 text-secondary shrink-0" /> <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
+                        <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-secondary shrink-0" /> <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
                         <p className="font-bold text-base-content mt-3">
                           {t('tourist.rate_label')} {Number(guide.full_day_rate).toLocaleString()} XOF/jour
                         </p>
@@ -615,8 +615,8 @@ export default function TouristDashboardPage() {
                     </div>
 
                     <div className="border-t border-border/60 p-4 bg-base-300/30 flex justify-between items-center">
-                      <span className="text-xs font-semibold text-base-content/60">
-                        📍 {scan.localite || t('common.default_country')}
+                      <span className="text-xs font-semibold text-base-content/60 flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-secondary" /> {scan.localite || t('common.default_country')}
                       </span>
                       <Link 
                         href="/scan"

@@ -1,44 +1,45 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { Suspense, useActionState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { COLORS } from '@/lib/constants/colors'
 import { KeyRound, Loader2 } from 'lucide-react'
+import { useFormStatus } from 'react-dom'
+import { toast } from 'sonner'
+import { forgotPasswordAction } from './actions'
 
-export default function ForgotPasswordPage() {
+function SubmitButton() {
+  const { pending } = useFormStatus()
   const t = useTranslations('Auth')
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-    setLoading(true)
-    setError(null)
-    setSuccess(false)
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="btn w-full rounded-2xl border-none text-white cursor-pointer"
+      style={{ backgroundColor: COLORS.gold }}
+    >
+      {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : t('forgot_button')}
+    </button>
+  )
+}
 
-    try {
-      const supabase = createClient()
-      const redirectTo = `${window.location.origin}/api/auth/callback?next=/auth/login`
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo,
-      })
+function ForgotPasswordForm() {
+  const t = useTranslations('Auth')
+  const params = useParams<{ locale: string }>()
+  const locale = params?.locale || 'fr'
 
-      if (resetError) {
-        setError(resetError.message)
-        return
-      }
+  const [state, formAction] = useActionState(forgotPasswordAction, null)
 
-      setSuccess(true)
-    } catch {
-      setError(t('error_generic'))
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (state?.success) {
+      toast.success(state.success)
+    } else if (state?.error) {
+      toast.error(state.error)
     }
-  }
+  }, [state])
 
   return (
     <div className="rounded-[28px] border border-border bg-base-200 p-6 shadow-xl sm:p-8">
@@ -53,39 +54,34 @@ export default function ForgotPasswordPage() {
         <p className="mt-2 text-sm text-base-content/60">{t('forgot_subtitle')}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form action={formAction} className="space-y-4">
+        <input type="hidden" name="locale" value={locale} />
+
         <label className="form-control w-full">
           <span className="label-text mb-1 text-sm font-semibold">{t('email')}</span>
           <input
             type="email"
+            name="email"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             className="input input-bordered w-full rounded-2xl bg-base-100"
             autoComplete="email"
+            placeholder="exemple@domaine.com"
           />
         </label>
 
-        {error && (
+        {state?.error && (
           <div className="rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
-            {error}
+            {state.error}
           </div>
         )}
 
-        {success && (
+        {state?.success && (
           <div className="rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
-            {t('success_forgot')}
+            {state.success}
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn w-full rounded-2xl border-none text-white"
-          style={{ backgroundColor: COLORS.gold }}
-        >
-          {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : t('forgot_button')}
-        </button>
+        <SubmitButton />
       </form>
 
       <div className="mt-4 text-center text-sm">
@@ -94,5 +90,19 @@ export default function ForgotPasswordPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <ForgotPasswordForm />
+    </Suspense>
   )
 }

@@ -59,6 +59,7 @@ export default function Navbar() {
   const { toggle, isDark, mounted } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [bottomNavOpen, setBottomNavOpen] = useState(false)
   const [profile, setProfile] = useState<ProfileRow | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
@@ -121,6 +122,12 @@ export default function Navbar() {
     return () => subscription.unsubscribe()
   }, [router])
 
+  useEffect(() => {
+    setBottomNavOpen(false)
+    setDrawerOpen(false)
+    setSettingsOpen(false)
+  }, [pathname])
+
   const publicLinks: NavLinkItem[] = [
     { href: '/lieux', label: t('lieux'), icon: Map },
     { href: '/scan', label: t('scan'), icon: ScanLine },
@@ -147,38 +154,43 @@ export default function Navbar() {
     if (!profile) return []
     if (profile.role === 'admin') {
       return [
-        { href: '/dashboard/admin', label: '📊 Dashboard', icon: User },
-        { href: '/dashboard/admin?tab=guides', label: '👥 Gérer guides', icon: User },
-        { href: '/dashboard/admin?tab=reports', label: '🚨 Signalements', icon: User },
-        { href: '/dashboard/admin?tab=reviews', label: '💬 Avis', icon: User },
-        { href: '/dashboard/admin?tab=bans', label: '🔨 Bannissements', icon: User },
+        { href: '/dashboard/admin', label: 'Dashboard', icon: User },
+        { href: '/dashboard/admin?tab=guides', label: 'Gérer les guides', icon: User },
+        { href: '/dashboard/admin?tab=reports', label: 'Signalements', icon: User },
+        { href: '/dashboard/admin?tab=reviews', label: 'Avis', icon: User },
+        { href: '/dashboard/admin?tab=bans', label: 'Bannissements', icon: User },
       ]
     }
     if (profile.role === 'guide') {
       return [
-        { href: '/dashboard/guide', label: '👤 Mon profil public', icon: User },
-        { href: '/dashboard/guide?tab=quotes', label: '📋 Demandes reçues', icon: Calendar },
-        { href: '/dashboard/guide?tab=missions', label: '✅ Mes missions', icon: Compass },
-        { href: '/dashboard/guide?tab=subscription', label: '💳 Mon abonnement', icon: Settings },
+        { href: '/dashboard/guide', label: 'Mon profil public', icon: User },
+        { href: '/dashboard/guide?tab=quotes', label: 'Demandes reçues', icon: Calendar },
+        { href: '/dashboard/guide?tab=missions', label: 'Mes missions', icon: Compass },
+        { href: '/dashboard/guide?tab=subscription', label: 'Mon abonnement', icon: Settings },
       ]
     }
     return [
-      { href: '/dashboard/tourist', label: '👤 Mon profil', icon: User },
-      { href: '/dashboard/tourist?tab=bookings', label: '📅 Mes réservations', icon: Calendar },
-      { href: '/dashboard/tourist?tab=favorites', label: '❤️ Mes favoris', icon: Heart },
-      { href: '/dashboard/tourist?tab=scans', label: '🔍 Historique scans', icon: History },
+      { href: '/dashboard/tourist', label: 'Mon profil', icon: User },
+      { href: '/dashboard/tourist?tab=bookings', label: 'Mes réservations', icon: Calendar },
+      { href: '/dashboard/tourist?tab=favorites', label: 'Mes favoris', icon: Heart },
+      { href: '/dashboard/tourist?tab=scans', label: 'Historique scans', icon: History },
     ]
   }
 
   if (isAuthPage) return null
 
-  const isActive = (path: string): boolean => pathname === path
+  const isActive = (path: string): boolean => {
+    if (path === '/accueil') {
+      return pathname === '/' || pathname === '/accueil'
+    }
+    return pathname === path || pathname.startsWith(path + '/')
+  }
 
   return (
     <>
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-border/80 bg-base-100/92 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
+          <Link href="/accueil" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
             <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-border bg-base-200 shadow-sm">
               <Image src="/icons/icon-192x192.png" alt="HeriTogo" width={32} height={32} className="h-8 w-8 object-contain" />
             </div>
@@ -339,27 +351,31 @@ export default function Navbar() {
               </div>
               <nav className="flex-1 overflow-y-auto p-4">
                 <ul className="space-y-1">
-                  {drawerLinks().map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setDrawerOpen(false)}
-                        className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-base-content hover:bg-base-200"
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {drawerLinks().map((item) => {
+                    const ItemIcon = item.icon
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setDrawerOpen(false)}
+                          className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-base-content hover:bg-base-200"
+                        >
+                          <ItemIcon className="h-4 w-4 text-secondary" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </nav>
               <div className="border-t border-border p-4">
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm font-bold text-error"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm font-bold text-error cursor-pointer hover:bg-error/20 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  🚪 Déconnexion
+                  {t('logout')}
                 </button>
               </div>
             </motion.aside>
@@ -367,36 +383,116 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {isAuthenticated && profile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl">
-          <div className="mx-auto max-w-md px-3 pb-2 pt-2">
-            <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
-              {bottomLinks.map((link) => {
-                const Icon = link.icon
-                const active = isActive(link.href)
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[22px] px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
-                      active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
-                    }`}
-                  >
-                    {active && (
-                      <motion.span
-                        layoutId="activeBottomNav"
-                        className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
-                      />
-                    )}
-                    <Icon className="relative h-5 w-5" />
-                    <span className="relative truncate">{link.label}</span>
-                  </Link>
-                )
-              })}
-            </div>
+      {/* ── Bottom Bar (Mobile always visible, Desktop via floating button) ── */}
+
+      {/* Mobile bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl md:hidden">
+        <div className="mx-auto max-w-md px-3 pb-2 pt-2">
+          <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
+            {(isAuthenticated && profile ? bottomLinks : [
+              { href: '/accueil', label: t('accueil'), icon: Home },
+              { href: '/lieux', label: t('lieux'), icon: Map },
+              { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
+              { href: '/histoire', label: t('histoire'), icon: BookOpenText },
+              { href: '/scan', label: t('scan'), icon: ScanLine },
+            ]).map((link) => {
+              const Icon = link.icon
+              const active = isActive(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[22px] px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
+                    active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
+                  }`}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="activeBottomNav"
+                      className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
+                    />
+                  )}
+                  <Icon className="relative h-5 w-5" />
+                  <span className="relative truncate">{link.label}</span>
+                </Link>
+              )
+            })}
           </div>
-        </nav>
-      )}
+        </div>
+      </nav>
+
+      {/* Desktop: floating "Découvrir" button */}
+      <div className="hidden md:block">
+        <AnimatePresence>
+          {bottomNavOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[60]"
+                onClick={() => setBottomNavOpen(false)}
+              />
+              {/* Bottom nav panel sliding up */}
+              <motion.div
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '100%', opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 340, damping: 34 }}
+                className="fixed bottom-0 left-1/2 z-[61] w-full max-w-xl -translate-x-1/2 rounded-t-[32px] border border-border/60 bg-base-100/95 px-4 pb-6 pt-4 shadow-2xl backdrop-blur-xl"
+              >
+                {/* Drag handle */}
+                <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-base-content/20" />
+                <div className="grid grid-cols-5 gap-2 rounded-[28px] bg-base-200 p-2">
+                  {(isAuthenticated && profile ? bottomLinks : [
+                    { href: '/accueil', label: t('accueil'), icon: Home },
+                    { href: '/lieux', label: t('lieux'), icon: Map },
+                    { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
+                    { href: '/histoire', label: t('histoire'), icon: BookOpenText },
+                    { href: '/scan', label: t('scan'), icon: ScanLine },
+                  ]).map((link) => {
+                    const Icon = link.icon
+                    const active = isActive(link.href)
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setBottomNavOpen(false)}
+                        className={`relative flex flex-col items-center justify-center gap-1.5 rounded-[22px] px-2 py-3 text-[10px] font-bold transition-colors ${
+                          active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/60 hover:text-base-content'
+                        }`}
+                      >
+                        {active && (
+                          <motion.span
+                            layoutId="activeBottomNavDesktop"
+                            className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
+                          />
+                        )}
+                        <Icon className="relative h-5 w-5" />
+                        <span className="relative truncate">{link.label}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Floating trigger button */}
+        <motion.button
+          type="button"
+          onClick={() => setBottomNavOpen((v) => !v)}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.95 }}
+          className="fixed bottom-6 right-6 z-[65] flex items-center gap-2 rounded-full px-5 py-3 text-sm font-black text-white shadow-lg shadow-black/20 transition-shadow hover:shadow-xl cursor-pointer"
+          style={{ backgroundColor: COLORS.forest }}
+        >
+          <Compass className="h-5 w-5" />
+          {t('discover')}
+        </motion.button>
+      </div>
     </>
   )
 }

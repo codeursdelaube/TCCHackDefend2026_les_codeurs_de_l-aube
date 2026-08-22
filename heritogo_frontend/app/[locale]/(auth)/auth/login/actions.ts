@@ -49,17 +49,24 @@ export async function loginAction(prevState: any, formData: FormData) {
     // Connexion réussie — réinitialiser le compteur de tentatives
     resetRateLimit(rateLimitKey)
 
-    // Récupérer le profil pour déterminer le rôle
-    const profile = await prisma.profile.findUnique({
-      where: { id: data.user.id },
-      select: { role: true, is_active: true }
-    })
+    // Récupérer le profil pour déterminer le rôle avec fallback sécurisé
+    let role = 'tourist'
+    try {
+      const profile = await prisma.profile.findUnique({
+        where: { id: data.user.id },
+        select: { role: true, is_active: true }
+      })
 
-    if (profile && !profile.is_active) {
-      return { error: 'Votre compte a été désactivé. Contactez le support.' }
+      if (profile && !profile.is_active) {
+        return { error: 'Votre compte a été désactivé. Contactez le support.' }
+      }
+
+      if (profile?.role) {
+        role = profile.role
+      }
+    } catch (dbErr) {
+      console.warn('[loginAction] DB profile fetch fallback to tourist:', dbErr)
     }
-
-    const role = profile?.role || 'tourist'
 
     // Utiliser le paramètre redirect s'il est fourni et valide
     if (redirectTo && redirectTo.startsWith('/')) {

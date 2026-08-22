@@ -1,7 +1,7 @@
-import ImPlat1 from '@/public/Cuisine/fufu.jpeg';
+import ImPlat1 from '@/public/Cuisine/fufuhero.png';
 import ImPlat2 from '@/public/Cuisine/ablo.jpeg';
 import ImPlat3 from '@/public/Cuisine/khom (2).jpeg';
-import ImPlat4 from '@/public/Cuisine/ayimolou.jpg';
+import ImPlat4 from '@/public/Cuisine/ayimolou.png';
 import ImPlat5 from '@/public/Cuisine/djenkoume.jpeg';
 import ImPlat6 from '@/public/Cuisine/gboma.jpg';
 import ImPlat7 from '@/public/Cuisine/akoume_ademe.jpg';

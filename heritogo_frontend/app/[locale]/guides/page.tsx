@@ -10,9 +10,11 @@ import {
   Star, Compass, Languages, MapPin, Search, SlidersHorizontal,
   UserCheck, ShieldCheck, Heart, AlertCircle, Loader2
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
 import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
+import { toast } from 'sonner'
 
 
 interface GuideRow {
@@ -36,6 +38,7 @@ const ZONES = ['Lomé', 'Kpalimé', 'Atakpamé', 'Kara', 'Dapaong', 'Aného', 'T
 const LANGUAGES = ['Français', 'English', 'Espagnol', 'Deutsch', 'Éwé', 'Kabyè', 'Mina']
 
 export default function GuidesPage() {
+  const t = useTranslations('GuidesPage')
   const [guides, setGuides] = useState<GuideRow[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,7 +66,7 @@ export default function GuidesPage() {
 
       const result = await apiFetch<{ guides?: GuideRow[] }>(url.toString())
       if (!result.ok || !result.data) {
-        setError(result.error || 'Erreur lors de la récupération des guides')
+        setError(result.error || t('error_loading'))
         return
       }
 
@@ -74,7 +77,7 @@ export default function GuidesPage() {
     } finally {
       setLoading(false)
     }
-  }, [selectedZone, selectedLang, maxPrice])
+  }, [selectedZone, selectedLang, maxPrice, t])
 
   useEffect(() => {
     fetchGuides()
@@ -84,8 +87,10 @@ export default function GuidesPage() {
     let updatedFavs = [...favIds]
     if (favIds.includes(guideId)) {
       updatedFavs = updatedFavs.filter(id => id !== guideId)
+      toast.info('Guide retiré des favoris')
     } else {
       updatedFavs.push(guideId)
+      toast.success('Guide ajouté aux favoris')
     }
     setFavIds(updatedFavs)
     safeLocalStorageSet('heritogo_favorites', JSON.stringify(updatedFavs))
@@ -107,13 +112,14 @@ export default function GuidesPage() {
           style={{ backgroundColor: COLORS.forest }}
         >
           <UserCheck className="h-3.5 w-3.5" />
-          Guides certifiés
+          {t('tag')}
         </span>
-        <h1 className="mt-3 font-serif text-3xl font-bold sm:text-4xl text-base-content">
-          Trouvez le guide local parfait
+        <h1 className="mt-3 font-serif text-3xl font-bold italic sm:text-5xl">
+          {t('title')}
         </h1>
+        <span className="heritage-weave" />
         <p className="mt-2 text-sm text-base-content/65 leading-6 max-w-2xl">
-          Explorez le Togo en toute sécurité accompagnés de professionnels passionnés. Histoire, culture, cuisine, nature : choisissez votre expert.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -125,7 +131,7 @@ export default function GuidesPage() {
           <div className="flex items-center justify-between border-b border-border pb-3">
             <span className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
               <SlidersHorizontal className="h-4 w-4 text-primary" style={{ color: COLORS.forest }} />
-              Filtres
+              {t('filters')}
             </span>
             {(selectedZone || selectedLang || maxPrice !== '100000') && (
               <button
@@ -134,9 +140,9 @@ export default function GuidesPage() {
                   setSelectedLang('')
                   setMaxPrice('100000')
                 }}
-                className="text-xs font-bold text-error hover:underline"
+                className="text-xs font-bold text-error hover:underline cursor-pointer"
               >
-                Réinitialiser
+                {t('reset')}
               </button>
             )}
           </div>
@@ -145,7 +151,7 @@ export default function GuidesPage() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Rechercher par nom..."
+              placeholder={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input input-bordered w-full rounded-2xl bg-base-100 pl-10 text-sm focus:border-primary focus:outline-none"
@@ -155,13 +161,13 @@ export default function GuidesPage() {
 
           {/* Zone Filter */}
           <div>
-            <span className="block text-xs font-black uppercase tracking-wider text-base-content/60 mb-2">Zone de couverture</span>
+            <span className="block text-xs font-black uppercase tracking-wider text-base-content/60 mb-2">{t('zone_label')}</span>
             <select
               value={selectedZone}
               onChange={(e) => setSelectedZone(e.target.value)}
-              className="select select-bordered w-full rounded-2xl bg-base-100 focus:outline-none focus:border-primary text-sm"
+              className="select select-bordered w-full rounded-2xl bg-base-100 focus:outline-none focus:border-primary text-sm cursor-pointer"
             >
-              <option value="">Toutes les zones</option>
+              <option value="">{t('all_zones')}</option>
               {ZONES.map(z => (
                 <option key={z} value={z}>{z}</option>
               ))}
@@ -170,13 +176,13 @@ export default function GuidesPage() {
 
           {/* Language Filter */}
           <div>
-            <span className="block text-xs font-black uppercase tracking-wider text-base-content/60 mb-2">Langue parlée</span>
+            <span className="block text-xs font-black uppercase tracking-wider text-base-content/60 mb-2">{t('lang_label')}</span>
             <select
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
-              className="select select-bordered w-full rounded-2xl bg-base-100 focus:outline-none focus:border-primary text-sm"
+              className="select select-bordered w-full rounded-2xl bg-base-100 focus:outline-none focus:border-primary text-sm cursor-pointer"
             >
-              <option value="">Toutes les langues</option>
+              <option value="">{t('all_langs')}</option>
               {LANGUAGES.map(l => (
                 <option key={l} value={l}>{l}</option>
               ))}
@@ -186,7 +192,7 @@ export default function GuidesPage() {
           {/* Price Range Filter */}
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">Prix Max / Jour</span>
+              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('price_label')}</span>
               <span className="text-xs font-bold text-base-content/80">{Number(maxPrice).toLocaleString()} XOF</span>
             </div>
             <input
@@ -215,9 +221,9 @@ export default function GuidesPage() {
           ) : filteredGuides?.length === 0 ? (
             <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-12 text-center">
               <Compass className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-              <h3 className="font-serif text-xl font-bold">Aucun guide trouvé</h3>
+              <h3 className="font-serif text-xl font-bold">{t('no_guides')}</h3>
               <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                Modifiez vos filtres ou élargissez votre recherche pour trouver des guides locaux.
+                {t('no_guides_sub')}
               </p>
             </div>
           ) : (
@@ -254,13 +260,13 @@ export default function GuidesPage() {
                               className="badge badge-success badge-sm text-[9px] text-white font-extrabold uppercase py-2.5 px-2 rounded-lg gap-0.5"
                             >
                               <ShieldCheck className="h-3 w-3 shrink-0" />
-                              Certifié
+                              {t('certified')}
                             </span>
                           </div>
                           <div className="flex items-center gap-1 mt-1 text-xs">
                             <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
                             <span className="font-bold text-base-content">{Number(guide.avg_rating).toFixed(1)}</span>
-                            <span className="text-base-content/40">({guide.total_reviews} avis)</span>
+                            <span className="text-base-content/40">({guide.total_reviews} {t('reviews')})</span>
                           </div>
                         </div>
                       </div>
@@ -268,7 +274,8 @@ export default function GuidesPage() {
                       {/* Favorite Button */}
                       <button
                         onClick={() => toggleFavorite(guide.id)}
-                        className="rounded-full p-2 bg-base-100 hover:bg-base-300 transition-colors text-base-content/60 active:scale-95"
+                        className="rounded-full p-2 bg-base-100 hover:bg-base-300 transition-colors text-base-content/60 active:scale-95 cursor-pointer"
+                        aria-label="Favoris"
                       >
                         <Heart
                           className={`h-4.5 w-4.5 transition-colors ${favIds.includes(guide.id)
@@ -280,18 +287,18 @@ export default function GuidesPage() {
                     </div>
 
                     <p className="mt-4 text-xs text-base-content/70 line-clamp-3 leading-5">
-                      {guide.profile.bio || 'Guide professionnel certifié engagé à faire découvrir la richesse du patrimoine togolais.'}
+                      {guide.profile.bio || t('default_bio')}
                     </p>
 
                     <div className="mt-5 space-y-2 border-t border-border/55 pt-4">
                       <div className="flex items-center gap-2 text-xs text-base-content/75">
                         <Languages className="h-4 w-4 text-base-content/40 shrink-0" />
-                        <span className="font-semibold text-[10px] uppercase text-base-content/50 w-16">Langues :</span>
+                        <span className="font-semibold text-[10px] uppercase text-base-content/50 w-16">{t('languages')}</span>
                         <span className="truncate">{guide.languages?.join(', ') || 'N/A'}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-base-content/75">
                         <MapPin className="h-4 w-4 text-base-content/40 shrink-0" />
-                        <span className="font-semibold text-[10px] uppercase text-base-content/50 w-16">Zones :</span>
+                        <span className="font-semibold text-[10px] uppercase text-base-content/50 w-16">{t('zones')}</span>
                         <span className="truncate">{guide.coverage_zones?.join(', ') || 'N/A'}</span>
                       </div>
                     </div>
@@ -300,9 +307,9 @@ export default function GuidesPage() {
                   {/* Pricing and Actions */}
                   <div className="mt-6 flex items-center justify-between gap-4 border-t border-border/55 pt-4">
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-base-content/40">Tarif Journalier</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-base-content/40">{t('rate_label')}</p>
                       <p className="text-lg font-black text-base-content">
-                        {guide.full_day_rate ? Number(guide.full_day_rate).toLocaleString() : 'N/A'} <span className="text-xs font-bold text-base-content/60">{guide.full_day_rate ? 'XOF/jour' : ''}</span>
+                        {guide.full_day_rate ? Number(guide.full_day_rate).toLocaleString() : 'N/A'} <span className="text-xs font-bold text-base-content/60">{guide.full_day_rate ? t('per_day') : ''}</span>
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -310,14 +317,14 @@ export default function GuidesPage() {
                         href={`/guides/${guide.id}`}
                         className="btn btn-sm btn-ghost rounded-xl text-xs font-bold"
                       >
-                        Voir profil
+                        {t('view_profile')}
                       </Link>
                       <Link
                         href={`/booking/${guide.id}`}
                         className="btn btn-sm text-white rounded-xl border-none font-bold shadow-sm hover:shadow active:scale-95"
                         style={{ backgroundColor: COLORS.forest }}
                       >
-                        Réserver
+                        {t('book')}
                       </Link>
                     </div>
                   </div>

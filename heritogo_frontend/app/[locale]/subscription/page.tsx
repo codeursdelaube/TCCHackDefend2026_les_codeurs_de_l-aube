@@ -6,6 +6,7 @@ import { Check, Sparkles, Shield, Zap, ArrowRight, Star } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
 import { useRouter } from 'next/navigation'
 import { safeLocalStorageSet } from '@/lib/utils/storage'
+import { toast } from 'sonner'
 
 export default function SubscriptionPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -17,8 +18,9 @@ export default function SubscriptionPage() {
     setTimeout(() => {
       safeLocalStorageSet('heritogo_premium', 'true')
       setIsLoading(false)
+      toast.success('Abonnement Premium activé avec succès !')
       router.push('/dashboard/tourist')
-    }, 1500)
+    }, 1200)
   }
 
   return (
@@ -37,10 +39,12 @@ export default function SubscriptionPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-6 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl"
+          className="mb-4 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl"
         >
           {"Débloquez l'expérience complète"}
         </motion.h1>
+
+        <span className="heritage-weave mx-auto mb-6" />
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -71,16 +75,16 @@ export default function SubscriptionPage() {
 
           <ul className="mb-8 flex-1 space-y-4">
             <li className="flex items-center gap-3 text-sm font-semibold text-base-content/80">
-              <Check className="h-5 w-5 text-secondary" /> 3 scans de monuments gratuits
+              <Check className="h-5 w-5 text-secondary" /> 3 scans de monuments gratuits / mois
             </li>
             <li className="flex items-center gap-3 text-sm font-semibold text-base-content/80">
-              <Check className="h-5 w-5 text-secondary" /> Consultation basique des lieux
+              <Check className="h-5 w-5 text-secondary" /> Consultation de tous les lieux et plats
+            </li>
+            <li className="flex items-center gap-3 text-sm font-semibold text-base-content/80">
+              <Check className="h-5 w-5 text-secondary" /> Demande de réservation de guides locaux
             </li>
             <li className="flex items-center gap-3 text-sm font-semibold text-base-content/40">
-              <Check className="h-5 w-5 opacity-50" /> {"Pas d'audio-guides complets"}
-            </li>
-            <li className="flex items-center gap-3 text-sm font-semibold text-base-content/40">
-              <Check className="h-5 w-5 opacity-50" /> Impossible de réserver un guide
+              <Check className="h-5 w-5 opacity-50" /> {"Scans illimités non inclus"}
             </li>
           </ul>
 
@@ -108,39 +112,44 @@ export default function SubscriptionPage() {
               <Star className="h-6 w-6 text-amber-500 fill-amber-500" />
               Premium
             </h2>
-            <p className="mt-2 text-sm font-medium text-base-content/60">{"Pour les passionnés d'histoire."}</p>
+            <p className="mt-2 text-sm font-medium text-base-content/60">{"Pour les passionnés d'histoire et de culture."}</p>
           </div>
           <div className="mb-8">
-            <span className="text-5xl font-black">2 500 FCFA</span>
+            <span className="text-5xl font-black">2 000 FCFA</span>
             <span className="text-base-content/60 font-semibold"> / mois</span>
           </div>
 
           <ul className="mb-8 flex-1 space-y-4">
             <li className="flex items-center gap-3 text-sm font-bold text-base-content">
-              <Shield className="h-5 w-5 text-emerald-600" /> Scans IA en illimité
+              <Shield className="h-5 w-5 text-emerald-600" /> Scans de monuments en illimité
             </li>
             <li className="flex items-center gap-3 text-sm font-bold text-base-content">
-              <Zap className="h-5 w-5 text-amber-500" /> Audio-guides multilingues complets
+              <Zap className="h-5 w-5 text-amber-500" /> Audio-guides multilingues complets (TTS)
             </li>
             <li className="flex items-center gap-3 text-sm font-bold text-base-content">
-              <Star className="h-5 w-5 text-secondary" /> Réservation de guides certifiés
+              <Star className="h-5 w-5 text-amber-500 fill-amber-500 shrink-0" /> Réservation prioritaire de guides certifiés
             </li>
             <li className="flex items-center gap-3 text-sm font-bold text-base-content">
-              <Shield className="h-5 w-5 text-emerald-600" /> Support client prioritaire 24/7
+              <Shield className="h-5 w-5 text-emerald-600" /> Historique illimité et mode hors-ligne
             </li>
           </ul>
+
+          <div className="mb-3 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-500/10 py-1.5 px-3 text-[11px] font-bold text-amber-700 dark:text-amber-400">
+            <Zap className="h-3.5 w-3.5" />
+            <span>Mode démo actif — Activation instantanée sans débit réel</span>
+          </div>
 
           <button
             onClick={handleSubscribe}
             disabled={isLoading}
-            className="btn border-none rounded-2xl w-full text-white font-black text-lg transition-transform hover:scale-105"
+            className="btn border-none rounded-2xl w-full text-white font-black text-lg transition-transform hover:scale-105 cursor-pointer"
             style={{ backgroundColor: COLORS.forest }}
           >
             {isLoading ? (
               <span className="loading loading-spinner"></span>
             ) : (
               <>
-                {"S'abonner maintenant"} <ArrowRight className="h-5 w-5 ml-2" />
+                {"Activer l'accès Premium"} <ArrowRight className="h-5 w-5 ml-2" />
               </>
             )}
           </button>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useMemo, useState, useTransition } from 'react'
 import Image from 'next/image'
@@ -70,6 +70,7 @@ export default function CuisinePage() {
             <h1 className="max-w-3xl text-2xl sm:text-4xl lg:text-6xl font-black leading-tight tracking-normal text-base-content">
               {t('page_title')}
             </h1>
+            <span className="heritage-weave" />
             <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('page_subtitle')}</p>
           </div>
 
@@ -119,11 +120,15 @@ export default function CuisinePage() {
           </p>
         )}
 
-        {selectedCategory !== 'all' && (
+        {categoryRestaurants.length > 0 && (
           <section className="mt-5 rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-4xl sm:p-5">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-lg font-black tracking-normal">{t('restaurants_available', { count: categoryRestaurants.length })}</h2>
-              <span className="w-fit rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content">{getFilterLabel(selectedCategory)}</span>
+              <h2 className="text-lg font-black tracking-normal">
+                {selectedCategory === 'all' ? t('top_restaurants') : t('restaurants_available', { count: categoryRestaurants.length })}
+              </h2>
+              <span className="w-fit rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content">
+                {selectedCategory === 'all' ? t('selection') : getFilterLabel(selectedCategory)}
+              </span>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               {categoryRestaurants.map((resto, index) => (

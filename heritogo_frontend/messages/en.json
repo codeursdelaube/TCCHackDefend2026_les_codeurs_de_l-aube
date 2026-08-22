@@ -17,7 +17,9 @@
                    "histoire":  "History",
                    "guides":  "Guides",
                    "login":  "Sign in",
-                   "register":  "Sign up"
+                   "register":  "Sign up",
+                   "discover":  "Discover",
+                   "logout":  "Log out"
                },
     "Accueil":  {
                     "offline_banner":  "Offline Mode — cached data available",
@@ -115,21 +117,25 @@
                     "guides":  {
                                    "0":  {
                                              "name":  "Kossi Adom",
-                                             "languages":  "French, Ewe, English"
+                                             "languages":  "French, Ewe, English",
+                                             "zone":  "Lomé & Maritime"
                                          },
                                    "1":  {
                                              "name":  "Elom Afi",
-                                             "languages":  "French, Mina, Spanish"
+                                             "languages":  "French, Mina, Spanish",
+                                             "zone":  "Kpalimé & Plateaux"
                                          },
                                    "2":  {
                                              "name":  "Mawuli Agbo",
-                                             "languages":  "French, Kabye, English"
+                                             "languages":  "French, Kabye, English",
+                                             "zone":  "Kara & Koutammakou"
                                          },
                                    "tag":  "Certified guides",
                                    "certified":  "Certified",
                                    "price":  "20,000 FCFA/day",
                                    "reserve":  "Book",
-                                   "view_all":  "View all guides"
+                                    "view_all":  "View all guides",
+                                    "sample_disclaimer":  "Illustrative examples — real certified profiles are on /guides"
                                },
                     "subscription":  {
                                          "tag":  "Premium subscription",
@@ -180,7 +186,74 @@
                                         "regions":  "Regions",
                                         "languages":  "Languages",
                                         "explorers":  "Explorers"
-                                    }
+                                    },
+                    "stats_subs":  {
+                                       "sites":  "Listed monuments",
+                                       "regions":  "Regions covered",
+                                       "languages":  "Supported languages",
+                                       "pwa":  "Standalone PWA"
+                                   },
+                    "pillars_section":  {
+                                           "badge":  "Full Experience",
+                                           "title":  "Your Cultural Discovery Companion",
+                                           "desc":  "HeriTogo digitizes and promotes Togolese heritage to give travellers and enthusiasts immediate access to the living memory of the country."
+                                       },
+                    "pillars":  {
+                                    "scan":  {
+                                                "badge":  "AI Scan",
+                                                "title":  "Intelligent Monument Scanner",
+                                                "desc":  "Take a photo or upload an image to instantly identify Togo's monuments and historical treasures.",
+                                                "action":  "Scan a monument"
+                                            },
+                                    "geo":  {
+                                               "badge":  "Geolocation",
+                                               "title":  "Sites \u0026 National Heritage",
+                                               "desc":  "Explore over 120 sites across Togo's 5 regions with GPS itineraries and nearby recommended hotels.",
+                                               "action":  "Explore the map"
+                                           },
+                                    "food":  {
+                                                "badge":  "Gastronomy",
+                                                "title":  "Togolese Culinary Journey",
+                                                "desc":  "Discover iconic dishes (Ayimolou, Fufu, Djenkoum\u00e9) and find the best restaurants to enjoy them.",
+                                                "action":  "Discover flavours"
+                                            },
+                                    "guides":  {
+                                                  "badge":  "Guided Tours",
+                                                  "title":  "Certified Local Guides",
+                                                  "desc":  "Book verified professional guides for immersive, safe and personalised visits.",
+                                                  "action":  "Find a guide"
+                                              }
+                                },
+                    "scanner_section":  {
+                                           "badge":  "Smart Technology",
+                                           "title":  "How does the HeriTogo Scanner work?",
+                                           "desc":  "Computer vision technology designed to recognise Togolese heritage in an instant.",
+                                           "cta":  "Try the scanner now"
+                                       },
+                    "steps":  {
+                                  "0":  {
+                                            "title":  "Frame the monument",
+                                            "desc":  "Point your device at a Togolese historical monument or import a photo from your gallery."
+                                        },
+                                  "1":  {
+                                            "title":  "AI Recognition",
+                                            "desc":  "Our artificial intelligence model analyses the image and extracts the history, origin and anecdotes of the site."
+                                        },
+                                  "2":  {
+                                            "title":  "Listen \u0026 Go Deeper",
+                                            "desc":  "Enjoy the multilingual text-to-speech to hear the story, or book a certified guide to go further."
+                                        }
+                              },
+                    "monuments_section":  {
+                                             "badge":  "Must-See Heritage",
+                                             "title":  "Explore Iconic Sites",
+                                             "view_all":  "See all monuments ({count})"
+                                         },
+                    "guide_daily_rate":  "Daily rate",
+                    "subscribe_ideal":  "Perfect for tourists, students and cultural explorers.",
+                    "final_cta_sub":  "Explore Togo freely, starting today.",
+                    "pwa_label":  "Offline",
+                    "pwa_sub":  "Standalone PWA"
                 },
     "Scan":  {
                  "title":  "Heritogo Scanner",
@@ -233,7 +306,7 @@
                   "gps_action":  "Get Directions",
                   "history_title":  "History \u0026 Legends",
                   "desc_title":  "Description",
-                  "rating":  "Rating ★",
+                  "rating":  "Rating",
                   "visits_per_year":  "Visits/year",
                   "distance":  "Distance",
                   "period_tag":  "1905 — German Colonial Era",
@@ -287,6 +360,8 @@
                     "page_subtitle":  "Discover the authentic flavors of Togo",
                     "all":  "All",
                     "restaurants_available":  "{count} restaurant{count, plural, =1 {} other {s}} available",
+                    "top_restaurants":  "Recommended Restaurants",
+                    "selection":  "Selection",
                     "directions":  "Directions",
                     "hero_badge":  "Local flavors",
                     "lome_area":  "Lome",
@@ -634,7 +709,7 @@
                                      "default_country":  "Togo"
                                  },
                       "tourist":  {
-                                      "greeting":  "Hello, {name} 👋",
+                                      "greeting":  "Hello, {name}",
                                       "subtitle":  "Heritogo Traveler Space",
                                       "new_scan":  "New scan",
                                       "find_guide":  "Find a guide",
@@ -661,7 +736,7 @@
                                       "status_in_progress":  "In progress",
                                       "status_completed":  "Completed",
                                       "status_cancelled":  "Cancelled",
-                                      "booking_type":  "🎒 Type: {type}",
+                                      "booking_type":  "Type: {type}",
                                       "offer_label":  "Offer: {amount} FCFA",
                                       "view_guide":  "View guide",
                                       "leave_review":  "Leave a review",
@@ -739,7 +814,7 @@
                                     "doc_title_label":  "Label / Title",
                                     "doc_title_placeholder":  "E.g.: License Ministry of Tourism 2026",
                                     "doc_file_label":  "Supporting file (PDF only)",
-                                    "doc_upload_hint":  "📁 Please upload an official file in PDF format (max. 5 MB). The document will be directly accessible and downloadable for validation by the administration team.",
+                                    "doc_upload_hint":  "Please upload an official file in PDF format (max. 5 MB). The document will be directly accessible and downloadable for validation by the administration team.",
                                     "submit_for_verification":  "Submit for verification",
                                     "docs_submitted_title":  "Submitted documents",
                                     "no_docs":  "No documents submitted yet.",
@@ -890,12 +965,38 @@
                     "half_day":  "Half day:",
                     "hourly":  "Hourly:",
                     "virtual":  "Virtual visit:",
-                    "warning_text":  "⚠️ After submitting this form, the guide will review your request and send a custom quote. You will only pay after accepting the quote."
+                    "warning_text":  "After submitting this form, the guide will review your request and send a custom quote. You will only pay after accepting the quote."
                 },
     "Update":  {
                    "later":  "Later",
                    "title":  "Update available",
                    "install":  "Install",
                    "desc":  "A new version of Heritogo is ready. Install it to enjoy the latest fixes."
-               }
+               },
+    "GuidesPage": {
+        "tag": "Certified Guides",
+        "title": "Find the Perfect Local Guide",
+        "subtitle": "Explore Togo safely accompanied by passionate professionals. History, culture, cuisine, nature: choose your expert.",
+        "filters": "Filters",
+        "reset": "Reset",
+        "search_placeholder": "Search by name...",
+        "zone_label": "Coverage Zone",
+        "all_zones": "All zones",
+        "lang_label": "Spoken Language",
+        "all_langs": "All languages",
+        "price_label": "Max Price / Day",
+        "loading": "Loading guides...",
+        "error_loading": "Error retrieving guides",
+        "no_guides": "No guides found",
+        "no_guides_sub": "Adjust your filters or broaden your search to find local guides.",
+        "certified": "Certified",
+        "reviews": "reviews",
+        "default_bio": "Certified professional guide dedicated to showcasing the richness of Togolese heritage.",
+        "languages": "Languages:",
+        "zones": "Zones:",
+        "rate_label": "Daily Rate",
+        "per_day": "XOF/day",
+        "view_profile": "View profile",
+        "book": "Book"
+    }
 }

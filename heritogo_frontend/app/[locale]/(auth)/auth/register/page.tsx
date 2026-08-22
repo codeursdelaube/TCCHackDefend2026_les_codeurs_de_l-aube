@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useActionState } from 'react'
+import { useState, useActionState, Suspense } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link, usePathname } from '@/i18n/navigation'
@@ -46,7 +46,7 @@ const languages = [
   { code: 'zh', label: 'ZH' },
 ]
 
-export default function RegisterPage() {
+function RegisterForm() {
   const t = useTranslations('Auth')
   const tNav = useTranslations('Navbar')
   const params = useParams<{ locale: string }>()
@@ -362,3 +362,18 @@ export default function RegisterPage() {
     </div>
   )
 }
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <RegisterForm />
+    </Suspense>
+  )
+}
+

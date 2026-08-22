@@ -12,7 +12,7 @@ import { apiFetch } from '@/lib/utils/http'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
-  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink 
+  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink, Star
 } from 'lucide-react'
 
 interface PendingGuide {
@@ -601,7 +601,7 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 text-amber-500">
                           {Array.from({ length: r.rating_overall }).map((_, i) => (
-                            <span key={i}>★</span>
+                            <Star key={i} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                           ))}
                         </div>
                         <span className="text-[10px] text-base-content/40 font-bold">{new Date(r.created_at).toLocaleDateString()}</span>

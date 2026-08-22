@@ -111,7 +111,7 @@ export default function SiteDetailPage({ params }: PageProps) {
         <div className="grid gap-5 rounded-[32px] border border-border bg-base-200 p-5 shadow-xl sm:grid-cols-3 sm:p-6">
           <div className="rounded-[24px] bg-base-100 p-4">
             <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('rating')}</p>
-            <p className="mt-2 flex items-center gap-2 text-2xl font-black"><Star className="h-5 w-5 fill-secondary text-secondary" />4.7</p>
+            <p className="mt-2 flex items-center gap-2 text-2xl font-black"><Star className="h-5 w-5 fill-amber-500 text-amber-500" />4.7</p>
           </div>
           <div className="rounded-[24px] bg-base-100 p-4">
             <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('visits_per_year')}</p>

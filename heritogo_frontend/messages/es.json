@@ -17,7 +17,9 @@
                    "histoire":  "Historia",
                    "guides":  "Guías",
                    "login":  "Iniciar sesión",
-                   "register":  "Registrarse"
+                   "register":  "Registrarse",
+                   "discover":  "Descubrir",
+                   "logout":  "Cerrar sesión"
                },
     "Accueil":  {
                     "offline_banner":  "Modo sin conexión — datos guardados disponibles",
@@ -115,21 +117,25 @@
                     "guides":  {
                                    "0":  {
                                              "name":  "Kossi Adom",
-                                             "languages":  "Francés, Ewé, Inglés"
+                                             "languages":  "Francés, Ewé, Inglés",
+                                             "zone":  "Lomé y Marítima"
                                          },
                                    "1":  {
                                              "name":  "Elom Afi",
-                                             "languages":  "Francés, Mina, Español"
+                                             "languages":  "Francés, Mina, Español",
+                                             "zone":  "Kpalimé y Altiplanos"
                                          },
                                    "2":  {
                                              "name":  "Mawuli Agbo",
-                                             "languages":  "Francés, Kabyè, Inglés"
+                                             "languages":  "Francés, Kabyè, Inglés",
+                                             "zone":  "Kara y Koutammakou"
                                          },
                                    "tag":  "Guías certificados",
                                    "certified":  "Certificado",
                                    "price":  "20 000 FCFA/día",
                                    "reserve":  "Reservar",
-                                   "view_all":  "Ver todos los guías"
+                                    "view_all":  "Ver todos los guías",
+                                    "sample_disclaimer":  "Ejemplos ilustrativos — los perfiles certificados reales están en /guides"
                                },
                     "subscription":  {
                                          "tag":  "Suscripción Premium",
@@ -180,7 +186,74 @@
                                         "regions":  "Regiones",
                                         "languages":  "Idiomas",
                                         "explorers":  "Exploradores"
-                                    }
+                                    },
+                    "stats_subs":  {
+                                       "sites":  "Monumentos listados",
+                                       "regions":  "Regiones cubiertas",
+                                       "languages":  "Idiomas soportados",
+                                       "pwa":  "PWA independiente"
+                                   },
+                    "pillars_section":  {
+                                           "badge":  "Experiencia Completa",
+                                           "title":  "Tu Compañero de Descubrimiento Cultural",
+                                           "desc":  "HeriTogo digitaliza y promueve el patrimonio togolés para dar a viajeros y apasionados acceso inmediato a la memoria viva del país."
+                                       },
+                    "pillars":  {
+                                    "scan":  {
+                                                "badge":  "Escaneo IA",
+                                                "title":  "Escáner Inteligente de Monumentos",
+                                                "desc":  "Toma una foto o carga una imagen para identificar al instante los monumentos y tesoros históricos de Togo.",
+                                                "action":  "Escanear un monumento"
+                                            },
+                                    "geo":  {
+                                               "badge":  "Geolocalización",
+                                               "title":  "Sitios & Patrimonio Nacional",
+                                               "desc":  "Explora más de 120 sitios a través de las 5 regiones de Togo con itinerarios GPS y hoteles recomendados cercanos.",
+                                               "action":  "Explorar el mapa"
+                                           },
+                                    "food":  {
+                                                "badge":  "Gastronomía",
+                                                "title":  "Viaje Culinario Togolés",
+                                                "desc":  "Descubre platos icónicos (Ayimolou, Fufu, Djenkoumé) y localiza los mejores restaurantes para disfrutarlos.",
+                                                "action":  "Descubrir los sabores"
+                                            },
+                                    "guides":  {
+                                                  "badge":  "Acompañamiento",
+                                                  "title":  "Guías Locales Certificados",
+                                                  "desc":  "Reserva guías profesionales verificados para visitas inmersivas, seguras y personalizadas.",
+                                                  "action":  "Encontrar un guía"
+                                              }
+                                },
+                    "scanner_section":  {
+                                           "badge":  "Tecnología Inteligente",
+                                           "title":  "¿Cómo funciona el Escáner HeriTogo?",
+                                           "desc":  "Tecnología de visión por computadora diseñada para reconocer el patrimonio togolés en un instante.",
+                                           "cta":  "Probar el escáner ahora"
+                                       },
+                    "steps":  {
+                                  "0":  {
+                                            "title":  "Encuadra el monumento",
+                                            "desc":  "Apunta tu dispositivo hacia un monumento histórico de Togo o importa una foto desde tu galería."
+                                        },
+                                  "1":  {
+                                            "title":  "Reconocimiento por IA",
+                                            "desc":  "Nuestro modelo de inteligencia artificial analiza la imagen y extrae la historia, el origen y las anécdotas del sitio."
+                                        },
+                                  "2":  {
+                                            "title":  "Escucha & Profundiza",
+                                            "desc":  "Disfruta de la síntesis de voz multilingüe para escuchar el relato o reserva un guía certificado para ir más lejos."
+                                        }
+                              },
+                    "monuments_section":  {
+                                             "badge":  "Patrimonio Imprescindible",
+                                             "title":  "Explora los Sitios Emblemáticos",
+                                             "view_all":  "Ver todos los monumentos ({count})"
+                                         },
+                    "guide_daily_rate":  "Tarifa diaria",
+                    "subscribe_ideal":  "Ideal para turistas, estudiantes y exploradores culturales.",
+                    "final_cta_sub":  "Explora Togo con total libertad desde hoy.",
+                    "pwa_label":  "Sin conexión",
+                    "pwa_sub":  "PWA independiente"
                 },
     "Scan":  {
                  "title":  "Escáner Heritogo",
@@ -233,7 +306,7 @@
                   "gps_action":  "Cómo llegar",
                   "history_title":  "Historia y Leyendas",
                   "desc_title":  "Descripción",
-                  "rating":  "Calificación ★",
+                  "rating":  "Calificación",
                   "visits_per_year":  "Visitas/año",
                   "distance":  "Distancia",
                   "period_tag":  "1905 — Época Colonial Alemana",
@@ -287,7 +360,9 @@
                     "page_subtitle":  "Descubra los sabores auténticos de Togo",
                     "all":  "Todos",
                     "restaurants_available":  "{count} restaurante{count, plural, =1 {} other {s}} disponible{count, plural, =1 {} other {s}}",
-                    "directions":  "Direcciones",
+                    "top_restaurants":  "Restaurantes recomendados",
+                    "selection":  "Selección",
+                    "directions":  "Cómo llegar",
                     "hero_badge":  "Sabores locales",
                     "lome_area":  "Lomé",
                     "default_hours":  "07h-22h",
@@ -634,7 +709,7 @@
                                      "default_country":  "Togo"
                                  },
                       "tourist":  {
-                                      "greeting":  "Hola, {name} 👋",
+                                      "greeting":  "Hola, {name}",
                                       "subtitle":  "Espacio de Viajero Heritogo",
                                       "new_scan":  "Nuevo escaneo",
                                       "find_guide":  "Buscar un guía",
@@ -661,7 +736,7 @@
                                       "status_in_progress":  "En curso",
                                       "status_completed":  "Completado",
                                       "status_cancelled":  "Cancelado",
-                                      "booking_type":  "🎒 Tipo: {type}",
+                                      "booking_type":  "Tipo: {type}",
                                       "offer_label":  "Oferta: {amount} FCFA",
                                       "view_guide":  "Ver guía",
                                       "leave_review":  "Dejar una opinión",
@@ -739,7 +814,7 @@
                                     "doc_title_label":  "Etiqueta / Título",
                                     "doc_title_placeholder":  "Ej: Licencia Ministerio de Turismo 2026",
                                     "doc_file_label":  "Archivo adjunto (solo PDF)",
-                                    "doc_upload_hint":  "📁 Suba un archivo oficial en formato PDF (máx. 5 MB). El documento será accesible y descargable para su validación por parte del equipo de administración.",
+                                    "doc_upload_hint":  "Suba un archivo oficial en formato PDF (máx. 5 MB). El documento será accesible y descargable para su validación por parte del equipo de administración.",
                                     "submit_for_verification":  "Enviar para verificación",
                                     "docs_submitted_title":  "Documentos enviados",
                                     "no_docs":  "Ningún documento enviado todavía.",
@@ -890,12 +965,38 @@
                     "half_day":  "Medio día:",
                     "hourly":  "Por hora:",
                     "virtual":  "Visita virtual:",
-                    "warning_text":  "⚠️ Tras validar este formulario, el guía analizará su solicitud y le enviará un presupuesto personalizado. Solo pagará después de aceptar el presupuesto."
+                    "warning_text":  "Tras validar este formulario, el guía analizará su solicitud y le enviará un presupuesto personalizado. Solo pagará después de aceptar el presupuesto."
                 },
     "Update":  {
                    "later":  "Más tarde",
                    "title":  "Actualización disponible",
                    "install":  "Instalar",
                    "desc":  "Una nueva versión de Heritogo está lista. Instálala para disfrutar de las últimas correcciones."
-               }
+               },
+    "GuidesPage":  {
+                       "tag":  "Guías certificados",
+                       "title":  "Encuentra tu guía",
+                       "subtitle":  "Explora Togo acompañado de un guía local certificado. Cada guía es verificado y calificado por nuestra comunidad.",
+                       "filters":  "Filtros",
+                       "reset":  "Restablecer",
+                       "search_placeholder":  "Buscar un guía…",
+                       "zone_label":  "Zona",
+                       "all_zones":  "Todas las zonas",
+                       "lang_label":  "Idioma",
+                       "all_langs":  "Todos los idiomas",
+                       "price_label":  "Precio máx. / día",
+                       "certified":  "Certificado",
+                       "reviews":  "reseñas",
+                       "languages":  "Idiomas",
+                       "zones":  "Zonas",
+                       "rate_label":  "Tarifa diaria",
+                       "per_day":  "XOF / día",
+                       "view_profile":  "Ver perfil",
+                       "book":  "Reservar",
+                       "no_guides":  "Ningún guía encontrado",
+                       "no_guides_sub":  "Intenta modificar tus filtros para encontrar un guía disponible en tu zona.",
+                       "default_bio":  "Este guía aún no ha completado su biografía.",
+                       "error_loading":  "No se pueden cargar los guías. Inténtalo de nuevo.",
+                       "loading":  "Cargando guías..."
+                   }
 }

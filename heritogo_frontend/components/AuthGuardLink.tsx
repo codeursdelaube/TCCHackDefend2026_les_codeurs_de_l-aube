@@ -1,8 +1,8 @@
 'use client'
 
 import { type ReactNode, type CSSProperties } from 'react'
-import { useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/components/providers/AuthProvider'
 
 interface AuthGuardLinkProps {
   href: string
@@ -13,8 +13,8 @@ interface AuthGuardLinkProps {
 }
 
 /**
- * Wrapper de lien qui vérifie l'authentification avant la navigation.
- * Si l'utilisateur n'est pas connecté, redirige vers la page register
+ * Wrapper de lien qui vérifie l'authentification en mémoire avant la navigation.
+ * Si l'utilisateur n'est pas connecté, redirige vers la page login
  * avec un paramètre redirect pour retourner à la page demandée après connexion.
  */
 export default function AuthGuardLink({
@@ -25,33 +25,26 @@ export default function AuthGuardLink({
   requireAuth = true,
 }: AuthGuardLinkProps) {
   const params = useParams<{ locale: string }>()
+  const router = useRouter()
   const locale = params?.locale || 'fr'
+  const { isAuthenticated, loading } = useAuth()
 
-  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!requireAuth) return
 
-    e.preventDefault()
-
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }))
-
-    if (!user) {
-      // Redirige vers login avec parametre de retour
-      const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
-      window.location.href = `/${locale}/auth/login?redirect=${encodeURIComponent(targetPath)}`
-      return
+    if (!loading && !isAuthenticated) {
+      e.preventDefault()
+      // Redirige vers login avec paramètre de retour
+      router.push(`/${locale}/auth/login?redirect=${encodeURIComponent(targetPath)}`)
     }
-
-    // Naviguer vers la destination avec le bon préfixe locale
-    const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
-    window.location.href = targetPath
   }
 
-  const fullHref = href.startsWith('/') ? `/${locale}${href}` : href
-
   return (
-    <a href={fullHref} onClick={handleClick} className={className} style={style}>
+    <a href={targetPath} onClick={handleClick} className={className} style={style}>
       {children}
     </a>
   )
 }
+

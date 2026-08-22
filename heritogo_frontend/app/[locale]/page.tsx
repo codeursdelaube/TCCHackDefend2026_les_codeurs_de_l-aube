@@ -4,13 +4,16 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowRight, BadgeCheck, BookOpenText, CalendarDays,
-  Check, Crown, Landmark, Languages, Mail,
-  MapPin, Megaphone, Palette, Scan, Star, Users, Utensils, WifiOff,
+  ArrowRight, BadgeCheck, BookOpen, Camera, Check, Compass,
+  Crown, Headphones, Landmark, Languages, MapPin,
+  ShieldCheck, Sparkles, Star, Utensils, WifiOff,
   ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import AuthGuardLink from '@/components/AuthGuardLink'
+import PwaInstallButton from '@/components/PwaInstallButton'
+import { Link } from '@/i18n/navigation'
+import { monuments } from '@/app/LieuxT/site'
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface SlideItem {
@@ -22,7 +25,7 @@ interface SlideItem {
   link: string
 }
 
-/* ─── Tokens couleur — palette Stitch officielle ─────────── */
+/* ─── Tokens couleur — palette officielle HeriTogo ───────── */
 const C = {
   forest: '#004D40',
   rust:   '#BF360C',
@@ -32,10 +35,11 @@ const C = {
 } as const
 
 /* ════════════════════════════════════════════════════════════
-   PAGE ACCUEIL
+   PAGE ACCUEIL HERITOGO
 ════════════════════════════════════════════════════════════ */
 export default function AccueilPage() {
   const t = useTranslations('Accueil')
+  const tMonuments = useTranslations('Monuments')
   const [isOnline, setIsOnline]         = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
 
@@ -67,44 +71,79 @@ export default function AccueilPage() {
     },
   ], [t])
 
-  /* ── Données statiques ── */
-  const categories = useMemo(() => [
-    { icon: Landmark,     label: t('categories.places.label'),    sub: t('categories.places.sub'),    href: '/lieux' },
-    { icon: Palette,      label: t('categories.cultures.label'),  sub: t('categories.cultures.sub'),  href: '/histoire' },
-    { icon: BookOpenText, label: t('categories.stories.label'),   sub: t('categories.stories.sub'),   href: '/histoire' },
-    { icon: CalendarDays, label: t('categories.events.label'),    sub: t('categories.events.sub'),    href: '/lieux' },
-    { icon: Users,        label: t('categories.community.label'), sub: t('categories.community.sub'), href: '/guides' },
+  /* ── Les 4 piliers d'expérience ── */
+  const pillars = useMemo(() => [
+    {
+      href: '/scan',
+      icon: Camera,
+      badge: t('pillars.scan.badge'),
+      isPremium: true,
+      title: t('pillars.scan.title'),
+      description: t('pillars.scan.desc'),
+      action: t('pillars.scan.action'),
+      accent: C.rust,
+    },
+    {
+      href: '/lieux',
+      icon: MapPin,
+      badge: t('pillars.geo.badge'),
+      title: t('pillars.geo.title'),
+      description: t('pillars.geo.desc'),
+      action: t('pillars.geo.action'),
+      accent: C.forest,
+    },
+    {
+      href: '/cuisine',
+      icon: Utensils,
+      badge: t('pillars.food.badge'),
+      title: t('pillars.food.title'),
+      description: t('pillars.food.desc'),
+      action: t('pillars.food.action'),
+      accent: C.gold,
+    },
+    {
+      href: '/guides',
+      icon: Compass,
+      badge: t('pillars.guides.badge'),
+      title: t('pillars.guides.title'),
+      description: t('pillars.guides.desc'),
+      action: t('pillars.guides.action'),
+      accent: C.forest,
+    },
   ], [t])
 
-  const featureCards = useMemo(() => [
+  /* ── Les 3 étapes de fonctionnement ── */
+  const steps = useMemo(() => [
     {
-      href: '/scan', icon: Scan, isPremium: true,
-      title:       t('features.scan_title'),
-      description: t('features.scan_desc'),
-      tag:         t('features.scan_tag'),
-      badge:       t('features.scan_badge'),
-      cta:         t('features.scan_cta'),
+      number: '01',
+      icon: Camera,
+      title: t('steps.0.title'),
+      description: t('steps.0.desc'),
     },
     {
-      href: '/lieux', icon: MapPin, isPremium: false,
-      title:       t('features.geo_title'),
-      description: t('features.geo_desc'),
-      tag:         t('features.geo_tag'),
-      cta:         t('features.geo_cta'),
+      number: '02',
+      icon: Sparkles,
+      title: t('steps.1.title'),
+      description: t('steps.1.desc'),
     },
     {
-      href: '/cuisine', icon: Utensils, isPremium: false,
-      title:       t('features.cuisine_title'),
-      description: t('features.cuisine_desc'),
-      tag:         t('features.cuisine_tag'),
-      cta:         t('features.cuisine_cta'),
+      number: '03',
+      icon: Headphones,
+      title: t('steps.2.title'),
+      description: t('steps.2.desc'),
     },
   ], [t])
 
+  /* ── Sites emblématiques sélectionnés ── */
+  const showcaseSites = useMemo(() => {
+    return monuments.slice(0, 4)
+  }, [])
+
+  /* ── Guides certifiés d'exemple ── */
   const guides = useMemo(() => [
-    { initials: 'KA', name: t('guides.0.name'), rating: '4.8', languages: t('guides.0.languages'), bg: C.forest },
-    { initials: 'EA', name: t('guides.1.name'), rating: '4.9', languages: t('guides.1.languages'), bg: C.rust   },
-    { initials: 'MA', name: t('guides.2.name'), rating: '5.0', languages: t('guides.2.languages'), bg: C.gold   },
+    { initials: 'KA', name: t('guides.0.name'), rating: '4.8', languages: t('guides.0.languages'), bg: C.forest, zone: t('guides.0.zone') },
+    { initials: 'EA', name: t('guides.1.name'), rating: '4.9', languages: t('guides.1.languages'), bg: C.rust,   zone: t('guides.1.zone') },
+    { initials: 'MA', name: t('guides.2.name'), rating: '5.0', languages: t('guides.2.languages'), bg: C.gold,   zone: t('guides.2.zone') },
   ], [t])
 
   const subFeatures = useMemo(() => [
@@ -115,10 +154,10 @@ export default function AccueilPage() {
   ], [t])
 
   const stats = useMemo(() => [
-    { value: '120+', label: t('stats_short.sites') },
-    { value: '7',    label: t('stats_short.regions') },
-    { value: '4',    label: t('stats_short.languages') },
-    { value: '500+', label: t('stats_short.explorers') },
+    { value: '120+', label: t('stats_short.sites'), sub: t('stats_subs.sites') },
+    { value: '5',    label: t('stats_short.regions'), sub: t('stats_subs.regions') },
+    { value: '4',    label: t('stats_short.languages'), sub: t('stats_subs.languages') },
+    { value: '100%', label: t('pwa_label'), sub: t('pwa_sub') },
   ], [t])
 
   /* ── Effets ── */
@@ -143,11 +182,8 @@ export default function AccueilPage() {
 
   const slide = slides[currentSlide]
 
-  /* ════════════════════════════════════════════════════════
-     JSX
-  ════════════════════════════════════════════════════════ */
   return (
-    <main className="min-h-screen bg-background pb-28 pt-16 text-foreground">
+    <main className="min-h-screen bg-base-100 pb-28 pt-16 text-base-content">
 
       {/* ── Bandeau hors ligne ── */}
       {!isOnline && (
@@ -198,7 +234,7 @@ export default function AccueilPage() {
             {t('hero_kicker')}
           </p>
 
-          {/* Titre animé — élément signature */}
+          {/* Titre animé */}
           <AnimatePresence mode="wait">
             <motion.h1
               key={slide.title}
@@ -222,47 +258,48 @@ export default function AccueilPage() {
           </p>
 
           {/* Boutons CTA */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <AuthGuardLink
               href="/scan"
               className="inline-flex min-h-[52px] items-center justify-center gap-2
-                         rounded-lg px-7 py-3 text-sm font-black uppercase tracking-wider
+                         rounded-2xl px-7 py-3 text-sm font-black uppercase tracking-wider
                          text-white shadow-lg transition-all
                          hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
               style={{ background: C.rust }}
             >
-              <Scan className="h-5 w-5" />
+              <Camera className="h-5 w-5" />
               {t('cta_scan')}
             </AuthGuardLink>
             <AuthGuardLink
               href="/lieux"
               className="inline-flex min-h-[52px] items-center justify-center gap-2
-                         rounded-lg border border-white/80 px-7 py-3 text-sm font-black
+                         rounded-2xl border border-white/80 px-7 py-3 text-sm font-black
                          uppercase tracking-wider text-white transition-all
                          hover:bg-white/10 active:scale-[0.98]"
             >
               <MapPin className="h-5 w-5" />
               {t('cta_discover')}
             </AuthGuardLink>
+            <PwaInstallButton className="border-white/30 bg-white/15 text-white hover:bg-white hover:text-black" />
           </div>
         </div>
 
         {/* Flèches */}
         <button
           onClick={() => setCurrentSlide(s => (s - 1 + slides.length) % slides.length)}
-          aria-label="Slide précédent"
+          aria-label={t('previous_slide')}
           className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full
                      bg-black/25 p-2 text-white backdrop-blur-sm transition
-                     hover:bg-black/45 sm:left-5"
+                     hover:bg-black/45 sm:left-5 cursor-pointer"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           onClick={() => setCurrentSlide(s => (s + 1) % slides.length)}
-          aria-label="Slide suivant"
+          aria-label={t('next_slide')}
           className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full
                      bg-black/25 p-2 text-white backdrop-blur-sm transition
-                     hover:bg-black/45 sm:right-5"
+                     hover:bg-black/45 sm:right-5 cursor-pointer"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -276,8 +313,8 @@ export default function AccueilPage() {
               aria-label={t('go_to_slide', { index: i + 1 })}
               className={
                 i === currentSlide
-                  ? 'h-2 w-8 rounded-full bg-white transition-all'
-                  : 'h-2 w-2 rounded-full bg-white/40 transition-all hover:bg-white/65'
+                  ? 'h-2 w-8 rounded-full bg-white transition-all cursor-pointer'
+                  : 'h-2 w-2 rounded-full bg-white/40 transition-all hover:bg-white/65 cursor-pointer'
               }
             />
           ))}
@@ -285,72 +322,23 @@ export default function AccueilPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════
-          CATÉGORIES
+          STATS BAR ÉLÉGANTE
       ══════════════════════════════════════════════════ */}
-      <nav className="border-b border-border bg-card">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.map(cat => {
-            const Icon = cat.icon
-            return (
-              <AuthGuardLink
-                key={cat.label}
-                href={cat.href}
-                className="group flex min-h-[88px] items-center gap-3 border-b-2
-                           border-transparent px-3 py-4 transition-all
-                           hover:border-primary sm:px-4"
-              >
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-                  style={{ background: C.cream, color: C.forest }}
-                >
-                  <Icon className="h-5 w-5" />
-                </span>
-                <span>
-                  <span className="block text-sm font-black text-foreground">
-                    {cat.label}
-                  </span>
-                  <span className="mt-0.5 block text-[11px] font-medium text-muted-foreground">
-                    {cat.sub}
-                  </span>
-                </span>
-              </AuthGuardLink>
-            )
-          })}
-        </div>
-      </nav>
-
-      {/* ══════════════════════════════════════════════════
-          TICKER
-      ══════════════════════════════════════════════════ */}
-      <div className="overflow-hidden py-3" style={{ background: C.cream }}>
-        <div className="flex items-center gap-4">
-          <Megaphone className="ml-5 h-4 w-4 shrink-0" style={{ color: C.rust }} />
-          <motion.p
-            className="flex gap-16 whitespace-nowrap text-xs font-black uppercase tracking-wider"
-            style={{ color: C.forest }}
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-          >
-            {[0, 1, 2, 3].map(n => <span key={n}>{t('ticker')}</span>)}
-          </motion.p>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════
-          STATS BAR
-      ══════════════════════════════════════════════════ */}
-      <section className="px-4 py-8" style={{ background: C.forest }}>
+      <section className="border-b border-border/80 bg-base-200 px-4 py-8 shadow-sm">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 sm:grid-cols-4">
           {stats.map(stat => (
             <div key={stat.label} className="text-center">
               <p
-                className="font-serif text-5xl font-bold italic leading-none sm:text-6xl"
-                style={{ color: C.gold }}
+                className="font-serif text-4xl font-bold italic leading-none sm:text-5xl"
+                style={{ color: C.forest }}
               >
                 {stat.value}
               </p>
-              <p className="mt-2 text-xs font-black uppercase tracking-wide text-white/75">
+              <p className="mt-2 text-xs font-black uppercase tracking-wide text-base-content">
                 {stat.label}
+              </p>
+              <p className="text-[11px] font-medium text-base-content/55">
+                {stat.sub}
               </p>
             </div>
           ))}
@@ -358,83 +346,178 @@ export default function AccueilPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════
-          CONTENU PRINCIPAL
+          CONTENU PRINCIPAL STRUCTURÉ
       ══════════════════════════════════════════════════ */}
-      <div className="mx-auto max-w-5xl space-y-20 px-4 py-16 sm:px-8">
+      <div className="mx-auto max-w-5xl space-y-24 px-4 py-16 sm:px-8">
 
-        {/* ── FONCTIONNALITÉS ── */}
+        {/* ── LES 4 PILIERS DE L'APPLICATION ── */}
         <section>
-          <div className="mb-8">
-            <p
-              className="text-xs font-black uppercase tracking-widest"
-              style={{ color: C.rust }}
+          <div className="mb-10 text-center sm:text-left">
+            <span
+              className="inline-flex items-center gap-2 rounded-2xl bg-secondary/10 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider text-secondary"
             >
-              {t('features_header.tag')}
-            </p>
-            <h2 className="mt-2 font-serif text-4xl font-bold italic text-foreground sm:text-5xl">
-              {t('features_title')}
+              <Sparkles className="h-4 w-4" />
+              {t('pillars_section.badge')}
+            </span>
+            <h2 className="mt-3 font-serif text-3xl font-bold italic sm:text-5xl">
+              {t('pillars_section.title')}
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">
-              {t('features_header.description')}
+            <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-base-content/65 sm:text-base">
+              {t('pillars_section.desc')}
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {featureCards.map(card => {
-              const Icon = card.icon
+          <div className="grid gap-6 md:grid-cols-2">
+            {pillars.map((pillar) => {
+              const Icon = pillar.icon
               return (
                 <AuthGuardLink
-                  key={card.href}
-                  href={card.href}
-                  className="group flex min-h-[340px] flex-col rounded-xl border border-border
-                             bg-card p-6 shadow-sm transition-all
-                             hover:-translate-y-1 hover:border-primary hover:shadow-md"
+                  key={pillar.href}
+                  href={pillar.href}
+                  className="group relative flex flex-col justify-between rounded-[32px] border border-border bg-base-200 p-7 shadow-sm transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
                 >
-                  <div className="mb-5 flex items-start justify-between gap-3">
-                    <div
-                      className="flex h-12 w-12 items-center justify-center rounded-lg text-white"
-                      style={{ background: C.forest }}
-                    >
-                      <Icon className="h-6 w-6" />
+                  <div>
+                    <div className="mb-6 flex items-center justify-between">
+                      <div
+                        className="flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-sm"
+                        style={{ backgroundColor: pillar.accent }}
+                      >
+                        <Icon className="h-7 w-7" />
+                      </div>
+                      <span className="rounded-2xl border border-border bg-base-100 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-base-content/75">
+                        {pillar.badge}
+                      </span>
                     </div>
-                    <span
-                      className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wide"
-                      style={{ background: C.cream, color: C.forest }}
-                    >
-                      {card.tag}
-                    </span>
+
+                    <h3 className="font-serif text-2xl font-bold text-base-content group-hover:text-primary transition-colors">
+                      {pillar.title}
+                    </h3>
+
+                    <p className="mt-3 text-sm font-medium leading-7 text-base-content/65">
+                      {pillar.description}
+                    </p>
                   </div>
 
-                  <h3 className="font-serif text-2xl font-bold italic text-foreground">
-                    {card.title}
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    {card.description}
-                  </p>
-
-                  {card.isPremium && card.badge && (
-                    <span
-                      className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full
-                                 px-3 py-1.5 text-xs font-black text-white"
-                      style={{ background: C.rust }}
-                    >
-                      <Crown className="h-3.5 w-3.5" />
-                      {card.badge}
-                    </span>
-                  )}
-
-                  <span
-                    className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm
-                               font-black transition-all group-hover:gap-3"
-                    style={{ color: C.rust }}
-                  >
-                    {card.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
+                  <div className="mt-8 flex items-center gap-2 text-sm font-black text-secondary">
+                    <span>{pillar.action}</span>
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
+                  </div>
                 </AuthGuardLink>
               )
             })}
+          </div>
+        </section>
+
+        {/* ── COMMENT ÇA MARCHE (SCAN IA) ── */}
+        <section className="rounded-[36px] border border-border bg-base-200 p-8 sm:p-12 shadow-sm">
+          <div className="mb-10 text-center">
+            <span
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary/10 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider text-primary dark:text-secondary"
+            >
+              <Camera className="h-4 w-4" />
+              {t('scanner_section.badge')}
+            </span>
+            <h2 className="mt-3 font-serif text-3xl font-bold italic sm:text-4xl">
+              {t('scanner_section.title')}
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-base-content/60">
+              {t('scanner_section.desc')}
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {steps.map((step) => {
+              const StepIcon = step.icon
+              return (
+                <div
+                  key={step.number}
+                  className="relative flex flex-col rounded-[28px] border border-border bg-base-100 p-6 shadow-xs"
+                >
+                  <span className="text-3xl font-black text-secondary/30">
+                    {step.number}
+                  </span>
+                  <div className="my-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 text-secondary">
+                    <StepIcon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-base-content">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-xs font-medium leading-6 text-base-content/65">
+                    {step.description}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="mt-8 text-center">
+            <AuthGuardLink
+              href="/scan"
+              className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-2xl px-8 py-3 text-sm font-black text-white shadow-md transition-all hover:scale-105"
+              style={{ backgroundColor: C.forest }}
+            >
+              <Camera className="h-4 w-4" />
+              {t('scanner_section.cta')}
+            </AuthGuardLink>
+          </div>
+        </section>
+
+        {/* ── TRÉSORS DU TOGO (MONUMENTS EN VEDETTE) ── */}
+        <section>
+          <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <span
+                className="inline-flex items-center gap-2 rounded-2xl bg-secondary/10 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider text-secondary"
+              >
+                <Landmark className="h-4 w-4" />
+                {t('monuments_section.badge')}
+              </span>
+              <h2 className="mt-3 font-serif text-3xl font-bold italic sm:text-5xl">
+                {t('monuments_section.title')}
+              </h2>
+            </div>
+            <Link
+              href="/lieux"
+              className="inline-flex items-center gap-2 text-sm font-black text-secondary transition-all hover:gap-3"
+            >
+              {t('monuments_section.view_all', { count: monuments.length })}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {showcaseSites.map((site) => (
+              <Link
+                key={site.id}
+                href={`/lieux/${site.id}`}
+                className="group flex flex-col overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="relative h-48 w-full overflow-hidden bg-base-300">
+                  <Image
+                    src={site.image}
+                    alt={tMonuments(`${site.id}.nom`)}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 25vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute right-3 top-3 rounded-xl bg-secondary px-2.5 py-1 text-[10px] font-black uppercase text-secondary-content">
+                    {site.région}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col p-4">
+                  <h3 className="line-clamp-1 font-bold text-base text-base-content group-hover:text-primary transition-colors">
+                    {tMonuments(`${site.id}.nom`)}
+                  </h3>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-base-content/55">
+                    <MapPin className="h-3 w-3 text-secondary shrink-0" />
+                    <span className="truncate">{site.localite}</span>
+                  </p>
+                  <p className="mt-2 line-clamp-2 text-xs text-base-content/65">
+                    {tMonuments(`${site.id}.description`)}
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -443,20 +526,20 @@ export default function AccueilPage() {
           <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p
-                className="text-xs font-black uppercase tracking-widest"
-                style={{ color: C.rust }}
+                className="text-xs font-black uppercase tracking-widest text-secondary"
               >
                 {t('guides.tag')}
               </p>
-              <h2 className="mt-2 font-serif text-4xl font-bold italic text-foreground sm:text-5xl">
+              <h2 className="mt-2 font-serif text-3xl font-bold italic sm:text-5xl">
                 {t('guides_title')}
               </h2>
+              <p className="mt-2 text-xs font-semibold text-base-content/55">
+                {t('guides.sample_disclaimer')}
+              </p>
             </div>
             <AuthGuardLink
               href="/guides"
-              className="inline-flex items-center gap-2 text-sm font-black
-                         transition-all hover:gap-3"
-              style={{ color: C.rust }}
+              className="inline-flex items-center gap-2 text-sm font-black text-secondary transition-all hover:gap-3"
             >
               {t('guides.view_all')}
               <ArrowRight className="h-4 w-4" />
@@ -467,61 +550,66 @@ export default function AccueilPage() {
             {guides.map(guide => (
               <article
                 key={guide.name}
-                className="rounded-xl border border-border bg-card p-6 shadow-sm
-                           transition-all hover:border-primary hover:shadow-md"
+                className="rounded-[30px] border border-border bg-base-200 p-6 shadow-sm
+                           transition-all hover:border-primary/40 hover:shadow-md flex flex-col justify-between"
               >
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex h-14 w-14 shrink-0 items-center justify-center
-                               rounded-full text-lg font-black text-white"
-                    style={{ background: guide.bg }}
-                  >
-                    {guide.initials}
-                  </div>
-                  <div>
-                    <h3 className="font-black text-foreground">{guide.name}</h3>
-                    <span
-                      className="mt-1.5 inline-flex items-center gap-1 rounded-full
-                                 px-2.5 py-1 text-[11px] font-black text-white"
-                      style={{ background: C.forest }}
+                <div>
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="flex h-14 w-14 shrink-0 items-center justify-center
+                                 rounded-2xl text-lg font-black text-white shadow-sm"
+                      style={{ background: guide.bg }}
                     >
-                      <BadgeCheck className="h-3.5 w-3.5" />
-                      {t('guides.certified')}
-                    </span>
+                      {guide.initials}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base text-base-content">{guide.name}</h3>
+                      <span
+                        className="mt-1 inline-flex items-center gap-1 rounded-full
+                                   px-2.5 py-0.5 text-[10px] font-black text-white"
+                        style={{ background: C.forest }}
+                      >
+                        <BadgeCheck className="h-3 w-3" />
+                        {t('guides.certified')}
+                      </span>
+                    </div>
                   </div>
+
+                  <div className="mt-4 flex items-center gap-1.5 text-xs font-black text-base-content">
+                    <Star className="h-4 w-4" style={{ fill: C.gold, color: C.gold }} />
+                    <span>{guide.rating}</span>
+                    <span className="text-base-content/40">• {guide.zone}</span>
+                  </div>
+
+                  <p className="mt-3 flex items-center gap-2 text-xs text-base-content/65">
+                    <Languages className="h-4 w-4 shrink-0 text-secondary" />
+                    <span>{guide.languages}</span>
+                  </p>
                 </div>
 
-                <div className="mt-5 flex items-center gap-1.5 text-sm font-black text-foreground">
-                  <Star className="h-4 w-4" style={{ fill: C.gold, color: C.gold }} />
-                  {guide.rating}
+                <div className="mt-6 border-t border-border/60 pt-4">
+                  <div className="mb-3 flex justify-between items-baseline">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-base-content/45">{t('guide_daily_rate')}</span>
+                    <span className="text-sm font-black text-base-content">{t('guides.price')}</span>
+                  </div>
+                  <AuthGuardLink
+                    href="/guides"
+                    className="inline-flex min-h-[44px] w-full items-center justify-center
+                               rounded-2xl text-xs font-black text-white transition-all
+                               hover:brightness-110 active:scale-[0.98]"
+                    style={{ background: C.forest }}
+                  >
+                    {t('guides.reserve')}
+                  </AuthGuardLink>
                 </div>
-
-                <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Languages className="h-4 w-4 shrink-0" style={{ color: C.rust }} />
-                  {guide.languages}
-                </p>
-
-                <p className="mt-5 text-xl font-black text-foreground">
-                  {t('guides.price')}
-                </p>
-
-                <AuthGuardLink
-                  href="/guides"
-                  className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center
-                             rounded-lg text-sm font-black text-white transition-all
-                             hover:brightness-110 active:scale-[0.98]"
-                  style={{ background: C.forest }}
-                >
-                  {t('guides.reserve')}
-                </AuthGuardLink>
               </article>
             ))}
           </div>
         </section>
 
-        {/* ── ABONNEMENT PREMIUM ── */}
+        {/* ── ABONNEMENT PREMIUM (2 000 FCFA) ── */}
         <section
-          className="rounded-2xl p-7 text-white shadow-xl sm:p-10"
+          className="rounded-[36px] p-8 text-white shadow-2xl sm:p-12"
           style={{ background: C.forest }}
         >
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
@@ -533,16 +621,19 @@ export default function AccueilPage() {
                 <Crown className="h-4 w-4" style={{ color: C.gold }} />
                 {t('subscription.tag')}
               </span>
-              <h2 className="mt-5 font-serif text-4xl font-bold italic sm:text-5xl">
+              <h2 className="mt-5 font-serif text-3xl font-bold italic sm:text-5xl leading-tight">
                 {t('subscribe_title')}
               </h2>
               <p className="mt-4 text-3xl font-black" style={{ color: C.gold }}>
                 {t('subscribe_price')}
               </p>
+              <p className="mt-2 text-xs text-white/70">
+                {t('subscribe_ideal')}
+              </p>
             </div>
 
-            <div className="rounded-xl border border-white/15 bg-white/10 p-6">
-              <ul className="space-y-3">
+            <div className="rounded-[28px] border border-white/15 bg-white/10 p-6 sm:p-8 backdrop-blur-xs">
+              <ul className="space-y-3.5">
                 {subFeatures.map(f => (
                   <li key={f} className="flex items-center gap-3 text-sm font-bold">
                     <Check className="h-5 w-5 shrink-0" style={{ color: C.gold }} />
@@ -552,9 +643,9 @@ export default function AccueilPage() {
               </ul>
               <AuthGuardLink
                 href="/subscription"
-                className="mt-6 inline-flex min-h-[52px] w-full items-center justify-center
-                           rounded-lg text-sm font-black text-white transition-all
-                           hover:brightness-110 active:scale-[0.98]"
+                className="mt-8 inline-flex min-h-[52px] w-full items-center justify-center
+                           rounded-2xl text-sm font-black uppercase tracking-wide text-white transition-all
+                           hover:brightness-110 active:scale-[0.98] shadow-lg cursor-pointer"
                 style={{ background: C.rust }}
               >
                 {t('subscribe_cta')}
@@ -563,33 +654,37 @@ export default function AccueilPage() {
           </div>
         </section>
 
-        {/* ── CTA FINAL ── */}
+        {/* ── APPEL À L'AVENTURE FINAL ── */}
         <section
-          className="rounded-2xl p-8 text-white shadow-xl sm:p-10"
-          style={{ background: C.ink }}
+          className="rounded-[36px] border border-border bg-base-200 p-8 text-base-content sm:p-12 shadow-sm"
         >
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div>
               <p
-                className="text-xs font-black uppercase tracking-widest"
-                style={{ color: C.gold }}
+                className="text-xs font-black uppercase tracking-widest text-secondary"
               >
                 {t('final_cta.tag')}
               </p>
-              <h2 className="mt-3 max-w-lg font-serif text-3xl font-bold italic sm:text-4xl">
+              <h2 className="mt-2 max-w-lg font-serif text-2xl font-bold italic sm:text-4xl">
                 {t('final_cta.title')}
               </h2>
+              <p className="mt-2 text-xs text-base-content/60">
+                {t('final_cta_sub')}
+              </p>
             </div>
-            <AuthGuardLink
-              href="/lieux"
-              className="inline-flex shrink-0 items-center gap-2 rounded-lg px-7 py-4
-                         text-sm font-black transition-all
-                         hover:brightness-110 active:scale-[0.98]"
-              style={{ background: C.gold, color: C.ink }}
-            >
-              {t('final_cta.cta')}
-              <ArrowRight className="h-4 w-4" />
-            </AuthGuardLink>
+            <div className="flex flex-wrap items-center gap-3">
+              <PwaInstallButton />
+              <AuthGuardLink
+                href="/lieux"
+                className="inline-flex shrink-0 items-center gap-2 rounded-2xl px-8 py-4
+                           text-sm font-black text-white transition-all shadow-md
+                           hover:brightness-110 active:scale-[0.98] cursor-pointer"
+                style={{ background: C.forest }}
+              >
+                {t('final_cta.cta')}
+                <ArrowRight className="h-4 w-4" />
+              </AuthGuardLink>
+            </div>
           </div>
         </section>
 

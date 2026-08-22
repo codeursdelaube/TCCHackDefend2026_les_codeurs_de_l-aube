@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { Suspense, useActionState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
@@ -17,7 +17,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="btn w-full rounded-2xl border-none text-white"
+      className="btn w-full rounded-2xl border-none text-white cursor-pointer"
       style={{ backgroundColor: COLORS.forest }}
     >
       {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : t('login_button')}
@@ -25,10 +25,10 @@ function SubmitButton() {
   )
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const t = useTranslations('Auth')
   const params = useParams<{ locale: string }>()
-  const locale = params.locale
+  const locale = params?.locale || 'fr'
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get('redirect') || ''
 
@@ -99,5 +99,19 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   )
 }

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
@@ -49,6 +49,7 @@ export default function HistoirePage() {
               <span className="truncate">{t('badge')}</span>
             </div>
             <h1 className="max-w-4xl text-3xl font-black leading-tight tracking-normal sm:text-5xl lg:text-6xl">{t('title')}</h1>
+            <span className="heritage-weave" />
             <p className="mt-4 max-w-2xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('subtitle')}</p>
           </div>
         </motion.article>

@@ -12,7 +12,7 @@ import {
   Star, Compass, MapPin, ShieldCheck, Heart, 
   AlertCircle, Loader2, ArrowLeft, Calendar, BadgeCent, 
   Briefcase, AlertTriangle, CheckCircle, 
-  Languages, Share2
+  Languages, Share2, Info, UserCheck
 } from 'lucide-react'
 import ReportModal from '@/components/ReportModal'
 import TextToSpeech from '@/components/TextToSpeech'
@@ -127,7 +127,9 @@ export default function GuideDetailPage() {
   if (error || !guide) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-24 text-center">
-        <div className="text-4xl">😕</div>
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-base-200 text-muted-foreground">
+          <UserCheck className="h-8 w-8 opacity-40" />
+        </div>
         <h2 className="font-serif text-xl font-bold text-foreground">
           Guide momentanément indisponible
         </h2>
@@ -410,9 +412,10 @@ export default function GuideDetailPage() {
               )}
             </div>
 
-            <div className="rounded-2xl bg-base-100 p-4 border border-border/60">
+            <div className="rounded-2xl bg-base-100 p-4 border border-border/60 flex items-start gap-2">
+              <Info className="h-4 w-4 shrink-0 text-secondary mt-0.5" />
               <p className="text-xs text-base-content/70 leading-5">
-                💡 Les tarifs sont fixés par le guide et peuvent varier légèrement selon la complexité du circuit proposé ou le nombre de personnes.
+                Les tarifs sont fixés par le guide et peuvent varier légèrement selon la complexité du circuit proposé ou le nombre de personnes.
               </p>
             </div>
             

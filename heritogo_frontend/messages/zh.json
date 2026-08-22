@@ -17,7 +17,9 @@
                    "histoire":  "历史",
                    "guides":  "导游",
                    "login":  "登录",
-                   "register":  "注册"
+                   "register":  "注册",
+                   "discover":  "发现",
+                   "logout":  "退出登录"
                },
     "Accueil":  {
                     "offline_banner":  "离线模式 — 可用缓存数据",
@@ -115,21 +117,25 @@
                     "guides":  {
                                    "0":  {
                                              "name":  "Kossi Adom",
-                                             "languages":  "法语、埃维语、英语"
+                                             "languages":  "法语、埃维语、英语",
+                                             "zone":  "洛美与滨海区"
                                          },
                                    "1":  {
                                              "name":  "Elom Afi",
-                                             "languages":  "法语、米纳语、西班牙语"
+                                             "languages":  "法语、米纳语、西班牙语",
+                                             "zone":  "帕利梅与高原区"
                                          },
                                    "2":  {
                                              "name":  "Mawuli Agbo",
-                                             "languages":  "法语、卡比耶语、英语"
+                                             "languages":  "法语、卡比耶语、英语",
+                                             "zone":  "卡拉与库塔马库"
                                          },
                                    "tag":  "认证导游",
                                    "certified":  "已认证",
                                    "price":  "20,000 FCFA/天",
                                    "reserve":  "预订",
-                                   "view_all":  "查看所有导游"
+                                    "view_all":  "查看所有导游",
+                                    "sample_disclaimer":  "示例参考 — 真实认证导游资料请访问 /guides"
                                },
                     "subscription":  {
                                          "tag":  "高级订阅",
@@ -180,7 +186,74 @@
                                         "regions":  "地区",
                                         "languages":  "语言",
                                         "explorers":  "探索者"
-                                    }
+                                     },
+                    "stats_subs":  {
+                                       "sites":  "已收录纪念碑",
+                                       "regions":  "覆盖地区",
+                                       "languages":  "支持语言",
+                                       "pwa":  "独立 PWA"
+                                   },
+                    "pillars_section":  {
+                                           "badge":  "全面体验",
+                                           "title":  "您的文化探索伴侣",
+                                           "desc":  "HeriTogo将多哥文化遗产数字化，让旅行者和爱好者即时了解该国的活态记忆。"
+                                       },
+                    "pillars":  {
+                                    "scan":  {
+                                                "badge":  "AI扫描",
+                                                "title":  "智能纪念碑扫描仪",
+                                                "desc":  "拍照或上传图片，即刻识别多哥的纪念碑和历史珍宝。",
+                                                "action":  "扫描纪念碑"
+                                            },
+                                    "geo":  {
+                                               "badge":  "地理定位",
+                                               "title":  "景点与国家遗产",
+                                               "desc":  "探索多哥 5 个地区超过 120 个景点，配备 GPS 路线和附近推荐酒店。",
+                                               "action":  "探索地图"
+                                           },
+                                    "food":  {
+                                                "badge":  "美食",
+                                                "title":  "多哥烹饪之旅",
+                                                "desc":  "发现标志性菜肴并找到最佳餐厅品尝正宗美食。",
+                                                "action":  "发现美食"
+                                            },
+                                    "guides":  {
+                                                  "badge":  "导游服务",
+                                                  "title":  "认证当地导游",
+                                                  "desc":  "预订经过验证的专业导游，享受沉浸式参观体验。",
+                                                  "action":  "寻找导游"
+                                              }
+                                },
+                    "scanner_section":  {
+                                           "badge":  "智能技术",
+                                           "title":  "HeriTogo扫描仪如何工作？",
+                                           "desc":  "专为即刻识别多哥文化遗产而设计的计算机视觉技术。",
+                                           "cta":  "立即尝试扫描仪"
+                                       },
+                    "steps":  {
+                                  "0":  {
+                                            "title":  "对准纪念碑",
+                                            "desc":  "将设备对准多哥历史纪念碑，或从相册导入照片。"
+                                        },
+                                  "1":  {
+                                            "title":  "AI识别",
+                                            "desc":  "我们的AI模型分析图像，提取该地的历史、起源和趣闻。"
+                                        },
+                                  "2":  {
+                                            "title":  "聆听并深入了解",
+                                            "desc":  "享受多语言语音合成，或预订认证导游以进一步探索。"
+                                        }
+                              },
+                    "monuments_section":  {
+                                             "badge":  "必看遗产",
+                                             "title":  "探索标志性景点",
+                                             "view_all":  "查看所有纪念碑 ({count})"
+                                         },
+                    "guide_daily_rate":  "日常费用",
+                    "subscribe_ideal":  "适合游客、学生和文化探索者。",
+                    "final_cta_sub":  "今天就开始自由探索多哥。",
+                    "pwa_label":  "离线",
+                    "pwa_sub":  "独立 PWA"
                 },
     "Scan":  {
                  "title":  "Heritogo 扫描器",
@@ -233,7 +306,7 @@
                   "gps_action":  "获取路线",
                   "history_title":  "历史与传说",
                   "desc_title":  "景点介绍",
-                  "rating":  "评分 ★",
+                  "rating":  "评分",
                   "visits_per_year":  "年访问量",
                   "distance":  "距离",
                   "period_tag":  "1905 — 德国殖民时期",
@@ -287,7 +360,9 @@
                     "page_subtitle":  "发现多哥的地道风味",
                     "all":  "全部",
                     "restaurants_available":  "{count} 家餐厅可用",
-                    "directions":  "路线",
+                    "top_restaurants":  "推荐餐厅",
+                    "selection":  "精选",
+                    "directions":  "路线导航",
                     "hero_badge":  "本地风味",
                     "lome_area":  "洛美",
                     "default_hours":  "07:00-22:00",
@@ -634,7 +709,7 @@
                                      "default_country":  "多哥"
                                  },
                       "tourist":  {
-                                      "greeting":  "你好，{name} 👋",
+                                      "greeting":  "你好，{name}",
                                       "subtitle":  "Heritogo 游客中心",
                                       "new_scan":  "新建扫描",
                                       "find_guide":  "寻找导游",
@@ -661,7 +736,7 @@
                                       "status_in_progress":  "进行中",
                                       "status_completed":  "已完成",
                                       "status_cancelled":  "已取消",
-                                      "booking_type":  "🎒 类型: {type}",
+                                      "booking_type":  "类型: {type}",
                                       "offer_label":  "报价: {amount} FCFA",
                                       "view_guide":  "查看导游",
                                       "leave_review":  "发表评价",
@@ -739,7 +814,7 @@
                                     "doc_title_label":  "文件名称 / 标题",
                                     "doc_title_placeholder":  "例如：旅游部官方执照 2026",
                                     "doc_file_label":  "证明文件 (仅限 PDF)",
-                                    "doc_upload_hint":  "📁 请上传 PDF 格式的官方文件 (最大 5 MB)。管理团队将直接查阅并下载此文件进行验证。",
+                                    "doc_upload_hint":  "请上传 PDF 格式的官方文件 (最大 5 MB)。管理团队将直接查阅并下载此文件进行验证。",
                                     "submit_for_verification":  "提交验证",
                                     "docs_submitted_title":  "已提交的文件",
                                     "no_docs":  "暂无提交的文件。",
@@ -889,7 +964,7 @@
                                       "half_day":  "半天服务：",
                                       "hourly":  "按小时服务：",
                                       "virtual":  "线上服务：",
-                                      "warning_text":  "⚠️ 提交此表单后，导游将审核您的需求并发送个性化报价。只有在您接受报价后才需要付款。"
+                                      "warning_text":  "提交此表单后，导游将审核您的需求并发送个性化报价。只有在您接受报价后才需要付款。"
                                   }
                   },
     "Booking":  {
@@ -949,5 +1024,31 @@
                    "title":  "有可用更新",
                    "install":  "安装",
                    "desc":  "Heritogo 的新版本已就绪。请安装以享受最新的修复。"
-               }
+               },
+    "GuidesPage": {
+        "tag": "认证导游",
+        "title": "寻找理想的当地导游",
+        "subtitle": "在热情专业的导游陪伴下安全探索多哥。历史、文化、美食、自然：选择您的专属向导。",
+        "filters": "筛选",
+        "reset": "重置",
+        "search_placeholder": "按姓名搜索...",
+        "zone_label": "服务区域",
+        "all_zones": "所有区域",
+        "lang_label": "使用语言",
+        "all_langs": "所有语言",
+        "price_label": "最高价格 / 天",
+        "loading": "正在加载导游...",
+        "error_loading": "获取导游信息时出错",
+        "no_guides": "未找到导游",
+        "no_guides_sub": "请修改筛选条件或扩大搜索范围以查找当地导游。",
+        "certified": "已认证",
+        "reviews": "条评价",
+        "default_bio": "致力于展示多哥丰富文化遗产的专业认证导游。",
+        "languages": "语言：",
+        "zones": "区域：",
+        "rate_label": "每日费用",
+        "per_day": "XOF/天",
+        "view_profile": "查看资料",
+        "book": "预订"
+    }
 }

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { toast } from 'sonner'
 
 interface GuideInfo {
   id: string
@@ -106,17 +107,22 @@ export default function BookingPage() {
       })
 
       if (!result.ok) {
-        setSubmitError(result.error || t('error_generic'))
+        const err = result.error || t('error_generic')
+        setSubmitError(err)
+        toast.error(err)
         return
       }
 
       setSuccess(true)
+      toast.success(t('request_sent'))
       setTimeout(() => {
         window.location.href = `/${params.locale}/dashboard/tourist?booking_created=true`
       }, 2000)
     } catch (err: unknown) {
       console.error(err)
-      setSubmitError(getUserFriendlyError(err))
+      const userErr = getUserFriendlyError(err)
+      setSubmitError(userErr)
+      toast.error(userErr)
     } finally {
       setSubmitting(false)
     }

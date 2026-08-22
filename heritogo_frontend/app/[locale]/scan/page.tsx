@@ -12,6 +12,7 @@ import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
 import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { toast } from 'sonner'
 
 
 interface PredictionResult {
@@ -122,10 +123,13 @@ export default function ScanPage() {
 
         setResult(result.data)
         setTranslatedText({ fr: result.data.data.histoire })
+        toast.success(`Monument identifié : ${result.data.data.monument}`)
         return null
       } catch (scanError: unknown) {
         console.error(scanError)
-        return getUserFriendlyError(scanError)
+        const errMsg = getUserFriendlyError(scanError)
+        toast.error(errMsg)
+        return errMsg
       }
     },
     null,
@@ -227,6 +231,7 @@ export default function ScanPage() {
     safeLocalStorageSet('heritogo_premium', 'true')
     setIsPremium(true)
     setShowPaywall(false)
+    toast.success('Accès Premium activé ! Scans illimités débloqués.')
   }
 
   return (

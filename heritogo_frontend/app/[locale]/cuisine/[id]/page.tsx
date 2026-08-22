@@ -1,4 +1,4 @@
-﻿import Image from 'next/image'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Banknote, ChefHat, ChevronRight, Flame, MapPin, Navigation, Phone, Soup, Star, Utensils } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
@@ -104,7 +104,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                         <h3 className="text-base font-black">{restaurant.nom}</h3>
                         <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-base-content/55"><MapPin className="h-3.5 w-3.5 text-secondary" />{restaurant.quartier}</p>
                       </div>
-                      {restaurant.note && <span className="inline-flex items-center gap-1 rounded-2xl border border-border bg-base-200 px-2.5 py-1 text-xs font-black"><Star className="h-3.5 w-3.5 fill-secondary text-secondary" />{restaurant.note}</span>}
+                      {restaurant.note && <span className="inline-flex items-center gap-1 rounded-2xl border border-border bg-base-200 px-2.5 py-1 text-xs font-black"><Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />{restaurant.note}</span>}
                     </div>
                     <div className="mt-4 space-y-2 text-xs font-semibold text-base-content/60">
                       <p className="flex items-start gap-2"><MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-secondary" />{restaurant.adresse}</p>

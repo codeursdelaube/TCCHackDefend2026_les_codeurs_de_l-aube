@@ -76,8 +76,9 @@ export default function ReportModal({ reportedId, bookingId, isOpen, onClose, on
           </button>
         </div>
 
-        <div className="mt-4 text-xs text-base-content/60 leading-5">
-          ⚠️ Veuillez signaler tout comportement suspect, fraude, absence ou faux profil. Vos signalements sont traités de manière confidentielle par notre équipe administrative sous 24h.
+        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300 leading-5">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>Veuillez signaler tout comportement suspect, fraude, absence ou faux profil. Vos signalements sont traités de manière confidentielle par notre équipe administrative sous 24h.</span>
         </div>
 
         <div className="mt-6 space-y-4">
