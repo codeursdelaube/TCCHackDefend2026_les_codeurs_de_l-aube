@@ -87,11 +87,11 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
         className={`group inline-flex items-center justify-center gap-2.5 rounded-2xl border border-secondary/30 bg-secondary/10 px-5 py-3 text-xs font-black uppercase tracking-wider text-secondary transition-all hover:bg-secondary hover:text-white active:scale-95 shadow-sm cursor-pointer ${className}`}
       >
         <Smartphone className="h-4 w-4 transition-transform group-hover:scale-110" />
-        <span>Installer l&apos;application (PWA)</span>
+        <span>Installer l&apos;application</span>
         <Download className="h-3.5 w-3.5 opacity-70" />
       </button>
 
-      {/* Modal d'instructions d'installation */}
+      {/* Modal d'instructions d'installation iOS / Navigateur */}
       <AnimatePresence>
         {showIosModal && (
           <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
@@ -99,59 +99,59 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative w-full max-w-md rounded-[32px] border border-border bg-base-100 p-6 shadow-2xl"
+              className="relative w-full max-w-sm rounded-[28px] border border-border bg-base-100 p-6 shadow-2xl text-base-content"
             >
               <button
-                type="button"
                 onClick={() => setShowIosModal(false)}
-                className="absolute right-4 top-4 rounded-xl p-2 text-base-content/50 hover:bg-base-200"
+                className="absolute right-4 top-4 rounded-full p-2 text-base-content/60 hover:bg-base-200 cursor-pointer"
+                aria-label="Fermer"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
 
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10 text-secondary">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
                 <Smartphone className="h-7 w-7" />
               </div>
 
-              <h3 className="font-serif text-2xl font-bold text-base-content">
-                Installer HeriTogo
+              <h3 className="text-center font-serif text-xl font-bold">
+                Installer HeriTogo sur votre écran
               </h3>
-              <p className="mt-2 text-sm text-base-content/65 leading-relaxed font-medium">
-                Accédez à vos guides, cartes et scans même hors ligne, sans passer par un magasin d&apos;applications.
+              <p className="mt-2 text-center text-xs font-medium text-base-content/70 leading-relaxed">
+                Accédez à tous vos guides et monuments instantanément depuis votre écran d&apos;accueil, même sans connexion.
               </p>
 
-              <div className="mt-6 space-y-3.5 rounded-2xl bg-base-200 p-4 text-xs font-semibold text-base-content/80">
+              <div className="mt-6 space-y-3 rounded-2xl bg-base-200 p-4 text-xs font-semibold">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-[11px] font-black text-white">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-base-100 text-primary font-bold shadow-xs">
                     1
-                  </span>
-                  <span>
-                    Sur votre navigateur, appuyez sur le bouton <strong>Partager</strong>{' '}
-                    <Share className="inline h-3.5 w-3.5 text-secondary" />
-                  </span>
+                  </div>
+                  <p>
+                    Appuyez sur le bouton <strong className="text-primary font-bold">Partager</strong> (<Share className="inline h-3.5 w-3.5 align-middle mx-1 text-primary" />) en bas de Safari.
+                  </p>
                 </div>
+
                 <div className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-[11px] font-black text-white">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-base-100 text-primary font-bold shadow-xs">
                     2
-                  </span>
-                  <span>
-                    Faites défiler et sélectionnez{' '}
-                    <strong>« Sur l&apos;écran d&apos;accueil »</strong>{' '}
-                    <PlusSquare className="inline h-3.5 w-3.5 text-secondary" />
-                  </span>
+                  </div>
+                  <p>
+                    Faites défiler puis choisissez <strong className="text-primary font-bold">&laquo; Sur l&apos;écran d&apos;accueil &raquo;</strong> (<PlusSquare className="inline h-3.5 w-3.5 align-middle mx-1 text-primary" />).
+                  </p>
                 </div>
+
                 <div className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-[11px] font-black text-white">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-base-100 text-primary font-bold shadow-xs">
                     3
-                  </span>
-                  <span>Profitez de l&apos;application en plein écran avec le mode hors-ligne !</span>
+                  </div>
+                  <p>
+                    Appuyez sur <strong className="text-primary font-bold">&laquo; Ajouter &raquo;</strong> en haut à droite.
+                  </p>
                 </div>
               </div>
 
               <button
-                type="button"
                 onClick={() => setShowIosModal(false)}
-                className="mt-6 w-full rounded-2xl bg-secondary py-3 text-xs font-black uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 active:scale-98"
+                className="mt-6 w-full rounded-2xl bg-primary py-3 text-xs font-black uppercase tracking-wider text-primary-content shadow-md transition-all hover:brightness-110 active:scale-95 cursor-pointer"
               >
                 J&apos;ai compris
               </button>

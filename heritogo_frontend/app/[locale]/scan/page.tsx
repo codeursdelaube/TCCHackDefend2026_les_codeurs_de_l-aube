@@ -44,6 +44,15 @@ export default function ScanPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Message évolutif d'analyse
+  const [scanStepIndex, setScanStepIndex] = useState(0)
+  const scanStepMessages = [
+    'Numérisation des motifs architecturaux…',
+    'Recherche dans la mémoire patrimoniale du Togo…',
+    'Analyse par vision IA & recoupement géoculturel…',
+    'Génération des anecdotes et secrets historiques…',
+  ]
+
   // Paywall & Limit States
   const [scanCount, setScanCount] = useState<number>(() => {
     if (typeof window === 'undefined') return 0
@@ -134,6 +143,17 @@ export default function ScanPage() {
     },
     null,
   )
+
+  useEffect(() => {
+    if (!loading) {
+      setScanStepIndex(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setScanStepIndex((prev) => (prev + 1) % scanStepMessages.length)
+    }, 2800)
+    return () => clearInterval(interval)
+  }, [loading, scanStepMessages.length])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -325,6 +345,34 @@ export default function ScanPage() {
       {error && (
         <section className="mx-auto mt-5 max-w-6xl rounded-[24px] border border-secondary/30 bg-secondary/10 p-4 text-sm font-bold text-secondary">
           {error}
+        </section>
+      )}
+
+      {loading && (
+        <section className="mx-auto mt-5 max-w-6xl rounded-[32px] border border-border bg-base-200 p-6 shadow-sm sm:p-8 animate-pulse">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
+            <div className="space-y-2">
+              <div className="h-4 w-28 rounded-lg bg-base-300" />
+              <div className="h-8 w-64 rounded-xl bg-base-300" />
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl bg-secondary/15 px-4 py-2.5 text-xs font-black text-secondary">
+              <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+              <span>{scanStepMessages[scanStepIndex]}</span>
+            </div>
+          </div>
+
+          <div className="mt-5 flex gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-9 w-14 rounded-2xl bg-base-300" />
+            ))}
+          </div>
+
+          <div className="mt-5 space-y-3 rounded-[28px] border border-border bg-base-100 p-6">
+            <div className="h-4 w-full rounded-md bg-base-300" />
+            <div className="h-4 w-5/6 rounded-md bg-base-300" />
+            <div className="h-4 w-4/6 rounded-md bg-base-300" />
+            <div className="h-4 w-3/4 rounded-md bg-base-300" />
+          </div>
         </section>
       )}
 

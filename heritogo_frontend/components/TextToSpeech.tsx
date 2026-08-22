@@ -96,7 +96,7 @@ export default function TextToSpeech({ text, className }: TextToSpeechProps) {
       aria-label={isSpeaking ? 'Arrêter la lecture' : 'Écouter'}
       className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-white transition-all active:scale-95 ${className}`}
       style={{
-        background: isSpeaking ? '#BF360C' : '#004D40',
+        background: isSpeaking ? '#BF360C' : '#3B2519',
       }}
     >
       {isLoading

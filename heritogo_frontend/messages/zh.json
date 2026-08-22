@@ -1,1030 +1,1094 @@
 {
-    "Navbar":  {
-                   "accueil":  "首页",
-                   "scan":  "扫描",
-                   "lieux":  "景点",
-                   "cuisine":  "美食",
-                   "loisirs":  "公园与动物园",
-                   "scan_button":  "扫描纪念碑",
-                   "select_lang":  "语言",
-                   "settings":  "设置",
-                   "language":  "语言",
-                   "theme":  "主题",
-                   "light":  "浅色",
-                   "dark":  "深色",
-                   "tagline":  "移动文化遗产",
-                   "close_settings":  "关闭设置",
-                   "histoire":  "历史",
-                   "guides":  "导游",
-                   "login":  "登录",
-                   "register":  "注册",
-                   "discover":  "发现",
-                   "logout":  "退出登录"
-               },
-    "Accueil":  {
-                    "offline_banner":  "离线模式 — 可用缓存数据",
-                    "explorers":  "{count}+ 探索者",
-                    "discover":  "发现",
-                    "scroll":  "滚动",
-                    "hackathon_badge":  "#TCCHackDefend2026",
-                    "slides":  {
-                                   "0":  {
-                                             "title":  "Heritogo",
-                                             "subtitle":  "智能旅游指南",
-                                             "description":  "利用 Gemini AI 瞬间识别多哥纪念碑。对准您的相机，探索历史故事。",
-                                             "buttonText":  "扫描纪念碑"
-                                         },
-                                   "1":  {
-                                             "title":  "探索",
-                                             "subtitle":  "多哥景点",
-                                             "description":  "发现多哥隐藏的宝藏。地理定位实时显示最近的景点。",
-                                             "buttonText":  "探索景点"
-                                         },
-                                   "2":  {
-                                             "title":  "品尝",
-                                             "subtitle":  "烹饪文化遗产",
-                                             "description":  "Fufu, Ablo, Kom… 发现多哥的地道风味以及传承这些美食的餐厅。",
-                                             "buttonText":  "探索美食"
-                                         }
-                               },
-                    "stats":  {
-                                  "lieux":  "已收录景点",
-                                  "regions":  "覆盖区域",
-                                  "explorers":  "探索者人数",
-                                  "rating":  "平均评分"
-                              },
-                    "features_header":  {
-                                            "tag":  "多哥国家遗产",
-                                            "title":  "三大工具，\u003chighlight\u003e一种体验\u003c/highlight\u003e",
-                                            "description":  "Heritogo 结合 AI 与地理定位，带您沉浸式感受多哥文化与美食的核心魅力。"
-                                        },
-                    "features":  {
-                                     "scan_title":  "Gemini AI 扫描器",
-                                     "scan_desc":  "拍摄纪念碑照片。Gemini 2.5 Flash 自动识别并讲述它的历史，支持本地 TTS 语音朗读。",
-                                     "scan_tag":  "Gemini AI",
-                                     "geo_title":  "地理定位与地图",
-                                     "geo_desc":  "您的 GPS 位置通过大圆航线公式计算距离。最近的景点、餐厅和酒店将立即显示。",
-                                     "geo_tag":  "实时定位",
-                                     "cuisine_title":  "烹饪文化遗产",
-                                     "cuisine_desc":  "Fufu, Ablo, Tchakpalo… 探索标志性菜肴，找到您附近供应这些美食的当地餐厅。",
-                                     "cuisine_tag":  "美味烹饪",
-                                     "access":  "访问",
-                                     "scan_badge":  "高级版 2,000 FCFA/月",
-                                     "scan_cta":  "立即扫描",
-                                     "geo_cta":  "探索地图",
-                                     "cuisine_cta":  "发现美食"
-                                 },
-                    "tts_banner":  {
-                                       "title":  "内置语音合成",
-                                       "description":  "直接在您的浏览器中收听法语或英语的纪念碑历史，无需安装任何软件。",
-                                       "button":  "立即尝试"
-                                   },
-                    "gamification":  {
-                                         "tag":  "游戏化",
-                                         "title":  "探索并\u003chighlight\u003e解锁徽章\u003c/highlight\u003e",
-                                         "description":  "访问每个景点或发现每个区域都会解锁徽章奖励。在您的社交网络上分享您的勋章。",
-                                         "button":  "查看我的徽章",
-                                         "progress_title":  "您的进度",
-                                         "progress_text":  "3 / 8 个徽章",
-                                         "badges":  {
-                                                        "explorateur":  "探索者",
-                                                        "lomeen":  "洛美本地通",
-                                                        "enfant_mer":  "大海之子",
-                                                        "decouvreur_nord":  "北部发现者",
-                                                        "tour_togo":  "环游多哥",
-                                                        "gourmet":  "多哥美食家"
-                                                    }
-                                     },
-                    "how_it_works":  {
-                                         "tag":  "简单快捷",
-                                         "title":  "它是如何工作的？",
-                                         "step1_title":  "打开应用",
-                                         "step1_desc":  "从浏览器访问 Heritogo。无需安装 — 它是一个 PWA 应用。",
-                                         "step2_title":  "扫描或探索",
-                                         "step2_desc":  "拍摄纪念碑或开启地理定位，发现身边的历史古迹。",
-                                         "step3_title":  "收听历史",
-                                         "step3_desc":  "AI 识别该地点。语音合成将为您讲述它的历史 — 支持法语和英语。",
-                                         "start":  "开始探索旅程",
-                                         "footer_info":  "免费 · 无需安装 · 支持离线工作"
-                                     },
-                    "previous_slide":  "上一张图片",
-                    "next_slide":  "下一张图片",
-                    "features_title":  "探索我们的功能",
-                    "guides_title":  "预订本地认证导游",
-                    "subscribe_title":  "无限使用 AI 扫描器",
-                    "subscribe_price":  "2,000 FCFA / 月",
-                    "subscribe_cta":  "立即订阅",
-                    "guides":  {
-                                   "0":  {
-                                             "name":  "Kossi Adom",
-                                             "languages":  "法语、埃维语、英语",
-                                             "zone":  "洛美与滨海区"
-                                         },
-                                   "1":  {
-                                             "name":  "Elom Afi",
-                                             "languages":  "法语、米纳语、西班牙语",
-                                             "zone":  "帕利梅与高原区"
-                                         },
-                                   "2":  {
-                                             "name":  "Mawuli Agbo",
-                                             "languages":  "法语、卡比耶语、英语",
-                                             "zone":  "卡拉与库塔马库"
-                                         },
-                                   "tag":  "认证导游",
-                                   "certified":  "已认证",
-                                   "price":  "20,000 FCFA/天",
-                                   "reserve":  "预订",
-                                    "view_all":  "查看所有导游",
-                                    "sample_disclaimer":  "示例参考 — 真实认证导游资料请访问 /guides"
-                               },
-                    "subscription":  {
-                                         "tag":  "高级订阅",
-                                         "features":  {
-                                                          "scans":  "无限扫描",
-                                                          "audio":  "多语言语音导览",
-                                                          "history":  "扫描历史",
-                                                          "offline":  "离线模式"
-                                                      }
-                                     },
-                    "final_cta":  {
-                                      "tag":  "开始旅程",
-                                      "title":  "多哥文化遗产现在就在你的口袋里。",
-                                      "cta":  "探索景点"
-                                  },
-                    "hero_kicker":  "多哥文化遗产智能导览",
-                    "hero_title":  "探索。理解。传承。",
-                    "hero_motto":  "探索。理解。传承。",
-                    "hero_sub":  "您的多哥文化遗产智能导览",
-                    "cta_scan":  "扫描纪念碑",
-                    "cta_discover":  "发现景点",
-                    "go_to_slide":  "跳转到第 {index} 张",
-                    "ticker":  "✦ 我们的遗产连接着过去、现在和未来。用 Heritogo 以全新方式探索多哥 ✦",
-                    "categories":  {
-                                       "places":  {
-                                                      "label":  "景点",
-                                                      "sub":  "文化场所"
-                                                  },
-                                       "cultures":  {
-                                                        "label":  "文化",
-                                                        "sub":  "鲜活传统"
-                                                    },
-                                       "stories":  {
-                                                       "label":  "故事",
-                                                       "sub":  "多哥记忆"
-                                                   },
-                                       "events":  {
-                                                      "label":  "活动",
-                                                      "sub":  "本地亮点"
-                                                  },
-                                       "community":  {
-                                                         "label":  "社区",
-                                                         "sub":  "导游与旅人"
-                                                     }
-                                   },
-                    "stats_short":  {
-                                        "sites":  "景点",
-                                        "regions":  "地区",
-                                        "languages":  "语言",
-                                        "explorers":  "探索者"
-                                     },
-                    "stats_subs":  {
-                                       "sites":  "已收录纪念碑",
-                                       "regions":  "覆盖地区",
-                                       "languages":  "支持语言",
-                                       "pwa":  "独立 PWA"
-                                   },
-                    "pillars_section":  {
-                                           "badge":  "全面体验",
-                                           "title":  "您的文化探索伴侣",
-                                           "desc":  "HeriTogo将多哥文化遗产数字化，让旅行者和爱好者即时了解该国的活态记忆。"
-                                       },
-                    "pillars":  {
-                                    "scan":  {
-                                                "badge":  "AI扫描",
-                                                "title":  "智能纪念碑扫描仪",
-                                                "desc":  "拍照或上传图片，即刻识别多哥的纪念碑和历史珍宝。",
-                                                "action":  "扫描纪念碑"
-                                            },
-                                    "geo":  {
-                                               "badge":  "地理定位",
-                                               "title":  "景点与国家遗产",
-                                               "desc":  "探索多哥 5 个地区超过 120 个景点，配备 GPS 路线和附近推荐酒店。",
-                                               "action":  "探索地图"
-                                           },
-                                    "food":  {
-                                                "badge":  "美食",
-                                                "title":  "多哥烹饪之旅",
-                                                "desc":  "发现标志性菜肴并找到最佳餐厅品尝正宗美食。",
-                                                "action":  "发现美食"
-                                            },
-                                    "guides":  {
-                                                  "badge":  "导游服务",
-                                                  "title":  "认证当地导游",
-                                                  "desc":  "预订经过验证的专业导游，享受沉浸式参观体验。",
-                                                  "action":  "寻找导游"
-                                              }
-                                },
-                    "scanner_section":  {
-                                           "badge":  "智能技术",
-                                           "title":  "HeriTogo扫描仪如何工作？",
-                                           "desc":  "专为即刻识别多哥文化遗产而设计的计算机视觉技术。",
-                                           "cta":  "立即尝试扫描仪"
-                                       },
-                    "steps":  {
-                                  "0":  {
-                                            "title":  "对准纪念碑",
-                                            "desc":  "将设备对准多哥历史纪念碑，或从相册导入照片。"
-                                        },
-                                  "1":  {
-                                            "title":  "AI识别",
-                                            "desc":  "我们的AI模型分析图像，提取该地的历史、起源和趣闻。"
-                                        },
-                                  "2":  {
-                                            "title":  "聆听并深入了解",
-                                            "desc":  "享受多语言语音合成，或预订认证导游以进一步探索。"
-                                        }
-                              },
-                    "monuments_section":  {
-                                             "badge":  "必看遗产",
-                                             "title":  "探索标志性景点",
-                                             "view_all":  "查看所有纪念碑 ({count})"
-                                         },
-                    "guide_daily_rate":  "日常费用",
-                    "subscribe_ideal":  "适合游客、学生和文化探索者。",
-                    "final_cta_sub":  "今天就开始自由探索多哥。",
-                    "pwa_label":  "离线",
-                    "pwa_sub":  "独立 PWA"
+    "Navbar": {
+        "accueil": "首页",
+        "scan": "扫描",
+        "lieux": "景点",
+        "cuisine": "美食",
+        "loisirs": "公园与动物园",
+        "scan_button": "扫描纪念碑",
+        "select_lang": "语言",
+        "settings": "设置",
+        "language": "语言",
+        "theme": "主题",
+        "light": "浅色",
+        "dark": "深色",
+        "tagline": "移动文化遗产",
+        "close_settings": "关闭设置",
+        "histoire": "历史",
+        "guides": "导游",
+        "login": "登录",
+        "register": "注册",
+        "discover": "发现",
+        "logout": "退出登录"
+    },
+    "Accueil": {
+        "categories": {
+            "monuments": "历史古迹",
+            "tamberma": "塔姆贝尔马城堡",
+            "nature": "瀑布与名山",
+            "cuisine": "地道美食与风味",
+            "guides": "认证本地导游",
+            "scan": "智能AI扫描",
+            "plages": "海滩与多哥湖",
+            "histoire": "历史与博物馆"
+        },
+        "offline_banner": "离线模式 — 可用缓存数据",
+        "explorers": "{count}+ 探索者",
+        "discover": "发现",
+        "scroll": "滚动",
+        "hackathon_badge": "#TCCHackDefend2026",
+        "slides": {
+            "0": {
+                "title": "Heritogo",
+                "subtitle": "智能旅游指南",
+                "description": "利用 AI 瞬间识别多哥纪念碑。对准您的相机，探索历史故事。",
+                "buttonText": "扫描纪念碑"
+            },
+            "1": {
+                "title": "探索",
+                "subtitle": "多哥景点",
+                "description": "发现多哥隐藏的宝藏。地理定位实时显示最近的景点。",
+                "buttonText": "探索景点"
+            },
+            "2": {
+                "title": "品尝",
+                "subtitle": "烹饪文化遗产",
+                "description": "Fufu, Ablo, Kom… 发现多哥的地道风味以及传承这些美食的餐厅。",
+                "buttonText": "探索美食"
+            }
+        },
+        "stats": {
+            "lieux": "已收录景点",
+            "regions": "覆盖区域",
+            "explorers": "探索者人数",
+            "rating": "平均评分"
+        },
+        "features_header": {
+            "tag": "多哥国家遗产",
+            "title": "三大工具，<highlight>一种体验</highlight>",
+            "description": "Heritogo 结合 AI 与地理定位，带您沉浸式感受多哥文化与美食的核心魅力。"
+        },
+        "features": {
+            "scan_title": "AI 扫描器",
+            "scan_desc": "拍摄纪念碑照片。Intelligence Artificielle 自动识别并讲述它的历史，支持本地 TTS 语音朗读。",
+            "scan_tag": "AI",
+            "geo_title": "地理定位与地图",
+            "geo_desc": "您的 GPS 位置通过大圆航线公式计算距离。最近的景点、餐厅和酒店将立即显示。",
+            "geo_tag": "实时定位",
+            "cuisine_title": "烹饪文化遗产",
+            "cuisine_desc": "Fufu, Ablo, Tchakpalo… 探索标志性菜肴，找到您附近供应这些美食的当地餐厅。",
+            "cuisine_tag": "美味烹饪",
+            "access": "访问",
+            "scan_badge": "高级版 2,000 FCFA/月",
+            "scan_cta": "立即扫描",
+            "geo_cta": "探索地图",
+            "cuisine_cta": "发现美食"
+        },
+        "tts_banner": {
+            "title": "内置语音合成",
+            "description": "直接在您的浏览器中收听法语或英语的纪念碑历史，无需安装任何软件。",
+            "button": "立即尝试"
+        },
+        "gamification": {
+            "tag": "游戏化",
+            "title": "探索并<highlight>解锁徽章</highlight>",
+            "description": "访问每个景点或发现每个区域都会解锁徽章奖励。在您的社交网络上分享您的勋章。",
+            "button": "查看我的徽章",
+            "progress_title": "您的进度",
+            "progress_text": "3 / 8 个徽章",
+            "badges": {
+                "explorateur": "探索者",
+                "lomeen": "洛美本地通",
+                "enfant_mer": "大海之子",
+                "decouvreur_nord": "北部发现者",
+                "tour_togo": "环游多哥",
+                "gourmet": "多哥美食家"
+            }
+        },
+        "how_it_works": {
+            "tag": "简单快捷",
+            "title": "它是如何工作的？",
+            "step1_title": "打开应用",
+            "step1_desc": "从浏览器访问 Heritogo。无需安装 — 它是一个 PWA 应用。",
+            "step2_title": "扫描或探索",
+            "step2_desc": "拍摄纪念碑或开启地理定位，发现身边的历史古迹。",
+            "step3_title": "收听历史",
+            "step3_desc": "AI 识别该地点。语音合成将为您讲述它的历史 — 支持法语和英语。",
+            "start": "开始探索旅程",
+            "footer_info": "免费 · 无需安装 · 支持离线工作"
+        },
+        "previous_slide": "上一张图片",
+        "next_slide": "下一张图片",
+        "features_title": "探索我们的功能",
+        "guides_title": "预订本地认证导游",
+        "subscribe_title": "无限使用 AI 扫描器",
+        "subscribe_price": "2,000 FCFA / 月",
+        "subscribe_cta": "立即订阅",
+        "guides": {
+            "0": {
+                "name": "Kossi Adom",
+                "languages": "法语、埃维语、英语",
+                "zone": "洛美与滨海区"
+            },
+            "1": {
+                "name": "Elom Afi",
+                "languages": "法语、米纳语、西班牙语",
+                "zone": "帕利梅与高原区"
+            },
+            "2": {
+                "name": "Mawuli Agbo",
+                "languages": "法语、卡比耶语、英语",
+                "zone": "卡拉与库塔马库"
+            },
+            "tag": "认证导游",
+            "certified": "已认证",
+            "price": "20,000 FCFA/天",
+            "reserve": "预订",
+            "view_all": "查看所有导游",
+            "sample_disclaimer": "示例参考 — 真实认证导游资料请访问 /guides"
+        },
+        "subscription": {
+            "tag": "高级订阅",
+            "features": {
+                "scans": "无限扫描",
+                "audio": "多语言语音导览",
+                "history": "扫描历史",
+                "offline": "离线模式"
+            }
+        },
+        "final_cta": {
+            "tag": "开始旅程",
+            "title": "多哥文化遗产现在就在你的口袋里。",
+            "cta": "探索景点"
+        },
+        "hero_kicker": "多哥文化遗产智能导览",
+        "hero_title": "探索。理解。传承。",
+        "hero_motto": "探索。理解。传承。",
+        "hero_sub": "您的多哥文化遗产智能导览",
+        "cta_scan": "扫描纪念碑",
+        "cta_discover": "发现景点",
+        "go_to_slide": "跳转到第 {index} 张",
+        "ticker": "✦ 我们的遗产连接着过去、现在和未来。用 Heritogo 以全新方式探索多哥 ✦",
+        "stats_short": {
+            "sites": "景点",
+            "regions": "地区",
+            "languages": "语言",
+            "explorers": "探索者"
+        },
+        "stats_subs": {
+            "sites": "已收录纪念碑",
+            "regions": "覆盖地区",
+            "languages": "支持语言",
+            "pwa": "独立 PWA"
+        },
+        "pillars_section": {
+            "badge": "全面体验",
+            "title": "您的文化探索伴侣",
+            "desc": "HeriTogo将多哥文化遗产数字化，让旅行者和爱好者即时了解该国的活态记忆。"
+        },
+        "pillars": {
+            "scan": {
+                "badge": "AI扫描",
+                "title": "智能纪念碑扫描仪",
+                "desc": "拍照或上传图片，即刻识别多哥的纪念碑和历史珍宝。",
+                "action": "扫描纪念碑"
+            },
+            "geo": {
+                "badge": "地理定位",
+                "title": "景点与国家遗产",
+                "desc": "探索多哥 5 个地区超过 120 个景点，配备 GPS 路线和附近推荐酒店。",
+                "action": "探索地图"
+            },
+            "food": {
+                "badge": "美食",
+                "title": "多哥烹饪之旅",
+                "desc": "发现标志性菜肴并找到最佳餐厅品尝正宗美食。",
+                "action": "发现美食"
+            },
+            "guides": {
+                "badge": "导游服务",
+                "title": "认证当地导游",
+                "desc": "预订经过验证的专业导游，享受沉浸式参观体验。",
+                "action": "寻找导游"
+            }
+        },
+        "scanner_section": {
+            "badge": "智能技术",
+            "title": "HeriTogo扫描仪如何工作？",
+            "desc": "专为即刻识别多哥文化遗产而设计的计算机视觉技术。",
+            "cta": "立即尝试扫描仪"
+        },
+        "steps": {
+            "0": {
+                "title": "对准纪念碑",
+                "desc": "将设备对准多哥历史纪念碑，或从相册导入照片。"
+            },
+            "1": {
+                "title": "AI识别",
+                "desc": "我们的AI模型分析图像，提取该地的历史、起源和趣闻。"
+            },
+            "2": {
+                "title": "聆听并深入了解",
+                "desc": "享受多语言语音合成，或预订认证导游以进一步探索。"
+            }
+        },
+        "monuments_section": {
+            "badge": "必看遗产",
+            "title": "探索标志性景点",
+            "view_all": "查看所有纪念碑 ({count})"
+        },
+        "guide_daily_rate": "日常费用",
+        "subscribe_ideal": "适合游客、学生和文化探索者。",
+        "final_cta_sub": "今天就开始自由探索多哥。",
+        "pwa_label": "离线",
+        "pwa_sub": "独立 PWA",
+        "tagline": "您的旅行伴侣",
+        "app_name": "HeriTogo",
+        "header_kicker": "多哥遗产与旅游智能指南",
+        "header_title": "探索您身边的多哥旅游目的地与文化遗产。",
+        "destinations_title": "热门目的地",
+        "destinations_subtitle": "精选多哥必游景点",
+        "destinations_see_all": "查看更多",
+        "pill_discover": "探索",
+        "pill_discover_region": "探索该地区",
+        "downloaded_title": "离线目的地",
+        "downloaded_subtitle": "无需网络连接也可随时访问",
+        "downloaded_badge": "离线模式",
+        "downloaded_cached": "PWA缓存",
+        "treasures_title": "1001个多哥必游胜地与珍贵遗产",
+        "treasures_subtitle": "按分类快速探索多哥文化遗产。",
+        "category_counts": {
+            "monuments": "12大核心古迹",
+            "tamberma": "联合国教科文组织库塔马库",
+            "nature": "高原区与克洛托",
+            "cuisine": "9大传统特色美味",
+            "guides": "认证专业伴游",
+            "scan": "即时视觉识别",
+            "plages": "南部海岸与湖泊",
+            "histoire": "鲜活文化记忆"
+        },
+        "incontournables_title": "精选必游",
+        "incontournables_see_all": "查看全部",
+        "regions_section_title": "多哥五大区域尽在指尖",
+        "regions_section_desc": "从大西洋海岸到北部悬崖，领略多哥丰富的自然与人文风貌。",
+        "regions": {
+            "maritime": {
+                "name": "滨海区与大洛美",
+                "tag": "首都与大西洋海岸",
+                "desc": "洛美宫、阿博德拉福奴隶之家、多哥湖与金色沙滩。",
+                "badge": "海岸"
+            },
+            "plateaux": {
+                "name": "高原区与克洛托",
+                "tag": "咖啡、森林与瀑布",
+                "desc": "帕利梅、阿古山、伊克帕瀑布、维亚莱城堡与繁茂庄园。",
+                "badge": "生态旅游"
+            },
+            "centrale": {
+                "name": "中央区与索科德",
+                "tag": "手工艺与古老传统",
+                "desc": "索科德、法扎奥-马尔法卡萨公园、手工纺织与特色民俗节日。",
+                "badge": "传统"
+            },
+            "kara": {
+                "name": "卡拉区与库塔马库",
+                "tag": "联合国世遗塔塔城堡",
+                "desc": "巴塔马里巴传统要塞民居、德法莱山与传统锻造工坊。",
+                "badge": "世遗"
+            },
+            "savanes": {
+                "name": "萨凡纳草原区与达庞",
+                "tag": "岩洞与萨赫勒悬崖",
+                "desc": "纳诺与博古岩画洞穴、狮子坑自然区与壮丽狂野风光。",
+                "badge": "探险"
+            }
+        },
+        "audioguides_section_title": "丰富的语音导览与传奇故事",
+        "audioguides_section_desc": "使用您的母语聆听历史古迹与神圣景点的生动讲解。",
+        "audioguide_sample_title": "独立纪念碑",
+        "audioguide_sample_location": "洛美 • 滨海区",
+        "audioguide_sample_desc": "于1960年4月27日落成，纪念多哥重获国家独立。由乔治·库斯特尔创作的宏伟雕像象征着多哥人民挣脱束缚、迈向自由。",
+        "audioguide_play": "播放故事",
+        "audioguide_pause": "暂停",
+        "audioguide_choose_lang": "导览语言",
+        "audioguide_btn_open": "查看完整详情",
+        "audioguide_tts_badge": "智能AI语音",
+        "interactive_map_title": "在交互式地图上查看旅游景点",
+        "interactive_map_desc": "根据您的兴趣与实时GPS定位，快速查找附近的古迹、瀑布与自然景观。",
+        "interactive_map_all_regions": "所有区域",
+        "interactive_map_btn_gps": "附近的景点",
+        "interactive_map_open_view": "打开交互式地图"
+    },
+    "Scan": {
+        "title": "Heritogo 扫描器",
+        "subtitle": "拍照或导入文件，瞬间识别多哥的文化珍宝和历史纪念碑。",
+        "change_image": "更换图片",
+        "select_capture": "选择您的照片",
+        "compatible_info": "支持实时相机拍摄及相册图片导入。",
+        "open_gallery": "打开相机 / 相册",
+        "analyzing": "AI 智能分析中",
+        "identify": "识别纪念碑",
+        "tts_stop": "停止朗读",
+        "tts_play": "收听历史故事",
+        "gps_available": "GPS 已启用",
+        "errors": {
+            "unknown": "多哥官方数据库中未收录此纪念碑或物体。",
+            "general": "分析过程中发生错误，请稍后再试。",
+            "server": "无法连接到服务器或双子座 AI 服务。"
+        },
+        "result_label": "已识别的纪念地",
+        "gps_active": "GPS 已启用",
+        "premium_active": "高级版已启用",
+        "quota": "额度：{count}/3 次扫描",
+        "default_location": "洛美，多哥",
+        "limit_title": "已达到免费额度",
+        "limit_desc": "你本月已使用 3 次免费的多哥古迹扫描。升级到高级版即可无限扫描，并支持当地旅游。",
+        "premium_scan": "无限古迹扫描",
+        "premium_tts": "高质量多语言 TTS 语音导览",
+        "premium_history": "持久保存访问历史",
+        "premium_cta": "升级到高级版（模拟）",
+        "free_continue": "继续使用免费版"
+    },
+    "Lieux": {
+        "all": "全部",
+        "title": "发现多哥",
+        "subtitle": "探索我们宏伟的国家遗产中蕴藏的文化、历史和自然财富。",
+        "search_placeholder": "搜索旅游景点、瀑布...",
+        "results_for": "搜索结果：",
+        "no_sites": "未找到相关旅游景点",
+        "try_other": "请尝试其他拼写或关键词。",
+        "regions": {
+            "all": "全部",
+            "maritime": "滨海区",
+            "plateaux": "高原区",
+            "kara": "卡拉区",
+            "centrale": "中部区",
+            "savanes": "草原区"
+        },
+        "discover": "探索",
+        "back_to_sites": "返回景点列表",
+        "gps_action": "获取路线",
+        "history_title": "历史与传说",
+        "desc_title": "景点介绍",
+        "rating": "评分",
+        "visits_per_year": "年访问量",
+        "distance": "距离",
+        "period_tag": "1905 — 德国殖民时期",
+        "history_btn": "历史",
+        "info_btn": "实用信息",
+        "hotels_nearby": "附近酒店",
+        "listen": "收听",
+        "stop": "停止",
+        "share": "分享",
+        "copied": "已复制！",
+        "hero_badge": "探索附近",
+        "filter_region": "按地区筛选"
+    },
+    "Cuisine": {
+        "title": "多哥风味",
+        "subtitle": "探索我们丰富的烹饪文化遗产。探索多哥最著名的传统菜肴的历史与秘密。",
+        "search_placeholder": "搜索 fufu, ablo, 酱汁...",
+        "results_for": "搜索结果：",
+        "no_plats": "未找到相关传统菜肴",
+        "try_other": "请尝试其他拼写（例如 come, djenkoume）或分类。",
+        "categories": {
+            "accompagnement": "配菜",
+            "plat_principal": "主菜",
+            "street_food": "街头小吃",
+            "sauce": "酱汁"
+        },
+        "know_more": "了解更多",
+        "acc_prefix": "搭配：",
+        "back_to_cuisine": "返回美食列表",
+        "cuisine_title": "烹饪遗产 · 多哥",
+        "find_nearby": "寻找附近餐厅",
+        "origin_tradition": "起源与传统",
+        "ideal_acc": "完美搭配",
+        "where_to_eat": "在哪里品尝这道菜",
+        "address_count": "{count} 个地点",
+        "no_resto": "目前没有收录这道菜的推荐餐厅。",
+        "other_plats": "其他菜肴 · {category}",
+        "sheet_title": "美食名片",
+        "sheet": {
+            "name": "名称",
+            "category": "类别",
+            "origin": "产地",
+            "acc": "建议搭配"
+        },
+        "available_in": "供应于",
+        "resto_in_lome": "洛美的 {count} 家餐厅",
+        "other_restos": "及另外 {count} 家餐厅…",
+        "view_restos": "查看所有餐厅",
+        "navigate": "获取路线",
+        "page_title": "多哥美食",
+        "page_subtitle": "发现多哥的地道风味",
+        "all": "全部",
+        "restaurants_available": "{count} 家餐厅可用",
+        "top_restaurants": "推荐餐厅",
+        "selection": "精选",
+        "directions": "路线导航",
+        "hero_badge": "本地风味",
+        "lome_area": "洛美",
+        "default_hours": "07:00-22:00",
+        "origin_country": "多哥",
+        "filters": {
+            "ayimolou": "Ayimolou",
+            "fufu": "Fufu",
+            "djenkoume": "Djenkoume",
+            "gboma": "Gboma",
+            "akoume": "Akoume"
+        },
+        "filter_category": "按菜品筛选"
+    },
+    "Loisirs": {
+        "tag": "娱乐与生物多样性",
+        "title": "游乐园与动物园",
+        "subtitle": "探索多哥自然野生与城市环境中的休闲空间、水上乐园和野生动物保护区。",
+        "search_placeholder": "搜索公园、动物园（例如 lome, tatapark）...",
+        "no_parcs": "未找到相关场所",
+        "try_other": "请尝试不带声调的拼写或检查文字是否正确。",
+        "regions": {
+            "savanes": "草原区",
+            "kara": "卡拉区",
+            "centrale": "中部区",
+            "plateaux": "高原区",
+            "maritime": "滨海区"
+        },
+        "gps_available": "GPS 已启用",
+        "rejoin": "获取路线"
+    },
+    "Onboarding": {
+        "scan_tooltip": "扫描纪念碑以了解其历史",
+        "lang_tooltip": "在此更改语言",
+        "settings_tooltip": "访问设置",
+        "skip": "跳过",
+        "next": "下一步",
+        "finish": "完成",
+        "welcome": "欢迎使用 Heritogo！",
+        "intro": "了解如何使用应用程序"
+    },
+    "Plats": {
+        "fufu_togolais": {
+            "nom": "Fufu",
+            "description": "多哥菜的主食，通过在研钵中用力捣煮山药制成。",
+            "histoire": "Fufu 是真正的国家传统，通常在周末和节日期间与家人一起食用。其制作需要非凡的体力：将热山药块用大木杵捣至光滑、有弹性和奶油状的糊状。",
+            "accompagnementsIdaux": "清汤（辣）、棕榈果酱、花生或 Arbi（浓缩番茄）配羊肉、牛肉或鸡肉。"
+        },
+        "ablo_togolais": {
+            "nom": "Ablo",
+            "description": "微甜的米糕，蒸制而成，质地柔软、多孔、蓬松。",
+            "histoire": "Ablo 源自多哥南部和贝宁，是沿海街头美食之王。其细腻的发酵使其具有独特的酸甜味道。历史上由妇女在路边和公交车站出售，传统上陪伴洛美或 Aného 海滩的野餐。",
+            "accompagnementsIdaux": "油炸或烤鱼、黑胡椒（干捣黑胡椒或 'Yébéessé Sourou'）和新鲜洋葱番茄沙拉。"
+        },
+        "kom_togolais": {
+            "nom": "Kohm",
+            "description": "一种致密、微酸的发酵玉米面团球，包裹在玉米叶中煮熟。",
+            "histoire": "也称为 'Galo' 或 'Come'，这道源自加（加纳）的菜肴已成为多哥日常饮食的支柱。发酵玉米面团几天的技术使菜肴可以保存很长时间，使其成为海岸渔民的理想食物。",
+            "accompagnementsIdaux": "油炸鱼、新鲜捣碎的青椒、黑胡椒（Shito）和切片洋葱。"
+        },
+        "ayimolou_togolais": {
+            "nom": "Ayimolou",
+            "description": "传统多哥炒饭与豆类一起煮，赋予其特征性的棕色。",
+            "histoire": "Ayimolou 是多哥最受欢迎的菜肴，是洛美居民的最爱早餐。传统上由 'Ayimolou-tché'（街头小贩）清晨出售，其深色特征是在煮米饭和豆类时添加高粱茎或钾碱获得的。",
+            "accompagnementsIdaux": "红色煎炸油（Wagasi）、黑胡椒粉、煮鸡蛋、油炸鱼或意大利面作为配菜。"
+        },
+        "djenkoume_togolais": {
+            "nom": "Djinkoumé",
+            "description": "一种美味的红色玉米面团，直接在辣番茄和肉浓缩汤中煮熟。",
+            "histoire": "Djinkoumé 是多哥南部 Ewé 人民的祖传菜肴，与其他面团不同，因为玉米面粉不是在清水中煮熟，而是直接注入用大蒜、洋葱和生姜调味的炸鸡的烹饪汁中。这是一道味道丰富的庆祝菜肴。",
+            "accompagnementsIdaux": "当地鸡肉（'自行车鸡'）油炸或烤制和新鲜胡椒。"
+        },
+        "gboma_dessi": {
+            "nom": "Gboma Dessi",
+            "description": "一种丰富奶油状的酱汁，以枯萎的绿叶为基础，与各种肉类和熏鱼一起炖煮。",
+            "histoire": "'Dessi' 一词在 Ewé 中意为酱汁，'Gboma' 指的是一种略带苦味的当地菠菜。这种酱汁是多哥好客的象征：它包含的蛋白质种类越多（蟹、干牛肉皮、虾、熏鱼），客人就越受尊敬。",
+            "accompagnementsIdaux": "理想搭配白玉米面团（Akoumé）或白米饭。"
+        },
+        "adzeme_togolais": {
+            "nom": "Adèmè",
+            "description": "一种绿色、粘稠且营养丰富的酱汁，由 corète 叶制成，因其独特的质地而备受推崇。",
+            "histoire": "Adèmè 是多哥海岸最具标志性的酱汁之一。粘稠质地（类似秋葵）是通过用一撮钾碱煮沸 corète 叶获得的。这是一种以其消化特性和铁含量丰富而闻名的舒适菜肴。",
+            "accompagnementsIdaux": "仅与 Ewassa 或 Akoumé（玉米面团）一起食用。"
+        },
+        "koliko_togolais": {
+            "nom": "Koliko",
+            "description": "外脆内融的薯条，切成方块或条状。",
+            "histoire": "Koliko 是洛美、卡拉和 Atakpamé 街头必不可少的夜间小吃。小贩从日落开始在街角设置大锅沸腾油。这是学生和夜间工作者喜欢的快速、热且经济的餐点。",
+            "accompagnementsIdaux": "辣番茄酱、胡椒粉（Kankan）或配炸火鸡或鸡肉块。"
+        },
+        "vebe_togolais": {
+            "nom": "Vèbè（花生酱）",
+            "description": "一种由烤花生酱制成的奶油般丝滑的酱汁，用当地香料调味。",
+            "histoire": "花生酱贯穿多哥的所有地区，从南到北（花生广泛种植）。它展示了多哥烹饪遗产将甜腻风味与强辣椒结合以创造完美平衡的能力。",
+            "accompagnementsIdaux": "白米饭、山药 fufu 或玉米面团。"
+        }
+    },
+    "Monuments": {
+        "grand_marche_lome": {
+            "nom": "Assigamé 大市场",
+            "description": "多哥首都著名的巨大市场，主要的商业中心和文化十字路口。",
+            "histoire": "在 Assigamé 大市场中，人们发现了 Nana Benz，著名的印花布料商，她们标志着国家的经济历史。"
+        },
+        "cathedrale_lome": {
+            "nom": "洛美圣心大教堂",
+            "description": "20世纪初在首都中心建造的哥特式建筑瑰宝。",
+            "histoire": "该哥特式建筑由圣言会传教士在德国殖民时期于1901年至1902年间建造，是多哥首都最重要的建筑和精神地标之一。1985年教皇约翰保罗二世访问后进行了修复。"
+        },
+        "statue_amitie_germano": {
+            "nom": "德国-多哥友谊雕像",
+            "description": "象征第一次外交协定和1884年保护条约的历史纪念碑。",
+            "histoire": "该雕像在 Baguida 竖立，以纪念1884年7月5日德国探险家 Gustav Nachtigal 与 Togoville 国王 Mlapa III 签署的保护条约。该纪念碑象征着多哥与德国之间复杂外交和历史关系的起点。"
+        },
+        "koutamakou": {
+            "nom": "Batammariba 土地（Koutamakou）",
+            "description": "著名的 Batammariba 土地，以其在西非独特的防御建筑而闻名。",
+            "histoire": "在这个地区，房屋是真正的多层农舍堡垒，其防御形式和露台非常独特。设计用于容纳家庭负责人拥有的一切，它们被分组为约十个单位的小村庄，对应一个氏族。"
+        },
+        "kpalime": {
+            "nom": "Kpalimé（绿色天堂）",
+            "description": "咖啡和可可地区，因其非凡的自然景观而被称为多哥的绿色天堂。",
+            "histoire": "Kpalimé 被茂密树林的山丘、绿色高原、丛林和深谷环绕，被郁郁葱葱的自然环绕，那里是 Agou 峰（多哥最高峰）的所在地。它也是该国最重要的手工艺中心，许多木雕师、蜡染艺术家、陶艺家和织工在那里工作。"
+        },
+        "maison_des_esclaves": {
+            "nom": "奴隶之家（Woold Home）",
+            "description": "位于 Agbodrafo 的感人纪念地，奴隶贸易的历史见证。",
+            "histoire": "位于 Agbodrafo，一个被公认为 '奴隶海岸' 组成部分的古老葡萄牙城市，奴隶之家（Woold Home）以及锁链井构成了这个痛苦过去的主要遗迹，情感依然生动。"
+        },
+        "monument_independance": {
+            "nom": "独立纪念碑",
+            "description": "位于多哥首都中心的一个宏伟国家纪念碑。",
+            "histoire": "位于洛美自由广场旁，这座宏伟纪念碑象征着当代历史、重获独立和多哥人民的主权。"
+        },
+        "musee_de_lome": {
+            "nom": "国家艺术博物馆",
+            "description": "致力于保存多哥艺术、工艺和文化的国家机构。",
+            "histoire": "这座位于首都的著名国家博物馆汇集了该国最好的艺术和遗产收藏，追溯了多哥各社区的文化历史和传统。"
+        },
+        "palais_de_lome": {
+            "nom": "洛美宫",
+            "description": "前殖民宫殿转变为海边的著名艺术中心和植物园。",
+            "histoire": "前总督宫由德国殖民者于1905年建造（随后由法国总督占领），这座宏伟建筑于2019年完全翻新，成为国际规模的艺术和文化中心，周围是海洋边缘具有非凡生物多样性的植物园。"
+        },
+        "chateau_vial": {
+            "nom": "Vial 城堡",
+            "description": "一座历史悠久的哥特式住宅，俯瞰 Kloto 山的森林和山谷。",
+            "histoire": "这座哥特式城堡由当时的法国总督于1940年代在 Kpalimé 附近 Kloto 山的翠绿高度上建造，作为国家住所。它提供了与加纳接壤的森林山谷的无遮挡景观。"
+        },
+        "village_artisanal": {
+            "nom": "洛美手工艺市场",
+            "description": "发现当地创作并观察工匠工作的理想场所。",
+            "histoire": "这是购买有价值纪念品的完美场所。访客可以直接观察多哥工匠的创作过程：蜡染工作、木雕、雕刻或传统编织技术。"
+        },
+        "cascade_yikpa": {
+            "nom": "Yikpa 瀑布",
+            "description": "多哥最壮观和最高的瀑布之一，坐落在野生自然中。",
+            "histoire": "也称为 Douala 瀑布，它是多哥最令人印象深刻和最高的瀑布之一。位于 Danyi 高原的最北端，它沿着陡峭的悬崖流入茂密的植被，壮观地标记着与加纳的自然边界。"
+        }
+    },
+    "Parcs": {
+        "africa_park_tata_park": {
+            "nom": "Africa Park (Tata Park)",
+            "description": "多哥最大的游乐园。它设有机动和充气游乐设施、陀螺车、3D电影院、餐厅和酒吧。",
+            "tarif": "入场：1000-2000 FCFA，额外游乐设施（200-500 FCFA）"
+        },
+        "amoukadi_paradis": {
+            "nom": "Amoukadi Paradis",
+            "description": "位于 Adétikopé 的休闲综合体，提供各种服务如游泳池。",
+            "tarif": "游泳池：成人 1500 FCFA，儿童 1000 FCFA"
+        },
+        "espace_aere_aqualand": {
+            "nom": "Aqualand 开放空间",
+            "description": "一个自然宏伟的环境，既是餐厅又是游乐场。为年轻人和老年人提供游乐设施（滑梯、充气游泳池、秋千、桌上足球）。",
+            "tarif": "免费入场，按菜单消费"
+        },
+        "espace_loisirs_nyumba": {
+            "nom": "Nyumba 休闲空间",
+            "description": "适合所有年龄段的休闲空间，提供游乐设施、游戏、娱乐和餐饮服务，在一个安全有趣的环境中。",
+            "tarif": "入场：每人 500 FCFA，付费游乐设施"
+        },
+        "fil_o_parc": {
+            "nom": "Fil O Parc",
+            "description": "一个休闲和放松综合体，包括游乐场、游泳池和餐厅。",
+            "tarif": "游泳池：成人 2000 FCFA，儿童 1500 FCFA"
+        },
+        "funny_park": {
+            "nom": "Funny Park",
+            "description": "一个提供各种游乐设施的游乐园，包括空调游戏室、户外餐厅、水上乐园和小马俱乐部。",
+            "tarif": "水上乐园：每人 2000 FCFA，游乐设施：300-500 FCFA"
+        },
+        "ludi_park": {
+            "nom": "Ludi Park",
+            "description": "一个拥有12洞迷你高尔夫球场和游乐场的游乐园。",
+            "tarif": "入场：1000 FCFA，迷你高尔夫：额外 2000 FCFA"
+        },
+        "olodge": {
+            "nom": "O'Lodge",
+            "description": "位于多哥湖畔的酒店综合体和水上乐园。（目前报告为永久关闭）",
+            "tarif": "关闭 – 无可用价格"
+        },
+        "parc_zoologique_temedja": {
+            "nom": "Témédja 动物园（Zoo Tali N'na）",
+            "description": "位于 Témédja 的野生动物园，提供在安全自然环境中发现各种野生动物的机会。",
+            "tarif": "入场：成人 2000 FCFA，儿童 1000 FCFA"
+        },
+        "zoo_fauna_cultura": {
+            "nom": "Fauna Cultura 动物园",
+            "description": "一个私人迷你动物园和养殖场。在那里可以观察到80多种动物物种。",
+            "tarif": "入场：每人 2000 FCFA，包含导游"
+        },
+        "parc_evou_kpodegbe": {
+            "nom": "Evou-Kpodegbe 公园",
+            "description": "位于 Témédja 动物园附近的动物园。",
+            "tarif": "入场：每人 1500 FCFA"
+        },
+        "o2_zoo": {
+            "nom": "O2 Zoo",
+            "description": "位于 UCAO-UUT 大学附近的动物园。",
+            "tarif": "免费入场（接受捐赠）"
+        },
+        "alea_park": {
+            "nom": "Aléa Park",
+            "description": "一个建在 7,000 平方米面积上的体育和娱乐综合体，提供广泛的活动。",
+            "tarif": "日套餐：5000 FCFA（访问所有活动），按活动减少套餐"
+        },
+        "parc_national_fazao_malfakassa": {
+            "nom": "Fazao-Malfakassa 国家公园",
+            "description": "多哥最大的国家公园，约50头草原大象、水牛、羚羊、疣猪甚至有时黑猩猩的避难所。",
+            "tarif": "入场：根据国籍约 5000-10000 FCFA（强制导游）"
+        },
+        "parc_national_keran": {
+            "nom": "Kéran 国家公园",
+            "description": "位于多哥北部的国家公园，是许多动物物种的避难所，包括大象和羚羊。",
+            "tarif": "入场：居民 5000 FCFA，非居民 10000 FCFA"
+        },
+        "parc_national_fosse_aux_lions": {
+            "nom": "狮子坑国家公园",
+            "description": "三个多哥国家公园中最小的一个，建于1954年。",
+            "tarif": "入场：每人 3000 FCFA"
+        }
+    },
+    "Common": {
+        "listen": "收听",
+        "stop": "停止"
+    },
+    "ChatBot": {
+        "title": "TGO AI",
+        "subtitle": "文化助手",
+        "welcome": "Woezon！我是 TGO AI，你的文化导游，帮助你了解多哥的纪念地、地区和美食。",
+        "fallback_response": "感谢你的提问。我可以帮助你找到旅途中实用的景点、美食和文化体验。",
+        "typing": "TGO AI 正在准备回复...",
+        "placeholder": "询问关于多哥的问题...",
+        "send": "发送",
+        "open": "打开 TGO AI 聊天",
+        "close": "关闭聊天"
+    },
+    "Histoire": {
+        "badge": "国家记忆",
+        "title": "多哥历史",
+        "subtitle": "一个沉浸式阅读页面，用来讲述多哥的起源、王国、交流、抗争和重要阶段。",
+        "listen_language": "朗读语言",
+        "listen": "朗读历史",
+        "stop": "停止朗读",
+        "contents": "目录",
+        "section": "章节",
+        "paste_hint": "把完整文本粘贴到此文件中的 TOGO_HISTORY_TEXT 常量里。用空行分隔段落，即可自动生成带动画的章节。",
+        "stats": {
+            "period": "多哥",
+            "period_label": "叙事",
+            "sections": "章节"
+        },
+        "paragraphs": [
+            "多哥拥有丰富的历史，这段历史由不同民族、语言、迁徙、贸易路线和精神传统共同塑造。本页面是一个编辑基础，用于向游客呈现完整且易读的故事。",
+            "在殖民时期以前，多哥地区有许多围绕酋邦、王国、市场和代代相传知识而组织起来的社群。",
+            "从十九世纪开始，与欧洲列强的接触深刻改变了这一地区。德国殖民统治以及后来的法国和英国行政管理，留下了政治、建筑和社会层面的痕迹。",
+            "多哥于1960年4月27日宣布独立，这是国家主权的重要一步。此后，多哥继续在记忆、文化创造和共同未来之间书写自己的历史。"
+        ]
+    },
+    "Auth": {
+        "login_title": "登录",
+        "login_subtitle": "访问您的 Heritogo 账户",
+        "register_title": "创建账户",
+        "register_subtitle": "加入 Heritogo 社区",
+        "forgot_title": "忘记密码",
+        "forgot_subtitle": "通过电子邮件接收重置链接",
+        "email": "电子邮件",
+        "password": "密码",
+        "confirm_password": "确认密码",
+        "full_name": "全名",
+        "login_button": "登录",
+        "register_button": "注册",
+        "register_loading": "注册中...",
+        "privacy_accept_prefix": "我已阅读并接受 Heritogo 的",
+        "privacy_policy_link": "隐私政策",
+        "privacy_accept_suffix": "*",
+        "privacy_required_error": "您必须接受隐私政策才能继续。",
+        "password_req_length": "至少 8 个字符",
+        "password_req_uppercase": "一个大写字母",
+        "password_req_lowercase": "一个小写字母",
+        "password_req_number": "一个数字",
+        "forgot_button": "发送链接",
+        "forgot_link": "忘记密码？",
+        "no_account": "还没有账户？",
+        "has_account": "已有账户？",
+        "register_link": "注册",
+        "login_link": "登录",
+        "back_home": "返回首页",
+        "role_label": "我注册为",
+        "role_tourist": "游客",
+        "role_tourist_desc": "探索多哥并预订导游",
+        "role_guide": "导游",
+        "role_guide_desc": "向旅行者提供服务",
+        "loading": "加载中...",
+        "error_generic": "发生错误，请重试。",
+        "error_password_match": "密码不匹配。",
+        "error_password_short": "密码至少需要6个字符。",
+        "success_register": "账户已创建！正在跳转...",
+        "success_forgot": "邮件已发送，请检查收件箱。",
+        "check_email": "请检查电子邮件以确认您的账户。"
+    },
+    "Dashboard": {
+        "common": {
+            "loading": "加载中...",
+            "loading_rights": "正在验证管理员权限...",
+            "loading_guide": "正在加载您的导游中心...",
+            "loading_space": "正在加载您的个人中心...",
+            "error_update": "更新时发生错误",
+            "error_network": "网络错误",
+            "error_server": "无法与服务器通信。",
+            "success_update": "个人资料更新成功！",
+            "success_booking_sent": "您的预订申请已成功发送给导游！他们将很快与您联系并提供报价。",
+            "cancel": "取消",
+            "approve": "批准",
+            "reject": "拒绝",
+            "save": "保存",
+            "save_changes": "保存修改",
+            "not_specified": "未填写",
+            "status": "状态",
+            "date": "日期",
+            "amount": "金额",
+            "action": "操作",
+            "details": "详情",
+            "guest_name": "朋友",
+            "not_available": "N/A",
+            "default_country": "多哥"
+        },
+        "tourist": {
+            "greeting": "你好，{name}",
+            "subtitle": "Heritogo 游客中心",
+            "new_scan": "新建扫描",
+            "find_guide": "寻找导游",
+            "tab_profile": "我的资料",
+            "tab_bookings": "我的预订",
+            "tab_favorites": "我的收藏",
+            "tab_scans": "扫描历史",
+            "info_title": "信息",
+            "full_name": "全名",
+            "email": "电子邮件",
+            "phone": "电话",
+            "preferred_lang": "首选语言",
+            "edit_profile": "修改个人资料",
+            "lang_fr": "法语",
+            "lang_en": "英语",
+            "lang_es": "西班牙语",
+            "lang_zh": "中文",
+            "no_bookings": "暂无预订",
+            "no_bookings_desc": "探索我们认证的多哥导游，规划您的下一次文化之旅！",
+            "explore_guides": "探索导游",
+            "status_quote_requested": "已请求报价",
+            "status_quote_sent": "已收到报价",
+            "status_confirmed": "已确认",
+            "status_in_progress": "进行中",
+            "status_completed": "已完成",
+            "status_cancelled": "已取消",
+            "booking_type": "类型: {type}",
+            "offer_label": "报价: {amount} FCFA",
+            "view_guide": "查看导游",
+            "leave_review": "发表评价",
+            "review_left": "已评价 ({rating}/5)",
+            "no_favorites": "暂无收藏的导游",
+            "no_favorites_desc": "从公开列表中将导游添加到您的收藏夹，以便更快速地找到他们。",
+            "view_guides": "查看导游",
+            "details": "详情",
+            "book": "预订",
+            "no_scans": "暂无扫描记录",
+            "no_scans_desc": "通过拍摄纪念碑的照片，探索多哥财富的历史。",
+            "open_scanner": "打开扫描仪",
+            "date_unknown": "日期未知",
+            "scan_again": "重新扫描",
+            "lang_label": "语言:",
+            "zones_label": "区域:",
+            "rate_label": "费用:"
+        },
+        "guide": {
+            "greeting": "你好，{name}",
+            "status_approved": "已批准",
+            "status_under_review": "审核中",
+            "status_rejected": "已拒绝",
+            "status_waiting": "等待提交文件",
+            "missions_stat": "任务数",
+            "rating_stat": "综合评分",
+            "tab_bookings": "申请与任务",
+            "tab_profile": "编辑公开资料",
+            "tab_documents": "文件验证",
+            "new_quotes_title": "新报价请求",
+            "no_quotes": "暂无新报价请求。",
+            "status_quote_required": "需要报价",
+            "meeting_point": "集合地点: {point}",
+            "group_size": "人数: {size} 人",
+            "refuse": "拒绝",
+            "send_quote_btn": "发送报价",
+            "confirmed_missions_title": "已确认与进行中的任务",
+            "no_active_missions": "暂无进行中或已确认的任务。",
+            "status_in_progress": "进行中",
+            "status_confirmed": "已确认",
+            "budget_label": "预算: {amount} XOF",
+            "contact_label": "联系电话: ",
+            "start_mission": "开始向导服务",
+            "complete_mission": "标记为已完成",
+            "missions_history": "任务历史",
+            "table_tourist": "游客",
+            "table_status": "状态",
+            "table_action": "操作 / 备注",
+            "history_completed": "已完成",
+            "history_cancelled": "已取消",
+            "history_quote_sent": "已发送报价",
+            "cancel_quote": "取消报价",
+            "mission_paid": "任务已支付",
+            "no_history": "暂无历史记录。",
+            "phone_label": "电话号码",
+            "exp_label": "从业年限",
+            "bio_label": "个人简介",
+            "bio_placeholder": "介绍您的背景、对多哥的热爱以及您推荐的旅游路线...",
+            "rates_title": "费率 (XOF)",
+            "rate_full": "全天费率",
+            "rate_half": "半天费率",
+            "rate_hour": "时薪",
+            "rate_virtual": "虚拟服务 (选填)",
+            "langs_title": "精通语言",
+            "zones_title": "服务区域",
+            "specs_title": "您的专长",
+            "spec_placeholder": "例如：生态旅游、森林徒步",
+            "add_spec": "添加",
+            "submit_doc_title": "提交证明文件",
+            "doc_type": "文件类型",
+            "doc_license": "官方导游执照",
+            "doc_id": "身份证或护照",
+            "doc_cert": "认证或证书 (历史/旅游相关)",
+            "doc_other": "其他证明文件",
+            "doc_title_label": "文件名称 / 标题",
+            "doc_title_placeholder": "例如：旅游部官方执照 2026",
+            "doc_file_label": "证明文件 (仅限 PDF)",
+            "doc_upload_hint": "请上传 PDF 格式的官方文件 (最大 5 MB)。管理团队将直接查阅并下载此文件进行验证。",
+            "submit_for_verification": "提交验证",
+            "docs_submitted_title": "已提交的文件",
+            "no_docs": "暂无提交的文件。",
+            "open_doc": "打开文件",
+            "doc_verified": "已验证",
+            "doc_pending": "审核中",
+            "propose_quote_title": "提供报价",
+            "proposed_amount": "建议金额 (XOF)",
+            "message_explan": "说明留言",
+            "message_placeholder": "说明该报价包含的项目 (交通、餐饮、景点门票等)...",
+            "send_quote": "发送报价",
+            "confirm_action": "您确定要执行此操作吗？",
+            "review_count_label": "评价",
+            "start_at": "开始时间 {time}",
+            "default_doc_label": "验证文件",
+            "cancel_reason_refused": "导游已拒绝",
+            "cancel_reason_guide": "导游已取消",
+            "pdf_only": "只允许上传 PDF 文件。",
+            "pdf_too_large": "文件不得超过 5 MB。",
+            "remove": "移除"
+        },
+        "admin": {
+            "console_title": "管理后台",
+            "general_admin": "系统管理",
+            "admin_subtitle": "验证认证导游、处理社区举报以及审核游客评价。",
+            "stat_exam": "待审导游",
+            "stat_reports": "待处理举报",
+            "stat_reviews": "提交的评价",
+            "stat_total": "总导游数",
+            "tab_validation": "导游验证",
+            "tab_reports": "举报管理",
+            "tab_reviews": "评价审核",
+            "tab_logs": "操作日志",
+            "pending_title": "待批准的申请",
+            "no_pending": "暂无待验证的导游申请。",
+            "exp_status_label": "{years} 年经验 • 状态: ",
+            "docs_provided": "提供的证明文件:",
+            "download_pdf": "下载 PDF",
+            "manage_guides": "管理所有导游",
+            "table_name": "姓名",
+            "table_status": "当前状态",
+            "table_rating": "综合评分",
+            "table_missions": "任务数",
+            "table_actions": "操作",
+            "suspend": "停用",
+            "reactivate": "重新启用",
+            "confirm_approve": "您确定要批准该导游并验证其文件吗？",
+            "confirm_suspend": "您确定要停用该导游吗？",
+            "error_approve": "批准时发生错误",
+            "error_reject": "拒绝时发生错误",
+            "error_suspend": "停用时发生错误",
+            "error_resolve": "处理举报时发生错误",
+            "error_toggle_hidden": "修改评价可见性时发生错误",
+            "reports_title": "社区举报列表",
+            "no_reports": "暂无举报记录。",
+            "report_reason": "举报原因: {reason}",
+            "reporter": "举报人: ",
+            "reported_guide": "被举报人: ",
+            "description_label": "详情描述:",
+            "reject_report": "驳回举报",
+            "resolve_report": "标记为已解决",
+            "resolve_prompt": "解决备注:",
+            "resolve_default": "管理员已处理",
+            "reviews_title": "游客评价审核",
+            "no_reviews": "暂无评价。",
+            "hidden": "已隐藏",
+            "review_author": "来自 {reviewer} 对导游 {guide} 的评价",
+            "no_comment": "未填写评论内容。",
+            "hidden_reason_label": "隐藏原因: {reason}",
+            "make_public": "公开显示",
+            "hide_review": "隐藏评价",
+            "logs_title": "管理员操作日志",
+            "table_date": "日期",
+            "table_admin": "管理员",
+            "table_action": "操作",
+            "table_target": "目标",
+            "table_details": "详情",
+            "no_logs": "暂无操作记录。",
+            "reject_modal_title": "拒绝原因",
+            "reject_modal_subtitle": "请输入拒绝接受该导游证明文件的原因。该消息将通知对方。",
+            "reject_modal_placeholder": "例如：文件模糊不清或无法阅读。执照已过期。",
+            "reject_guide_btn": "拒绝导游",
+            "hide_modal_title": "隐藏评价",
+            "hide_modal_subtitle": "请输入隐藏此评价的原因以作记录。",
+            "hide_modal_placeholder": "例如：评价包含辱骂或不当言论。",
+            "load_error": "加载管理数据时出错。",
+            "quick_action_reason": "管理员快速操作"
+        },
+        "share": {
+            "title": "分享我的行程",
+            "text_intro": "这是我通过 Heritogo 规划的行程:",
+            "copy_link": "复制链接",
+            "copied": "链接已复制！",
+            "whatsapp": "分享到 WhatsApp",
+            "no_items": "没有可分享的项目",
+            "share_btn": "分享",
+            "share_gps": "GPS:",
+            "discover_app": "在 Heritogo 上发现："
+        },
+        "Booking": {
+            "loading": "正在加载表单...",
+            "error_fetching_guide": "获取导游信息时出错",
+            "error_loading_guide": "无法加载导游数据",
+            "guide_not_found": "找不到导游",
+            "guide_not_available": "该导游目前不可预订。",
+            "back_to_directory": "返回名录",
+            "back_to_profile": "返回导游个人主页",
+            "booking_request": "预订申请",
+            "form_subtitle": "填写此表单向 {name} 发送报价申请。",
+            "request_sent": "申请已发送！",
+            "success_message": "您的预订申请已成功传送。正在重定向到您的仪表板...",
+            "error_start_date": "请选择开始日期。",
+            "error_generic": "预订时发生错误。",
+            "mission_type_label": "服务/任务类型",
+            "types": {
+                "full_day": {
+                    "label": "全天",
+                    "desc": "完整行程"
                 },
-    "Scan":  {
-                 "title":  "Heritogo 扫描器",
-                 "subtitle":  "拍照或导入文件，瞬间识别多哥的文化珍宝和历史纪念碑。",
-                 "change_image":  "更换图片",
-                 "select_capture":  "选择您的照片",
-                 "compatible_info":  "支持实时相机拍摄及相册图片导入。",
-                 "open_gallery":  "打开相机 / 相册",
-                 "analyzing":  "AI 智能分析中",
-                 "identify":  "识别纪念碑",
-                 "tts_stop":  "停止朗读",
-                 "tts_play":  "收听历史故事",
-                 "gps_available":  "GPS 已启用",
-                 "errors":  {
-                                "unknown":  "多哥官方数据库中未收录此纪念碑或物体。",
-                                "general":  "分析过程中发生错误，请稍后再试。",
-                                "server":  "无法连接到服务器或双子座 AI 服务。"
-                            },
-                 "result_label":  "已识别的纪念地",
-                 "gps_active":  "GPS 已启用",
-                 "premium_active":  "高级版已启用",
-                 "quota":  "额度：{count}/3 次扫描",
-                 "default_location":  "洛美，多哥",
-                 "limit_title":  "已达到免费额度",
-                 "limit_desc":  "你本月已使用 3 次免费的多哥古迹扫描。升级到高级版即可无限扫描，并支持当地旅游。",
-                 "premium_scan":  "无限古迹扫描",
-                 "premium_tts":  "高质量多语言 TTS 语音导览",
-                 "premium_history":  "持久保存访问历史",
-                 "premium_cta":  "升级到高级版（模拟）",
-                 "free_continue":  "继续使用免费版"
-             },
-    "Lieux":  {
-                  "all":  "全部",
-                  "title":  "发现多哥",
-                  "subtitle":  "探索我们宏伟的国家遗产中蕴藏的文化、历史和自然财富。",
-                  "search_placeholder":  "搜索旅游景点、瀑布...",
-                  "results_for":  "搜索结果：",
-                  "no_sites":  "未找到相关旅游景点",
-                  "try_other":  "请尝试其他拼写或关键词。",
-                  "regions":  {
-                                  "all":  "全部",
-                                  "maritime":  "滨海区",
-                                  "plateaux":  "高原区",
-                                  "kara":  "卡拉区",
-                                  "centrale":  "中部区",
-                                  "savanes":  "草原区"
-                              },
-                  "discover":  "探索",
-                  "back_to_sites":  "返回景点列表",
-                  "gps_action":  "获取路线",
-                  "history_title":  "历史与传说",
-                  "desc_title":  "景点介绍",
-                  "rating":  "评分",
-                  "visits_per_year":  "年访问量",
-                  "distance":  "距离",
-                  "period_tag":  "1905 — 德国殖民时期",
-                  "history_btn":  "历史",
-                  "info_btn":  "实用信息",
-                  "hotels_nearby":  "附近酒店",
-                  "listen":  "收听",
-                  "stop":  "停止",
-                  "share":  "分享",
-                  "copied":  "已复制！",
-                  "hero_badge":  "探索附近",
-                  "filter_region":  "按地区筛选"
-              },
-    "Cuisine":  {
-                    "title":  "多哥风味",
-                    "subtitle":  "探索我们丰富的烹饪文化遗产。探索多哥最著名的传统菜肴的历史与秘密。",
-                    "search_placeholder":  "搜索 fufu, ablo, 酱汁...",
-                    "results_for":  "搜索结果：",
-                    "no_plats":  "未找到相关传统菜肴",
-                    "try_other":  "请尝试其他拼写（例如 come, djenkoume）或分类。",
-                    "categories":  {
-                                       "accompagnement":  "配菜",
-                                       "plat_principal":  "主菜",
-                                       "street_food":  "街头小吃",
-                                       "sauce":  "酱汁"
-                                   },
-                    "know_more":  "了解更多",
-                    "acc_prefix":  "搭配：",
-                    "back_to_cuisine":  "返回美食列表",
-                    "cuisine_title":  "烹饪遗产 · 多哥",
-                    "find_nearby":  "寻找附近餐厅",
-                    "origin_tradition":  "起源与传统",
-                    "ideal_acc":  "完美搭配",
-                    "where_to_eat":  "在哪里品尝这道菜",
-                    "address_count":  "{count} 个地点",
-                    "no_resto":  "目前没有收录这道菜的推荐餐厅。",
-                    "other_plats":  "其他菜肴 · {category}",
-                    "sheet_title":  "美食名片",
-                    "sheet":  {
-                                  "name":  "名称",
-                                  "category":  "类别",
-                                  "origin":  "产地",
-                                  "acc":  "建议搭配"
-                              },
-                    "available_in":  "供应于",
-                    "resto_in_lome":  "洛美的 {count} 家餐厅",
-                    "other_restos":  "及另外 {count} 家餐厅…",
-                    "view_restos":  "查看所有餐厅",
-                    "navigate":  "获取路线",
-                    "page_title":  "多哥美食",
-                    "page_subtitle":  "发现多哥的地道风味",
-                    "all":  "全部",
-                    "restaurants_available":  "{count} 家餐厅可用",
-                    "top_restaurants":  "推荐餐厅",
-                    "selection":  "精选",
-                    "directions":  "路线导航",
-                    "hero_badge":  "本地风味",
-                    "lome_area":  "洛美",
-                    "default_hours":  "07:00-22:00",
-                    "origin_country":  "多哥",
-                    "filters":  {
-                                    "ayimolou":  "Ayimolou",
-                                    "fufu":  "Fufu",
-                                    "djenkoume":  "Djenkoume",
-                                    "gboma":  "Gboma",
-                                    "akoume":  "Akoume"
-                                },
-                    "filter_category":  "按菜品筛选"
+                "half_day": {
+                    "label": "半天",
+                    "desc": "上午/下午"
                 },
-    "Loisirs":  {
-                    "tag":  "娱乐与生物多样性",
-                    "title":  "游乐园与动物园",
-                    "subtitle":  "探索多哥自然野生与城市环境中的休闲空间、水上乐园和野生动物保护区。",
-                    "search_placeholder":  "搜索公园、动物园（例如 lome, tatapark）...",
-                    "no_parcs":  "未找到相关场所",
-                    "try_other":  "请尝试不带声调的拼写或检查文字是否正确。",
-                    "regions":  {
-                                    "savanes":  "草原区",
-                                    "kara":  "卡拉区",
-                                    "centrale":  "中部区",
-                                    "plateaux":  "高原区",
-                                    "maritime":  "滨海区"
-                                },
-                    "gps_available":  "GPS 已启用",
-                    "rejoin":  "获取路线"
+                "hourly": {
+                    "label": "按小时",
+                    "desc": "按小时计费"
                 },
-    "Onboarding":  {
-                       "scan_tooltip":  "扫描纪念碑以了解其历史",
-                       "lang_tooltip":  "在此更改语言",
-                       "settings_tooltip":  "访问设置",
-                       "skip":  "跳过",
-                       "next":  "下一步",
-                       "finish":  "完成",
-                       "welcome":  "欢迎使用 Heritogo！",
-                       "intro":  "了解如何使用应用程序"
-                   },
-    "Plats":  {
-                  "fufu_togolais":  {
-                                        "nom":  "Fufu",
-                                        "description":  "多哥菜的主食，通过在研钵中用力捣煮山药制成。",
-                                        "histoire":  "Fufu 是真正的国家传统，通常在周末和节日期间与家人一起食用。其制作需要非凡的体力：将热山药块用大木杵捣至光滑、有弹性和奶油状的糊状。",
-                                        "accompagnementsIdaux":  "清汤（辣）、棕榈果酱、花生或 Arbi（浓缩番茄）配羊肉、牛肉或鸡肉。"
-                                    },
-                  "ablo_togolais":  {
-                                        "nom":  "Ablo",
-                                        "description":  "微甜的米糕，蒸制而成，质地柔软、多孔、蓬松。",
-                                        "histoire":  "Ablo 源自多哥南部和贝宁，是沿海街头美食之王。其细腻的发酵使其具有独特的酸甜味道。历史上由妇女在路边和公交车站出售，传统上陪伴洛美或 Aného 海滩的野餐。",
-                                        "accompagnementsIdaux":  "油炸或烤鱼、黑胡椒（干捣黑胡椒或 \u0027Yébéessé Sourou\u0027）和新鲜洋葱番茄沙拉。"
-                                    },
-                  "kom_togolais":  {
-                                       "nom":  "Kohm",
-                                       "description":  "一种致密、微酸的发酵玉米面团球，包裹在玉米叶中煮熟。",
-                                       "histoire":  "也称为 \u0027Galo\u0027 或 \u0027Come\u0027，这道源自加（加纳）的菜肴已成为多哥日常饮食的支柱。发酵玉米面团几天的技术使菜肴可以保存很长时间，使其成为海岸渔民的理想食物。",
-                                       "accompagnementsIdaux":  "油炸鱼、新鲜捣碎的青椒、黑胡椒（Shito）和切片洋葱。"
-                                   },
-                  "ayimolou_togolais":  {
-                                            "nom":  "Ayimolou",
-                                            "description":  "传统多哥炒饭与豆类一起煮，赋予其特征性的棕色。",
-                                            "histoire":  "Ayimolou 是多哥最受欢迎的菜肴，是洛美居民的最爱早餐。传统上由 \u0027Ayimolou-tché\u0027（街头小贩）清晨出售，其深色特征是在煮米饭和豆类时添加高粱茎或钾碱获得的。",
-                                            "accompagnementsIdaux":  "红色煎炸油（Wagasi）、黑胡椒粉、煮鸡蛋、油炸鱼或意大利面作为配菜。"
-                                        },
-                  "djenkoume_togolais":  {
-                                             "nom":  "Djinkoumé",
-                                             "description":  "一种美味的红色玉米面团，直接在辣番茄和肉浓缩汤中煮熟。",
-                                             "histoire":  "Djinkoumé 是多哥南部 Ewé 人民的祖传菜肴，与其他面团不同，因为玉米面粉不是在清水中煮熟，而是直接注入用大蒜、洋葱和生姜调味的炸鸡的烹饪汁中。这是一道味道丰富的庆祝菜肴。",
-                                             "accompagnementsIdaux":  "当地鸡肉（\u0027自行车鸡\u0027）油炸或烤制和新鲜胡椒。"
-                                         },
-                  "gboma_dessi":  {
-                                      "nom":  "Gboma Dessi",
-                                      "description":  "一种丰富奶油状的酱汁，以枯萎的绿叶为基础，与各种肉类和熏鱼一起炖煮。",
-                                      "histoire":  "\u0027Dessi\u0027 一词在 Ewé 中意为酱汁，\u0027Gboma\u0027 指的是一种略带苦味的当地菠菜。这种酱汁是多哥好客的象征：它包含的蛋白质种类越多（蟹、干牛肉皮、虾、熏鱼），客人就越受尊敬。",
-                                      "accompagnementsIdaux":  "理想搭配白玉米面团（Akoumé）或白米饭。"
-                                  },
-                  "adzeme_togolais":  {
-                                          "nom":  "Adèmè",
-                                          "description":  "一种绿色、粘稠且营养丰富的酱汁，由 corète 叶制成，因其独特的质地而备受推崇。",
-                                          "histoire":  "Adèmè 是多哥海岸最具标志性的酱汁之一。粘稠质地（类似秋葵）是通过用一撮钾碱煮沸 corète 叶获得的。这是一种以其消化特性和铁含量丰富而闻名的舒适菜肴。",
-                                          "accompagnementsIdaux":  "仅与 Ewassa 或 Akoumé（玉米面团）一起食用。"
-                                      },
-                  "koliko_togolais":  {
-                                          "nom":  "Koliko",
-                                          "description":  "外脆内融的薯条，切成方块或条状。",
-                                          "histoire":  "Koliko 是洛美、卡拉和 Atakpamé 街头必不可少的夜间小吃。小贩从日落开始在街角设置大锅沸腾油。这是学生和夜间工作者喜欢的快速、热且经济的餐点。",
-                                          "accompagnementsIdaux":  "辣番茄酱、胡椒粉（Kankan）或配炸火鸡或鸡肉块。"
-                                      },
-                  "vebe_togolais":  {
-                                        "nom":  "Vèbè（花生酱）",
-                                        "description":  "一种由烤花生酱制成的奶油般丝滑的酱汁，用当地香料调味。",
-                                        "histoire":  "花生酱贯穿多哥的所有地区，从南到北（花生广泛种植）。它展示了多哥烹饪遗产将甜腻风味与强辣椒结合以创造完美平衡的能力。",
-                                        "accompagnementsIdaux":  "白米饭、山药 fufu 或玉米面团。"
-                                    }
-              },
-    "Monuments":  {
-                      "grand_marche_lome":  {
-                                                "nom":  "Assigamé 大市场",
-                                                "description":  "多哥首都著名的巨大市场，主要的商业中心和文化十字路口。",
-                                                "histoire":  "在 Assigamé 大市场中，人们发现了 Nana Benz，著名的印花布料商，她们标志着国家的经济历史。"
-                                            },
-                      "cathedrale_lome":  {
-                                              "nom":  "洛美圣心大教堂",
-                                              "description":  "20世纪初在首都中心建造的哥特式建筑瑰宝。",
-                                              "histoire":  "该哥特式建筑由圣言会传教士在德国殖民时期于1901年至1902年间建造，是多哥首都最重要的建筑和精神地标之一。1985年教皇约翰保罗二世访问后进行了修复。"
-                                          },
-                      "statue_amitie_germano":  {
-                                                    "nom":  "德国-多哥友谊雕像",
-                                                    "description":  "象征第一次外交协定和1884年保护条约的历史纪念碑。",
-                                                    "histoire":  "该雕像在 Baguida 竖立，以纪念1884年7月5日德国探险家 Gustav Nachtigal 与 Togoville 国王 Mlapa III 签署的保护条约。该纪念碑象征着多哥与德国之间复杂外交和历史关系的起点。"
-                                                },
-                      "koutamakou":  {
-                                         "nom":  "Batammariba 土地（Koutamakou）",
-                                         "description":  "著名的 Batammariba 土地，以其在西非独特的防御建筑而闻名。",
-                                         "histoire":  "在这个地区，房屋是真正的多层农舍堡垒，其防御形式和露台非常独特。设计用于容纳家庭负责人拥有的一切，它们被分组为约十个单位的小村庄，对应一个氏族。"
-                                     },
-                      "kpalime":  {
-                                      "nom":  "Kpalimé（绿色天堂）",
-                                      "description":  "咖啡和可可地区，因其非凡的自然景观而被称为多哥的绿色天堂。",
-                                      "histoire":  "Kpalimé 被茂密树林的山丘、绿色高原、丛林和深谷环绕，被郁郁葱葱的自然环绕，那里是 Agou 峰（多哥最高峰）的所在地。它也是该国最重要的手工艺中心，许多木雕师、蜡染艺术家、陶艺家和织工在那里工作。"
-                                  },
-                      "maison_des_esclaves":  {
-                                                  "nom":  "奴隶之家（Woold Home）",
-                                                  "description":  "位于 Agbodrafo 的感人纪念地，奴隶贸易的历史见证。",
-                                                  "histoire":  "位于 Agbodrafo，一个被公认为 \u0027奴隶海岸\u0027 组成部分的古老葡萄牙城市，奴隶之家（Woold Home）以及锁链井构成了这个痛苦过去的主要遗迹，情感依然生动。"
-                                              },
-                      "monument_independance":  {
-                                                    "nom":  "独立纪念碑",
-                                                    "description":  "位于多哥首都中心的一个宏伟国家纪念碑。",
-                                                    "histoire":  "位于洛美自由广场旁，这座宏伟纪念碑象征着当代历史、重获独立和多哥人民的主权。"
-                                                },
-                      "musee_de_lome":  {
-                                            "nom":  "国家艺术博物馆",
-                                            "description":  "致力于保存多哥艺术、工艺和文化的国家机构。",
-                                            "histoire":  "这座位于首都的著名国家博物馆汇集了该国最好的艺术和遗产收藏，追溯了多哥各社区的文化历史和传统。"
-                                        },
-                      "palais_de_lome":  {
-                                             "nom":  "洛美宫",
-                                             "description":  "前殖民宫殿转变为海边的著名艺术中心和植物园。",
-                                             "histoire":  "前总督宫由德国殖民者于1905年建造（随后由法国总督占领），这座宏伟建筑于2019年完全翻新，成为国际规模的艺术和文化中心，周围是海洋边缘具有非凡生物多样性的植物园。"
-                                         },
-                      "chateau_vial":  {
-                                           "nom":  "Vial 城堡",
-                                           "description":  "一座历史悠久的哥特式住宅，俯瞰 Kloto 山的森林和山谷。",
-                                           "histoire":  "这座哥特式城堡由当时的法国总督于1940年代在 Kpalimé 附近 Kloto 山的翠绿高度上建造，作为国家住所。它提供了与加纳接壤的森林山谷的无遮挡景观。"
-                                       },
-                      "village_artisanal":  {
-                                                "nom":  "洛美手工艺市场",
-                                                "description":  "发现当地创作并观察工匠工作的理想场所。",
-                                                "histoire":  "这是购买有价值纪念品的完美场所。访客可以直接观察多哥工匠的创作过程：蜡染工作、木雕、雕刻或传统编织技术。"
-                                            },
-                      "cascade_yikpa":  {
-                                            "nom":  "Yikpa 瀑布",
-                                            "description":  "多哥最壮观和最高的瀑布之一，坐落在野生自然中。",
-                                            "histoire":  "也称为 Douala 瀑布，它是多哥最令人印象深刻和最高的瀑布之一。位于 Danyi 高原的最北端，它沿着陡峭的悬崖流入茂密的植被，壮观地标记着与加纳的自然边界。"
-                                        }
-                  },
-    "Parcs":  {
-                  "africa_park_tata_park":  {
-                                                "nom":  "Africa Park (Tata Park)",
-                                                "description":  "多哥最大的游乐园。它设有机动和充气游乐设施、陀螺车、3D电影院、餐厅和酒吧。",
-                                                "tarif":  "入场：1000-2000 FCFA，额外游乐设施（200-500 FCFA）"
-                                            },
-                  "amoukadi_paradis":  {
-                                           "nom":  "Amoukadi Paradis",
-                                           "description":  "位于 Adétikopé 的休闲综合体，提供各种服务如游泳池。",
-                                           "tarif":  "游泳池：成人 1500 FCFA，儿童 1000 FCFA"
-                                       },
-                  "espace_aere_aqualand":  {
-                                               "nom":  "Aqualand 开放空间",
-                                               "description":  "一个自然宏伟的环境，既是餐厅又是游乐场。为年轻人和老年人提供游乐设施（滑梯、充气游泳池、秋千、桌上足球）。",
-                                               "tarif":  "免费入场，按菜单消费"
-                                           },
-                  "espace_loisirs_nyumba":  {
-                                                "nom":  "Nyumba 休闲空间",
-                                                "description":  "适合所有年龄段的休闲空间，提供游乐设施、游戏、娱乐和餐饮服务，在一个安全有趣的环境中。",
-                                                "tarif":  "入场：每人 500 FCFA，付费游乐设施"
-                                            },
-                  "fil_o_parc":  {
-                                     "nom":  "Fil O Parc",
-                                     "description":  "一个休闲和放松综合体，包括游乐场、游泳池和餐厅。",
-                                     "tarif":  "游泳池：成人 2000 FCFA，儿童 1500 FCFA"
-                                 },
-                  "funny_park":  {
-                                     "nom":  "Funny Park",
-                                     "description":  "一个提供各种游乐设施的游乐园，包括空调游戏室、户外餐厅、水上乐园和小马俱乐部。",
-                                     "tarif":  "水上乐园：每人 2000 FCFA，游乐设施：300-500 FCFA"
-                                 },
-                  "ludi_park":  {
-                                    "nom":  "Ludi Park",
-                                    "description":  "一个拥有12洞迷你高尔夫球场和游乐场的游乐园。",
-                                    "tarif":  "入场：1000 FCFA，迷你高尔夫：额外 2000 FCFA"
-                                },
-                  "olodge":  {
-                                 "nom":  "O\u0027Lodge",
-                                 "description":  "位于多哥湖畔的酒店综合体和水上乐园。（目前报告为永久关闭）",
-                                 "tarif":  "关闭 – 无可用价格"
-                             },
-                  "parc_zoologique_temedja":  {
-                                                  "nom":  "Témédja 动物园（Zoo Tali N\u0027na）",
-                                                  "description":  "位于 Témédja 的野生动物园，提供在安全自然环境中发现各种野生动物的机会。",
-                                                  "tarif":  "入场：成人 2000 FCFA，儿童 1000 FCFA"
-                                              },
-                  "zoo_fauna_cultura":  {
-                                            "nom":  "Fauna Cultura 动物园",
-                                            "description":  "一个私人迷你动物园和养殖场。在那里可以观察到80多种动物物种。",
-                                            "tarif":  "入场：每人 2000 FCFA，包含导游"
-                                        },
-                  "parc_evou_kpodegbe":  {
-                                             "nom":  "Evou-Kpodegbe 公园",
-                                             "description":  "位于 Témédja 动物园附近的动物园。",
-                                             "tarif":  "入场：每人 1500 FCFA"
-                                         },
-                  "o2_zoo":  {
-                                 "nom":  "O2 Zoo",
-                                 "description":  "位于 UCAO-UUT 大学附近的动物园。",
-                                 "tarif":  "免费入场（接受捐赠）"
-                             },
-                  "alea_park":  {
-                                    "nom":  "Aléa Park",
-                                    "description":  "一个建在 7,000 平方米面积上的体育和娱乐综合体，提供广泛的活动。",
-                                    "tarif":  "日套餐：5000 FCFA（访问所有活动），按活动减少套餐"
-                                },
-                  "parc_national_fazao_malfakassa":  {
-                                                         "nom":  "Fazao-Malfakassa 国家公园",
-                                                         "description":  "多哥最大的国家公园，约50头草原大象、水牛、羚羊、疣猪甚至有时黑猩猩的避难所。",
-                                                         "tarif":  "入场：根据国籍约 5000-10000 FCFA（强制导游）"
-                                                     },
-                  "parc_national_keran":  {
-                                              "nom":  "Kéran 国家公园",
-                                              "description":  "位于多哥北部的国家公园，是许多动物物种的避难所，包括大象和羚羊。",
-                                              "tarif":  "入场：居民 5000 FCFA，非居民 10000 FCFA"
-                                          },
-                  "parc_national_fosse_aux_lions":  {
-                                                        "nom":  "狮子坑国家公园",
-                                                        "description":  "三个多哥国家公园中最小的一个，建于1954年。",
-                                                        "tarif":  "入场：每人 3000 FCFA"
-                                                    }
-              },
-    "Common":  {
-                   "listen":  "收听",
-                   "stop":  "停止"
-               },
-    "ChatBot":  {
-                    "title":  "TGO AI",
-                    "subtitle":  "文化助手",
-                    "welcome":  "Woezon！我是 TGO AI，你的文化导游，帮助你了解多哥的纪念地、地区和美食。",
-                    "fallback_response":  "感谢你的提问。我可以帮助你找到旅途中实用的景点、美食和文化体验。",
-                    "typing":  "TGO AI 正在准备回复...",
-                    "placeholder":  "询问关于多哥的问题...",
-                    "send":  "发送",
-                    "open":  "打开 TGO AI 聊天",
-                    "close":  "关闭聊天"
-                },
-    "Histoire":  {
-                     "badge":  "国家记忆",
-                     "title":  "多哥历史",
-                     "subtitle":  "一个沉浸式阅读页面，用来讲述多哥的起源、王国、交流、抗争和重要阶段。",
-                     "listen_language":  "朗读语言",
-                     "listen":  "朗读历史",
-                     "stop":  "停止朗读",
-                     "contents":  "目录",
-                     "section":  "章节",
-                     "paste_hint":  "把完整文本粘贴到此文件中的 TOGO_HISTORY_TEXT 常量里。用空行分隔段落，即可自动生成带动画的章节。",
-                     "stats":  {
-                                   "period":  "多哥",
-                                   "period_label":  "叙事",
-                                   "sections":  "章节"
-                               },
-                     "paragraphs":  [
-                                        "多哥拥有丰富的历史，这段历史由不同民族、语言、迁徙、贸易路线和精神传统共同塑造。本页面是一个编辑基础，用于向游客呈现完整且易读的故事。",
-                                        "在殖民时期以前，多哥地区有许多围绕酋邦、王国、市场和代代相传知识而组织起来的社群。",
-                                        "从十九世纪开始，与欧洲列强的接触深刻改变了这一地区。德国殖民统治以及后来的法国和英国行政管理，留下了政治、建筑和社会层面的痕迹。",
-                                        "多哥于1960年4月27日宣布独立，这是国家主权的重要一步。此后，多哥继续在记忆、文化创造和共同未来之间书写自己的历史。"
-                                    ]
-                 },
-    "Auth":  {
-                 "login_title":  "登录",
-                 "login_subtitle":  "访问您的 Heritogo 账户",
-                 "register_title":  "创建账户",
-                 "register_subtitle":  "加入 Heritogo 社区",
-                 "forgot_title":  "忘记密码",
-                 "forgot_subtitle":  "通过电子邮件接收重置链接",
-                 "email":  "电子邮件",
-                 "password":  "密码",
-                 "confirm_password":  "确认密码",
-                 "full_name":  "全名",
-                 "login_button":  "登录",
-                 "register_button":  "注册",
-                 "register_loading":  "注册中...",
-                 "privacy_accept_prefix":  "我已阅读并接受 Heritogo 的",
-                 "privacy_policy_link":  "隐私政策",
-                 "privacy_accept_suffix":  "*",
-                 "privacy_required_error":  "您必须接受隐私政策才能继续。",
-                 "password_req_length":  "至少 8 个字符",
-                 "password_req_uppercase":  "一个大写字母",
-                 "password_req_lowercase":  "一个小写字母",
-                 "password_req_number":  "一个数字",
-                 "forgot_button":  "发送链接",
-                 "forgot_link":  "忘记密码？",
-                 "no_account":  "还没有账户？",
-                 "has_account":  "已有账户？",
-                 "register_link":  "注册",
-                 "login_link":  "登录",
-                 "back_home":  "返回首页",
-                 "role_label":  "我注册为",
-                 "role_tourist":  "游客",
-                 "role_tourist_desc":  "探索多哥并预订导游",
-                 "role_guide":  "导游",
-                 "role_guide_desc":  "向旅行者提供服务",
-                 "loading":  "加载中...",
-                 "error_generic":  "发生错误，请重试。",
-                 "error_password_match":  "密码不匹配。",
-                 "error_password_short":  "密码至少需要6个字符。",
-                 "success_register":  "账户已创建！正在跳转...",
-                 "success_forgot":  "邮件已发送，请检查收件箱。",
-                 "check_email":  "请检查电子邮件以确认您的账户。"
-             },
-    "Dashboard":  {
-                      "common":  {
-                                     "loading":  "加载中...",
-                                     "loading_rights":  "正在验证管理员权限...",
-                                     "loading_guide":  "正在加载您的导游中心...",
-                                     "loading_space":  "正在加载您的个人中心...",
-                                     "error_update":  "更新时发生错误",
-                                     "error_network":  "网络错误",
-                                     "error_server":  "无法与服务器通信。",
-                                     "success_update":  "个人资料更新成功！",
-                                     "success_booking_sent":  "您的预订申请已成功发送给导游！他们将很快与您联系并提供报价。",
-                                     "cancel":  "取消",
-                                     "approve":  "批准",
-                                     "reject":  "拒绝",
-                                     "save":  "保存",
-                                     "save_changes":  "保存修改",
-                                     "not_specified":  "未填写",
-                                     "status":  "状态",
-                                     "date":  "日期",
-                                     "amount":  "金额",
-                                     "action":  "操作",
-                                     "details":  "详情",
-                                     "guest_name":  "朋友",
-                                     "not_available":  "N/A",
-                                     "default_country":  "多哥"
-                                 },
-                      "tourist":  {
-                                      "greeting":  "你好，{name}",
-                                      "subtitle":  "Heritogo 游客中心",
-                                      "new_scan":  "新建扫描",
-                                      "find_guide":  "寻找导游",
-                                      "tab_profile":  "我的资料",
-                                      "tab_bookings":  "我的预订",
-                                      "tab_favorites":  "我的收藏",
-                                      "tab_scans":  "扫描历史",
-                                      "info_title":  "信息",
-                                      "full_name":  "全名",
-                                      "email":  "电子邮件",
-                                      "phone":  "电话",
-                                      "preferred_lang":  "首选语言",
-                                      "edit_profile":  "修改个人资料",
-                                      "lang_fr":  "法语",
-                                      "lang_en":  "英语",
-                                      "lang_es":  "西班牙语",
-                                      "lang_zh":  "中文",
-                                      "no_bookings":  "暂无预订",
-                                      "no_bookings_desc":  "探索我们认证的多哥导游，规划您的下一次文化之旅！",
-                                      "explore_guides":  "探索导游",
-                                      "status_quote_requested":  "已请求报价",
-                                      "status_quote_sent":  "已收到报价",
-                                      "status_confirmed":  "已确认",
-                                      "status_in_progress":  "进行中",
-                                      "status_completed":  "已完成",
-                                      "status_cancelled":  "已取消",
-                                      "booking_type":  "类型: {type}",
-                                      "offer_label":  "报价: {amount} FCFA",
-                                      "view_guide":  "查看导游",
-                                      "leave_review":  "发表评价",
-                                      "review_left":  "已评价 ({rating}/5)",
-                                      "no_favorites":  "暂无收藏的导游",
-                                      "no_favorites_desc":  "从公开列表中将导游添加到您的收藏夹，以便更快速地找到他们。",
-                                      "view_guides":  "查看导游",
-                                      "details":  "详情",
-                                      "book":  "预订",
-                                      "no_scans":  "暂无扫描记录",
-                                      "no_scans_desc":  "通过拍摄纪念碑的照片，探索多哥财富的历史。",
-                                      "open_scanner":  "打开扫描仪",
-                                      "date_unknown":  "日期未知",
-                                      "scan_again":  "重新扫描",
-                                      "lang_label":  "语言:",
-                                      "zones_label":  "区域:",
-                                      "rate_label":  "费用:"
-                                  },
-                      "guide":  {
-                                    "greeting":  "你好，{name}",
-                                    "status_approved":  "已批准",
-                                    "status_under_review":  "审核中",
-                                    "status_rejected":  "已拒绝",
-                                    "status_waiting":  "等待提交文件",
-                                    "missions_stat":  "任务数",
-                                    "rating_stat":  "综合评分",
-                                    "tab_bookings":  "申请与任务",
-                                    "tab_profile":  "编辑公开资料",
-                                    "tab_documents":  "文件验证",
-                                    "new_quotes_title":  "新报价请求",
-                                    "no_quotes":  "暂无新报价请求。",
-                                    "status_quote_required":  "需要报价",
-                                    "meeting_point":  "集合地点: {point}",
-                                    "group_size":  "人数: {size} 人",
-                                    "refuse":  "拒绝",
-                                    "send_quote_btn":  "发送报价",
-                                    "confirmed_missions_title":  "已确认与进行中的任务",
-                                    "no_active_missions":  "暂无进行中或已确认的任务。",
-                                    "status_in_progress":  "进行中",
-                                    "status_confirmed":  "已确认",
-                                    "budget_label":  "预算: {amount} XOF",
-                                    "contact_label":  "联系电话: ",
-                                    "start_mission":  "开始向导服务",
-                                    "complete_mission":  "标记为已完成",
-                                    "missions_history":  "任务历史",
-                                    "table_tourist":  "游客",
-                                    "table_status":  "状态",
-                                    "table_action":  "操作 / 备注",
-                                    "history_completed":  "已完成",
-                                    "history_cancelled":  "已取消",
-                                    "history_quote_sent":  "已发送报价",
-                                    "cancel_quote":  "取消报价",
-                                    "mission_paid":  "任务已支付",
-                                    "no_history":  "暂无历史记录。",
-                                    "phone_label":  "电话号码",
-                                    "exp_label":  "从业年限",
-                                    "bio_label":  "个人简介",
-                                    "bio_placeholder":  "介绍您的背景、对多哥的热爱以及您推荐的旅游路线...",
-                                    "rates_title":  "费率 (XOF)",
-                                    "rate_full":  "全天费率",
-                                    "rate_half":  "半天费率",
-                                    "rate_hour":  "时薪",
-                                    "rate_virtual":  "虚拟服务 (选填)",
-                                    "langs_title":  "精通语言",
-                                    "zones_title":  "服务区域",
-                                    "specs_title":  "您的专长",
-                                    "spec_placeholder":  "例如：生态旅游、森林徒步",
-                                    "add_spec":  "添加",
-                                    "submit_doc_title":  "提交证明文件",
-                                    "doc_type":  "文件类型",
-                                    "doc_license":  "官方导游执照",
-                                    "doc_id":  "身份证或护照",
-                                    "doc_cert":  "认证或证书 (历史/旅游相关)",
-                                    "doc_other":  "其他证明文件",
-                                    "doc_title_label":  "文件名称 / 标题",
-                                    "doc_title_placeholder":  "例如：旅游部官方执照 2026",
-                                    "doc_file_label":  "证明文件 (仅限 PDF)",
-                                    "doc_upload_hint":  "请上传 PDF 格式的官方文件 (最大 5 MB)。管理团队将直接查阅并下载此文件进行验证。",
-                                    "submit_for_verification":  "提交验证",
-                                    "docs_submitted_title":  "已提交的文件",
-                                    "no_docs":  "暂无提交的文件。",
-                                    "open_doc":  "打开文件",
-                                    "doc_verified":  "已验证",
-                                    "doc_pending":  "审核中",
-                                    "propose_quote_title":  "提供报价",
-                                    "proposed_amount":  "建议金额 (XOF)",
-                                    "message_explan":  "说明留言",
-                                    "message_placeholder":  "说明该报价包含的项目 (交通、餐饮、景点门票等)...",
-                                    "send_quote":  "发送报价",
-                                    "confirm_action":  "您确定要执行此操作吗？",
-                                    "review_count_label":  "评价",
-                                    "start_at":  "开始时间 {time}",
-                                    "default_doc_label":  "验证文件",
-                                    "cancel_reason_refused":  "导游已拒绝",
-                                    "cancel_reason_guide":  "导游已取消",
-                                    "pdf_only":  "只允许上传 PDF 文件。",
-                                    "pdf_too_large":  "文件不得超过 5 MB。",
-                                    "remove":  "移除"
-                                },
-                      "admin":  {
-                                    "console_title":  "管理后台",
-                                    "general_admin":  "系统管理",
-                                    "admin_subtitle":  "验证认证导游、处理社区举报以及审核游客评价。",
-                                    "stat_exam":  "待审导游",
-                                    "stat_reports":  "待处理举报",
-                                    "stat_reviews":  "提交的评价",
-                                    "stat_total":  "总导游数",
-                                    "tab_validation":  "导游验证",
-                                    "tab_reports":  "举报管理",
-                                    "tab_reviews":  "评价审核",
-                                    "tab_logs":  "操作日志",
-                                    "pending_title":  "待批准的申请",
-                                    "no_pending":  "暂无待验证的导游申请。",
-                                    "exp_status_label":  "{years} 年经验 • 状态: ",
-                                    "docs_provided":  "提供的证明文件:",
-                                    "download_pdf":  "下载 PDF",
-                                    "manage_guides":  "管理所有导游",
-                                    "table_name":  "姓名",
-                                    "table_status":  "当前状态",
-                                    "table_rating":  "综合评分",
-                                    "table_missions":  "任务数",
-                                    "table_actions":  "操作",
-                                    "suspend":  "停用",
-                                    "reactivate":  "重新启用",
-                                    "confirm_approve":  "您确定要批准该导游并验证其文件吗？",
-                                    "confirm_suspend":  "您确定要停用该导游吗？",
-                                    "error_approve":  "批准时发生错误",
-                                    "error_reject":  "拒绝时发生错误",
-                                    "error_suspend":  "停用时发生错误",
-                                    "error_resolve":  "处理举报时发生错误",
-                                    "error_toggle_hidden":  "修改评价可见性时发生错误",
-                                    "reports_title":  "社区举报列表",
-                                    "no_reports":  "暂无举报记录。",
-                                    "report_reason":  "举报原因: {reason}",
-                                    "reporter":  "举报人: ",
-                                    "reported_guide":  "被举报人: ",
-                                    "description_label":  "详情描述:",
-                                    "reject_report":  "驳回举报",
-                                    "resolve_report":  "标记为已解决",
-                                    "resolve_prompt":  "解决备注:",
-                                    "resolve_default":  "管理员已处理",
-                                    "reviews_title":  "游客评价审核",
-                                    "no_reviews":  "暂无评价。",
-                                    "hidden":  "已隐藏",
-                                    "review_author":  "来自 {reviewer} 对导游 {guide} 的评价",
-                                    "no_comment":  "未填写评论内容。",
-                                    "hidden_reason_label":  "隐藏原因: {reason}",
-                                    "make_public":  "公开显示",
-                                    "hide_review":  "隐藏评价",
-                                    "logs_title":  "管理员操作日志",
-                                    "table_date":  "日期",
-                                    "table_admin":  "管理员",
-                                    "table_action":  "操作",
-                                    "table_target":  "目标",
-                                    "table_details":  "详情",
-                                    "no_logs":  "暂无操作记录。",
-                                    "reject_modal_title":  "拒绝原因",
-                                    "reject_modal_subtitle":  "请输入拒绝接受该导游证明文件的原因。该消息将通知对方。",
-                                    "reject_modal_placeholder":  "例如：文件模糊不清或无法阅读。执照已过期。",
-                                    "reject_guide_btn":  "拒绝导游",
-                                    "hide_modal_title":  "隐藏评价",
-                                    "hide_modal_subtitle":  "请输入隐藏此评价的原因以作记录。",
-                                    "hide_modal_placeholder":  "例如：评价包含辱骂或不当言论。",
-                                    "load_error":  "加载管理数据时出错。",
-                                    "quick_action_reason":  "管理员快速操作"
-                                },
-                      "share":  {
-                                    "title":  "分享我的行程",
-                                    "text_intro":  "这是我通过 Heritogo 规划的行程:",
-                                    "copy_link":  "复制链接",
-                                    "copied":  "链接已复制！",
-                                    "whatsapp":  "分享到 WhatsApp",
-                                    "no_items":  "没有可分享的项目",
-                                    "share_btn":  "分享",
-                                    "share_gps":  "GPS:",
-                                    "discover_app":  "在 Heritogo 上发现："
-                                },
-                      "Booking":  {
-                                      "loading":  "正在加载表单...",
-                                      "error_fetching_guide":  "获取导游信息时出错",
-                                      "error_loading_guide":  "无法加载导游数据",
-                                      "guide_not_found":  "找不到导游",
-                                      "guide_not_available":  "该导游目前不可预订。",
-                                      "back_to_directory":  "返回名录",
-                                      "back_to_profile":  "返回导游个人主页",
-                                      "booking_request":  "预订申请",
-                                      "form_subtitle":  "填写此表单向 {name} 发送报价申请。",
-                                      "request_sent":  "申请已发送！",
-                                      "success_message":  "您的预订申请已成功传送。正在重定向到您的仪表板...",
-                                      "error_start_date":  "请选择开始日期。",
-                                      "error_generic":  "预订时发生错误。",
-                                      "mission_type_label":  "服务/任务类型",
-                                      "types":  {
-                                                    "full_day":  {
-                                                                     "label":  "全天",
-                                                                     "desc":  "完整行程"
-                                                                 },
-                                                    "half_day":  {
-                                                                     "label":  "半天",
-                                                                     "desc":  "上午/下午"
-                                                                 },
-                                                    "hourly":  {
-                                                                   "label":  "按小时",
-                                                                   "desc":  "按小时计费"
-                                                               },
-                                                    "virtual":  {
-                                                                    "label":  "线上虚拟",
-                                                                    "desc":  "视频通话服务"
-                                                                }
-                                                },
-                                      "date_label":  "预定日期",
-                                      "start_time_label":  "开始时间",
-                                      "meeting_point_label":  "集合地点",
-                                      "meeting_point_placeholder":  "例如：洛美2月2日酒店大堂",
-                                      "group_size_label":  "出行人数 (1 - 50)",
-                                      "message_label":  "行程详情 / 留言",
-                                      "message_placeholder":  "简要描述您想参观的景点、您的兴趣爱好（历史、美食、自然等）...",
-                                      "special_needs_label":  "特殊需求或限制（选填）",
-                                      "special_needs_placeholder":  "例如：行动不便、食物过敏、有婴幼儿同行等...",
-                                      "send_request":  "发送预订申请",
-                                      "sidebar_guide":  "您的导游",
-                                      "certified":  "已认证",
-                                      "pricing_title":  "参考价格",
-                                      "full_day":  "全天服务：",
-                                      "half_day":  "半天服务：",
-                                      "hourly":  "按小时服务：",
-                                      "virtual":  "线上服务：",
-                                      "warning_text":  "提交此表单后，导游将审核您的需求并发送个性化报价。只有在您接受报价后才需要付款。"
-                                  }
-                  },
-    "Booking":  {
-                    "loading":  "加载中...",
-                    "error_fetching_guide":  "无法获取导游信息",
-                    "error_loading_guide":  "无法加载导游数据",
-                    "guide_not_found":  "未找到导游",
-                    "guide_not_available":  "该导游目前不接受预订",
-                    "back_to_directory":  "返回目录",
-                    "back_to_profile":  "返回导游主页",
-                    "booking_request":  "预订请求",
-                    "form_subtitle":  "填写表格向 {name} 发送报价请求。",
-                    "request_sent":  "请求已发送！",
-                    "success_message":  "您的预订请求已成功提交，正在跳转至您的仪表板...",
-                    "error_start_date":  "请选择开始日期。",
-                    "error_generic":  "预订过程中发生错误。",
-                    "mission_type_label":  "参观类型 / 任务类型",
-                    "types":  {
-                                  "full_day":  {
-                                                   "label":  "全天",
-                                                   "desc":  "完整一天"
-                                               },
-                                  "half_day":  {
-                                                   "label":  "半天",
-                                                   "desc":  "上午/下午"
-                                               },
-                                  "hourly":  {
-                                                 "label":  "按小时",
-                                                 "desc":  "每小时计费"
-                                             },
-                                  "virtual":  {
-                                                  "label":  "虚拟参观",
-                                                  "desc":  "视频通话"
-                                              }
-                              },
-                    "date_label":  "预计日期",
-                    "start_time_label":  "开始时间",
-                    "meeting_point_label":  "集合地点",
-                    "meeting_point_placeholder":  "例如：洛美2月2日酒店大堂",
-                    "group_size_label":  "人数（1 - 50）",
-                    "message_label":  "行程详情 / 留言",
-                    "message_placeholder":  "简要描述您希望参观的地点和兴趣（历史、美食、自然）...",
-                    "special_needs_label":  "特殊需求或限制（选填）",
-                    "special_needs_placeholder":  "例如：行动不便、食物过敏、携带儿童...",
-                    "send_request":  "发送预订请求",
-                    "sidebar_guide":  "您的导游",
-                    "certified":  "认证导游",
-                    "pricing_title":  "参考价格",
-                    "full_day":  "全天：",
-                    "half_day":  "半天：",
-                    "hourly":  "按小时：",
-                    "virtual":  "虚拟参观：",
-                    "warning_text":  "提交表格后，导游将审核您的请求并发送定制报价。接受报价后才需付款。"
-                },
-    "Update":  {
-                   "later":  "稍后",
-                   "title":  "有可用更新",
-                   "install":  "安装",
-                   "desc":  "Heritogo 的新版本已就绪。请安装以享受最新的修复。"
-               },
+                "virtual": {
+                    "label": "线上虚拟",
+                    "desc": "视频通话服务"
+                }
+            },
+            "date_label": "预定日期",
+            "start_time_label": "开始时间",
+            "meeting_point_label": "集合地点",
+            "meeting_point_placeholder": "例如：洛美2月2日酒店大堂",
+            "group_size_label": "出行人数 (1 - 50)",
+            "message_label": "行程详情 / 留言",
+            "message_placeholder": "简要描述您想参观的景点、您的兴趣爱好（历史、美食、自然等）...",
+            "special_needs_label": "特殊需求或限制（选填）",
+            "special_needs_placeholder": "例如：行动不便、食物过敏、有婴幼儿同行等...",
+            "send_request": "发送预订申请",
+            "sidebar_guide": "您的导游",
+            "certified": "已认证",
+            "pricing_title": "参考价格",
+            "full_day": "全天服务：",
+            "half_day": "半天服务：",
+            "hourly": "按小时服务：",
+            "virtual": "线上服务：",
+            "warning_text": "提交此表单后，导游将审核您的需求并发送个性化报价。只有在您接受报价后才需要付款。"
+        }
+    },
+    "Booking": {
+        "loading": "加载中...",
+        "error_fetching_guide": "无法获取导游信息",
+        "error_loading_guide": "无法加载导游数据",
+        "guide_not_found": "未找到导游",
+        "guide_not_available": "该导游目前不接受预订",
+        "back_to_directory": "返回目录",
+        "back_to_profile": "返回导游主页",
+        "booking_request": "预订请求",
+        "form_subtitle": "填写表格向 {name} 发送报价请求。",
+        "request_sent": "请求已发送！",
+        "success_message": "您的预订请求已成功提交，正在跳转至您的仪表板...",
+        "error_start_date": "请选择开始日期。",
+        "error_generic": "预订过程中发生错误。",
+        "mission_type_label": "参观类型 / 任务类型",
+        "types": {
+            "full_day": {
+                "label": "全天",
+                "desc": "完整一天"
+            },
+            "half_day": {
+                "label": "半天",
+                "desc": "上午/下午"
+            },
+            "hourly": {
+                "label": "按小时",
+                "desc": "每小时计费"
+            },
+            "virtual": {
+                "label": "虚拟参观",
+                "desc": "视频通话"
+            }
+        },
+        "date_label": "预计日期",
+        "start_time_label": "开始时间",
+        "meeting_point_label": "集合地点",
+        "meeting_point_placeholder": "例如：洛美2月2日酒店大堂",
+        "group_size_label": "人数（1 - 50）",
+        "message_label": "行程详情 / 留言",
+        "message_placeholder": "简要描述您希望参观的地点和兴趣（历史、美食、自然）...",
+        "special_needs_label": "特殊需求或限制（选填）",
+        "special_needs_placeholder": "例如：行动不便、食物过敏、携带儿童...",
+        "send_request": "发送预订请求",
+        "sidebar_guide": "您的导游",
+        "certified": "认证导游",
+        "pricing_title": "参考价格",
+        "full_day": "全天：",
+        "half_day": "半天：",
+        "hourly": "按小时：",
+        "virtual": "虚拟参观：",
+        "warning_text": "提交表格后，导游将审核您的请求并发送定制报价。接受报价后才需付款。"
+    },
+    "Update": {
+        "later": "稍后",
+        "title": "有可用更新",
+        "install": "安装",
+        "desc": "Heritogo 的新版本已就绪。请安装以享受最新的修复。"
+    },
     "GuidesPage": {
         "tag": "认证导游",
         "title": "寻找理想的当地导游",

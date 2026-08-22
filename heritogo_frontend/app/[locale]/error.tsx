@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { AlertCircle, RefreshCw, Home, Wifi, WifiOff } from 'lucide-react'
+import { AlertTriangle, RefreshCw, Home, Wifi, WifiOff, Compass, Sparkles } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 
 export default function ErrorPage({
@@ -17,9 +17,10 @@ export default function ErrorPage({
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator === 'undefined' ? true : navigator.onLine
   )
+  const [retrying, setRetrying] = useState(false)
 
   useEffect(() => {
-    console.error('[error.tsx]', error)
+    console.error('[HeriTogo Error Handler]', error)
 
     const update = () => setIsOnline(navigator.onLine)
     window.addEventListener('online', update)
@@ -31,63 +32,75 @@ export default function ErrorPage({
     }
   }, [error])
 
+  const handleRetry = () => {
+    setRetrying(true)
+    setTimeout(() => {
+      reset()
+      setRetrying(false)
+    }, 400)
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-base-100 px-4 pb-32 pt-20 text-base-content">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-border bg-base-200 p-8 text-center shadow-xl">
-        <div
-          className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-white"
-          style={{ backgroundColor: '#004D40' }}
-        >
-          <AlertCircle className="h-8 w-8" />
+    <div className="flex min-h-screen items-center justify-center bg-[#FDFBF8] dark:bg-[#1A120C] px-4 pb-28 pt-20 text-base-content">
+      <div className="w-full max-w-md space-y-6 rounded-[32px] border border-[#E6D9C4] dark:border-border bg-white dark:bg-[#241811] p-8 text-center shadow-2xl">
+        
+        {/* Icône d'état Café & Blanc */}
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] bg-[#3B2519] dark:bg-[#C99A3E] text-white dark:text-[#2A1C14] shadow-lg">
+          <Compass className="h-10 w-10 animate-pulse" />
         </div>
 
+        {/* Message intelligent */}
         <div className="space-y-2">
-          <h2 className="font-serif text-xl font-bold italic text-base-content">
-            Une erreur est survenue
+          <h2 className="font-serif text-2xl font-bold tracking-tight text-base-content">
+            {isOnline ? 'Un imprévu sur votre itinéraire' : 'Connexion interrompue'}
           </h2>
-          <p className="text-sm leading-6 text-base-content/60">
+          <p className="text-xs font-medium leading-relaxed text-base-content/70">
             {isOnline
-              ? "Cette page n'a pas pu s'afficher correctement. Notre équipe a été notifiée."
-              : 'Vous semblez être hors ligne. Vérifiez votre connexion internet.'}
+              ? "Le guide n'a pas pu charger ces données pour le moment. Vos informations enregistrées restent en sécurité."
+              : 'Votre appareil semble hors-ligne. Vos guides et pages déjà enregistrés restent accessibles.'}
           </p>
         </div>
 
+        {/* Statut Réseau */}
         <div
-          className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium ${
-            isOnline ? 'bg-base-100' : 'bg-error/10'
+          className={`flex items-center justify-center gap-2 rounded-2xl p-3 text-xs font-bold ${
+            isOnline
+              ? 'bg-[#F1E7D8]/60 dark:bg-base-300 text-[#3B2519] dark:text-[#F1E7D8]'
+              : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
           }`}
         >
           {isOnline ? (
             <>
-              <Wifi className="h-4 w-4 text-green-500" />
-              <span className="text-base-content">Réseau disponible</span>
+              <Wifi className="h-4 w-4 text-emerald-500" />
+              <span>Réseau actif • Tentative de reconnexion</span>
             </>
           ) : (
             <>
-              <WifiOff className="h-4 w-4 text-error" />
-              <span className="text-error">Pas de connexion</span>
+              <WifiOff className="h-4 w-4 text-amber-500" />
+              <span>Mode hors-ligne disponible</span>
             </>
           )}
         </div>
 
-        <div className="space-y-3">
+        {/* Boutons de récupération immédiate */}
+        <div className="space-y-3 pt-2">
           <button
             type="button"
-            onClick={() => reset()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all hover:opacity-90"
-            style={{ backgroundColor: '#004D40' }}
+            onClick={handleRetry}
+            disabled={retrying}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#3B2519] dark:bg-[#C99A3E] py-3.5 text-xs font-black uppercase tracking-wider text-white dark:text-[#2A1C14] shadow-md transition-all hover:brightness-110 active:scale-95 cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className="h-4 w-4" />
-            Réessayer
+            <RefreshCw className={`h-4 w-4 ${retrying ? 'animate-spin' : ''}`} />
+            <span>{retrying ? 'Rechargement...' : 'Réessayer'}</span>
           </button>
 
           <Link
             href="/"
             locale={locale}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-base-100 py-3 text-sm font-bold text-base-content transition-all hover:bg-base-300"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-base-200 py-3 text-xs font-bold text-base-content transition-all hover:bg-base-300 active:scale-95"
           >
-            <Home className="h-4 w-4" />
-            Accueil
+            <Home className="h-4 w-4 text-[#A9754A]" />
+            <span>Retour à l&apos;accueil</span>
           </Link>
         </div>
       </div>

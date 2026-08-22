@@ -1,14 +1,16 @@
 export const COLORS = {
-  // Noms d'origine (redirigés vers la palette Togo)
-  forest: '#1C2D52', // Indigo Nuit
-  rust: '#B6491F',   // Terre de Latérite
-  gold: '#C99A3E',   // Or du Mil
-  cream: '#F7F1E4',  // Sable d'Harmattan
+  // Palette officielle "Café & Blanc" (Terroir des Plateaux & Kloto)
+  espresso: '#3B2519', // Brun café torréfié profond (primary)
+  caramel: '#A9754A',  // Accent chaud (secondary)
+  crema: '#C99A3E',    // Mousse dorée d'espresso (accent/badges)
+  latte: '#F1E7D8',    // Fond doux / muted
+  milk: '#FDFBF8',     // Blanc lait / background
 
-  // Palette officielle "Sentir le Togo"
-  indigo: '#1C2D52',
-  laterite: '#B6491F',
-  lagoon: '#0F6E64',
-  sand: '#F7F1E4',
-  ink: '#211D1A',
+  // Alias rétrocompatibles
+  forest: '#3B2519',
+  rust: '#A9754A',
+  gold: '#C99A3E',
+  cream: '#FDFBF8',
+  ink: '#2A1C14',
 } as const
+

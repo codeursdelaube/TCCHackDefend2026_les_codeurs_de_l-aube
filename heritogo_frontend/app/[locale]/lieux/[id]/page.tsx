@@ -2,12 +2,23 @@
 
 import { use, useState } from 'react'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, BedDouble, BookOpen, Check, MapPin, Navigation, Share2, Star } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { monuments } from '@/app/LieuxT/site'
 import hotels from '@/app/nearbyhotels/hotels'
+import TextToSpeech from '@/components/TextToSpeech'
+
+const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-48 rounded-[24px] bg-muted/40 border border-border flex items-center justify-center animate-pulse">
+      <span className="text-xs font-bold text-muted-foreground">Chargement de la carte…</span>
+    </div>
+  ),
+})
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const earthRadiusKm = 6371
@@ -26,8 +37,6 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-import TextToSpeech from '@/components/TextToSpeech'
-
 function ShareButton({ title, shareLabel, copiedLabel }: { title: string; shareLabel: string; copiedLabel: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -36,13 +45,15 @@ function ShareButton({ title, shareLabel, copiedLabel }: { title: string; shareL
     if (navigator.share) {
       try {
         await navigator.share({ title, url })
-      } catch {}
+      } catch { }
       return
     }
     await navigator.clipboard.writeText(url)
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1800)
   }
+
+
 
   return (
     <button type="button" onClick={share} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] border border-border bg-base-200 px-5 text-sm font-black text-base-content transition-all hover:border-secondary/50 active:scale-95">
@@ -98,11 +109,18 @@ export default function SiteDetailPage({ params }: PageProps) {
 
         <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-8">
           <div className="mx-auto max-w-7xl">
-            <p className="mb-3 inline-flex items-center gap-2 rounded-2xl bg-white/12 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-white backdrop-blur-md">
-              <MapPin className="h-4 w-4 text-secondary" />
-              {site.localite}
-            </p>
-            <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-normal text-white sm:text-6xl">{siteName}</h1>
+            {/* Fil d'Ariane discret style carnet de voyage */}
+            <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-2 text-xs font-semibold text-white/80">
+              <Link href="/" className="hover:text-[#C99A3E] transition-colors">Togo</Link>
+              <span className="text-white/40">/</span>
+              <Link href="/lieux" className="hover:text-[#C99A3E] transition-colors">{getRegionName(site.région)}</Link>
+              <span className="text-white/40">/</span>
+              <span className="text-white/80">{site.localite}</span>
+              <span className="text-white/40">/</span>
+              <span className="text-[#C99A3E] truncate max-w-[240px] font-bold">{siteName}</span>
+            </nav>
+
+            <h1 className="max-w-4xl font-serif text-3xl font-bold leading-tight tracking-normal text-white sm:text-5xl lg:text-6xl">{siteName}</h1>
           </div>
         </div>
       </section>
@@ -124,7 +142,7 @@ export default function SiteDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_22rem] lg:px-8">
+      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_24rem] lg:px-8">
         <div className="space-y-5">
           {/* TTS + Share — juste sous le titre, avant la description */}
           <div className="flex flex-wrap items-center gap-3">
@@ -161,10 +179,17 @@ export default function SiteDetailPage({ params }: PageProps) {
           </article>
         </div>
 
-        <aside className="h-fit rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
-          <div className="space-y-3">
-            <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-secondary px-5 text-sm font-black text-secondary-content transition-all hover:-translate-y-0.5 active:scale-95">
-              <Navigation className="h-5 w-5" />
+        <aside className="h-fit space-y-4 rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
+          <h3 className="font-serif text-lg font-bold text-base-content flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-secondary" />
+            Localisation Interactive
+          </h3>
+          <div className="overflow-hidden rounded-[24px] border border-border">
+            <DynamicCarte monumentsList={[site]} />
+          </div>
+          <div className="space-y-3 pt-2">
+            <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-primary px-5 text-sm font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 shadow-md">
+              <Navigation className="h-5 w-5 text-accent" />
               {t('gps_action')}
             </a>
           </div>

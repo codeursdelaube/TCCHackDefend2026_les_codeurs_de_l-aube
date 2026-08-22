@@ -14,6 +14,7 @@ import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
 import ChatBot from "../_components/ChatBot";
+import SplashScreen from "@/components/SplashScreen";
 
 const SEO_DATA: Record<string, { title: string; description: string; keywords: string[] }> = {
   fr: {
@@ -101,6 +102,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     icons: {
       icon: '/icons/icon-192x192.png',
       apple: '/icons/icon-192x192.png',
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: 'HeriTogo',
+      startupImage: [
+        {
+          url: '/Hero2.png',
+        },
+      ],
     },
     verification: {
       google: '7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A',
@@ -216,6 +227,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
         className="min-h-full flex flex-col pb-20 bg-base-100 h-full antialiased"
       >
         <ThemeProvider>
+          <SplashScreen />
           <AuthProvider>
             <NextIntlClientProvider messages={messages}>
               <ServiceWorkerRegister />
@@ -224,7 +236,18 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               <CookieConsentBanner />
               {children}
               <ChatBot />
-              <Toaster position="top-center" richColors closeButton />
+              <Toaster
+                position="top-center"
+                richColors
+                closeButton
+                toastOptions={{
+                  style: {
+                    borderRadius: '1.25rem',
+                    border: '1px solid var(--border)',
+                    fontFamily: 'var(--font-body)',
+                  },
+                }}
+              />
             </NextIntlClientProvider>
           </AuthProvider>
         </ThemeProvider>
