@@ -102,6 +102,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       icon: '/icons/icon-192x192.png',
       apple: '/icons/icon-192x192.png',
     },
+    verification: {
+      google: '7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A',
+    },
   }
 }
 
@@ -198,6 +201,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           `}
         </Script>
         <meta name="theme-color" content="#1C2D52" />
+        <meta name="google-site-verification" content="7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A" />
         <link rel="shortcut icon" href="/icons/icon-192x192.png" />
         <script
           type="application/ld+json"
