@@ -144,6 +144,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
         '@id': `${baseUrl}/#website`,
         url: baseUrl,
         name: 'HeriTogo',
+        alternateName: ['Heritogo', 'HeriTogo Togo', 'HeriTogo Guide Culturel'],
         publisher: {
           '@id': `${baseUrl}/#organization`,
         },
@@ -202,7 +203,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
         </Script>
         <meta name="theme-color" content="#1C2D52" />
         <meta name="google-site-verification" content="7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A" />
-        <link rel="shortcut icon" href="/icons/icon-192x192.png" />
+        <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
