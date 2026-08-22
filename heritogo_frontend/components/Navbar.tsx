@@ -56,7 +56,7 @@ export default function Navbar() {
   const params = useParams<{ locale: string }>()
   const router = useRouter()
   const t = useTranslations('Navbar')
-  const { toggle, isDark, mounted } = useTheme()
+  const { setTheme, isDark, mounted } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [bottomNavOpen, setBottomNavOpen] = useState(false)
@@ -130,15 +130,16 @@ export default function Navbar() {
 
   const publicLinks: NavLinkItem[] = [
     { href: '/lieux', label: t('lieux'), icon: Map },
-    { href: '/scan', label: t('scan'), icon: ScanLine },
-    { href: '/guides', label: t('guides'), icon: Compass },
+    { href: '/regions', label: 'Régions', icon: Compass },
     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
+    { href: '/guides', label: t('guides'), icon: User },
+    { href: '/scan', label: t('scan'), icon: ScanLine },
   ]
 
   const bottomLinks: NavLinkItem[] = [
     { href: '/accueil', label: t('accueil'), icon: Home },
     { href: '/lieux', label: t('lieux'), icon: Map },
-    { href: '/histoire', label: t('histoire'), icon: BookOpenText },
+    { href: '/regions', label: 'Régions', icon: Compass },
     { href: '/scan', label: t('scan'), icon: ScanLine },
     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
   ]
@@ -188,7 +189,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-border/80 bg-base-100/92 shadow-sm backdrop-blur-xl">
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-[#E5E5E0] dark:border-[#243B2C] bg-white/95 dark:bg-[#0F1F16]/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/accueil" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
             <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-border bg-base-200 shadow-sm">
@@ -303,14 +304,10 @@ export default function Navbar() {
               ))}
             </div>
             {mounted && (
-              <button
-                type="button"
-                onClick={toggle}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-base-100 py-3 text-sm font-bold"
-              >
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                {isDark ? t('light') : t('dark')}
-              </button>
+              <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-base-100 p-1.5">
+                <button type="button" onClick={() => setTheme('light')} className={`flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold ${!isDark ? 'bg-primary text-primary-content' : 'text-base-content/60'}`}><Sun className="h-4 w-4" />{t('light')}</button>
+                <button type="button" onClick={() => setTheme('dark')} className={`flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold ${isDark ? 'bg-primary text-primary-content' : 'text-base-content/60'}`}><Moon className="h-4 w-4" />{t('dark')}</button>
+              </div>
             )}
           </div>
         )}
@@ -392,8 +389,8 @@ export default function Navbar() {
             {(isAuthenticated && profile ? bottomLinks : [
               { href: '/accueil', label: t('accueil'), icon: Home },
               { href: '/lieux', label: t('lieux'), icon: Map },
+              { href: '/regions', label: 'Régions', icon: Compass },
               { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
-              { href: '/histoire', label: t('histoire'), icon: BookOpenText },
               { href: '/scan', label: t('scan'), icon: ScanLine },
             ]).map((link) => {
               const Icon = link.icon
@@ -448,8 +445,8 @@ export default function Navbar() {
                   {(isAuthenticated && profile ? bottomLinks : [
                     { href: '/accueil', label: t('accueil'), icon: Home },
                     { href: '/lieux', label: t('lieux'), icon: Map },
+                    { href: '/regions', label: 'Régions', icon: Compass },
                     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
-                    { href: '/histoire', label: t('histoire'), icon: BookOpenText },
                     { href: '/scan', label: t('scan'), icon: ScanLine },
                   ]).map((link) => {
                     const Icon = link.icon

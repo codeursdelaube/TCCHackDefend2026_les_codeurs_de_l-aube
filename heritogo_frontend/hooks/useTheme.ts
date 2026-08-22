@@ -1,42 +1,41 @@
-'use client'
+﻿'use client'
 import { useEffect, useState } from 'react'
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 
 type Theme = 'light' | 'dark'
-const KEY = 'heritogo_theme'
+const PRIMARY_KEY = 'heritogo_theme'
+const LEGACY_KEY = 'theme'
+
+function isTheme(value: string | null): value is Theme {
+  return value === 'light' || value === 'dark'
+}
+
+function applyTheme(theme: Theme) {
+  document.documentElement.classList.toggle('dark', theme === 'dark')
+  document.documentElement.dataset.theme = theme
+  safeLocalStorageSet(PRIMARY_KEY, theme)
+  safeLocalStorageSet(LEGACY_KEY, theme)
+  document.cookie = `${PRIMARY_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`
+  document.cookie = `${LEGACY_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`
+}
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>('light')
+  const [theme, setThemeState] = useState<Theme>('light')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const saved = safeLocalStorageGet(KEY) as Theme | null
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      const initial = saved ?? (prefersDark ? 'dark' : 'light')
-      setTheme(initial)
-      setMounted(true)
-    }, 0)
-
-    return () => window.clearTimeout(timer)
+    const primary = safeLocalStorageGet(PRIMARY_KEY)
+    const legacy = safeLocalStorageGet(LEGACY_KEY)
+    const initial = isTheme(primary) ? primary : isTheme(legacy) ? legacy : 'light'
+    setThemeState(initial)
+    applyTheme(initial)
+    setMounted(true)
   }, [])
 
-  const toggle = () => {
-    const next: Theme = theme === 'light' ? 'dark' : 'light'
-    setTheme(next)
-    safeLocalStorageSet(KEY, next)
-    if (next === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    document.cookie = `heritogo_theme=${next}; path=/; max-age=31536000`
+  const setTheme = (next: Theme) => {
+    setThemeState(next)
+    applyTheme(next)
   }
 
-  return {
-    theme,
-    toggle,
-    isDark: theme === 'dark',
-    mounted,
-  }
+  return { theme, setTheme, toggle: () => setTheme(theme === 'light' ? 'dark' : 'light'), isDark: theme === 'dark', mounted }
 }

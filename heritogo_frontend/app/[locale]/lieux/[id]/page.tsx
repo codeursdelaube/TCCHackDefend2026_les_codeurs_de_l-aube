@@ -4,77 +4,111 @@ import { use, useState } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, BedDouble, BookOpen, Check, MapPin, Navigation, Share2, Star } from 'lucide-react'
+import {
+  ArrowLeft, ArrowRight, BedDouble, Camera, Check, ChevronDown, ChevronUp,
+  Clock, Compass, Eye, Footprints, Headphones, Heart, History, Info,
+  MapPin, MessageSquare, Navigation, Pause, Play, Share2, ShieldCheck,
+  ShoppingBag, Sparkles, Star, Sun, Utensils, Users
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { monuments } from '@/app/LieuxT/site'
+import platsTogolais from '@/app/Plats/plat'
 import hotels from '@/app/nearbyhotels/hotels'
-import TextToSpeech from '@/components/TextToSpeech'
+import { getSiteRating } from '@/lib/constants/ratings'
+import { getSiteExtraDetails, SiteActivity } from '@/lib/constants/siteDetails'
 
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-48 rounded-[24px] bg-muted/40 border border-border flex items-center justify-center animate-pulse">
-      <span className="text-xs font-bold text-muted-foreground">Chargement de la carte…</span>
+    <div className="flex h-56 w-full items-center justify-center rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] animate-pulse">
+      <span className="text-xs font-semibold text-[#767676]">Chargement de la carte interactive…</span>
     </div>
   ),
 })
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const earthRadiusKm = 6371
-  const toRad = (degree: number) => (degree * Math.PI) / 180
+  const R = 6371
+  const toRad = (d: number) => (d * Math.PI) / 180
   const dLat = toRad(lat2 - lat1)
   const dLng = toRad(lng2 - lng1)
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
-  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
 function formatDistance(km: number): string {
   return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`
 }
 
+function StarRow({ rating, count, size = 'sm' }: { rating: number; count?: number; size?: 'sm' | 'md' | 'lg' }) {
+  const full = Math.floor(rating)
+  const half = rating % 1 >= 0.5
+  const sz = size === 'lg' ? 'h-5 w-5' : size === 'md' ? 'h-4 w-4' : 'h-3.5 w-3.5'
+  return (
+    <div className="flex items-center gap-1">
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Star
+            key={i}
+            className={sz}
+            style={{
+              fill: i <= full ? '#E8A923' : i === full + 1 && half ? '#E8A923' : 'transparent',
+              color: i <= full || (i === full + 1 && half) ? '#E8A923' : '#D1D1CC',
+            }}
+          />
+        ))}
+      </div>
+      {count !== undefined && <span className="text-xs text-[#767676]">({count})</span>}
+    </div>
+  )
+}
+
+function ActivityIcon({ icon }: { icon: SiteActivity['icon'] }) {
+  switch (icon) {
+    case 'camera': return <Camera className="h-4 w-4 text-[#1B7E4B]" />
+    case 'footsteps': return <Footprints className="h-4 w-4 text-[#C85C2D]" />
+    case 'eye': return <Eye className="h-4 w-4 text-[#1B7E4B]" />
+    case 'compass': return <Compass className="h-4 w-4 text-[#E8A923]" />
+    case 'shopping': return <ShoppingBag className="h-4 w-4 text-[#C85C2D]" />
+    case 'sparkles': return <Sparkles className="h-4 w-4 text-[#E8A923]" />
+    case 'history': return <History className="h-4 w-4 text-[#1B7E4B]" />
+    case 'sun': return <Sun className="h-4 w-4 text-[#E8A923]" />
+    default: return <Sparkles className="h-4 w-4 text-[#1B7E4B]" />
+  }
+}
+
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
-function ShareButton({ title, shareLabel, copiedLabel }: { title: string; shareLabel: string; copiedLabel: string }) {
-  const [copied, setCopied] = useState(false)
-
-  const share = async () => {
-    const url = window.location.href
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, url })
-      } catch { }
-      return
-    }
-    await navigator.clipboard.writeText(url)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1800)
-  }
-
-
-
-  return (
-    <button type="button" onClick={share} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[20px] border border-border bg-base-200 px-5 text-sm font-black text-base-content transition-all hover:border-secondary/50 active:scale-95">
-      {copied ? <Check className="h-5 w-5 text-secondary" /> : <Share2 className="h-5 w-5 text-secondary" />}
-      {copied ? copiedLabel : shareLabel}
-    </button>
-  )
-}
+const TABS = ['apercu', 'activites', 'guide_pratique', 'carte', 'similaires'] as const
+type Tab = (typeof TABS)[number]
 
 export default function SiteDetailPage({ params }: PageProps) {
   const t = useTranslations('Lieux')
   const tMonuments = useTranslations('Monuments')
+  const tPlats = useTranslations('Plats')
   const resolvedParams = use(params)
   const site = monuments.find((item) => item.id === resolvedParams.id)
   if (!site) notFound()
+
+  const [activeTab, setActiveTab] = useState<Tab>('apercu')
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false)
+  const [selectedLang, setSelectedLang] = useState('fr-FR')
+  const [showFullText, setShowFullText] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const siteLat = Number(site.lat)
   const siteLng = Number(site.lng)
   const siteName = tMonuments(`${site.id}.nom`)
   const siteDescription = tMonuments(`${site.id}.description`)
   const siteHistory = tMonuments(`${site.id}.histoire`)
+
+  const ratingData = getSiteRating(site.id)
+  const extraDetails = getSiteExtraDetails(site.id, site.région)
+
+  // Spécialités culinaires associées à ce site
+  const relatedDishes = platsTogolais.filter((p) => extraDetails.dishesIds.includes(p.id))
 
   const getRegionName = (region: string): string => {
     switch (region) {
@@ -87,114 +121,534 @@ export default function SiteDetailPage({ params }: PageProps) {
     }
   }
 
+  const toggleAudio = () => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+    if (isPlayingAudio) {
+      window.speechSynthesis.cancel()
+      setIsPlayingAudio(false)
+    } else {
+      window.speechSynthesis.cancel()
+      const text = `${siteName}. ${siteDescription}. ${siteHistory}`
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = selectedLang
+      utterance.rate = 0.95
+      utterance.onend = () => setIsPlayingAudio(false)
+      utterance.onerror = () => setIsPlayingAudio(false)
+      window.speechSynthesis.speak(utterance)
+      setIsPlayingAudio(true)
+    }
+  }
+
+  const share = async () => {
+    const url = window.location.href
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: siteName, url })
+      } catch {}
+      return
+    }
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1800)
+  }
+
   const nearbyHotels = hotels
     .map((hotel) => ({ ...hotel, distance_km: haversine(siteLat, siteLng, hotel.lat, hotel.lng) }))
     .sort((a, b) => a.distance_km - b.distance_km)
-    .slice(0, 6)
+    .slice(0, 3)
 
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${siteLat},${siteLng}`
+  const previewSites = monuments.filter((m) => m.id !== site.id && m.région === site.région).slice(0, 4)
+  const otherSites = previewSites.length > 0 ? previewSites : monuments.filter((m) => m.id !== site.id).slice(0, 4)
+
+  const tabLabels: Record<Tab, string> = {
+    apercu: 'Aperçu',
+    activites: 'Que faire ici ?',
+    guide_pratique: 'Guide Malin',
+    carte: 'Carte & GPS',
+    similaires: 'À proximité',
+  }
 
   return (
-    <main className="min-h-screen bg-base-100 pb-28 text-base-content">
-      <section className="relative min-h-[62vh] overflow-hidden">
+    <main className="min-h-screen bg-white pb-28 pt-16 text-[#1A1A1A]">
+      
+      {/* ── HERO PHOTO plein format ── */}
+      <div className="relative h-72 w-full overflow-hidden sm:h-80 md:h-96">
         <Image src={site.image} alt={siteName} fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/35" />
 
-        <div className="absolute left-4 right-4 top-20 z-10 mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/lieux" className="inline-flex h-12 w-12 items-center justify-center rounded-[20px] bg-white/90 text-stone-950 shadow-sm transition-all hover:bg-white active:scale-95" aria-label={t('back_to_sites')}>
-            <ArrowLeft className="h-5 w-5" />
+        {/* Bouton retour */}
+        <div className="absolute left-4 top-4 z-10">
+          <Link
+            href="/lieux"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1A1A1A] shadow-md transition hover:scale-105 active:scale-95"
+          >
+            <ArrowLeft className="h-4 w-4" />
           </Link>
-          <span className="rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">{getRegionName(site.région)}</span>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-8">
-          <div className="mx-auto max-w-7xl">
-            {/* Fil d'Ariane discret style carnet de voyage */}
-            <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-2 text-xs font-semibold text-white/80">
-              <Link href="/" className="hover:text-[#C99A3E] transition-colors">Togo</Link>
-              <span className="text-white/40">/</span>
-              <Link href="/lieux" className="hover:text-[#C99A3E] transition-colors">{getRegionName(site.région)}</Link>
-              <span className="text-white/40">/</span>
-              <span className="text-white/80">{site.localite}</span>
-              <span className="text-white/40">/</span>
-              <span className="text-[#C99A3E] truncate max-w-[240px] font-bold">{siteName}</span>
-            </nav>
+        {/* Bouton Partager */}
+        <div className="absolute right-4 top-4 z-10">
+          <button
+            type="button"
+            onClick={share}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1A1A1A] shadow-md transition hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            {copied ? <Check className="h-4 w-4 text-[#1B7E4B]" /> : <Share2 className="h-4 w-4" />}
+          </button>
+        </div>
 
-            <h1 className="max-w-4xl font-serif text-3xl font-bold leading-tight tracking-normal text-white sm:text-5xl lg:text-6xl">{siteName}</h1>
+        {/* Titre & Note en bas du hero */}
+        <div className="absolute bottom-5 left-5 right-5 z-10 text-white space-y-1.5">
+          <div className="flex flex-wrap gap-1.5 items-center">
+            <span className="rounded-md bg-[#1B7E4B] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              {getRegionName(site.région)}
+            </span>
+            <span className="text-xs font-semibold text-white/90">
+              · {site.localite}
+            </span>
+          </div>
+
+          <h1 className="font-serif text-2xl font-bold leading-tight text-white sm:text-4xl drop-shadow-sm">
+            {siteName}
+          </h1>
+
+          <div className="flex items-center gap-2 pt-0.5">
+            <StarRow rating={ratingData.rating} count={ratingData.count} size="md" />
+            <span className="rounded-lg bg-[#1B7E4B] px-2 py-0.5 text-xs font-black text-white shadow-xs">
+              {ratingData.rating} / 5
+            </span>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-5 rounded-[32px] border border-border bg-base-200 p-5 shadow-xl sm:grid-cols-3 sm:p-6">
-          <div className="rounded-[24px] bg-base-100 p-4">
-            <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('rating')}</p>
-            <p className="mt-2 flex items-center gap-2 text-2xl font-black"><Star className="h-5 w-5 fill-amber-500 text-amber-500" />4.7</p>
-          </div>
-          <div className="rounded-[24px] bg-base-100 p-4">
-            <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('visits_per_year')}</p>
-            <p className="mt-2 text-2xl font-black">12 400</p>
-          </div>
-          <div className="rounded-[24px] bg-base-100 p-4">
-            <p className="text-xs font-black uppercase tracking-wide text-base-content/45">{t('distance')}</p>
-            <p className="mt-2 flex items-center gap-2 text-2xl font-black"><MapPin className="h-5 w-5 text-secondary" />{site.localite}</p>
-          </div>
+      {/* ── CORPS DE LA PAGE ── */}
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 space-y-6">
+
+        {/* Tags d'intérêt touristique */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {extraDetails.tags.map((tag) => (
+            <span
+              key={tag}
+              className="shrink-0 rounded-full border border-[#E5E5E0] bg-[#F5F5F0] px-3 py-1 text-xs font-bold text-[#1A1A1A]"
+            >
+              #{tag}
+            </span>
+          ))}
         </div>
-      </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_24rem] lg:px-8">
-        <div className="space-y-5">
-          {/* TTS + Share — juste sous le titre, avant la description */}
-          <div className="flex flex-wrap items-center gap-3">
-            <TextToSpeech text={`${siteName}. ${siteDescription}. ${siteHistory}`} />
-            <ShareButton title={siteName} shareLabel={t('share')} copiedLabel={t('copied')} />
-          </div>
+        {/* Bouton GPS & Itinéraire principal */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <a
+            href={googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-bold text-white shadow-sm transition hover:brightness-110 active:scale-98"
+            style={{ background: '#1B7E4B' }}
+          >
+            <Navigation className="h-4 w-4" />
+            <span>Itinéraire Google Maps (GPS)</span>
+          </a>
 
-          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
-            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BookOpen className="h-5 w-5 text-secondary" />{t('desc_title')}</h2>
-            <p className="m-0 text-sm font-medium leading-7 text-base-content/68">{siteDescription}</p>
-          </article>
+          <Link
+            href="/guides"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] font-bold text-[#1A1A1A] transition hover:bg-[#E5E5E0] active:scale-98"
+          >
+            <Users className="h-4 w-4 text-[#1B7E4B]" />
+            <span>Réserver un guide pour ce lieu</span>
+          </Link>
+        </div>
 
-          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
-            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BookOpen className="h-5 w-5 text-secondary" />{t('history_title')}</h2>
-            <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/68">{siteHistory}</p>
-          </article>
+        {/* Onglets de navigation interactifs */}
+        <div className="flex gap-0 overflow-x-auto border-b border-[#E5E5E0] scrollbar-none sticky top-14 bg-white/95 backdrop-blur-md z-20">
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`shrink-0 border-b-2 px-4 py-3 text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === tab
+                  ? 'border-[#1B7E4B] text-[#1B7E4B]'
+                  : 'border-transparent text-[#767676] hover:text-[#1A1A1A]'
+              }`}
+            >
+              {tabLabels[tab]}
+            </button>
+          ))}
+        </div>
 
-          <article className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
-            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-normal"><BedDouble className="h-5 w-5 text-secondary" />{t('hotels_nearby')}</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {nearbyHotels.map((hotel) => (
-                <div key={hotel.id} className="rounded-[24px] border border-border bg-base-100 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-sm font-black">{hotel.nom}</h3>
-                      <p className="mt-1 text-xs font-semibold text-base-content/50">{formatDistance(hotel.distance_km)}</p>
+        {/* ══════════════════════════════════════════════════
+            TAB 1: APERÇU GÉNÉRAL & NARRATION
+        ══════════════════════════════════════════════════ */}
+        {activeTab === 'apercu' && (
+          <div className="space-y-6">
+
+            {/* Audioguide TTS interactif */}
+            <div className="flex items-center justify-between rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1B7E4B] text-white shadow-xs">
+                  <Headphones className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#1B7E4B]">Narration Vocale</p>
+                  <p className="text-sm font-black text-[#1A1A1A]">Écouter l&apos;histoire du monument</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {['fr-FR', 'en-US', 'es-ES'].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => {
+                      setSelectedLang(l)
+                      if (isPlayingAudio) {
+                        window.speechSynthesis.cancel()
+                        setIsPlayingAudio(false)
+                      }
+                    }}
+                    className={`rounded-xl px-2 py-1 text-[11px] font-black cursor-pointer transition-all ${
+                      selectedLang === l
+                        ? 'bg-[#1B7E4B] text-white shadow-xs'
+                        : 'bg-white text-[#767676] border border-[#E5E5E0] hover:border-[#1B7E4B]/40'
+                    }`}
+                  >
+                    {l.split('-')[0].toUpperCase()}
+                  </button>
+                ))}
+                <button
+                  onClick={toggleAudio}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1B7E4B] text-white transition hover:scale-105 active:scale-95 cursor-pointer shadow-sm ml-1"
+                >
+                  {isPlayingAudio ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current ml-0.5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Barre audio animée */}
+            {isPlayingAudio && (
+              <div className="flex items-center justify-center gap-1.5 py-1">
+                {[40, 75, 90, 60, 100, 45, 80, 65, 95, 50, 70, 85, 60, 90].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-1 rounded-full bg-[#E8A923] animate-pulse"
+                    style={{ height: `${h}%`, maxHeight: '20px', minHeight: '6px', animationDelay: `${i * 0.08}s` }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Fiche Description & Histoire */}
+            <div className="rounded-2xl border border-[#E5E5E0] bg-white p-5 space-y-3">
+              <h2 className="text-xs font-black uppercase tracking-wider text-[#767676]">Présentation &amp; Histoire</h2>
+              <p className="text-sm leading-relaxed text-[#3D3D3D] font-medium">
+                {siteDescription}
+              </p>
+              {siteHistory && (
+                <div className={`mt-3 pt-3 border-t border-[#E5E5E0] space-y-2 ${showFullText ? 'block' : 'hidden'}`}>
+                  <p className="text-xs font-black uppercase tracking-wide text-[#1B7E4B]">Contexte Historique</p>
+                  <p className="text-sm leading-relaxed text-[#3D3D3D] font-medium">
+                    {siteHistory}
+                  </p>
+                </div>
+              )}
+              {siteHistory && (
+                <button
+                  type="button"
+                  onClick={() => setShowFullText(!showFullText)}
+                  className="pt-2 flex items-center gap-1 text-xs font-bold text-[#1B7E4B] hover:underline cursor-pointer"
+                >
+                  {showFullText ? (
+                    <><span>Réduire</span><ChevronUp className="h-3.5 w-3.5" /></>
+                  ) : (
+                    <><span>Lire toute l&apos;histoire complète…</span><ChevronDown className="h-3.5 w-3.5" /></>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Ce qu'il faut faire en bref */}
+            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xs font-black uppercase tracking-wider text-[#1A1A1A]">
+                  Expériences recommandées
+                </h2>
+                <button
+                  onClick={() => setActiveTab('activites')}
+                  className="text-xs font-bold text-[#1B7E4B] hover:underline cursor-pointer"
+                >
+                  Tout voir ({extraDetails.activities.length}) →
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {extraDetails.activities.slice(0, 2).map((act, i) => (
+                  <div key={i} className="flex items-start gap-3 rounded-xl bg-white p-3.5 border border-[#E5E5E0]">
+                    <div className="p-2 rounded-xl bg-[#F5F5F0] shrink-0 mt-0.5">
+                      <ActivityIcon icon={act.icon} />
                     </div>
-                    <BedDouble className="h-5 w-5 text-secondary" />
+                    <div>
+                      <p className="text-xs font-bold text-[#1A1A1A] leading-snug">{act.title}</p>
+                      <p className="text-[11px] text-[#767676] mt-1 leading-relaxed line-clamp-2">{act.desc}</p>
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm font-black text-secondary">{hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA</p>
+                ))}
+              </div>
+            </div>
+
+            {/* Spécialités culinaires à proximité */}
+            {relatedDishes.length > 0 && (
+              <div className="rounded-2xl border border-[#E5E5E0] bg-white p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Utensils className="h-4 w-4 text-[#C85C2D]" />
+                    <h2 className="text-xs font-black uppercase tracking-wider text-[#1A1A1A]">
+                      À déguster dans les environs
+                    </h2>
+                  </div>
+                  <Link href="/cuisine" className="text-xs font-bold text-[#C85C2D] hover:underline">
+                    Guide gastronomique →
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {relatedDishes.map((dish) => (
+                    <Link
+                      key={dish.id}
+                      href={`/cuisine/${dish.id}`}
+                      className="group overflow-hidden rounded-xl border border-[#E5E5E0] bg-[#F5F5F0] hover:shadow-sm transition-all"
+                    >
+                      <div className="relative h-24 overflow-hidden">
+                        <Image
+                          src={dish.image}
+                          alt={tPlats(`${dish.id}.nom`)}
+                          fill
+                          sizes="180px"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-2">
+                        <p className="truncate text-xs font-bold text-[#1A1A1A]">{tPlats(`${dish.id}.nom`)}</p>
+                        <p className="text-[10px] text-[#767676] capitalize">{dish.catégorie}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Hôtels & Hébergements proches */}
+            {nearbyHotels.length > 0 && (
+              <div className="rounded-2xl border border-[#E5E5E0] bg-white p-5 space-y-3">
+                <h2 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#1A1A1A]">
+                  <BedDouble className="h-4 w-4 text-[#1B7E4B]" />
+                  {t('hotels_nearby')}
+                </h2>
+                <div className="space-y-2">
+                  {nearbyHotels.map((hotel) => (
+                    <div key={hotel.id} className="flex items-center justify-between rounded-xl bg-[#F5F5F0] p-3 text-xs">
+                      <div>
+                        <p className="font-bold text-[#1A1A1A]">{hotel.nom}</p>
+                        <p className="text-[#767676]">{formatDistance(hotel.distance_km)} du monument</p>
+                      </div>
+                      <span className="font-bold text-[#1B7E4B]">{hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Avis Voyageurs */}
+            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xs font-black uppercase tracking-wider text-[#1A1A1A]">Avis des explorateurs</h2>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <StarRow rating={ratingData.rating} count={ratingData.count} size="md" />
+                    <span className="text-xs font-black text-[#1B7E4B]">{ratingData.rating}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                {extraDetails.reviews.map((rev, i) => (
+                  <div key={i} className="rounded-xl bg-white p-3.5 border border-[#E5E5E0] space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">{rev.author} <span className="text-[10px] text-[#767676] font-normal">({rev.origin})</span></span>
+                      <span className="text-[10px] text-[#767676]">{rev.date}</span>
+                    </div>
+                    <StarRow rating={rev.rating} size="sm" />
+                    <p className="text-xs text-[#3D3D3D] leading-relaxed font-medium">{rev.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB 2: ACTIVITÉS & QUE FAIRE SUR PLACE
+        ══════════════════════════════════════════════════ */}
+        {activeTab === 'activites' && (
+          <div className="space-y-4">
+            <div className="border-b border-[#E5E5E0] pb-3">
+              <h2 className="text-lg font-black text-[#1A1A1A]">Activités &amp; Choses à faire</h2>
+              <p className="text-xs text-[#767676]">Suggestions pour tirer le meilleur parti de votre visite sur ce site</p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {extraDetails.activities.map((act, i) => (
+                <div key={i} className="rounded-2xl border border-[#E5E5E0] bg-white p-4 space-y-2 shadow-xs hover:border-[#1B7E4B]/40 transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-[#F5F5F0] shrink-0">
+                      <ActivityIcon icon={act.icon} />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#1A1A1A]">{act.title}</h3>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#767676] pl-10 font-medium">{act.desc}</p>
                 </div>
               ))}
             </div>
-          </article>
-        </div>
 
-        <aside className="h-fit space-y-4 rounded-[32px] border border-border bg-base-200 p-5 shadow-sm lg:sticky lg:top-24">
-          <h3 className="font-serif text-lg font-bold text-base-content flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-secondary" />
-            Localisation Interactive
-          </h3>
-          <div className="overflow-hidden rounded-[24px] border border-border">
-            <DynamicCarte monumentsList={[site]} />
+            {/* Bannière guide */}
+            <div className="rounded-2xl border border-[#1B7E4B]/30 bg-[#1B7E4B]/5 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="space-y-1 text-center sm:text-left">
+                <p className="text-xs font-black uppercase text-[#1B7E4B] flex items-center justify-center sm:justify-start gap-1.5">
+                  <ShieldCheck className="h-4 w-4" /> Guide Local Certifié
+                </p>
+                <p className="text-sm font-bold text-[#1A1A1A]">Vous souhaitez une visite guidée personnalisée ?</p>
+                <p className="text-xs text-[#767676]">Réservez un guide togolais certifié pour des explications immersives.</p>
+              </div>
+              <Link
+                href="/guides"
+                className="shrink-0 rounded-full px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:brightness-110"
+                style={{ background: '#1B7E4B' }}
+              >
+                Trouver un guide
+              </Link>
+            </div>
           </div>
-          <div className="space-y-3 pt-2">
-            <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-primary px-5 text-sm font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 shadow-md">
-              <Navigation className="h-5 w-5 text-accent" />
-              {t('gps_action')}
-            </a>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB 3: GUIDE PRATIQUE & CONSEILS TOURISTES
+        ══════════════════════════════════════════════════ */}
+        {activeTab === 'guide_pratique' && (
+          <div className="space-y-4">
+            <div className="border-b border-[#E5E5E0] pb-3">
+              <h2 className="text-lg font-black text-[#1A1A1A]">Conseils Pratiques du Voyageur</h2>
+              <p className="text-xs text-[#767676]">Toutes les informations utiles pour organiser votre venue sereinement</p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#1B7E4B]">
+                  <Sun className="h-4 w-4" />
+                  <span>Meilleur moment</span>
+                </div>
+                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.bestTime}</p>
+              </div>
+
+              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#C85C2D]">
+                  <Clock className="h-4 w-4" />
+                  <span>Durée recommandée</span>
+                </div>
+                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.duration}</p>
+              </div>
+
+              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#E8A923]">
+                  <Footprints className="h-4 w-4" />
+                  <span>Tenue &amp; Équipement</span>
+                </div>
+                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.outfit}</p>
+              </div>
+
+              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#1B7E4B]">
+                  <Navigation className="h-4 w-4" />
+                  <span>Accès &amp; Transport</span>
+                </div>
+                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.access}</p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5E5E0] bg-white p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-black uppercase text-[#767676]">
+                <Info className="h-4 w-4 text-[#1B7E4B]" />
+                <span>Tarif &amp; Entrée</span>
+              </div>
+              <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.fee}</p>
+            </div>
           </div>
-        </aside>
-      </section>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB 4: CARTE & GPS
+        ══════════════════════════════════════════════════ */}
+        {activeTab === 'carte' && (
+          <div className="space-y-4">
+            <div className="overflow-hidden rounded-2xl border border-[#E5E5E0] shadow-sm">
+              <DynamicCarte monumentsList={[site]} />
+            </div>
+
+            <div className="flex items-center justify-between rounded-xl bg-[#F5F5F0] p-3 text-xs">
+              <span className="text-[#767676]">Coordonnées GPS : <strong className="text-[#1A1A1A]">{siteLat.toFixed(5)}, {siteLng.toFixed(5)}</strong></span>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-[#1B7E4B] hover:underline"
+              >
+                Lancer le guidage →
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB 5: SITES SIMILAIRES & PROCHES
+        ══════════════════════════════════════════════════ */}
+        {activeTab === 'similaires' && (
+          <div className="space-y-4">
+            <div className="border-b border-[#E5E5E0] pb-3">
+              <h2 className="text-lg font-black text-[#1A1A1A]">Autres trésors dans la région</h2>
+              <p className="text-xs text-[#767676]">Continuez votre exploration à proximité de {site.localite}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+              {otherSites.map((ps) => {
+                const pr = getSiteRating(ps.id)
+                return (
+                  <Link
+                    key={ps.id}
+                    href={`/lieux/${ps.id}`}
+                    className="group overflow-hidden rounded-2xl border border-[#E5E5E0] bg-white shadow-xs hover:shadow-md transition-all"
+                  >
+                    <div className="relative h-36 overflow-hidden bg-[#F5F5F0]">
+                      <Image
+                        src={ps.image}
+                        alt={tMonuments(`${ps.id}.nom`)}
+                        fill
+                        sizes="280px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <span className="absolute left-2.5 top-2.5 rounded-md bg-[#1B7E4B] px-2 py-0.5 text-[9px] font-bold uppercase text-white shadow-xs">
+                        {ps.localite}
+                      </span>
+                    </div>
+                    <div className="p-3 space-y-1">
+                      <p className="truncate text-xs font-bold text-[#1A1A1A]">{tMonuments(`${ps.id}.nom`)}</p>
+                      <StarRow rating={pr.rating} count={pr.count} />
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+      </div>
     </main>
   )
 }

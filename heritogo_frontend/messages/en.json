@@ -521,6 +521,60 @@
             "description": "A creamy and velvety sauce made from roasted peanut paste, spiced with local spices.",
             "histoire": "Peanut sauce crosses all regions of Togo, from South to North (where peanuts are widely grown). It demonstrates the ability of Togolese culinary heritage to bind sweet and fatty flavors with strong peppers to create a perfect balance.",
             "accompagnementsIdaux": "White rice, yam fufu, or corn dough."
+        },
+        "wagasi_togolais": {
+            "nom": "Wagasi (Fulani Cheese)",
+            "description": "Golden fried artisan cow-milk cheese with a natural red rind, specialty of Fulani pastoralists.",
+            "histoire": "Made from fresh cow milk curdled with natural Calotropis procera extract, Wagasi is fried until crispy and delicious, often served with seasoned tomato sauce or hearty rice dishes.",
+            "accompagnementsIdaux": "Great with Ayimolou, fried plantains, or spicy tomato dip."
+        },
+        "fetri_dessi": {
+            "nom": "Fétri Dessi (Okra Stew)",
+            "description": "Rich and silky okra stew simmered in red palm oil with crab, smoked fish, and coastal prawns.",
+            "histoire": "A crown jewel of Togolese gastronomy, Fétri Dessi marries tender okra with rich Atlantic seafood for an unforgettable family feast.",
+            "accompagnementsIdaux": "Akoumé (corn fufu), Ewassa, or Cassava paste."
+        },
+        "to_sorgho_togolais": {
+            "nom": "Tô (Sorghum & Millet Paste)",
+            "description": "Nutritious and earthy staple grain paste from Northern Togo, rich in traditional minerals.",
+            "histoire": "The foundational meal of the Kara and Savanes regions, Tô is beaten from wholesome sorghum flour in simmering water, fueling farmers across generations.",
+            "accompagnementsIdaux": "Okra soup, baobab leaf sauce, or rich peanut stew."
+        },
+        "riz_gras_togolais": {
+            "nom": "Togolese Jollof Rice (Riz Gras)",
+            "description": "Fragrant rice slowly simmered in a savory broth of fresh tomatoes, local vegetables, and spices.",
+            "histoire": "The Togolese take on seasoned rice stands out with garden vegetables (cabbage, carrots, African eggplant) and a fragrant seasoning of garlic, ginger, and green pepper.",
+            "accompagnementsIdaux": "Fried chicken, grilled fish, and spicy shito pepper."
+        },
+        "soupe_poisson_togolaise": {
+            "nom": "Coastal Fish Soup",
+            "description": "Spicy aromatic broth packed with freshly caught Atlantic fish from Lomé and Aného.",
+            "histoire": "Prepared daily by coastal fishermen's families, this fragrant fish soup uses grouper and captain fish simmered with ginger, garlic, and fresh African basil.",
+            "accompagnementsIdaux": "Hot Ablo, white Akoumé, or crusty bread."
+        },
+        "hanvidokpome_aneho": {
+            "nom": "Hanvidokpomè (Aného Roast Pork)",
+            "description": "Festive slow-roasted spiced pork, the historical signature dish of Aného.",
+            "histoire": "From the historic town of Aného, Hanvidokpomè is the ultimate celebratory meal during Epé-Ekpé festivities, marinated in heritage spices and roasted to tender perfection.",
+            "accompagnementsIdaux": "Ablo, Kohm, or corn cakes with seasoned tomato relish."
+        },
+        "agbeli_togolais": {
+            "nom": "Agbeli (Pounded Cassava)",
+            "description": "Silky, stretchy steamed cassava fufu delicately pounded in a wooden mortar.",
+            "histoire": "Beloved in the southern Plateaux, Agbeli is a lighter alternative to yam fufu, perfectly paired with rich aromatic soups.",
+            "accompagnementsIdaux": "Clear fish stew, palm nut soup, or Adémè sauce."
+        },
+        "tchoukoutou_togolais": {
+            "nom": "Tchoukoutou (Sorghum Craft Beer)",
+            "description": "Traditional cloudy fermented sorghum beer served chilled in a natural calabash gourd.",
+            "histoire": "The iconic drink of North Togo, brewed through ancient female knowledge of grain malting and open-pot fermentation for friendship and sacred ceremonies.",
+            "accompagnementsIdaux": "Shared among friends in traditional calabash bowls."
+        },
+        "sodabi_togolais": {
+            "nom": "Artisanal Sodabi",
+            "description": "Famous heritage palm spirit distilled from pure fermented oil-palm sap.",
+            "histoire": "Celebrated as the nectar of the ancestors, Sodabi is present in every traditional blessing and gathering, often infused with healing botanicals.",
+            "accompagnementsIdaux": "Enjoyed as a celebratory toast or traditional digestif."
         }
     },
     "Monuments": {
@@ -583,6 +637,91 @@
             "nom": "Yikpa Waterfall",
             "description": "One of the most spectacular and highest waterfalls in Togo, nestled in wild nature.",
             "histoire": "Also called Douala Falls, it's one of the most impressive and highest waterfalls in Togo. Located at the northern end of the Danyi plateau, it flows along a steep cliff into dense vegetation, spectacularly marking the natural border with Ghana."
+        },
+        "marche_fetiches_akodessewa": {
+            "nom": "Akodessawa Fetish Market",
+            "description": "The largest voodoo and traditional healing market in the world, located in Lomé.",
+            "histoire": "A true spiritual institution, the Akodessewa market brings together healers and voodoo priests from all over West Africa, offering authentic protective talismans and herbal remedies."
+        },
+        "togoville_sanctuaire": {
+            "nom": "Togoville & Lake Togo",
+            "description": "Historic sacred town, birthplace of the country's name with ancient voodoo shrines and colonial cathedral.",
+            "histoire": "Located on the shores of Lake Togo, Togoville gave its name to the country after the 1884 treaty. It is a unique meeting point between animist traditions and historic Christianity."
+        },
+        "aneho_cite_coloniale": {
+            "nom": "Aného (Historic Capital)",
+            "description": "Former colonial capital of Togo nestled between the Atlantic Ocean and the coastal lagoon.",
+            "histoire": "Capital of Togo from 1886 to 1897, Aného is a historic Guin-Mina town known for its colonial architecture and the sacred Glidji festival."
+        },
+        "plage_de_lome": {
+            "nom": "Lomé Beach & Corniche",
+            "description": "The scenic golden coastline lined with coconut palms stretching right across the capital city.",
+            "histoire": "Lomé's beach is one of the rare oceanfronts located right in the heart of a capital. On weekends, traditional fishermen can be seen drawing their huge nets to rhythmic songs at sunset."
+        },
+        "cascade_kpime": {
+            "nom": "Kpimé Waterfall",
+            "description": "Stunning tropical waterfall cascading through the lush green hills of Kpalimé.",
+            "histoire": "Located near Kpalimé, Kpimé Waterfall drops down rocky cliff faces surrounded by dense cocoa and fern groves, offering a cool revitalizing stop for hikers."
+        },
+        "cascade_aklowa": {
+            "nom": "Aklowa Waterfall (Badou)",
+            "description": "Majestic 100-meter high mineral waterfall hidden in the pristine rainforest of Badou.",
+            "histoire": "One of the most impressive waterfalls in Togo, Aklowa rushes from a steep cliff. Local tradition attributes healing and purifying qualities to its clear waters."
+        },
+        "notse_agbogbo": {
+            "nom": "Agbogbo Wall in Notsè",
+            "description": "Legendary remnants of the ancient fortified royal capital of the Ewé people.",
+            "histoire": "In the 15th century, Notsè was the capital of the Ewé kingdom under King Agokoli. The massive clay defensive walls remain a sacred symbol of ancestral heritage."
+        },
+        "parc_fazao_malfakassa": {
+            "nom": "Fazao-Malfakassa National Park",
+            "description": "Togo's largest national park (192,000 ha), sanctuary for wild elephants, buffalos, and rugged hills.",
+            "histoire": "Located across the Atakora mountain range in the Central Region, this vast reserve protects pristine savannah forests and abundant African wildlife."
+        },
+        "lac_de_nangbeto": {
+            "nom": "Nangbéto Lake & Dam",
+            "description": "Vast lake on the Mono River, home to wild hippos and rich birdlife.",
+            "histoire": "Formed by the hydroelectric dam on the Mono River, Lake Nangbéto is a haven for traditional canoe excursions and hippopotamus watching."
+        },
+        "sokode_centre": {
+            "nom": "Sokodé & Tem Heritage",
+            "description": "Second largest city in Togo, heart of Tem culture and the famous Gadao-Adossa knife dance.",
+            "histoire": "A historic crossroads connecting the Sahel to the Gulf of Guinea, Sokodé is known for its traditional weavers and the spectacular Gadao festival."
+        },
+        "faille_aledjo": {
+            "nom": "Alédjo Fault (Mountain Pass)",
+            "description": "Dramatic rocky road pass cut directly through the towering cliffs of the Atakora mountains.",
+            "histoire": "An engineering marvel carved into the rock to link North and South Togo, offering breathtaking mountain panoramas."
+        },
+        "reserve_sarakawa": {
+            "nom": "Sarakawa Wildlife Reserve",
+            "description": "Renowned safari reserve featuring giraffes, zebras, and ostriches at the foot of the Kara mountains.",
+            "histoire": "Located near Kara, this protected park offers close encounters with large African mammals in a scenic landscape."
+        },
+        "forgerons_tchare": {
+            "nom": "Traditional Blacksmiths of Tcharè",
+            "description": "Ancient stone-hammer iron forging workshops of the Kabyè people in the Kara mountains.",
+            "histoire": "In the Kabyè hills, blacksmiths preserve ancestral metallurgy by beating glowing iron using round granite stones as hammers and anvils."
+        },
+        "reserve_oti_mandouri": {
+            "nom": "Oti-Mandouri Wildlife Reserve",
+            "description": "Vast protected savannah plain along the Oti River in northernmost Togo.",
+            "histoire": "Part of the WAPO international biosphere, this flood plain shelters elephant herds, buffalos, and hippos under endless northern skies."
+        },
+        "peintures_namoundjoga": {
+            "nom": "Namoundjoga Rock Paintings",
+            "description": "Prehistoric rock art sites engraved and painted on the sandstone cliffs of the Far North.",
+            "histoire": "Invaluable witness of prehistoric West Africa, the Namoundjoga rock shelters feature ancient ochre paintings depicting wildlife and sacred symbols."
+        },
+        "grottes_de_nok": {
+            "nom": "Nok Caves & Cliff Granaries (Nano)",
+            "description": "Cliffside troglodyte shelters and ancient clay granaries perched on dizzying canyon walls.",
+            "histoire": "In the 18th and 19th centuries, Moba and Gourma villagers built inaccessible shelters inside the Nano cliffs to protect themselves, leaving dozens of clay granaries suspended above the void."
+        },
+        "dapaong_marche": {
+            "nom": "Dapaong & Moba Country",
+            "description": "Northern capital of Togo, crossroads of Sahelian trade and authentic leathercraft.",
+            "histoire": "Surrounded by giant baobabs, Dapaong is the vibrant hub of the Savanes Region, renowned for its lively craft market, shea butter, and spices."
         }
     },
     "Parcs": {
@@ -1062,5 +1201,6 @@
         "per_day": "XOF/day",
         "view_profile": "View profile",
         "book": "Book"
-    }
+    },
+  "TravelTools": {"drawer":{"button":"Travel tools","open":"Open travel tools","title":"Traveller tools","close":"Close","privacy":"Your lists are saved on this device"},"checklist":{"kicker":"Prepare your arrival","title":"Before you leave","description":"A short, clear checklist saved on your device.","progress":"{done}/{total}","items":{"documents":{"title":"Keep documents handy","detail":"Passport, accommodation contact details and secure digital copies."},"entry":{"title":"Entry requirements checked","detail":"Check official sources before departure: requirements can change."},"offline":{"title":"Map and contacts saved","detail":"Download the useful area offline and keep a local contact."},"money":{"title":"Initial budget ready","detail":"Plan enough for arrival and always agree on a fare before a ride."}}},"planner":{"kicker":"Your trip, simply","title":"A ready-to-enjoy itinerary","description":"Choose your interest and follow a clear itinerary as you travel.","styleLabel":"Your interest","duration":"Duration","oneDay":"1 day","twoDays":"2 days","threeDays":"3 days","save":"Save my itinerary","saved":"Itinerary saved on this device","map":"See places on the map","itineraries":{"essentiel":{"label":"Essentials","description":"The best of Togo for a first visit.","days":{"1":"Lomé: Grand Marché, cathedral and seafront","2":"Kpalimé: crafts, coffee-cocoa and Womé waterfall","3":"Koutammakou: Batammariba villages and northern landscapes"}},"nature":{"label":"Nature","description":"Waterfalls, mountains and open spaces at your pace.","days":{"1":"Lomé: lagoon and Lake Togo","2":"Kpalimé: Mount Agou and Womé waterfall","3":"Fazao-Malfakassa: hiking and wildlife"}},"culture":{"label":"Culture","description":"Encounters, craftsmanship and living heritage.","days":{"1":"Lomé: museums, fetish market and local cuisine","2":"Kpalimé: artisan workshops and local produce","3":"Koutammakou: traditional architecture and local communities"}}}}}
 }

@@ -15,6 +15,7 @@ import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
 import ChatBot from "../_components/ChatBot";
 import SplashScreen from "@/components/SplashScreen";
+import TravelToolsDrawer from "@/components/TravelToolsDrawer";
 
 const SEO_DATA: Record<string, { title: string; description: string; keywords: string[] }> = {
   fr: {
@@ -135,7 +136,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
 
   // Lire le cookie thème côté serveur
   const cookieStore = await cookies();
-  const themeCookie = cookieStore.get('heritogo_theme')?.value;
+  const themeCookie = cookieStore.get('heritogo_theme')?.value ?? cookieStore.get('theme')?.value;
   const isDark = themeCookie === 'dark';
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://heritogo.codorah.com';
@@ -196,18 +197,14 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           {`
               (function() {
                 try {
-                  var cookie = document.cookie.match(/heritogo_theme=([^;]+)/);
-                  var saved = cookie ? cookie[1] : null;
-                  if (!saved) {
-                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    saved = prefersDark ? 'dark' : 'light';
-                    document.cookie = "heritogo_theme=" + saved + "; path=/; max-age=31536000; SameSite=Lax";
-                  }
-                  if (saved === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
+                  var primaryCookie = document.cookie.match(/(?:^|; )heritogo_theme=([^;]+)/);
+                  var legacyCookie = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+                  var saved = primaryCookie ? primaryCookie[1] : (legacyCookie ? legacyCookie[1] : 'light');
+                  saved = saved === 'dark' ? 'dark' : 'light';
+                  document.documentElement.classList.toggle('dark', saved === 'dark');
+                  document.documentElement.dataset.theme = saved;
+                  document.cookie = "heritogo_theme=" + saved + "; path=/; max-age=31536000; SameSite=Lax";
+                  document.cookie = "theme=" + saved + "; path=/; max-age=31536000; SameSite=Lax";
                 } catch(e) {}
               })();
           `}
@@ -236,6 +233,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               <CookieConsentBanner />
               {children}
               <ChatBot />
+              <TravelToolsDrawer />
               <Toaster
                 position="top-center"
                 richColors

@@ -24,6 +24,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
       case 'Plat Principal': return t('categories.plat_principal')
       case 'Street Food': return t('categories.street_food')
       case 'Sauce': return t('categories.sauce')
+      case 'Boisson': return 'Boisson Traditionnelle'
       default: return category
     }
   }

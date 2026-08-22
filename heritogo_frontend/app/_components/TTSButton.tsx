@@ -33,10 +33,10 @@ export default function TTSButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={toggle}
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-sm ${
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-sm ${
         speaking
-          ? 'bg-[#BF360C] text-white'
-          : 'bg-[#3B2519] text-white dark:bg-[#C99A3E] dark:text-[#2A1C14] hover:brightness-110'
+          ? 'bg-[#C85C2D] text-white'
+          : 'bg-[#1B7E4B] text-white hover:brightness-110'
       }`}
     >
       {speaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}

@@ -41,9 +41,9 @@ function createCoffeePin(pinColor: string, dotColor: string) {
   });
 }
 
-const pinExpresso = createCoffeePin("#3B2519", "#C99A3E"); // Maritime / Lomé
-const pinCaramel  = createCoffeePin("#A9754A", "#FDFBF8"); // Plateaux / Kpalimé
-const pinCrema    = createCoffeePin("#C99A3E", "#3B2519"); // Kara / Savanes / Centrale
+const pinSavane   = createCoffeePin("#1B7E4B", "#FFFFFF"); // Maritime / Plateaux
+const pinLaterite = createCoffeePin("#C85C2D", "#FFFFFF"); // Centrale
+const pinOr       = createCoffeePin("#E8A923", "#1A1A1A"); // Kara / Savanes
 
 interface CarteProps {
   monumentsList: Monument[];
@@ -63,13 +63,13 @@ export default function Carte({ monumentsList }: CarteProps) {
   const zoomLevel = isSingle ? 13 : 7;
 
   const getPinByRegion = (region: string) => {
-    if (region === 'Maritime') return pinExpresso;
-    if (region === 'Plateaux') return pinCaramel;
-    return pinCrema;
+    if (region === 'Maritime' || region === 'Plateaux') return pinSavane;
+    if (region === 'Centrale') return pinLaterite;
+    return pinOr;
   };
 
   return (
-    <div className={`w-full ${isSingle ? 'h-64 sm:h-72' : 'h-125'} relative z-0 rounded-[32px] overflow-hidden border border-border shadow-md bg-base-300`}>
+    <div className={`w-full ${isSingle ? 'h-64 sm:h-72' : 'h-125'} relative z-0 rounded-2xl overflow-hidden border border-[#E5E5E0] shadow-sm bg-[#F5F5F0]`}>
       <MapContainer
         center={positionCentre}
         zoom={zoomLevel}
@@ -93,21 +93,21 @@ export default function Carte({ monumentsList }: CarteProps) {
                 position={[site.lat, site.lng]}
                 icon={pinIcon}
               >
-                <Popup className="custom-coffee-popup">
-                  <div className="p-1.5 max-w-[200px] text-stone-900 font-sans">
-                    <span className="inline-block rounded-md bg-[#3B2519] px-2 py-0.5 text-[9px] font-black uppercase text-[#FDFBF8] mb-1">
+                <Popup className="custom-togo-popup">
+                  <div className="p-2 max-w-[210px] text-[#1A1A1A] font-sans">
+                    <span className="inline-block rounded-md bg-[#1B7E4B] px-2 py-0.5 text-[9px] font-bold uppercase text-white mb-1">
                       {site.région}
                     </span>
-                    <p className="font-bold text-sm leading-tight text-[#2A1C14] mb-1">{siteNom}</p>
-                    <p className="text-[11px] text-[#A9754A] font-semibold mb-2">
+                    <p className="font-bold text-xs leading-tight text-[#1A1A1A] mb-1">{siteNom}</p>
+                    <p className="text-[10px] text-[#767676] font-medium mb-1.5">
                       📍 {site.localite}
                     </p>
-                    <p className="line-clamp-2 text-[10px] text-stone-600 mb-2">
+                    <p className="line-clamp-2 text-[10px] text-[#767676] mb-2 leading-relaxed">
                       {siteDesc}
                     </p>
                     <Link
                       href={`/lieux/${site.id}`}
-                      className="inline-block w-full text-center rounded-lg bg-[#3B2519] py-1 text-[10px] font-bold text-white transition-opacity hover:opacity-90"
+                      className="inline-block w-full text-center rounded-lg bg-[#1B7E4B] py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90"
                     >
                       Découvrir →
                     </Link>

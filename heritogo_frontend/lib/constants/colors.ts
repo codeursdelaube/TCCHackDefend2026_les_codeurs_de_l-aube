@@ -1,16 +1,17 @@
 export const COLORS = {
-  // Palette officielle "Café & Blanc" (Terroir des Plateaux & Kloto)
-  espresso: '#3B2519', // Brun café torréfié profond (primary)
-  caramel: '#A9754A',  // Accent chaud (secondary)
-  crema: '#C99A3E',    // Mousse dorée d'espresso (accent/badges)
-  latte: '#F1E7D8',    // Fond doux / muted
-  milk: '#FDFBF8',     // Blanc lait / background
+  // Palette "Togo Vivant" — TripAdvisor style africain
+  savane: '#1B7E4B',    // Vert savane togolaise (primary)
+  laterite: '#C85C2D',  // Terre de latérite rouge (secondary)
+  or: '#E8A923',        // Or Kpalimé — étoiles, badges (accent)
+  sable: '#F5F5F0',     // Fond sable clair (muted/background)
+  blanc: '#FFFFFF',     // Blanc pur (card)
+  texte: '#1A1A1A',     // Texte principal
+  gris: '#767676',      // Texte secondaire
 
-  // Alias rétrocompatibles
-  forest: '#3B2519',
-  rust: '#A9754A',
-  gold: '#C99A3E',
-  cream: '#FDFBF8',
-  ink: '#2A1C14',
+  // Alias rétrocompatibles (pour Navbar et autres composants)
+  forest: '#1B7E4B',
+  rust:   '#C85C2D',
+  gold:   '#E8A923',
+  cream:  '#F5F5F0',
+  ink:    '#1A1A1A',
 } as const
-
