@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Sparkles, Shield, Zap, ArrowRight, Star } from 'lucide-react'
+import { Check, Shield, Zap, ArrowRight, Star } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
 import { useRouter } from 'next/navigation'
 import { safeLocalStorageSet } from '@/lib/utils/storage'
@@ -31,7 +31,7 @@ export default function SubscriptionPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-12 inline-flex items-center gap-2 rounded-2xl bg-secondary/10 px-4 py-2 text-sm font-black uppercase tracking-wider text-secondary"
         >
-          <Sparkles className="h-4 w-4" />
+          <Star className="h-4 w-4" />
           Heritogo Premium
         </motion.div>
 
@@ -44,7 +44,7 @@ export default function SubscriptionPage() {
           {"Débloquez l'expérience complète"}
         </motion.h1>
 
-        <span className="heritage-weave mx-auto mb-6" />
+        <span className="togo-underline mx-auto mb-6" />
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -62,7 +62,7 @@ export default function SubscriptionPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-col rounded-[32px] border border-border bg-base-200 p-8 shadow-sm"
+          className="flex flex-col rounded-xl border border-border bg-base-200 p-8 shadow-sm"
         >
           <div className="mb-6">
             <h2 className="text-2xl font-black">Découverte</h2>
@@ -101,8 +101,8 @@ export default function SubscriptionPage() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
-          className="relative flex flex-col rounded-[32px] border-2 p-8 shadow-xl"
-          style={{ borderColor: COLORS.forest, backgroundColor: '#004D4008' }}
+          className="relative flex flex-col rounded-xl border-2 p-8 shadow-xl"
+          style={{ borderColor: COLORS.forest, backgroundColor: 'var(--secondary)' }}
         >
           <div className="absolute -top-4 right-8 rounded-full bg-secondary px-4 py-1 text-xs font-black uppercase tracking-wider text-secondary-content shadow-lg">
             Recommandé

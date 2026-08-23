@@ -35,8 +35,8 @@ export default function TTSButton({ text }: { text: string }) {
       onClick={toggle}
       className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-sm ${
         speaking
-          ? 'bg-[#C85C2D] text-white'
-          : 'bg-[#1B7E4B] text-white hover:brightness-110'
+          ? 'bg-primary text-white'
+          : 'bg-primary text-white hover:brightness-110'
       }`}
     >
       {speaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}

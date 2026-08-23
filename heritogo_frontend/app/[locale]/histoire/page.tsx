@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { BookOpenText, ChevronDown, Clock3, Globe2, Landmark, ScrollText, Sparkles } from 'lucide-react'
+import { BookOpenText, ChevronDown, Clock3, Globe2, Landmark, ScrollText } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useRouter, usePathname } from 'next/navigation'
 import TextToSpeech from '@/components/TextToSpeech'
@@ -40,7 +40,7 @@ export default function HistoirePage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7 lg:min-h-88"
+          className="relative overflow-hidden rounded-xl border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7 lg:min-h-88"
         >
           <div className="absolute right-5 top-5 hidden h-28 w-28 rounded-full border border-secondary/20 sm:block" />
           <div className="relative z-10">
@@ -49,7 +49,7 @@ export default function HistoirePage() {
               <span className="truncate">{t('badge')}</span>
             </div>
             <h1 className="max-w-4xl text-3xl font-black leading-tight tracking-normal sm:text-5xl lg:text-6xl">{t('title')}</h1>
-            <span className="heritage-weave" />
+            <span className="togo-underline" />
             <p className="mt-4 max-w-2xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('subtitle')}</p>
           </div>
         </motion.article>
@@ -58,7 +58,7 @@ export default function HistoirePage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.08, ease: 'easeOut' }}
-          className="h-fit rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-4xl lg:sticky lg:top-24"
+          className="h-fit rounded-xl border border-border bg-base-200 p-4 shadow-sm sm:rounded-4xl lg:sticky lg:top-24"
         >
           <div className="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-wide text-base-content/50">
             <Globe2 className="h-4 w-4 text-secondary" />
@@ -89,12 +89,12 @@ export default function HistoirePage() {
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="rounded-[22px] border border-border bg-base-100 p-4">
+            <div className="rounded-xl border border-border bg-base-100 p-4">
               <Clock3 className="h-5 w-5 text-secondary" />
               <p className="mt-2 text-lg font-black">{t('stats.period')}</p>
               <p className="text-[11px] font-bold uppercase tracking-wide text-base-content/45">{t('stats.period_label')}</p>
             </div>
-            <div className="rounded-[22px] border border-border bg-base-100 p-4">
+            <div className="rounded-xl border border-border bg-base-100 p-4">
               <ScrollText className="h-5 w-5 text-secondary" />
               <p className="mt-2 text-lg font-black">{paragraphs.length}</p>
               <p className="text-[11px] font-bold uppercase tracking-wide text-base-content/45">{t('stats.sections')}</p>
@@ -112,7 +112,7 @@ export default function HistoirePage() {
         >
           <motion.nav
             variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
-            className="hidden h-fit rounded-[28px] border border-border bg-base-200 p-4 shadow-sm lg:sticky lg:top-24 lg:block"
+            className="hidden h-fit rounded-xl border border-border bg-base-200 p-4 shadow-sm lg:sticky lg:top-24 lg:block"
           >
             <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-wide text-base-content/50">
               <BookOpenText className="h-4 w-4 text-secondary" />
@@ -134,7 +134,7 @@ export default function HistoirePage() {
                 key={`section-${index}`}
                 id={`section-${index + 1}`}
                 variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-                className="scroll-mt-24 rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7"
+                className="scroll-mt-24 rounded-xl border border-border bg-base-200 p-5 shadow-sm sm:rounded-4xl sm:p-7"
               >
                 <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-sm font-black text-secondary-content">
                   {index + 1}

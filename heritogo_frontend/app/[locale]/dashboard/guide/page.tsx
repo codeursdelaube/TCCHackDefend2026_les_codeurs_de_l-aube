@@ -458,7 +458,7 @@ export default function GuideDashboard() {
 
       {/* Guide Info Banner */}
       {guide && (
-        <div className="rounded-[36px] bg-base-200 border border-border p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs mb-8">
+        <div className="rounded-xl bg-base-200 border border-border p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs mb-8">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div 
               className="h-20 w-20 shrink-0 rounded-2xl relative shadow-sm overflow-visible"
@@ -560,7 +560,7 @@ export default function GuideDashboard() {
               </h3>
               
               {bookings.filter(b => b.status === 'quote_requested').length === 0 ? (
-                <div className="rounded-[24px] border border-dashed border-border bg-base-200 p-8 text-center">
+                <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                   <p className="text-sm font-semibold text-base-content/50">{t('guide.no_quotes')}</p>
                 </div>
               ) : (
@@ -622,7 +622,7 @@ export default function GuideDashboard() {
               </h3>
 
               {bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status)).length === 0 ? (
-                <div className="rounded-[24px] border border-dashed border-border bg-base-200 p-8 text-center">
+                <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                   <p className="text-sm font-semibold text-base-content/50">{t('guide.no_active_missions')}</p>
                 </div>
               ) : (
@@ -684,7 +684,7 @@ export default function GuideDashboard() {
             {/* History */}
             <div className="border-t border-border/55 pt-6">
               <h3 className="font-serif text-lg font-bold mb-4">{t('guide.missions_history')}</h3>
-              <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
+              <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
                 <table className="table w-full text-xs font-semibold">
                   <thead>
                     <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
@@ -740,7 +740,7 @@ export default function GuideDashboard() {
 
         {/* Tab 2: Edit Profile */}
         {activeTab === 'profile' && (
-          <form onSubmit={handleUpdateProfile} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <form onSubmit={handleUpdateProfile} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
             <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.tab_profile')}</h3>
 
             {/* Avatar Upload */}
@@ -1000,7 +1000,7 @@ export default function GuideDashboard() {
           <div className="grid gap-6 md:grid-cols-2">
             
             {/* Upload form */}
-            <form onSubmit={handleUploadDocument} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-5">
+            <form onSubmit={handleUploadDocument} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-5">
               <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.submit_doc_title')}</h3>
               
               <label className="form-control w-full">
@@ -1075,7 +1075,7 @@ export default function GuideDashboard() {
             </form>
 
             {/* List of submitted docs */}
-            <div className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-4 h-fit">
+            <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-4 h-fit">
               <h3 className="font-serif text-lg font-bold">{t('guide.docs_submitted_title')}</h3>
               
               {(guide as any)?.documents?.length === 0 ? (
@@ -1115,7 +1115,7 @@ export default function GuideDashboard() {
       {/* Quote Dialog Modal */}
       {selectedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-5">
+          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-5">
             
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="font-serif text-xl font-bold text-base-content">{t('guide.propose_quote_title')}</h3>

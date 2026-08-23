@@ -189,7 +189,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-[#E5E5E0] dark:border-[#243B2C] bg-white/95 dark:bg-[#0F1F16]/95 shadow-sm backdrop-blur-xl">
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-border border-border bg-card/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/accueil" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
             <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-border bg-base-200 shadow-sm">
@@ -281,7 +281,7 @@ export default function Navbar() {
         </div>
 
         {settingsOpen && (
-          <div className="absolute right-4 top-full mt-3 w-[min(21rem,calc(100vw-2rem))] rounded-[28px] border border-border bg-base-200 p-4 shadow-2xl">
+          <div className="absolute right-4 top-full mt-3 w-[min(21rem,calc(100vw-2rem))] rounded-xl border border-border bg-base-200 p-4 shadow-2xl">
             <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
               <span className="text-xs font-black uppercase tracking-wider">{t('settings')}</span>
               <button type="button" onClick={() => setSettingsOpen(false)} className="rounded-xl p-1 hover:bg-base-300">
@@ -385,7 +385,7 @@ export default function Navbar() {
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl md:hidden">
         <div className="mx-auto max-w-md px-3 pb-2 pt-2">
-          <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
+          <div className="grid grid-cols-5 gap-1 rounded-xl bg-base-200 p-1.5">
             {(isAuthenticated && profile ? bottomLinks : [
               { href: '/accueil', label: t('accueil'), icon: Home },
               { href: '/lieux', label: t('lieux'), icon: Map },
@@ -399,14 +399,14 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[22px] px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
+                  className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
                     active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
                   }`}
                 >
                   {active && (
                     <motion.span
                       layoutId="activeBottomNav"
-                      className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
+                      className="absolute inset-0 rounded-xl bg-primary dark:bg-secondary"
                     />
                   )}
                   <Icon className="relative h-5 w-5" />
@@ -419,7 +419,7 @@ export default function Navbar() {
       </nav>
 
       {/* Desktop: floating "Découvrir" button */}
-      <div className="hidden md:block">
+      <div className="hidden" aria-hidden="true">
         <AnimatePresence>
           {bottomNavOpen && (
             <>
@@ -441,7 +441,7 @@ export default function Navbar() {
               >
                 {/* Drag handle */}
                 <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-base-content/20" />
-                <div className="grid grid-cols-5 gap-2 rounded-[28px] bg-base-200 p-2">
+                <div className="grid grid-cols-5 gap-2 rounded-xl bg-base-200 p-2">
                   {(isAuthenticated && profile ? bottomLinks : [
                     { href: '/accueil', label: t('accueil'), icon: Home },
                     { href: '/lieux', label: t('lieux'), icon: Map },
@@ -456,14 +456,14 @@ export default function Navbar() {
                         key={link.href}
                         href={link.href}
                         onClick={() => setBottomNavOpen(false)}
-                        className={`relative flex flex-col items-center justify-center gap-1.5 rounded-[22px] px-2 py-3 text-[10px] font-bold transition-colors ${
+                        className={`relative flex flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-[10px] font-bold transition-colors ${
                           active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/60 hover:text-base-content'
                         }`}
                       >
                         {active && (
                           <motion.span
                             layoutId="activeBottomNavDesktop"
-                            className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
+                            className="absolute inset-0 rounded-xl bg-primary dark:bg-secondary"
                           />
                         )}
                         <Icon className="relative h-5 w-5" />

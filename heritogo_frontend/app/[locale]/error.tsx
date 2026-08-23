@@ -39,20 +39,20 @@ export default function ErrorPage({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4 pb-28 pt-20 text-[#1A1A1A]">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-[#E5E5E0] bg-white p-8 text-center shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-card px-4 pb-28 pt-20 text-foreground">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-8 text-center shadow-xl">
 
         {/* Icône */}
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] bg-[#1B7E4B] text-white shadow-lg">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-xl bg-primary text-white shadow-lg">
           <Compass className="h-10 w-10 animate-pulse" />
         </div>
 
         {/* Message */}
         <div className="space-y-2">
-          <h2 className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A]">
+          <h2 className="font-serif text-2xl font-bold tracking-tight text-foreground">
             {isOnline ? 'Un imprévu sur votre itinéraire' : 'Connexion interrompue'}
           </h2>
-          <p className="text-sm leading-relaxed text-[#767676]">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             {isOnline
               ? "Le guide n'a pas pu charger ces données pour le moment. Vos informations enregistrées restent en sécurité."
               : 'Votre appareil semble hors-ligne. Les pages déjà visitées restent accessibles.'}
@@ -62,7 +62,7 @@ export default function ErrorPage({
         {/* Statut réseau */}
         <div className={`flex items-center justify-center gap-2 rounded-2xl p-3 text-xs font-bold ${
           isOnline
-            ? 'bg-[#1B7E4B]/10 text-[#1B7E4B]'
+            ? 'bg-primary text-primary'
             : 'bg-amber-500/15 text-amber-700'
         }`}>
           {isOnline ? (
@@ -79,7 +79,7 @@ export default function ErrorPage({
             onClick={handleRetry}
             disabled={retrying}
             className="flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 active:scale-95 cursor-pointer disabled:opacity-50"
-            style={{ background: '#1B7E4B' }}
+            style={{ background: 'var(--primary)' }}
           >
             <RefreshCw className={`h-4 w-4 ${retrying ? 'animate-spin' : ''}`} />
             <span>{retrying ? 'Rechargement…' : 'Réessayer'}</span>
@@ -88,9 +88,9 @@ export default function ErrorPage({
           <Link
             href="/"
             locale={locale}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-[#E5E5E0] bg-[#F5F5F0] py-3 text-xs font-bold text-[#1A1A1A] transition-all hover:bg-[#E5E5E0] active:scale-95"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-secondary py-3 text-xs font-bold text-foreground transition-all hover:bg-primary active:scale-95"
           >
-            <Home className="h-4 w-4 text-[#1B7E4B]" />
+            <Home className="h-4 w-4 text-primary" />
             <span>Retour à l&apos;accueil</span>
           </Link>
         </div>

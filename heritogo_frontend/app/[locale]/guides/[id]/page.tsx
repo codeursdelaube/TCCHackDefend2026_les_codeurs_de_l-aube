@@ -140,7 +140,7 @@ export default function GuideDetailPage() {
         <a
           href="javascript:history.back()"
           className="btn btn-sm rounded-xl text-white font-bold border-none mt-2"
-          style={{ backgroundColor: '#004D40' }}
+          style={{ backgroundColor: 'var(--primary)' }}
         >
           ← Retour à l'annuaire
         </a>
@@ -162,7 +162,7 @@ export default function GuideDetailPage() {
       </div>
 
       {/* Header Profile Banner */}
-      <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-emerald-950/20 via-base-200 to-base-200 border border-border p-6 sm:p-8 md:p-10 shadow-sm mb-8">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-950/20 via-base-200 to-base-200 border border-border p-6 sm:p-8 md:p-10 shadow-sm mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
@@ -251,7 +251,7 @@ export default function GuideDetailPage() {
         {/* Left column: Bio, Specialties, Languages, Zones */}
         <div className="lg:col-span-2 space-y-8">
           {/* Bio Section */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
+          <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-serif text-xl font-bold flex items-center gap-2">
                 <Compass className="h-5 w-5 text-primary" style={{ color: COLORS.forest }} />
@@ -265,7 +265,7 @@ export default function GuideDetailPage() {
           </div>
 
           {/* Details Section */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
             <h3 className="font-serif text-xl font-bold mb-2">Compétences & Zones</h3>
             
             <div className="grid gap-6 sm:grid-cols-2">
@@ -327,7 +327,7 @@ export default function GuideDetailPage() {
           </div>
 
           {/* Availability Calendar */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
+          <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
             <h3 className="font-serif text-xl font-bold mb-2 flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary" style={{ color: COLORS.forest }} />
               Disponibilités planifiées
@@ -368,7 +368,7 @@ export default function GuideDetailPage() {
         {/* Right column: Tariff, Report Guide, Safety tips */}
         <div className="space-y-8">
           {/* Pricing Details Card */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-6 shadow-sm space-y-6">
+          <div className="rounded-xl border border-border bg-base-200 p-6 shadow-sm space-y-6">
             <h3 className="font-serif text-lg font-bold flex items-center gap-2">
               <BadgeCent className="h-5 w-5 text-primary" style={{ color: COLORS.forest }} />
               Grille tarifaire indicative
@@ -429,7 +429,7 @@ export default function GuideDetailPage() {
           </div>
 
           {/* Safety & Trust Card */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-6 shadow-sm space-y-4">
+          <div className="rounded-xl border border-border bg-base-200 p-6 shadow-sm space-y-4">
             <h4 className="font-serif text-sm font-bold flex items-center gap-1.5">
               <CheckCircle className="h-4.5 w-4.5 text-emerald-600" />
               Charte confiance Heritogo
@@ -443,7 +443,7 @@ export default function GuideDetailPage() {
           </div>
 
           {/* Report Action Card */}
-          <div className="rounded-[28px] border border-red-500/20 bg-red-500/5 p-6 shadow-sm space-y-4 text-center sm:text-left">
+          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-6 shadow-sm space-y-4 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <AlertTriangle className="h-5 w-5 text-error" />
               <h4 className="font-serif text-sm font-bold text-error">Un problème avec ce profil ?</h4>

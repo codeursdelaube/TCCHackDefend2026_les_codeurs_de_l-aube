@@ -110,7 +110,7 @@ export default function AuthConfirmPage() {
       <div className="w-full max-w-sm rounded-2xl border border-border bg-base-200 p-8 text-center shadow-lg">
         {status === 'loading' && (
           <>
-            <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin" style={{ color: '#004D40' }} />
+            <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
             <h1 className="font-serif text-xl font-bold">Confirmation en cours...</h1>
             <p className="mt-2 text-sm text-base-content/60">Patientez quelques secondes.</p>
           </>
@@ -118,7 +118,7 @@ export default function AuthConfirmPage() {
 
         {status === 'success' && (
           <>
-            <CheckCircle2 className="mx-auto mb-4 h-12 w-12" style={{ color: '#004D40' }} />
+            <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-primary" />
             <h1 className="font-serif text-xl font-bold">Compte confirmé !</h1>
             <p className="mt-2 text-sm text-base-content/60">{message}</p>
           </>

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { ArrowRight, Compass, Filter, LayoutGrid, Map as MapIcon, MapPin, Search, Sparkles, Star } from 'lucide-react'
+import { ArrowRight, Compass, Filter, LayoutGrid, Map as MapIcon, MapPin, Search, Landmark, Star } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Monument, monuments } from '@/app/LieuxT/site'
@@ -11,9 +11,9 @@ import { Monument, monuments } from '@/app/LieuxT/site'
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-96 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] bg-[#F5F5F0] dark:bg-[#182B1E] animate-pulse">
-      <MapPin className="h-8 w-8 text-[#1B7E4B] animate-bounce" />
-      <span className="text-xs font-semibold text-[#767676] dark:text-[#9CA89E]">Chargement de la carte interactive du Togo…</span>
+    <div className="flex h-96 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-secondary animate-pulse">
+      <MapPin className="h-8 w-8 text-primary animate-bounce" />
+      <span className="text-xs font-semibold text-muted-foreground">Chargement de la carte interactive du Togo…</span>
     </div>
   ),
 })
@@ -34,13 +34,13 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
             key={i}
             className="h-3 w-3"
             style={{
-              fill: i <= full ? '#E8A923' : i === full + 1 && half ? '#E8A923' : 'transparent',
-              color: i <= full || (i === full + 1 && half) ? '#E8A923' : '#D1D1CC',
+              fill: i <= full ? 'var(--primary)' : i === full + 1 && half ? 'var(--primary)' : 'transparent',
+              color: i <= full || (i === full + 1 && half) ? 'var(--primary)' : 'var(--border)',
             }}
           />
         ))}
       </div>
-      <span className="text-xs text-[#767676] dark:text-[#9CA89E]">({count})</span>
+      <span className="text-xs text-muted-foreground">({count})</span>
     </div>
   )
 }
@@ -75,46 +75,46 @@ export default function ToutPage() {
   })
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#182B1E] dark:bg-[#0F1F16] px-3 pb-28 pt-20 text-[#1A1A1A] dark:text-[#F0F0EC] dark:text-[#F0F0EC] sm:px-6 lg:px-8 w-full overflow-hidden">
+    <main className="min-h-screen bg-background px-3 pb-28 pt-20 text-foreground sm:px-6 lg:px-8 w-full overflow-hidden">
       <div className="mx-auto max-w-7xl space-y-5 sm:space-y-8">
-        
+
         {/* ── HEADER & FILTRES ── */}
         <section className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,1.1fr)] lg:items-stretch">
-          
+
           {/* Bloc intro */}
-          <div className="overflow-hidden rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] bg-[#F5F5F0] dark:bg-[#182B1E] p-5 shadow-xs sm:p-7">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-xl bg-[#1B7E4B]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#1B7E4B]">
+          <div className="overflow-hidden rounded-2xl border border-border bg-secondary p-5 shadow-xs sm:p-7">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">
               <Compass className="h-4 w-4 shrink-0" />
               <span>{t('hero_badge')}</span>
             </div>
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-[#1A1A1A] dark:text-[#F0F0EC] sm:text-5xl">
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
               {t('title')}
             </h1>
             <div className="togo-underline" />
-            <p className="mt-3 text-sm font-medium leading-relaxed text-[#767676] dark:text-[#9CA89E]">
+            <p className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground">
               {t('subtitle')}
             </p>
           </div>
 
           {/* Recherche & Filtres */}
-          <div className="rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] bg-[#F5F5F0] dark:bg-[#182B1E] p-4 shadow-xs sm:p-5 flex flex-col justify-between">
-            <label className="relative flex min-h-12 items-center rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] bg-white dark:bg-[#182B1E] px-3.5 transition-all focus-within:border-[#1B7E4B] focus-within:ring-2 focus-within:ring-[#1B7E4B]/15 shadow-xs">
-              <Search className="h-4 w-4 shrink-0 text-[#767676] dark:text-[#9CA89E]" />
+          <div className="rounded-2xl border border-border bg-secondary p-4 shadow-xs sm:p-5 flex flex-col justify-between">
+            <label className="relative flex min-h-12 items-center rounded-2xl border border-border bg-card px-3.5 transition-all focus-within:border-border focus-within:ring-2 focus-within:ring-[var(--primary)]/15 shadow-xs">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 type="search"
                 value={searchInput}
                 onChange={(event) => startTransition(() => setSearchInput(event.target.value))}
                 placeholder={t('search_placeholder')}
-                className="min-w-0 flex-1 bg-transparent px-3 text-xs font-medium outline-none placeholder:text-[#767676] dark:text-[#9CA89E]"
+                className="min-w-0 flex-1 bg-transparent px-3 text-xs font-medium outline-none placeholder:text-muted-foreground"
               />
             </label>
 
             <div className="mt-4">
-              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#767676] dark:text-[#9CA89E] mb-2.5">
-                <Filter className="h-3.5 w-3.5 text-[#1B7E4B]" />
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2.5">
+                <Filter className="h-3.5 w-3.5 text-primary" />
                 <span>{t('filter_region')}</span>
               </div>
-              
+
               <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                 {regionsTogo.map((region) => {
                   const active = selectedRegion === region
@@ -125,8 +125,8 @@ export default function ToutPage() {
                       onClick={() => setSelectedRegion(region)}
                       className={`inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-bold transition-all cursor-pointer ${
                         active
-                          ? 'border-[#1B7E4B] bg-[#1B7E4B] text-white shadow-xs'
-                          : 'border-[#E5E5E0] dark:border-[#243B2C] bg-white dark:bg-[#182B1E] text-[#1A1A1A] dark:text-[#F0F0EC] hover:border-[#1B7E4B]/50'
+                          ? 'border-border bg-primary text-white shadow-xs'
+                          : 'border-border border-border bg-card text-foreground hover:border-border'
                       }`}
                     >
                       <MapPin className="h-3 w-3" />
@@ -140,29 +140,29 @@ export default function ToutPage() {
         </section>
 
         {searchInput && (
-          <p className="rounded-xl bg-[#F5F5F0] dark:bg-[#182B1E] border border-[#E5E5E0] dark:border-[#243B2C] px-4 py-2.5 text-xs font-semibold text-[#767676] dark:text-[#9CA89E]">
-            {t('results_for')} <span className="font-bold text-[#1B7E4B]">{searchInput}</span>
+          <p className="rounded-xl bg-secondary border border-border px-4 py-2.5 text-xs font-semibold text-muted-foreground">
+            {t('results_for')} <span className="font-bold text-primary">{searchInput}</span>
           </p>
         )}
 
         {/* ── BARRE TITRE & COMMUTATEUR ── */}
         <section className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#E5E5E0] dark:border-[#243B2C] pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border border-border pb-3">
             <div>
-              <h2 className="text-xl font-black text-[#1A1A1A] dark:text-[#F0F0EC] sm:text-2xl">
+              <h2 className="text-xl font-black text-foreground sm:text-2xl">
                 Monuments & Sites Emblématiques
               </h2>
-              <span className="text-xs text-[#767676] dark:text-[#9CA89E] font-medium">
+              <span className="text-xs text-muted-foreground font-medium">
                 {filteredSites.length} {filteredSites.length > 1 ? 'sites répertoriés' : 'site répertorié'}
               </span>
             </div>
 
-            <div className="flex items-center gap-1 rounded-xl border border-[#E5E5E0] dark:border-[#243B2C] bg-[#F5F5F0] dark:bg-[#182B1E] p-1">
+            <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary p-1">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-[#1B7E4B] text-white shadow-xs' : 'text-[#767676] dark:text-[#9CA89E] hover:text-[#1A1A1A] dark:text-[#F0F0EC]'
+                  viewMode === 'grid' ? 'bg-primary text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <LayoutGrid className="h-3.5 w-3.5" />
@@ -172,7 +172,7 @@ export default function ToutPage() {
                 type="button"
                 onClick={() => setViewMode('map')}
                 className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'map' ? 'bg-[#1B7E4B] text-white shadow-xs' : 'text-[#767676] dark:text-[#9CA89E] hover:text-[#1A1A1A] dark:text-[#F0F0EC]'
+                  viewMode === 'map' ? 'bg-primary text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <MapIcon className="h-3.5 w-3.5" />
@@ -183,16 +183,16 @@ export default function ToutPage() {
 
           {/* Contenu */}
           {viewMode === 'map' ? (
-            <div className="overflow-hidden rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
               <DynamicCarte monumentsList={filteredSites} />
             </div>
           ) : filteredSites.length === 0 ? (
-            <div className="mx-auto my-12 max-w-md rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] bg-[#F5F5F0] dark:bg-[#182B1E] p-8 text-center shadow-xs">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1B7E4B]/10 text-[#1B7E4B]">
-                <Sparkles className="h-6 w-6" />
+            <div className="mx-auto my-12 max-w-md rounded-2xl border border-border bg-secondary p-8 text-center shadow-xs">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary">
+                <Landmark className="h-6 w-6" />
               </div>
-              <p className="mt-3 font-serif text-lg font-bold text-[#1A1A1A] dark:text-[#F0F0EC]">{t('no_sites')}</p>
-              <p className="mt-1 text-xs text-[#767676] dark:text-[#9CA89E]">{t('try_other')}</p>
+              <p className="mt-3 font-serif text-lg font-bold text-foreground">{t('no_sites')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('try_other')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -202,39 +202,39 @@ export default function ToutPage() {
                   <Link
                     key={site.id}
                     href={`/lieux/${site.id}`}
-                    className="group flex flex-col overflow-hidden rounded-2xl border border-[#E5E5E0] dark:border-[#243B2C] bg-white dark:bg-[#182B1E] shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
                   >
-                    <div className="relative h-48 overflow-hidden bg-[#F5F5F0] dark:bg-[#182B1E]">
-                      <Image 
-                        src={site.image} 
-                        alt={tMonuments(`${site.id}.nom`)} 
-                        fill 
-                        placeholder="blur" 
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
-                        className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                    <div className="relative h-48 overflow-hidden bg-secondary">
+                      <Image
+                        src={site.image}
+                        alt={tMonuments(`${site.id}.nom`)}
+                        fill
+
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <span className="absolute left-3 top-3 rounded-lg bg-[#1B7E4B] px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow-sm">
+                      <span className="absolute left-3 top-3 rounded-lg bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow-sm">
                         {getRegionName(site.région)}
                       </span>
                     </div>
 
                     <div className="flex flex-1 flex-col justify-between p-4 space-y-2">
                       <div>
-                        <h3 className="font-bold text-[#1A1A1A] dark:text-[#F0F0EC] leading-snug">
+                        <h3 className="font-bold text-foreground leading-snug">
                           {tMonuments(`${site.id}.nom`)}
                         </h3>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-[#767676] dark:text-[#9CA89E]">
-                          <MapPin className="h-3.5 w-3.5 text-[#1B7E4B] shrink-0" />
+                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
                           {site.localite}, Togo
                         </p>
-                        <p className="mt-1.5 line-clamp-2 text-xs text-[#767676] dark:text-[#9CA89E] leading-relaxed">
+                        <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground leading-relaxed">
                           {tMonuments(`${site.id}.description`)}
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-[#E5E5E0] dark:border-[#243B2C] pt-2">
+                      <div className="flex items-center justify-between border-t border-border border-border pt-2">
                         <StarRating rating={ratingData.rating} count={ratingData.count} />
-                        <span className="rounded-lg bg-[#1B7E4B] px-2.5 py-1 text-xs font-black text-white">
+                        <span className="rounded-lg bg-primary px-2.5 py-1 text-xs font-black text-white">
                           {ratingData.rating}
                         </span>
                       </div>

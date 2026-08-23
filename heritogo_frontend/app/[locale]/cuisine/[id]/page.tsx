@@ -43,7 +43,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
         <div className="absolute inset-0 bg-linear-to-t from-black/78 via-black/25 to-black/40" />
 
         <div className="absolute left-4 right-4 top-20 z-10 mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/cuisine" className="inline-flex min-h-12 items-center gap-2 rounded-[20px] bg-white/90 px-4 text-sm font-black text-stone-950 shadow-sm transition-all hover:bg-white active:scale-95">
+          <Link href="/cuisine" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-card/90 px-4 text-sm font-black text-stone-950 shadow-sm transition-all hover:bg-card active:scale-95">
             <ArrowLeft className="h-5 w-5" />
             {t('back_to_cuisine')}
           </Link>
@@ -52,7 +52,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
 
         <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-8">
           <div className="mx-auto max-w-7xl">
-            <p className="mb-3 inline-flex items-center gap-2 rounded-2xl bg-white/12 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-white backdrop-blur-md">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-2xl bg-foreground/15 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-white">
               <ChefHat className="h-4 w-4 text-secondary" />
               {t('cuisine_title')}
             </p>
@@ -92,14 +92,14 @@ export default async function PlatDetailPage({ params }: PageProps) {
             </div>
 
             {nearbyRestaurants.length === 0 ? (
-              <div className="rounded-[28px] border border-border bg-base-100 p-8 text-center">
+              <div className="rounded-xl border border-border bg-base-100 p-8 text-center">
                 <Utensils className="mx-auto h-8 w-8 text-secondary" />
                 <p className="mt-3 text-sm font-semibold text-base-content/55">{t('no_resto')}</p>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {nearbyRestaurants.map((restaurant) => (
-                  <article key={restaurant.id} className="rounded-[28px] border border-border bg-base-100 p-4">
+                  <article key={restaurant.id} className="rounded-xl border border-border bg-base-100 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h3 className="text-base font-black">{restaurant.nom}</h3>
@@ -112,7 +112,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                       <a href={`tel:${restaurant.telephone}`} className="flex items-center gap-2 transition-colors hover:text-secondary"><Phone className="h-3.5 w-3.5 text-secondary" />{restaurant.telephone}</a>
                       <p className="flex items-center gap-2"><Banknote className="h-3.5 w-3.5 text-secondary" />{restaurant.budget_fcfa} FCFA</p>
                     </div>
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-primary px-4 py-2 text-xs font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-secondary dark:text-secondary-content">
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-secondary dark:text-secondary-content">
                       <Navigation className="h-4 w-4" />
                       {t('navigate')}
                     </a>
@@ -151,7 +151,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
               { label: t('sheet.origin'), value: t('origin_country') },
               { label: t('sheet.acc'), value: platAcc },
             ].map((item) => (
-              <div key={item.label} className="rounded-[22px] border border-border bg-base-100 p-4">
+              <div key={item.label} className="rounded-xl border border-border bg-base-100 p-4">
                 <p className="text-[11px] font-black uppercase tracking-wide text-base-content/42">{item.label}</p>
                 <p className="mt-1 line-clamp-3 text-sm font-bold leading-6 text-base-content/75">{item.value}</p>
               </div>

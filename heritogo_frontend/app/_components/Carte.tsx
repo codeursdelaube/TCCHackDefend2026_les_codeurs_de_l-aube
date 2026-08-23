@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { COLORS } from "@/lib/constants/colors";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import "leaflet/dist/leaflet.css";
@@ -41,9 +42,9 @@ function createCoffeePin(pinColor: string, dotColor: string) {
   });
 }
 
-const pinSavane   = createCoffeePin("#1B7E4B", "#FFFFFF"); // Maritime / Plateaux
-const pinLaterite = createCoffeePin("#C85C2D", "#FFFFFF"); // Centrale
-const pinOr       = createCoffeePin("#E8A923", "#1A1A1A"); // Kara / Savanes
+const pinSavane   = createCoffeePin(COLORS.gold, COLORS.white);
+const pinLaterite = createCoffeePin(COLORS.gold, COLORS.white);
+const pinOr       = createCoffeePin(COLORS.gold, COLORS.ink);
 
 interface CarteProps {
   monumentsList: Monument[];
@@ -69,7 +70,7 @@ export default function Carte({ monumentsList }: CarteProps) {
   };
 
   return (
-    <div className={`w-full ${isSingle ? 'h-64 sm:h-72' : 'h-125'} relative z-0 rounded-2xl overflow-hidden border border-[#E5E5E0] shadow-sm bg-[#F5F5F0]`}>
+    <div className={`w-full ${isSingle ? 'h-64 sm:h-72' : 'h-125'} relative z-0 rounded-2xl overflow-hidden border border-border shadow-sm bg-secondary`}>
       <MapContainer
         center={positionCentre}
         zoom={zoomLevel}
@@ -94,20 +95,20 @@ export default function Carte({ monumentsList }: CarteProps) {
                 icon={pinIcon}
               >
                 <Popup className="custom-togo-popup">
-                  <div className="p-2 max-w-[210px] text-[#1A1A1A] font-sans">
-                    <span className="inline-block rounded-md bg-[#1B7E4B] px-2 py-0.5 text-[9px] font-bold uppercase text-white mb-1">
+                  <div className="p-2 max-w-[210px] text-foreground font-sans">
+                    <span className="inline-block rounded-md bg-primary px-2 py-0.5 text-[9px] font-bold uppercase text-white mb-1">
                       {site.région}
                     </span>
-                    <p className="font-bold text-xs leading-tight text-[#1A1A1A] mb-1">{siteNom}</p>
-                    <p className="text-[10px] text-[#767676] font-medium mb-1.5">
-                      📍 {site.localite}
+                    <p className="font-bold text-xs leading-tight text-foreground mb-1">{siteNom}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium mb-1.5">
+                      {site.localite}
                     </p>
-                    <p className="line-clamp-2 text-[10px] text-[#767676] mb-2 leading-relaxed">
+                    <p className="line-clamp-2 text-[10px] text-muted-foreground mb-2 leading-relaxed">
                       {siteDesc}
                     </p>
                     <Link
                       href={`/lieux/${site.id}`}
-                      className="inline-block w-full text-center rounded-lg bg-[#1B7E4B] py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90"
+                      className="inline-block w-full text-center rounded-lg bg-primary py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90"
                     >
                       Découvrir →
                     </Link>

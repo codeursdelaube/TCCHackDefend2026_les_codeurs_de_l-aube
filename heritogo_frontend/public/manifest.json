@@ -4,8 +4,8 @@
   "description": "Le guide touristique intelligent du Togo",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F7F1E4",
-  "theme_color": "#1C2D52",
+  "background_color": "#FDFBF7",
+  "theme_color": "#D9A441",
   "orientation": "portrait",
   "icons": [
     {

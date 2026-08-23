@@ -97,7 +97,7 @@ export async function POST(request: Request) {
         subject: 'HériTogo — Documents de vérification bien reçus',
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 12px;">
-            <h2 style="color: #004D40; font-family: serif;">Bonjour ${updatedGuide.profile.full_name},</h2>
+            <h2 style="color: #D9A441; font-family: serif;">Bonjour ${updatedGuide.profile.full_name},</h2>
             <p>Nous vous informons que vos documents justificatifs ont bien été soumis sur votre espace Guide HériTogo.</p>
             <p><strong>Statut actuel :</strong> En cours de traitement par notre équipe de modération.</p>
             <p>Nous vérifions vos pièces d'identité et accréditations professionnelles afin de garantir la sécurité de notre communauté. Cette validation prend généralement moins de 48 heures.</p>

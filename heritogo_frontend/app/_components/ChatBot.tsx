@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bot, Send, Sparkles, X, AlertCircle } from 'lucide-react'
+import { Bot, Send, X, AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import { getUserFriendlyError } from '@/lib/utils/errors'
@@ -140,7 +140,7 @@ export default function ChatBot() {
                        left-3 right-3
                        top-[calc(4.75rem+env(safe-area-inset-top))]
                        flex min-h-0 flex-col overflow-hidden
-                       rounded-[28px] border border-border
+                       rounded-xl border border-border
                        bg-base-200 text-base-content shadow-2xl
                        sm:bottom-24 sm:left-auto sm:right-6 sm:top-auto
                        sm:h-[min(560px,calc(100dvh-8rem))] sm:w-97.5
@@ -165,7 +165,7 @@ export default function ChatBot() {
                 <div>
                   <h3 className="flex items-center gap-1.5 text-sm font-black uppercase tracking-wide">
                     {t('title')}
-                    <Sparkles className="h-3.5 w-3.5" style={{ color: COLORS.rust }} />
+                    <Bot className="h-3.5 w-3.5" style={{ color: COLORS.rust }} />
                   </h3>
                   <p className="line-clamp-1 text-[11px] font-semibold text-base-content/55">
                     {t('subtitle')}
@@ -214,7 +214,7 @@ export default function ChatBot() {
                     <div
                       className={`min-w-0 overflow-hidden wrap-break-words
                         rounded-2xl px-3.5 py-3 text-xs font-medium
-                        leading-relaxed shadow-sm sm:rounded-[22px]
+                        leading-relaxed shadow-sm sm:rounded-xl
                         ${isAi
                           ? 'rounded-tl-md border border-border bg-base-200 text-base-content'
                           : 'rounded-tr-md text-white'
@@ -240,7 +240,7 @@ export default function ChatBot() {
                                   rounded-xl bg-base-200">
                     <Bot className="h-3.5 w-3.5" />
                   </div>
-                  <div className="flex items-center gap-1 rounded-[22px] rounded-tl-md
+                  <div className="flex items-center gap-1 rounded-xl rounded-tl-md
                                   border border-border bg-base-200 px-3.5 py-3">
                     {[0, 1, 2].map(i => (
                       <span

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * lib/rate-limit.ts
  * Rate limiter en mémoire (in-process) pour protéger les routes auth contre le brute-force.
  * Note : en production multi-instance, utiliser Redis. Ici adapté pour le hackathon.

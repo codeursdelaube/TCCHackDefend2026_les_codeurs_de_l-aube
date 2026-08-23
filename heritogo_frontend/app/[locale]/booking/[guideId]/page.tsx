@@ -11,7 +11,7 @@ import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
 import { 
   ArrowLeft, Calendar, Clock, MapPin, Users, MessageSquare, 
-  Sparkles, Loader2, AlertCircle, CheckCircle, ShieldCheck, Star 
+  Loader2, AlertCircle, CheckCircle, ShieldCheck, Star
 } from 'lucide-react'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
@@ -172,7 +172,7 @@ export default function BookingPage() {
       <div className="grid gap-8 lg:grid-cols-[5fr_3fr]">
         
         {/* Booking Form Card */}
-        <div className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
+        <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm">
           <div className="mb-6 border-b border-border pb-4">
             <h1 className="font-serif text-2xl font-bold sm:text-3xl text-base-content">
               {t('booking_request')}
@@ -308,7 +308,7 @@ export default function BookingPage() {
               {/* Besoins spécifiques */}
               <label className="form-control w-full">
                 <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5" /> {t('special_needs_label')}
+                  <MessageSquare className="h-3.5 w-3.5" /> {t('special_needs_label')}
                 </span>
                 <input
                   type="text"
@@ -345,7 +345,7 @@ export default function BookingPage() {
         {/* Sidebar Summary Info */}
         <div className="space-y-6">
           {/* Guide Card Mini */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm space-y-4">
+          <div className="rounded-xl border border-border bg-base-200 p-5 shadow-sm space-y-4">
             <h3 className="font-serif text-sm font-black uppercase tracking-wider text-base-content/50">{t('sidebar_guide')}</h3>
             <div className="flex items-center gap-3">
               <div 
@@ -372,7 +372,7 @@ export default function BookingPage() {
           </div>
 
           {/* Pricing Info */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm space-y-4">
+          <div className="rounded-xl border border-border bg-base-200 p-5 shadow-sm space-y-4">
             <h3 className="font-serif text-sm font-black uppercase tracking-wider text-base-content/50">{t('pricing_title')}</h3>
             
             <div className="space-y-2 text-xs">

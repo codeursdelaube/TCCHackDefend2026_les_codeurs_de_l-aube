@@ -466,7 +466,7 @@ export default function AdminDashboardPage() {
             {/* List of all guides */}
             <div className="border-t border-border/55 pt-6">
               <h3 className="font-serif text-lg font-bold mb-4">{t('admin.manage_guides')}</h3>
-              <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
+              <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
                 <table className="table w-full text-xs font-semibold">
                   <thead>
                     <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
@@ -656,7 +656,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-4">
             <h3 className="font-serif text-lg font-bold mb-2">{t('admin.logs_title')}</h3>
             
-            <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
+            <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
               <table className="table w-full text-xs font-semibold">
                 <thead>
                   <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
@@ -693,7 +693,7 @@ export default function AdminDashboardPage() {
       {/* Reject Guide Modal */}
       {rejectionGuideId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-4">
             <h3 className="font-serif text-xl font-bold text-base-content">{t('admin.reject_modal_title')}</h3>
             <p className="text-xs text-base-content/60">
               {t('admin.reject_modal_subtitle')}
@@ -731,7 +731,7 @@ export default function AdminDashboardPage() {
       {/* Hide Review Modal */}
       {hideReviewId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-4">
             <h3 className="font-serif text-xl font-bold text-base-content">{t('admin.hide_modal_title')}</h3>
             <p className="text-xs text-base-content/60">
               {t('admin.hide_modal_subtitle')}

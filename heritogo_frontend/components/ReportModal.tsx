@@ -65,7 +65,7 @@ export default function ReportModal({ reportedId, bookingId, isOpen, onClose, on
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl">
         <div className="flex items-center justify-between border-b border-border pb-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-error" />

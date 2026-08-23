@@ -42,7 +42,7 @@ function ForgotPasswordForm() {
   }, [state])
 
   return (
-    <div className="rounded-[28px] border border-border bg-base-200 p-6 shadow-xl sm:p-8">
+    <div className="rounded-xl border border-border bg-base-200 p-6 shadow-xl sm:p-8">
       <div className="mb-6 text-center">
         <div
           className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white"

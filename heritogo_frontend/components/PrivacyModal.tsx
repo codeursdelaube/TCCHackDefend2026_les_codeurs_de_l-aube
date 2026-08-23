@@ -61,7 +61,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-card/20"
             aria-label={policy.closeLabel}
           >
             <X className="h-4 w-4" />

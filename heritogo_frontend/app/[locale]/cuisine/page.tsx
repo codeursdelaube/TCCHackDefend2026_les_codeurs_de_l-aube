@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { ArrowRight, ChefHat, Clock, Filter, MapPin, Navigation, Search, Sparkles, Star, Utensils } from 'lucide-react'
+import { ArrowRight, ChefHat, Clock, Filter, MapPin, Navigation, Search, Star, Utensils } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import platsTogolais from '@/app/Plats/plat'
@@ -10,14 +10,6 @@ import restaurants from '@/app/Resto/restaurants'
 
 const categoryFilters = ['all', 'Ayimolou', 'Fufu', 'Djenkoumé', 'Gboma', 'Akoumé', 'Wagasi', 'Gombo', 'Boissons'] as const
 type CategoryFilter = (typeof categoryFilters)[number]
-
-const TV = {
-  savane:   '#1B7E4B',
-  laterite: '#C85C2D',
-  or:       '#E8A923',
-  sable:    '#F5F5F0',
-  gris:     '#767676',
-} as const
 
 export default function CuisinePage() {
   const t = useTranslations('Cuisine')
@@ -72,47 +64,53 @@ export default function CuisinePage() {
   }, [selectedCategory, tPlats])
 
   return (
-    <main className="min-h-screen bg-white px-3 pb-28 pt-20 text-[#1A1A1A] sm:px-6 lg:px-8 w-full overflow-hidden">
-      <div className="mx-auto max-w-7xl space-y-8">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-card px-3 pb-28 pt-20 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl min-w-0 space-y-8">
 
         {/* ── HEADER & FILTRES ── */}
-        <section className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,1.1fr)] lg:items-stretch">
+        {/* Fix débordement mobile : les enfants d'un grid/flex ont une largeur
+            min-content implicite (min-width: auto). Le badge "hero_badge" en
+            inline-flex + uppercase + tracking-wider forçait sa ligne à rester
+            entière et poussait tout le bloc plus large que l'écran. Fix :
+            grid-cols-1 explicite en base + min-w-0 sur chaque item + le badge
+            peut désormais retourner à la ligne (flex-wrap + max-w-full). */}
+        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,1.1fr)] lg:items-stretch">
 
           {/* Bloc intro */}
-          <div className="overflow-hidden rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-5 shadow-xs sm:p-7">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-xl bg-[#C85C2D]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#C85C2D]">
+          <div className="min-w-0 overflow-hidden rounded-2xl bg-muted p-5 shadow-[0_4px_14px_rgba(34,29,23,0.05)] sm:p-7">
+            <div className="mb-3 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
               <ChefHat className="h-4 w-4 shrink-0" />
-              <span>{t('hero_badge')}</span>
+              <span className="break-words">{t('hero_badge')}</span>
             </div>
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-[#1A1A1A] sm:text-5xl">
+            <h1 className="break-words font-serif text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
               {t('page_title')}
             </h1>
             <div className="togo-underline" />
-            <p className="mt-3 text-sm font-medium leading-relaxed text-[#767676]">
+            <p className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground">
               {t('page_subtitle')}
             </p>
           </div>
 
           {/* Recherche & Filtres */}
-          <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 shadow-xs sm:p-5 flex flex-col justify-between">
-            <label className="relative flex min-h-12 items-center rounded-2xl border border-[#E5E5E0] bg-white px-3.5 transition-all focus-within:border-[#C85C2D] focus-within:ring-2 focus-within:ring-[#C85C2D]/15 shadow-xs">
-              <Search className="h-4 w-4 shrink-0 text-[#767676]" />
+          <div className="flex min-w-0 flex-col justify-between rounded-2xl bg-muted p-4 shadow-[0_4px_14px_rgba(34,29,23,0.05)] sm:p-5">
+            <label className="flex min-h-12 min-w-0 items-center rounded-2xl bg-card px-3.5 shadow-[0_1px_4px_rgba(34,29,23,0.06)] transition-all focus-within:ring-2 focus-within:ring-primary/20">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 type="search"
                 value={searchInput}
                 onChange={(event) => startTransition(() => setSearchInput(event.target.value))}
                 placeholder={t('search_placeholder')}
-                className="min-w-0 flex-1 bg-transparent px-3 text-xs font-medium outline-none placeholder:text-[#767676]"
+                className="min-w-0 flex-1 bg-transparent px-3 text-xs font-medium outline-none placeholder:text-muted-foreground"
               />
             </label>
 
-            <div className="mt-4">
-              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#767676] mb-2.5">
-                <Filter className="h-3.5 w-3.5 text-[#C85C2D]" />
+            <div className="mt-4 min-w-0">
+              <div className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Filter className="h-3.5 w-3.5 shrink-0 text-primary" />
                 <span>{t('filter_category')}</span>
               </div>
 
-              <div className="flex w-full gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+              <div className="-mx-1 flex w-full min-w-0 gap-2 overflow-x-auto px-1 pb-1 scrollbar-none sm:flex-wrap sm:overflow-visible">
                 {categoryFilters.map((category) => {
                   const active = selectedCategory === category
                   return (
@@ -120,14 +118,14 @@ export default function CuisinePage() {
                       key={category}
                       type="button"
                       onClick={() => setSelectedCategory(category)}
-                      className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-xs font-bold transition-all cursor-pointer ${
+                      className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold transition-all cursor-pointer ${
                         active
-                          ? 'border-[#C85C2D] bg-[#C85C2D] text-white shadow-xs'
-                          : 'border-[#E5E5E0] bg-white text-[#1A1A1A] hover:border-[#C85C2D]/50'
+                          ? 'bg-primary text-primary-foreground shadow-[0_2px_8px_rgba(34,29,23,0.1)]'
+                          : 'bg-card text-foreground hover:bg-primary/10 hover:text-primary'
                       }`}
                     >
-                      <Utensils className="h-3 w-3" />
-                      <span>{getFilterLabel(category)}</span>
+                      <Utensils className="h-3 w-3 shrink-0" />
+                      <span className="whitespace-nowrap">{getFilterLabel(category)}</span>
                     </button>
                   )
                 })}
@@ -137,29 +135,29 @@ export default function CuisinePage() {
         </section>
 
         {searchInput && (
-          <p className="rounded-xl bg-[#F5F5F0] border border-[#E5E5E0] px-4 py-2.5 text-xs font-semibold text-[#767676]">
-            {t('results_for')} <span className="font-bold text-[#C85C2D]">{searchInput}</span>
+          <p className="break-words rounded-full bg-muted px-4 py-2.5 text-xs font-semibold text-muted-foreground">
+            {t('results_for')} <span className="font-bold text-primary">{searchInput}</span>
           </p>
         )}
 
         {/* ── PLATS TRADITIONNELS ── */}
         <section className="space-y-4">
-          <div className="flex items-center justify-between border-b border-[#E5E5E0] pb-3">
-            <div>
-              <h2 className="text-xl font-black text-[#1A1A1A] sm:text-2xl">Plats &amp; Délices du Terroir</h2>
-              <span className="text-xs text-[#767676] font-medium">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div className="min-w-0">
+              <h2 className="text-xl font-black text-foreground sm:text-2xl">Plats &amp; Délices du Terroir</h2>
+              <span className="text-xs font-medium text-muted-foreground">
                 {filteredPlats.length} {filteredPlats.length > 1 ? 'spécialités' : 'spécialité'}
               </span>
             </div>
           </div>
 
           {filteredPlats.length === 0 ? (
-            <div className="mx-auto my-12 max-w-md rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-8 text-center shadow-xs">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#C85C2D]/10 text-[#C85C2D]">
-                <Sparkles className="h-6 w-6" />
+            <div className="mx-auto my-12 max-w-md rounded-2xl bg-muted p-8 text-center shadow-[0_4px_14px_rgba(34,29,23,0.05)]">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                <ChefHat className="h-6 w-6" />
               </div>
-              <p className="mt-3 font-serif text-lg font-bold text-[#1A1A1A]">{t('no_plats')}</p>
-              <p className="mt-1 text-xs text-[#767676]">{t('try_other')}</p>
+              <p className="mt-3 font-serif text-lg font-bold text-foreground">{t('no_plats')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('try_other')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -167,9 +165,9 @@ export default function CuisinePage() {
                 <Link
                   key={plat.id}
                   href={`/cuisine/${plat.id}`}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-[#E5E5E0] bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]"
+                  className="group flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card shadow-[0_4px_14px_rgba(34,29,23,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(34,29,23,0.12)] active:scale-[0.98]"
                 >
-                  <div className="relative h-48 overflow-hidden bg-[#F5F5F0]">
+                  <div className="relative h-48 overflow-hidden bg-muted">
                     <Image
                       src={plat.image}
                       alt={tPlats(`${plat.id}.nom`)}
@@ -177,23 +175,23 @@ export default function CuisinePage() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <span className="absolute left-3 top-3 rounded-lg bg-[#C85C2D] px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow-sm">
+                    <span className="absolute left-3 top-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground shadow-sm">
                       {getCategoryName(plat.catégorie)}
                     </span>
                   </div>
 
-                  <div className="flex flex-1 flex-col justify-between p-4 space-y-2">
-                    <div>
-                      <h3 className="font-bold text-[#1A1A1A] leading-snug">
+                  <div className="flex flex-1 flex-col justify-between space-y-2 p-4">
+                    <div className="min-w-0">
+                      <h3 className="break-words font-bold leading-snug text-foreground">
                         {tPlats(`${plat.id}.nom`)}
                       </h3>
-                      <p className="mt-1 line-clamp-2 text-xs text-[#767676] leading-relaxed">
+                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                         {tPlats(`${plat.id}.description`)}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between border-t border-[#E5E5E0] pt-2">
-                      <span className="text-xs font-semibold text-[#767676]">{t('know_more')}</span>
-                      <ArrowRight className="h-4 w-4 text-[#C85C2D] transition-transform group-hover:translate-x-1" />
+                    <div className="flex items-center justify-between border-t border-border pt-2">
+                      <span className="text-xs font-semibold text-muted-foreground">{t('know_more')}</span>
+                      <ArrowRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </Link>
@@ -204,47 +202,46 @@ export default function CuisinePage() {
 
         {/* ── RESTAURANTS ── */}
         {categoryRestaurants.length > 0 && (
-          <section className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-5 sm:p-7 shadow-xs space-y-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-[#E5E5E0] pb-3">
-              <div>
-                <h2 className="text-xl font-black text-[#1A1A1A] sm:text-2xl">
+          <section className="space-y-4 rounded-2xl bg-muted p-5 shadow-[0_4px_14px_rgba(34,29,23,0.05)] sm:p-7">
+            <div className="flex flex-col gap-2 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <h2 className="text-xl font-black text-foreground sm:text-2xl">
                   {selectedCategory === 'all' ? t('top_restaurants') : t('restaurants_available', { count: categoryRestaurants.length })}
                 </h2>
-                <p className="text-xs text-[#767676]">Adresses recommandées pour déguster ces spécialités</p>
+                <p className="text-xs text-muted-foreground">Adresses recommandées pour déguster ces spécialités</p>
               </div>
-              <span className="w-fit rounded-xl bg-[#C85C2D] px-3 py-1 text-[10px] font-black uppercase text-white">
+              <span className="w-fit shrink-0 rounded-full bg-primary px-3 py-1 text-[10px] font-black uppercase text-primary-foreground">
                 {selectedCategory === 'all' ? t('selection') : getFilterLabel(selectedCategory)}
               </span>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               {categoryRestaurants.map((resto, index) => (
-                <article key={resto.id} className="rounded-2xl border border-[#E5E5E0] bg-white p-4 space-y-3">
+                <article key={resto.id} className="min-w-0 space-y-3 rounded-2xl bg-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="truncate text-sm font-bold text-[#1A1A1A]">{resto.nom}</h3>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-[#767676]">
-                        <MapPin className="h-3.5 w-3.5 text-[#1B7E4B] shrink-0" />
+                      <h3 className="truncate text-sm font-bold text-foreground">{resto.nom}</h3>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
                         <span className="truncate">{resto.quartier || t('lome_area')}</span>
                       </p>
                     </div>
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-[#E8A923]/15 px-2 py-0.5 text-xs font-black text-[#C85C2D]">
-                      <Star className="h-3 w-3 fill-[#E8A923] text-[#E8A923]" />
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">
+                      <Star className="h-3 w-3 fill-primary text-primary" />
                       {resto.note || (4 + index * 0.1).toFixed(1)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between gap-2 pt-1">
-                    <span className="text-[11px] text-[#767676] flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
+                    <span className="flex min-w-0 items-center gap-1 truncate text-[11px] text-muted-foreground">
+                      <Clock className="h-3 w-3 shrink-0" />
                       {resto.horaires || t('default_hours')}
                     </span>
                     <a
                       href={`https://maps.google.com/?q=${resto.lat},${resto.lng}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold text-white transition-all hover:brightness-110"
-                      style={{ background: TV.savane }}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground transition-all hover:brightness-110"
                     >
                       <Navigation className="h-3 w-3" />
                       <span>{t('directions')}</span>
@@ -257,31 +254,31 @@ export default function CuisinePage() {
         )}
 
         {/* ── CONSEILS GOURMANDS DU TOURISTE ── */}
-        <section className="rounded-3xl border border-[#E5E5E0] bg-white p-6 shadow-xs space-y-4">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#C85C2D]">
-            <Utensils className="h-4 w-4" />
+        <section className="space-y-4 rounded-3xl bg-card p-6 shadow-[0_4px_14px_rgba(34,29,23,0.05)]">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
+            <Utensils className="h-4 w-4 shrink-0" />
             <span>Guide Gourmand du Voyageur</span>
           </div>
-          <h2 className="text-xl font-serif font-bold text-[#1A1A1A]">Comment savourer la cuisine togolaise comme un local</h2>
-          <div className="grid gap-3 sm:grid-cols-3 pt-2">
-            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-              <span className="text-xl">🥣</span>
-              <h3 className="font-bold text-xs text-[#1A1A1A]">L’art du Maquis &amp; du Bol d’eau</h3>
-              <p className="text-[11px] text-[#767676] leading-relaxed">
+          <h2 className="break-words font-serif text-xl font-bold text-foreground">Comment savourer la cuisine togolaise comme un local</h2>
+          <div className="grid gap-3 pt-2 sm:grid-cols-3">
+            <div className="min-w-0 space-y-1.5 rounded-2xl bg-muted p-4">
+              <ChefHat className="h-5 w-5 text-primary" />
+              <h3 className="text-xs font-bold text-foreground">L’art du Maquis &amp; du Bol d’eau</h3>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Avant de manger le Fufu ou l’Akoumé avec les doigts (main droite), on vous apportera toujours un bol d’eau tiède et du savon pour vous laver les mains.
               </p>
             </div>
-            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-              <span className="text-xl">🌶️</span>
-              <h3 className="font-bold text-xs text-[#1A1A1A]">Piment selon votre goût</h3>
-              <p className="text-[11px] text-[#767676] leading-relaxed">
-                Si vous craignez le piment fort, demandez toujours <em className="text-[#1A1A1A] font-bold">« sans piment direct »</em> ou demandez le piment noir (Shito/Yébéessé) servi à part dans une coupelle.
+            <div className="min-w-0 space-y-1.5 rounded-2xl bg-muted p-4">
+              <Utensils className="h-5 w-5 text-primary" />
+              <h3 className="text-xs font-bold text-foreground">Piment selon votre goût</h3>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Si vous craignez le piment fort, demandez toujours <em className="font-bold text-foreground">« sans piment direct »</em> ou demandez le piment noir (Shito/Yébéessé) servi à part dans une coupelle.
               </p>
             </div>
-            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-              <span className="text-xl">💵</span>
-              <h3 className="font-bold text-xs text-[#1A1A1A]">Petits budgets, grands festins</h3>
-              <p className="text-[11px] text-[#767676] leading-relaxed">
+            <div className="min-w-0 space-y-1.5 rounded-2xl bg-muted p-4">
+              <MapPin className="h-5 w-5 text-primary" />
+              <h3 className="text-xs font-bold text-foreground">Petits budgets, grands festins</h3>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Un copieux plat d’Ayimolou ou d’Ablo avec poisson coûte généralement entre 500 et 1 500 FCFA (0,80 € à 2,30 €). Ayez toujours de la petite monnaie.
               </p>
             </div>

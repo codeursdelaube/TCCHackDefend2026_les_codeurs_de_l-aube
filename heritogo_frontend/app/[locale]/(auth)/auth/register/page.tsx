@@ -37,7 +37,7 @@ function SubmitButton({ privacyAccepted }: { privacyAccepted: boolean }) {
   )
 }
 
-const strengthColors = ['', '#ef4444', '#f97316', '#eab308', '#22c55e']
+const strengthColors = ['', 'var(--destructive)', 'var(--primary)', 'var(--primary)', 'var(--primary)']
 const strengthLabels = ['', 'Tres faible', 'Faible', 'Moyen', 'Fort']
 const languages = [
   { code: 'fr', label: 'FR' },
@@ -74,7 +74,7 @@ function RegisterForm() {
   ]
 
   return (
-    <div className="rounded-[28px] border border-border bg-base-200 p-6 shadow-xl sm:p-8">
+    <div className="rounded-xl border border-border bg-base-200 p-6 shadow-xl sm:p-8">
       <div className="relative mb-4 flex justify-end">
         <button
           type="button"
@@ -88,7 +88,7 @@ function RegisterForm() {
         </button>
 
         {settingsOpen && (
-          <div className="absolute right-0 top-full z-20 mt-3 w-[min(21rem,calc(100vw-3rem))] rounded-[28px] border border-border bg-base-200 p-4 shadow-2xl">
+          <div className="absolute right-0 top-full z-20 mt-3 w-[min(21rem,calc(100vw-3rem))] rounded-xl border border-border bg-base-200 p-4 shadow-2xl">
             <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
               <span className="text-xs font-black uppercase tracking-wider">{tNav('settings')}</span>
               <button type="button" onClick={() => setSettingsOpen(false)} className="rounded-xl p-1 hover:bg-base-300">

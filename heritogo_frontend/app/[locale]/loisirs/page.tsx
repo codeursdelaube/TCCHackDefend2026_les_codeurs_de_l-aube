@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
-import { Banknote, Info, Navigation, Phone, Search, Sparkles } from 'lucide-react'
+import { Banknote, Info, Navigation, Phone, Search } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import parcs, { Parc } from '@/app/P&Z/pzo'
@@ -33,17 +33,17 @@ export default function ParcsZoosPage() {
     <main className="min-h-screen bg-base-100 px-4 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
       <section className="mx-auto max-w-7xl">
         <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
-          <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+          <div className="rounded-xl border border-border bg-base-200 p-5 shadow-sm sm:p-7">
             <div className="mb-5 inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
-              <Sparkles className="h-4 w-4" />
+              <Navigation className="h-4 w-4" />
               {t('tag')}
             </div>
             <h1 className="text-4xl font-black leading-tight tracking-normal sm:text-5xl">{t('title')}</h1>
             <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65">{t('subtitle')}</p>
           </div>
 
-          <div className="rounded-[32px] border border-border bg-base-200 p-4 shadow-sm">
-            <div className="relative flex items-center rounded-[24px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15">
+          <div className="rounded-xl border border-border bg-base-200 p-4 shadow-sm">
+            <div className="relative flex items-center rounded-xl border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15">
               <Search className="h-5 w-5 shrink-0 text-base-content/40" />
               <input
                 type="search"
@@ -57,7 +57,7 @@ export default function ParcsZoosPage() {
         </div>
 
         {filteredParcs.length === 0 ? (
-          <div className="mx-auto mt-8 max-w-md rounded-[32px] border border-border bg-base-200 p-8 text-center shadow-sm">
+          <div className="mx-auto mt-8 max-w-md rounded-xl border border-border bg-base-200 p-8 text-center shadow-sm">
             <Info className="mx-auto h-8 w-8 text-secondary" />
             <p className="mt-4 text-lg font-black">{t('no_parcs')}</p>
             <p className="mt-2 text-sm font-medium text-base-content/55">{t('try_other')}</p>
@@ -75,14 +75,14 @@ export default function ParcsZoosPage() {
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(index * 0.03, 0.18) }}
-                  className={`group overflow-hidden rounded-[32px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl ${index === 0 ? 'lg:col-span-2' : ''}`}
+                  className={`group overflow-hidden rounded-xl border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl ${index === 0 ? 'lg:col-span-2' : ''}`}
                 >
                   <figure className={`${index === 0 ? 'h-72' : 'h-56'} relative overflow-hidden bg-base-300`}>
                     {parc.image ? (
-                      <Image src={parc.image} alt={tParcs(`${parc.id}.nom`)} fill placeholder="blur" sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <Image src={parc.image} alt={tParcs(`${parc.id}.nom`)} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-base-100 text-base-content/35">
-                        <Sparkles className="h-10 w-10" />
+                        <Navigation className="h-10 w-10" />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/68 via-black/10 to-transparent" />
@@ -94,7 +94,7 @@ export default function ParcsZoosPage() {
                     <p className="mt-3 line-clamp-3 text-sm font-medium leading-6 text-base-content/60">{tParcs(`${parc.id}.description`)}</p>
 
                     <div className="mt-5 space-y-3 border-t border-border pt-4">
-                      <div className="flex items-start gap-2 rounded-[20px] border border-border bg-base-100 p-3 text-xs font-semibold leading-5 text-base-content/65">
+                      <div className="flex items-start gap-2 rounded-xl border border-border bg-base-100 p-3 text-xs font-semibold leading-5 text-base-content/65">
                         <Banknote className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
                         {tParcs(`${parc.id}.tarif`)}
                       </div>
@@ -108,7 +108,7 @@ export default function ParcsZoosPage() {
 
                       <div className="flex items-center justify-between gap-3 pt-1">
                         <span className="text-[10px] font-black uppercase tracking-wide text-base-content/40">{t('gps_available')}</span>
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${parc.lat},${parc.lng}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-[18px] bg-primary px-4 py-2 text-xs font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-secondary dark:text-secondary-content">
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${parc.lat},${parc.lng}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-black text-primary-content transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-secondary dark:text-secondary-content">
                           <Navigation className="h-4 w-4" />
                           {t('rejoin')}
                         </a>

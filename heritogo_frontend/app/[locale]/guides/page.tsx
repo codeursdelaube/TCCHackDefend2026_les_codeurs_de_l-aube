@@ -117,7 +117,7 @@ export default function GuidesPage() {
         <h1 className="mt-3 font-serif text-3xl font-bold italic sm:text-5xl">
           {t('title')}
         </h1>
-        <span className="heritage-weave" />
+        <span className="togo-underline" />
         <p className="mt-2 text-sm text-base-content/65 leading-6 max-w-2xl">
           {t('subtitle')}
         </p>
@@ -127,7 +127,7 @@ export default function GuidesPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_3fr]">
 
         {/* Filters Sidebar */}
-        <div className="rounded-[28px] border border-border bg-base-200 p-5 h-fit shadow-sm space-y-6">
+        <div className="rounded-xl border border-border bg-base-200 p-5 h-fit shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <span className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
               <SlidersHorizontal className="h-4 w-4 text-primary" style={{ color: COLORS.forest }} />
@@ -219,7 +219,7 @@ export default function GuidesPage() {
               <span>{error}</span>
             </div>
           ) : filteredGuides?.length === 0 ? (
-            <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-12 text-center">
+            <div className="rounded-xl border border-dashed border-border bg-base-200 p-12 text-center">
               <Compass className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
               <h3 className="font-serif text-xl font-bold">{t('no_guides')}</h3>
               <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
@@ -231,7 +231,7 @@ export default function GuidesPage() {
               {filteredGuides?.map((guide) => (
                 <div
                   key={guide.id}
-                  className="group relative flex flex-col justify-between rounded-[32px] border border-border bg-base-200 p-5 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+                  className="group relative flex flex-col justify-between rounded-xl border border-border bg-base-200 p-5 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
                 >
                   {/* Top Header Card */}
                   <div>

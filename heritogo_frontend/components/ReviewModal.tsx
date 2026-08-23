@@ -51,7 +51,7 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl">
         <div className="flex items-center justify-between border-b border-border pb-3">
           <h3 className="font-serif text-xl font-bold text-base-content">Laisser un avis</h3>
           <button type="button" onClick={onClose} className="rounded-xl p-1 hover:bg-base-300">

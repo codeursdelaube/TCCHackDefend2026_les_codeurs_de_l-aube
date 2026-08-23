@@ -4,9 +4,8 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Camera, Loader2, MapPin, RefreshCw, Sparkles, Upload, AlertTriangle, ShieldCheck, CreditCard, X } from 'lucide-react'
+import { Camera, Loader2, MapPin, RefreshCw, Upload, AlertTriangle, ShieldCheck, CreditCard, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
@@ -14,6 +13,13 @@ import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/u
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { toast } from 'sonner'
 
+// NOTE DESIGN : plus aucune couleur en dur ici (ni import COLORS, ni style
+// inline). Tout passe par les tokens (bg-primary, bg-card, bg-muted,
+// text-foreground, border-border...) définis dans globals.css. Un seul
+// accent (primary, doré) est utilisé pour toute action principale ;
+// secondary sert uniquement aux surfaces neutres, jamais à une 2e couleur
+// d'accent concurrente. Radius cohérent : rounded-3xl pour les grandes
+// cards, rounded-2xl pour boutons/inputs, rounded-full pour les pills.
 
 interface PredictionResult {
   prediction_status: string
@@ -255,48 +261,47 @@ export default function ScanPage() {
   }
 
   return (
-    <main className="min-h-screen bg-base-100 px-4 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-background px-4 pb-28 pt-20 text-foreground sm:px-6 lg:px-8">
       <section className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-        
+
         {/* Left Control Card */}
-        <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
-          <div className="flex justify-between items-center mb-5">
+        <div className="rounded-3xl bg-card p-5 shadow-[0_8px_24px_rgba(34,29,23,0.08)] sm:p-7">
+          <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
-                <Sparkles className="h-4 w-4" />
+              <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-[11px] font-black uppercase tracking-wide text-muted-foreground">
+                <Camera className="h-4 w-4" />
                 {userLocation ? t('gps_available') : t('select_capture')}
               </div>
               {userLocation && (
-                <div 
-                  className="p-1.5 rounded-full bg-base-100 border border-border flex items-center justify-center animate-pulse" 
+                <div
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary animate-pulse"
                   title={t('gps_active')}
                 >
-                  <MapPin className="h-3.5 w-3.5" style={{ color: COLORS.forest }} />
+                  <MapPin className="h-3.5 w-3.5" />
                 </div>
               )}
             </div>
 
             {/* Quota Indicator */}
             {isPremium ? (
-              <span className="badge bg-amber-500 text-white font-extrabold gap-1 border-none py-3 px-3 rounded-xl text-[10px] uppercase shadow-sm">
+              <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[10px] font-extrabold uppercase text-primary">
                 {t('premium_active')}
               </span>
             ) : (
-              <span className="badge bg-base-100 border-border text-base-content/75 font-bold py-3 px-3 rounded-xl text-[10px] uppercase">
+              <span className="rounded-full bg-muted px-3 py-1.5 text-[10px] font-bold uppercase text-muted-foreground">
                 {t('quota', { count: scanCount })}
               </span>
             )}
           </div>
-          
+
           <h1 className="text-4xl font-black leading-tight tracking-normal sm:text-5xl">{t('title')}</h1>
-          <p className="mt-4 text-sm font-medium leading-7 text-base-content/65">{t('subtitle')}</p>
+          <p className="mt-4 text-sm font-medium leading-7 text-muted-foreground">{t('subtitle')}</p>
 
           <div className="mt-8 grid gap-3">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-primary px-6 py-4 text-sm font-black uppercase tracking-wide text-primary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] dark:bg-secondary dark:text-secondary-content"
-              style={{ backgroundColor: COLORS.forest, color: '#fff' }}
+              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 text-sm font-black uppercase tracking-wide text-primary-foreground transition-transform active:scale-[0.98]"
             >
               <Upload className="h-5 w-5" />
               {preview ? t('change_image') : t('open_gallery')}
@@ -306,8 +311,7 @@ export default function ScanPage() {
                 type="button"
                 onClick={handleScanClick}
                 disabled={loading}
-                className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-secondary px-6 py-4 text-sm font-black uppercase tracking-wide text-secondary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:translate-y-0 disabled:opacity-55"
-                style={{ backgroundColor: COLORS.rust, color: '#fff' }}
+                className="inline-flex min-h-14 items-center justify-center gap-3 rounded-2xl bg-secondary px-6 py-4 text-sm font-black uppercase tracking-wide text-secondary-foreground shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:translate-y-0 disabled:opacity-55"
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
                 {loading ? t('analyzing') : t('identify')}
@@ -319,22 +323,22 @@ export default function ScanPage() {
         </div>
 
         {/* Right Preview Card */}
-        <div className="rounded-[32px] border border-dashed border-border bg-base-200 p-3 shadow-sm sm:p-4">
-          <div className="relative flex min-h-[390px] items-center justify-center overflow-hidden rounded-[28px] bg-base-100">
+        <div className="rounded-3xl bg-muted p-3 shadow-[0_8px_24px_rgba(34,29,23,0.06)] sm:p-4">
+          <div className="relative flex min-h-[390px] items-center justify-center overflow-hidden rounded-2xl bg-card">
             {preview ? (
               <Image src={preview} alt={t('select_capture')} fill className="object-contain p-2" />
             ) : (
               <div className="max-w-sm px-6 text-center">
-                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[28px] bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content" style={{ backgroundColor: COLORS.forest, color: '#fff' }}>
+                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
                   <Camera className="h-10 w-10" />
                 </div>
                 <p className="text-lg font-black">{t('select_capture')}</p>
-                <p className="mt-2 text-sm font-medium leading-6 text-base-content/55">{t('compatible_info')}</p>
+                <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">{t('compatible_info')}</p>
               </div>
             )}
           </div>
           {preview && (
-            <button type="button" onClick={resetScanner} className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-4 py-2 text-xs font-black text-base-content/70 transition-colors hover:border-secondary/50 hover:text-secondary">
+            <button type="button" onClick={resetScanner} className="mt-3 inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-xs font-black text-muted-foreground transition-colors hover:text-primary">
               <RefreshCw className="h-4 w-4" />
               {t('change_image')}
             </button>
@@ -343,47 +347,47 @@ export default function ScanPage() {
       </section>
 
       {error && (
-        <section className="mx-auto mt-5 max-w-6xl rounded-[24px] border border-secondary/30 bg-secondary/10 p-4 text-sm font-bold text-secondary">
+        <section className="mx-auto mt-5 max-w-6xl rounded-2xl bg-secondary/15 p-4 text-sm font-bold text-secondary-foreground">
           {error}
         </section>
       )}
 
       {loading && (
-        <section className="mx-auto mt-5 max-w-6xl rounded-[32px] border border-border bg-base-200 p-6 shadow-sm sm:p-8 animate-pulse">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
+        <section className="mx-auto mt-5 max-w-6xl animate-pulse rounded-3xl bg-card p-6 shadow-[0_8px_24px_rgba(34,29,23,0.08)] sm:p-8">
+          <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
-              <div className="h-4 w-28 rounded-lg bg-base-300" />
-              <div className="h-8 w-64 rounded-xl bg-base-300" />
+              <div className="h-4 w-28 rounded-lg bg-muted" />
+              <div className="h-8 w-64 rounded-xl bg-muted" />
             </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-secondary/15 px-4 py-2.5 text-xs font-black text-secondary">
-              <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+            <div className="flex items-center gap-3 rounded-full bg-primary/10 px-4 py-2.5 text-xs font-black text-primary">
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
               <span>{scanStepMessages[scanStepIndex]}</span>
             </div>
           </div>
 
           <div className="mt-5 flex gap-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-9 w-14 rounded-2xl bg-base-300" />
+              <div key={i} className="h-9 w-14 rounded-full bg-muted" />
             ))}
           </div>
 
-          <div className="mt-5 space-y-3 rounded-[28px] border border-border bg-base-100 p-6">
-            <div className="h-4 w-full rounded-md bg-base-300" />
-            <div className="h-4 w-5/6 rounded-md bg-base-300" />
-            <div className="h-4 w-4/6 rounded-md bg-base-300" />
-            <div className="h-4 w-3/4 rounded-md bg-base-300" />
+          <div className="mt-5 space-y-3 rounded-2xl bg-muted p-6">
+            <div className="h-4 w-full rounded-md bg-border" />
+            <div className="h-4 w-5/6 rounded-md bg-border" />
+            <div className="h-4 w-4/6 rounded-md bg-border" />
+            <div className="h-4 w-3/4 rounded-md bg-border" />
           </div>
         </section>
       )}
 
       {result?.data && (
-        <section className="mx-auto mt-5 max-w-6xl rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
+        <section className="mx-auto mt-5 max-w-6xl rounded-3xl bg-card p-5 shadow-[0_8px_24px_rgba(34,29,23,0.08)] sm:p-7">
           <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-wide text-base-content/50">{t('result_label')}</p>
-              <h2 className="mt-1 text-2xl font-black tracking-normal text-base-content">{result.data.monument}</h2>
+              <p className="text-[11px] font-black uppercase tracking-wide text-muted-foreground">{t('result_label')}</p>
+              <h2 className="mt-1 text-2xl font-black tracking-normal text-foreground">{result.data.monument}</h2>
             </div>
-            <TextToSpeech text={getCurrentText()} className="w-fit min-h-12 px-5" />
+            <TextToSpeech text={getCurrentText()} className="w-fit min-h-12 rounded-full px-5" />
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
@@ -392,31 +396,30 @@ export default function ScanPage() {
                 key={lang}
                 type="button"
                 onClick={() => handleLangChange(lang)}
-                className={`rounded-2xl border px-4 py-2 text-xs font-black uppercase transition-all active:scale-95 ${
+                className={`rounded-full px-4 py-2 text-xs font-black uppercase transition-all active:scale-95 ${
                   selectedLang === lang
-                    ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
-                    : 'border-border bg-base-100 text-base-content/60 hover:border-secondary/50'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:text-primary'
                 }`}
-                style={selectedLang === lang ? { backgroundColor: COLORS.forest, borderColor: 'transparent', color: '#fff' } : undefined}
               >
                 {lang}
               </button>
             ))}
           </div>
 
-          <div className="mt-5 rounded-[28px] border border-border bg-base-100 p-5">
+          <div className="mt-5 rounded-2xl bg-muted p-5">
             {isTranslating ? (
               <div className="flex min-h-40 items-center justify-center">
-                <Loader2 className="h-7 w-7 animate-spin text-secondary" style={{ color: COLORS.rust }} />
+                <Loader2 className="h-7 w-7 animate-spin text-primary" />
               </div>
             ) : (
-              <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/75">{getCurrentText()}</p>
+              <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-foreground/80">{getCurrentText()}</p>
             )}
           </div>
 
           {result.data.latitude && result.data.longitude && (
-            <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-4 py-3 text-xs font-bold text-base-content/65">
-              <MapPin className="h-4 w-4 text-secondary" style={{ color: COLORS.rust }} />
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-muted px-4 py-3 text-xs font-bold text-muted-foreground">
+              <MapPin className="h-4 w-4 text-primary" />
               {Number(result.data.latitude).toFixed(4)}, {Number(result.data.longitude).toFixed(4)}
             </div>
           )}
@@ -425,39 +428,39 @@ export default function ScanPage() {
 
       {/* Paywall Modal Dialog */}
       {showPaywall && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[32px] border border-border bg-base-200 p-6 shadow-2xl relative space-y-6 text-center">
-            
-            <button 
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md space-y-6 rounded-3xl bg-card p-6 text-center shadow-2xl">
+
+            <button
               onClick={() => setShowPaywall(false)}
-              className="absolute top-4 right-4 rounded-xl p-1.5 hover:bg-base-300 transition-colors"
+              className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <AlertTriangle className="h-7 w-7" />
             </div>
 
             <div className="space-y-2">
               <h3 className="font-serif text-2xl font-bold tracking-tight">{t('limit_title')}</h3>
-              <p className="text-xs text-base-content/70 leading-relaxed font-semibold">
+              <p className="text-xs font-semibold leading-relaxed text-muted-foreground">
                 {t('limit_desc')}
               </p>
             </div>
 
             {/* Premium Benefits List */}
-            <div className="rounded-2xl bg-base-100 p-4 border border-border/70 text-left text-xs font-bold space-y-2">
-              <p className="flex items-center gap-2 text-base-content/85">
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
+            <div className="space-y-2 rounded-2xl bg-muted p-4 text-left text-xs font-bold">
+              <p className="flex items-center gap-2 text-foreground/85">
+                <ShieldCheck className="h-4.5 w-4.5 text-primary" />
                 {t('premium_scan')}
               </p>
-              <p className="flex items-center gap-2 text-base-content/85">
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
+              <p className="flex items-center gap-2 text-foreground/85">
+                <ShieldCheck className="h-4.5 w-4.5 text-primary" />
                 {t('premium_tts')}
               </p>
-              <p className="flex items-center gap-2 text-base-content/85">
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
+              <p className="flex items-center gap-2 text-foreground/85">
+                <ShieldCheck className="h-4.5 w-4.5 text-primary" />
                 {t('premium_history')}
               </p>
             </div>
@@ -465,8 +468,7 @@ export default function ScanPage() {
             <div className="flex flex-col gap-2.5">
               <button
                 onClick={handleActivatePremium}
-                className="btn btn-block text-white rounded-2xl border-none font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                style={{ backgroundColor: COLORS.forest }}
+                className="btn btn-block flex items-center justify-center gap-2 rounded-2xl border-none bg-primary font-bold text-primary-foreground shadow-md hover:shadow-lg"
               >
                 <CreditCard className="h-4 w-4" /> {t('premium_cta')}
               </button>

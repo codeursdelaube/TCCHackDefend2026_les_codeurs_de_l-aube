@@ -99,7 +99,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative w-full max-w-sm rounded-[28px] border border-border bg-base-100 p-6 shadow-2xl text-base-content"
+              className="relative w-full max-w-sm rounded-xl border border-border bg-base-100 p-6 shadow-2xl text-base-content"
             >
               <button
                 onClick={() => setShowIosModal(false)}

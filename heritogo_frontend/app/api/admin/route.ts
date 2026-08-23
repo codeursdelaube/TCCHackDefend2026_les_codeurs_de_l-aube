@@ -198,7 +198,7 @@ export async function POST(request: Request) {
             subject: 'HériTogo — Votre compte de guide a été approuvé !',
             html: `
               <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 12px;">
-                <h2 style="color: #004D40; font-family: serif;">Félicitations ${guideProfile.profile.full_name} !</h2>
+                <h2 style="color: #D9A441; font-family: serif;">Félicitations ${guideProfile.profile.full_name} !</h2>
                 <p>Nous avons le plaisir de vous annoncer que vos documents justificatifs ont été validés avec succès par l'équipe administrative de HériTogo.</p>
                 <p><strong>Votre profil de guide est désormais approuvé et actif dans notre annuaire.</strong></p>
                 <p>Les touristes visitant la plateforme peuvent dorénavant vous trouver, consulter vos spécialités, tarifs, et vous envoyer des demandes de réservation directes.</p>

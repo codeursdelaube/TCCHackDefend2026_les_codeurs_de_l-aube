@@ -15,7 +15,7 @@ import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
 import ChatBot from "../_components/ChatBot";
 import SplashScreen from "@/components/SplashScreen";
-import TravelToolsDrawer from "@/components/TravelToolsDrawer";
+
 
 const SEO_DATA: Record<string, { title: string; description: string; keywords: string[] }> = {
   fr: {
@@ -233,7 +233,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               <CookieConsentBanner />
               {children}
               <ChatBot />
-              <TravelToolsDrawer />
+
               <Toaster
                 position="top-center"
                 richColors

@@ -8,7 +8,7 @@ import {
   ArrowLeft, ArrowRight, BedDouble, Camera, Check, ChevronDown, ChevronUp,
   Clock, Compass, Eye, Footprints, Headphones, Heart, History, Info,
   MapPin, MessageSquare, Navigation, Pause, Play, Share2, ShieldCheck,
-  ShoppingBag, Sparkles, Star, Sun, Utensils, Users
+  ShoppingBag, Landmark, Star, Sun, Utensils, Users
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
@@ -21,8 +21,8 @@ import { getSiteExtraDetails, SiteActivity } from '@/lib/constants/siteDetails'
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-56 w-full items-center justify-center rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] animate-pulse">
-      <span className="text-xs font-semibold text-[#767676]">Chargement de la carte interactive…</span>
+    <div className="flex h-56 w-full items-center justify-center rounded-2xl border border-border bg-secondary animate-pulse">
+      <span className="text-xs font-semibold text-muted-foreground">Chargement de la carte interactive…</span>
     </div>
   ),
 })
@@ -52,28 +52,28 @@ function StarRow({ rating, count, size = 'sm' }: { rating: number; count?: numbe
             key={i}
             className={sz}
             style={{
-              fill: i <= full ? '#E8A923' : i === full + 1 && half ? '#E8A923' : 'transparent',
-              color: i <= full || (i === full + 1 && half) ? '#E8A923' : '#D1D1CC',
+              fill: i <= full ? 'var(--primary)' : i === full + 1 && half ? 'var(--primary)' : 'transparent',
+              color: i <= full || (i === full + 1 && half) ? 'var(--primary)' : 'var(--border)',
             }}
           />
         ))}
       </div>
-      {count !== undefined && <span className="text-xs text-[#767676]">({count})</span>}
+      {count !== undefined && <span className="text-xs text-muted-foreground">({count})</span>}
     </div>
   )
 }
 
 function ActivityIcon({ icon }: { icon: SiteActivity['icon'] }) {
   switch (icon) {
-    case 'camera': return <Camera className="h-4 w-4 text-[#1B7E4B]" />
-    case 'footsteps': return <Footprints className="h-4 w-4 text-[#C85C2D]" />
-    case 'eye': return <Eye className="h-4 w-4 text-[#1B7E4B]" />
-    case 'compass': return <Compass className="h-4 w-4 text-[#E8A923]" />
-    case 'shopping': return <ShoppingBag className="h-4 w-4 text-[#C85C2D]" />
-    case 'sparkles': return <Sparkles className="h-4 w-4 text-[#E8A923]" />
-    case 'history': return <History className="h-4 w-4 text-[#1B7E4B]" />
-    case 'sun': return <Sun className="h-4 w-4 text-[#E8A923]" />
-    default: return <Sparkles className="h-4 w-4 text-[#1B7E4B]" />
+    case 'camera': return <Camera className="h-4 w-4 text-primary" />
+    case 'footsteps': return <Footprints className="h-4 w-4 text-primary" />
+    case 'eye': return <Eye className="h-4 w-4 text-primary" />
+    case 'compass': return <Compass className="h-4 w-4 text-primary" />
+    case 'shopping': return <ShoppingBag className="h-4 w-4 text-primary" />
+    case 'sparkles': return <Landmark className="h-4 w-4 text-primary" />
+    case 'history': return <History className="h-4 w-4 text-primary" />
+    case 'sun': return <Sun className="h-4 w-4 text-primary" />
+    default: return <Landmark className="h-4 w-4 text-primary" />
   }
 }
 
@@ -170,7 +170,7 @@ export default function SiteDetailPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-white pb-28 pt-16 text-[#1A1A1A]">
+    <main className="min-h-screen bg-card pb-28 pt-16 text-foreground">
       
       {/* ── HERO PHOTO plein format ── */}
       <div className="relative h-72 w-full overflow-hidden sm:h-80 md:h-96">
@@ -181,7 +181,7 @@ export default function SiteDetailPage({ params }: PageProps) {
         <div className="absolute left-4 top-4 z-10">
           <Link
             href="/lieux"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1A1A1A] shadow-md transition hover:scale-105 active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-foreground shadow-md transition hover:scale-105 active:scale-95"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
@@ -192,16 +192,16 @@ export default function SiteDetailPage({ params }: PageProps) {
           <button
             type="button"
             onClick={share}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1A1A1A] shadow-md transition hover:scale-105 active:scale-95 cursor-pointer"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-foreground shadow-md transition hover:scale-105 active:scale-95 cursor-pointer"
           >
-            {copied ? <Check className="h-4 w-4 text-[#1B7E4B]" /> : <Share2 className="h-4 w-4" />}
+            {copied ? <Check className="h-4 w-4 text-primary" /> : <Share2 className="h-4 w-4" />}
           </button>
         </div>
 
         {/* Titre & Note en bas du hero */}
         <div className="absolute bottom-5 left-5 right-5 z-10 text-white space-y-1.5">
           <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="rounded-md bg-[#1B7E4B] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+            <span className="rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
               {getRegionName(site.région)}
             </span>
             <span className="text-xs font-semibold text-white/90">
@@ -215,7 +215,7 @@ export default function SiteDetailPage({ params }: PageProps) {
 
           <div className="flex items-center gap-2 pt-0.5">
             <StarRow rating={ratingData.rating} count={ratingData.count} size="md" />
-            <span className="rounded-lg bg-[#1B7E4B] px-2 py-0.5 text-xs font-black text-white shadow-xs">
+            <span className="rounded-lg bg-primary px-2 py-0.5 text-xs font-black text-white shadow-xs">
               {ratingData.rating} / 5
             </span>
           </div>
@@ -230,7 +230,7 @@ export default function SiteDetailPage({ params }: PageProps) {
           {extraDetails.tags.map((tag) => (
             <span
               key={tag}
-              className="shrink-0 rounded-full border border-[#E5E5E0] bg-[#F5F5F0] px-3 py-1 text-xs font-bold text-[#1A1A1A]"
+              className="shrink-0 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-bold text-foreground"
             >
               #{tag}
             </span>
@@ -244,7 +244,7 @@ export default function SiteDetailPage({ params }: PageProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-bold text-white shadow-sm transition hover:brightness-110 active:scale-98"
-            style={{ background: '#1B7E4B' }}
+            style={{ background: 'var(--primary)' }}
           >
             <Navigation className="h-4 w-4" />
             <span>Itinéraire Google Maps (GPS)</span>
@@ -252,15 +252,15 @@ export default function SiteDetailPage({ params }: PageProps) {
 
           <Link
             href="/guides"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] font-bold text-[#1A1A1A] transition hover:bg-[#E5E5E0] active:scale-98"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-secondary font-bold text-foreground transition hover:bg-primary active:scale-98"
           >
-            <Users className="h-4 w-4 text-[#1B7E4B]" />
+            <Users className="h-4 w-4 text-primary" />
             <span>Réserver un guide pour ce lieu</span>
           </Link>
         </div>
 
         {/* Onglets de navigation interactifs */}
-        <div className="flex gap-0 overflow-x-auto border-b border-[#E5E5E0] scrollbar-none sticky top-14 bg-white/95 backdrop-blur-md z-20">
+        <div className="flex gap-0 overflow-x-auto border-b border-border scrollbar-none sticky top-14 bg-card/95 backdrop-blur-md z-20">
           {TABS.map((tab) => (
             <button
               key={tab}
@@ -268,8 +268,8 @@ export default function SiteDetailPage({ params }: PageProps) {
               onClick={() => setActiveTab(tab)}
               className={`shrink-0 border-b-2 px-4 py-3 text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === tab
-                  ? 'border-[#1B7E4B] text-[#1B7E4B]'
-                  : 'border-transparent text-[#767676] hover:text-[#1A1A1A]'
+                  ? 'border-border text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {tabLabels[tab]}
@@ -284,14 +284,14 @@ export default function SiteDetailPage({ params }: PageProps) {
           <div className="space-y-6">
 
             {/* Audioguide TTS interactif */}
-            <div className="flex items-center justify-between rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 shadow-xs">
+            <div className="flex items-center justify-between rounded-2xl border border-border bg-secondary p-4 shadow-xs">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1B7E4B] text-white shadow-xs">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-white shadow-xs">
                   <Headphones className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#1B7E4B]">Narration Vocale</p>
-                  <p className="text-sm font-black text-[#1A1A1A]">Écouter l&apos;histoire du monument</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-primary">Narration Vocale</p>
+                  <p className="text-sm font-black text-foreground">Écouter l&apos;histoire du monument</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -307,8 +307,8 @@ export default function SiteDetailPage({ params }: PageProps) {
                     }}
                     className={`rounded-xl px-2 py-1 text-[11px] font-black cursor-pointer transition-all ${
                       selectedLang === l
-                        ? 'bg-[#1B7E4B] text-white shadow-xs'
-                        : 'bg-white text-[#767676] border border-[#E5E5E0] hover:border-[#1B7E4B]/40'
+                        ? 'bg-primary text-white shadow-xs'
+                        : 'bg-card text-muted-foreground border border-border hover:border-border'
                     }`}
                   >
                     {l.split('-')[0].toUpperCase()}
@@ -316,7 +316,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                 ))}
                 <button
                   onClick={toggleAudio}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1B7E4B] text-white transition hover:scale-105 active:scale-95 cursor-pointer shadow-sm ml-1"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white transition hover:scale-105 active:scale-95 cursor-pointer shadow-sm ml-1"
                 >
                   {isPlayingAudio ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current ml-0.5" />}
                 </button>
@@ -329,7 +329,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                 {[40, 75, 90, 60, 100, 45, 80, 65, 95, 50, 70, 85, 60, 90].map((h, i) => (
                   <div
                     key={i}
-                    className="w-1 rounded-full bg-[#E8A923] animate-pulse"
+                    className="w-1 rounded-full bg-primary animate-pulse"
                     style={{ height: `${h}%`, maxHeight: '20px', minHeight: '6px', animationDelay: `${i * 0.08}s` }}
                   />
                 ))}
@@ -337,15 +337,15 @@ export default function SiteDetailPage({ params }: PageProps) {
             )}
 
             {/* Fiche Description & Histoire */}
-            <div className="rounded-2xl border border-[#E5E5E0] bg-white p-5 space-y-3">
-              <h2 className="text-xs font-black uppercase tracking-wider text-[#767676]">Présentation &amp; Histoire</h2>
-              <p className="text-sm leading-relaxed text-[#3D3D3D] font-medium">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+              <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Présentation &amp; Histoire</h2>
+              <p className="text-sm leading-relaxed text-foreground font-medium">
                 {siteDescription}
               </p>
               {siteHistory && (
-                <div className={`mt-3 pt-3 border-t border-[#E5E5E0] space-y-2 ${showFullText ? 'block' : 'hidden'}`}>
-                  <p className="text-xs font-black uppercase tracking-wide text-[#1B7E4B]">Contexte Historique</p>
-                  <p className="text-sm leading-relaxed text-[#3D3D3D] font-medium">
+                <div className={`mt-3 pt-3 border-t border-border space-y-2 ${showFullText ? 'block' : 'hidden'}`}>
+                  <p className="text-xs font-black uppercase tracking-wide text-primary">Contexte Historique</p>
+                  <p className="text-sm leading-relaxed text-foreground font-medium">
                     {siteHistory}
                   </p>
                 </div>
@@ -354,7 +354,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setShowFullText(!showFullText)}
-                  className="pt-2 flex items-center gap-1 text-xs font-bold text-[#1B7E4B] hover:underline cursor-pointer"
+                  className="pt-2 flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer"
                 >
                   {showFullText ? (
                     <><span>Réduire</span><ChevronUp className="h-3.5 w-3.5" /></>
@@ -366,14 +366,14 @@ export default function SiteDetailPage({ params }: PageProps) {
             </div>
 
             {/* Ce qu'il faut faire en bref */}
-            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-5 space-y-3">
+            <div className="rounded-2xl border border-border bg-secondary p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs font-black uppercase tracking-wider text-[#1A1A1A]">
+                <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
                   Expériences recommandées
                 </h2>
                 <button
                   onClick={() => setActiveTab('activites')}
-                  className="text-xs font-bold text-[#1B7E4B] hover:underline cursor-pointer"
+                  className="text-xs font-bold text-primary hover:underline cursor-pointer"
                 >
                   Tout voir ({extraDetails.activities.length}) →
                 </button>
@@ -381,13 +381,13 @@ export default function SiteDetailPage({ params }: PageProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {extraDetails.activities.slice(0, 2).map((act, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-xl bg-white p-3.5 border border-[#E5E5E0]">
-                    <div className="p-2 rounded-xl bg-[#F5F5F0] shrink-0 mt-0.5">
+                  <div key={i} className="flex items-start gap-3 rounded-xl bg-card p-3.5 border border-border">
+                    <div className="p-2 rounded-xl bg-secondary shrink-0 mt-0.5">
                       <ActivityIcon icon={act.icon} />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#1A1A1A] leading-snug">{act.title}</p>
-                      <p className="text-[11px] text-[#767676] mt-1 leading-relaxed line-clamp-2">{act.desc}</p>
+                      <p className="text-xs font-bold text-foreground leading-snug">{act.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed line-clamp-2">{act.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -396,15 +396,15 @@ export default function SiteDetailPage({ params }: PageProps) {
 
             {/* Spécialités culinaires à proximité */}
             {relatedDishes.length > 0 && (
-              <div className="rounded-2xl border border-[#E5E5E0] bg-white p-5 space-y-3">
+              <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Utensils className="h-4 w-4 text-[#C85C2D]" />
-                    <h2 className="text-xs font-black uppercase tracking-wider text-[#1A1A1A]">
+                    <Utensils className="h-4 w-4 text-primary" />
+                    <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
                       À déguster dans les environs
                     </h2>
                   </div>
-                  <Link href="/cuisine" className="text-xs font-bold text-[#C85C2D] hover:underline">
+                  <Link href="/cuisine" className="text-xs font-bold text-primary hover:underline">
                     Guide gastronomique →
                   </Link>
                 </div>
@@ -414,7 +414,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                     <Link
                       key={dish.id}
                       href={`/cuisine/${dish.id}`}
-                      className="group overflow-hidden rounded-xl border border-[#E5E5E0] bg-[#F5F5F0] hover:shadow-sm transition-all"
+                      className="group overflow-hidden rounded-xl border border-border bg-secondary hover:shadow-sm transition-all"
                     >
                       <div className="relative h-24 overflow-hidden">
                         <Image
@@ -426,8 +426,8 @@ export default function SiteDetailPage({ params }: PageProps) {
                         />
                       </div>
                       <div className="p-2">
-                        <p className="truncate text-xs font-bold text-[#1A1A1A]">{tPlats(`${dish.id}.nom`)}</p>
-                        <p className="text-[10px] text-[#767676] capitalize">{dish.catégorie}</p>
+                        <p className="truncate text-xs font-bold text-foreground">{tPlats(`${dish.id}.nom`)}</p>
+                        <p className="text-[10px] text-muted-foreground capitalize">{dish.catégorie}</p>
                       </div>
                     </Link>
                   ))}
@@ -437,19 +437,19 @@ export default function SiteDetailPage({ params }: PageProps) {
 
             {/* Hôtels & Hébergements proches */}
             {nearbyHotels.length > 0 && (
-              <div className="rounded-2xl border border-[#E5E5E0] bg-white p-5 space-y-3">
-                <h2 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#1A1A1A]">
-                  <BedDouble className="h-4 w-4 text-[#1B7E4B]" />
+              <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+                <h2 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-foreground">
+                  <BedDouble className="h-4 w-4 text-primary" />
                   {t('hotels_nearby')}
                 </h2>
                 <div className="space-y-2">
                   {nearbyHotels.map((hotel) => (
-                    <div key={hotel.id} className="flex items-center justify-between rounded-xl bg-[#F5F5F0] p-3 text-xs">
+                    <div key={hotel.id} className="flex items-center justify-between rounded-xl bg-secondary p-3 text-xs">
                       <div>
-                        <p className="font-bold text-[#1A1A1A]">{hotel.nom}</p>
-                        <p className="text-[#767676]">{formatDistance(hotel.distance_km)} du monument</p>
+                        <p className="font-bold text-foreground">{hotel.nom}</p>
+                        <p className="text-muted-foreground">{formatDistance(hotel.distance_km)} du monument</p>
                       </div>
-                      <span className="font-bold text-[#1B7E4B]">{hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA</span>
+                      <span className="font-bold text-primary">{hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA</span>
                     </div>
                   ))}
                 </div>
@@ -457,26 +457,26 @@ export default function SiteDetailPage({ params }: PageProps) {
             )}
 
             {/* Avis Voyageurs */}
-            <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-5 space-y-4">
+            <div className="rounded-2xl border border-border bg-secondary p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xs font-black uppercase tracking-wider text-[#1A1A1A]">Avis des explorateurs</h2>
+                  <h2 className="text-xs font-black uppercase tracking-wider text-foreground">Avis des explorateurs</h2>
                   <div className="flex items-center gap-1.5 mt-1">
                     <StarRow rating={ratingData.rating} count={ratingData.count} size="md" />
-                    <span className="text-xs font-black text-[#1B7E4B]">{ratingData.rating}</span>
+                    <span className="text-xs font-black text-primary">{ratingData.rating}</span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2.5">
                 {extraDetails.reviews.map((rev, i) => (
-                  <div key={i} className="rounded-xl bg-white p-3.5 border border-[#E5E5E0] space-y-1.5">
+                  <div key={i} className="rounded-xl bg-card p-3.5 border border-border space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#1A1A1A]">{rev.author} <span className="text-[10px] text-[#767676] font-normal">({rev.origin})</span></span>
-                      <span className="text-[10px] text-[#767676]">{rev.date}</span>
+                      <span className="font-bold text-foreground">{rev.author} <span className="text-[10px] text-muted-foreground font-normal">({rev.origin})</span></span>
+                      <span className="text-[10px] text-muted-foreground">{rev.date}</span>
                     </div>
                     <StarRow rating={rev.rating} size="sm" />
-                    <p className="text-xs text-[#3D3D3D] leading-relaxed font-medium">{rev.comment}</p>
+                    <p className="text-xs text-foreground leading-relaxed font-medium">{rev.comment}</p>
                   </div>
                 ))}
               </div>
@@ -490,38 +490,38 @@ export default function SiteDetailPage({ params }: PageProps) {
         ══════════════════════════════════════════════════ */}
         {activeTab === 'activites' && (
           <div className="space-y-4">
-            <div className="border-b border-[#E5E5E0] pb-3">
-              <h2 className="text-lg font-black text-[#1A1A1A]">Activités &amp; Choses à faire</h2>
-              <p className="text-xs text-[#767676]">Suggestions pour tirer le meilleur parti de votre visite sur ce site</p>
+            <div className="border-b border-border pb-3">
+              <h2 className="text-lg font-black text-foreground">Activités &amp; Choses à faire</h2>
+              <p className="text-xs text-muted-foreground">Suggestions pour tirer le meilleur parti de votre visite sur ce site</p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               {extraDetails.activities.map((act, i) => (
-                <div key={i} className="rounded-2xl border border-[#E5E5E0] bg-white p-4 space-y-2 shadow-xs hover:border-[#1B7E4B]/40 transition-colors">
+                <div key={i} className="rounded-2xl border border-border bg-card p-4 space-y-2 shadow-xs hover:border-border transition-colors">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-xl bg-[#F5F5F0] shrink-0">
+                    <div className="p-2 rounded-xl bg-secondary shrink-0">
                       <ActivityIcon icon={act.icon} />
                     </div>
-                    <h3 className="font-bold text-sm text-[#1A1A1A]">{act.title}</h3>
+                    <h3 className="font-bold text-sm text-foreground">{act.title}</h3>
                   </div>
-                  <p className="text-xs leading-relaxed text-[#767676] pl-10 font-medium">{act.desc}</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground pl-10 font-medium">{act.desc}</p>
                 </div>
               ))}
             </div>
 
             {/* Bannière guide */}
-            <div className="rounded-2xl border border-[#1B7E4B]/30 bg-[#1B7E4B]/5 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="rounded-2xl border border-border bg-primary p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-center sm:text-left">
-                <p className="text-xs font-black uppercase text-[#1B7E4B] flex items-center justify-center sm:justify-start gap-1.5">
+                <p className="text-xs font-black uppercase text-primary flex items-center justify-center sm:justify-start gap-1.5">
                   <ShieldCheck className="h-4 w-4" /> Guide Local Certifié
                 </p>
-                <p className="text-sm font-bold text-[#1A1A1A]">Vous souhaitez une visite guidée personnalisée ?</p>
-                <p className="text-xs text-[#767676]">Réservez un guide togolais certifié pour des explications immersives.</p>
+                <p className="text-sm font-bold text-foreground">Vous souhaitez une visite guidée personnalisée ?</p>
+                <p className="text-xs text-muted-foreground">Réservez un guide togolais certifié pour des explications immersives.</p>
               </div>
               <Link
                 href="/guides"
                 className="shrink-0 rounded-full px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:brightness-110"
-                style={{ background: '#1B7E4B' }}
+                style={{ background: 'var(--primary)' }}
               >
                 Trouver un guide
               </Link>
@@ -534,51 +534,51 @@ export default function SiteDetailPage({ params }: PageProps) {
         ══════════════════════════════════════════════════ */}
         {activeTab === 'guide_pratique' && (
           <div className="space-y-4">
-            <div className="border-b border-[#E5E5E0] pb-3">
-              <h2 className="text-lg font-black text-[#1A1A1A]">Conseils Pratiques du Voyageur</h2>
-              <p className="text-xs text-[#767676]">Toutes les informations utiles pour organiser votre venue sereinement</p>
+            <div className="border-b border-border pb-3">
+              <h2 className="text-lg font-black text-foreground">Conseils Pratiques du Voyageur</h2>
+              <p className="text-xs text-muted-foreground">Toutes les informations utiles pour organiser votre venue sereinement</p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#1B7E4B]">
+              <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-primary">
                   <Sun className="h-4 w-4" />
                   <span>Meilleur moment</span>
                 </div>
-                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.bestTime}</p>
+                <p className="text-xs font-bold text-foreground">{extraDetails.practicalInfo.bestTime}</p>
               </div>
 
-              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#C85C2D]">
+              <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-primary">
                   <Clock className="h-4 w-4" />
                   <span>Durée recommandée</span>
                 </div>
-                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.duration}</p>
+                <p className="text-xs font-bold text-foreground">{extraDetails.practicalInfo.duration}</p>
               </div>
 
-              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#E8A923]">
+              <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-primary">
                   <Footprints className="h-4 w-4" />
                   <span>Tenue &amp; Équipement</span>
                 </div>
-                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.outfit}</p>
+                <p className="text-xs font-bold text-foreground">{extraDetails.practicalInfo.outfit}</p>
               </div>
 
-              <div className="rounded-2xl border border-[#E5E5E0] bg-[#F5F5F0] p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-black uppercase text-[#1B7E4B]">
+              <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-black uppercase text-primary">
                   <Navigation className="h-4 w-4" />
                   <span>Accès &amp; Transport</span>
                 </div>
-                <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.access}</p>
+                <p className="text-xs font-bold text-foreground">{extraDetails.practicalInfo.access}</p>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#E5E5E0] bg-white p-4 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-black uppercase text-[#767676]">
-                <Info className="h-4 w-4 text-[#1B7E4B]" />
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-black uppercase text-muted-foreground">
+                <Info className="h-4 w-4 text-primary" />
                 <span>Tarif &amp; Entrée</span>
               </div>
-              <p className="text-xs font-bold text-[#1A1A1A]">{extraDetails.practicalInfo.fee}</p>
+              <p className="text-xs font-bold text-foreground">{extraDetails.practicalInfo.fee}</p>
             </div>
           </div>
         )}
@@ -588,17 +588,17 @@ export default function SiteDetailPage({ params }: PageProps) {
         ══════════════════════════════════════════════════ */}
         {activeTab === 'carte' && (
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-2xl border border-[#E5E5E0] shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
               <DynamicCarte monumentsList={[site]} />
             </div>
 
-            <div className="flex items-center justify-between rounded-xl bg-[#F5F5F0] p-3 text-xs">
-              <span className="text-[#767676]">Coordonnées GPS : <strong className="text-[#1A1A1A]">{siteLat.toFixed(5)}, {siteLng.toFixed(5)}</strong></span>
+            <div className="flex items-center justify-between rounded-xl bg-secondary p-3 text-xs">
+              <span className="text-muted-foreground">Coordonnées GPS : <strong className="text-foreground">{siteLat.toFixed(5)}, {siteLng.toFixed(5)}</strong></span>
               <a
                 href={googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-bold text-[#1B7E4B] hover:underline"
+                className="font-bold text-primary hover:underline"
               >
                 Lancer le guidage →
               </a>
@@ -611,9 +611,9 @@ export default function SiteDetailPage({ params }: PageProps) {
         ══════════════════════════════════════════════════ */}
         {activeTab === 'similaires' && (
           <div className="space-y-4">
-            <div className="border-b border-[#E5E5E0] pb-3">
-              <h2 className="text-lg font-black text-[#1A1A1A]">Autres trésors dans la région</h2>
-              <p className="text-xs text-[#767676]">Continuez votre exploration à proximité de {site.localite}</p>
+            <div className="border-b border-border pb-3">
+              <h2 className="text-lg font-black text-foreground">Autres trésors dans la région</h2>
+              <p className="text-xs text-muted-foreground">Continuez votre exploration à proximité de {site.localite}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
@@ -623,9 +623,9 @@ export default function SiteDetailPage({ params }: PageProps) {
                   <Link
                     key={ps.id}
                     href={`/lieux/${ps.id}`}
-                    className="group overflow-hidden rounded-2xl border border-[#E5E5E0] bg-white shadow-xs hover:shadow-md transition-all"
+                    className="group overflow-hidden rounded-2xl border border-border bg-card shadow-xs hover:shadow-md transition-all"
                   >
-                    <div className="relative h-36 overflow-hidden bg-[#F5F5F0]">
+                    <div className="relative h-36 overflow-hidden bg-secondary">
                       <Image
                         src={ps.image}
                         alt={tMonuments(`${ps.id}.nom`)}
@@ -633,12 +633,12 @@ export default function SiteDetailPage({ params }: PageProps) {
                         sizes="280px"
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <span className="absolute left-2.5 top-2.5 rounded-md bg-[#1B7E4B] px-2 py-0.5 text-[9px] font-bold uppercase text-white shadow-xs">
+                      <span className="absolute left-2.5 top-2.5 rounded-md bg-primary px-2 py-0.5 text-[9px] font-bold uppercase text-white shadow-xs">
                         {ps.localite}
                       </span>
                     </div>
                     <div className="p-3 space-y-1">
-                      <p className="truncate text-xs font-bold text-[#1A1A1A]">{tMonuments(`${ps.id}.nom`)}</p>
+                      <p className="truncate text-xs font-bold text-foreground">{tMonuments(`${ps.id}.nom`)}</p>
                       <StarRow rating={pr.rating} count={pr.count} />
                     </div>
                   </Link>
