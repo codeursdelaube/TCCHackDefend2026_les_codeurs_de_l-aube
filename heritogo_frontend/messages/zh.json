@@ -36,7 +36,7 @@
         "explorers": "{count}+ 探索者",
         "discover": "发现",
         "scroll": "滚动",
-        "hackathon_badge": "#TCCHackDefend2026",
+        "hackathon_badge": "UNESCO世界遗产",
         "slides": {
             "0": {
                 "title": "Heritogo",
@@ -941,6 +941,7 @@
             "status_cancelled": "已取消",
             "booking_type": "类型: {type}",
             "offer_label": "报价: {amount} FCFA",
+            "accept_quote": "接受报价",
             "view_guide": "查看导游",
             "leave_review": "发表评价",
             "review_left": "已评价 ({rating}/5)",

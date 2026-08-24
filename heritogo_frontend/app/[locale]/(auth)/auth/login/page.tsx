@@ -4,7 +4,6 @@ import { Suspense, useActionState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { COLORS } from '@/lib/constants/colors'
 import { Loader2, LogIn } from 'lucide-react'
 import { useFormStatus } from 'react-dom'
 import { loginAction } from './actions'
@@ -17,8 +16,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="btn w-full rounded-2xl border-none text-white cursor-pointer"
-      style={{ backgroundColor: COLORS.forest }}
+      className="inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
     >
       {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : t('login_button')}
     </button>
@@ -35,66 +33,68 @@ function LoginForm() {
   const [state, formAction] = useActionState(loginAction, null)
 
   return (
-    <div className="rounded-xl border border-border bg-base-200 p-6 shadow-xl sm:p-8">
-      <div className="mb-6 text-center">
-        <div
-          className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white"
-          style={{ backgroundColor: COLORS.forest }}
-        >
+    <div className="app-card p-6 sm:p-8 space-y-6 shadow-xl">
+      <div className="text-center space-y-2">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-sm">
           <LogIn className="h-7 w-7" />
         </div>
-        <h1 className="font-serif text-3xl font-bold text-base-content">{t('login_title')}</h1>
-        <p className="mt-2 text-sm text-base-content/60">{t('login_subtitle')}</p>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">{t('login_title')}</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">{t('login_subtitle')}</p>
       </div>
 
       <form action={formAction} className="space-y-4">
-        {/* Hidden inputs to pass state to server action */}
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="redirect" value={redirectParam} />
 
-        <label className="form-control w-full">
-          <span className="label-text mb-1 text-sm font-semibold">{t('email')}</span>
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            {t('email')}
+          </label>
           <input
             type="email"
             name="email"
             required
-            className="input input-bordered w-full rounded-2xl bg-base-100"
+            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             autoComplete="email"
           />
-        </label>
+        </div>
 
-        <label className="form-control w-full">
-          <span className="label-text mb-1 text-sm font-semibold">{t('password')}</span>
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            {t('password')}
+          </label>
           <input
             type="password"
             name="password"
             required
             minLength={6}
-            className="input input-bordered w-full rounded-2xl bg-base-100"
+            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             autoComplete="current-password"
           />
-        </label>
+        </div>
 
         {state?.error && (
-          <div className="rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
+          <div className="rounded-2xl border border-red-300 bg-red-50/40 dark:bg-red-950/20 px-4 py-3 text-xs font-bold text-red-600">
             {state.error}
           </div>
         )}
 
-        <SubmitButton />
+        <div className="pt-2">
+          <SubmitButton />
+        </div>
       </form>
 
-      <div className="mt-4 flex flex-col gap-2 text-center text-sm">
-        <Link href="/auth/forgot-password" className="font-semibold hover:underline" style={{ color: COLORS.rust }}>
+      <div className="flex flex-col gap-2 text-center text-xs pt-2 border-t border-border">
+        <Link href="/auth/forgot-password" className="font-bold text-primary hover:underline">
           {t('forgot_link')}
         </Link>
-        <p className="text-base-content/60">
+        <p className="text-muted-foreground">
           {t('no_account')}{' '}
-          <Link href="/auth/register" className="font-bold hover:underline" style={{ color: COLORS.forest }}>
+          <Link href="/auth/register" className="font-bold text-primary hover:underline">
             {t('register_link')}
           </Link>
         </p>
-        <Link href="/" className="text-base-content/50 hover:underline">
+        <Link href="/" className="text-muted-foreground hover:text-foreground">
           {t('back_home')}
         </Link>
       </div>
@@ -104,13 +104,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex justify-center p-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="text-center p-8"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" /></div>}>
       <LoginForm />
     </Suspense>
   )

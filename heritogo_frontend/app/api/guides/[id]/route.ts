@@ -8,14 +8,13 @@ export async function GET(
   try {
     const { id } = await params
 
-    const guide = await prisma.guideProfile.findUnique({
-      where: { id },
+    const guide = await prisma.guideProfile.findFirst({
+      where: { id, status: 'approved' },
       include: {
         profile: {
           select: {
             full_name: true,
             avatar_url: true,
-            phone: true,
             preferred_lang: true,
             bio: true
           }

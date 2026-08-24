@@ -1,189 +1,205 @@
-# SKILL — Discipline design HeriTogo (à donner à Codex)
+# HeriTogo Web — Briefing de refonte UI/UX
 
-## 🔴 Le bordel actuel, précisément
+## 0. Présentation du projet (contexte à lire avant toute action)
 
-Ce n'est pas un avis vague, voici ce qui ne va pas, avec preuves du CSS et des captures :
+HeriTogo est une plateforme de tourisme et de patrimoine culturel togolais,
+en production sous forme de PWA (`heritogo.codorah.com`). Elle permet de :
 
-1. **3 accents qui se battent** — orange (`--primary: #FF9700`), vert
-   (bouton "Trouver à proximité", `--color-togo-savane: #2D5A27`), et le
-   header en noir pur. Aucune app professionnelle ne fait ça. Une seule
-   couleur d'accent, toujours.
-2. **`--color-togo-laterite` et `--color-togo-or` ont exactement la même
-   valeur** (`#C68B59`) — deux noms pour une seule couleur, signe de
-   copier-coller sans réflexion.
-3. **Le fichier CSS a AU MOINS 3 blocs `[data-theme='dark']` différents et
-   contradictoires** empilés les uns après les autres (un premier bloc
-   propre en haut, puis deux autres blocs de "compatibilité" tout en bas
-   qui redéfinissent `--background`, `--card`, `--primary` avec des valeurs
-   différentes). Le dernier bloc écrase les précédents de façon
-   imprévisible selon l'ordre de chargement. C'est un fichier qui n'a
-   jamais été nettoyé, juste empilé patch après patch.
-4. **Des dizaines de règles `!important` sur des classes Tailwind
-   arbitraires hardcodées** (`bg-[#FFFFFF]`, `text-[#1A1A1A]`,
-   `border-[#E0DBD3]`...) — ça veut dire que les composants eux-mêmes
-   utilisent des couleurs en dur au lieu des tokens `bg-background`,
-   `text-foreground`, `border-border`. Le thème sombre n'est pas un vrai
-   thème, c'est un rustinage global qui devine quelles classes existent
-   dans le DOM et les écrase à la volée. Ça va casser à chaque nouveau
-   composant.
-5. **Boutons flottants "Boîte à outils" mal positionnés** (orange/vert,
-   coupés en bas de viewport sur la capture "À ne pas manquer") — on
-   dirait un widget de debug oublié, pas un élément de design intentionnel.
-6. **Incohérence de rayons** — badges numérotés (01/02/03/04) en carré à
-   angles droits, boutons en pilule complète, cards à coins arrondis
-   moyens : trois systèmes de radius différents sur le même écran.
-7. **Le thème sombre par défaut alors que la référence (image 1) est un
-   design clair, pâle, aéré** — Codex est parti dans la direction opposée
-   de ce qui était demandé.
+- Découvrir **29 sites patrimoniaux** togolais (monuments, dont le
+  Koutammakou, classé UNESCO — cases traditionnelles Tata Somba)
+- Identifier un monument en photo via un **scanner IA** (vision par
+  ordinateur)
+- Explorer **5 régions** touristiques (Littoral/Maritime, Écotourisme
+  Plateaux & Kloto, UNESCO Kara & Koutammakou, etc.)
+- Découvrir la **gastronomie togolaise** (31 plats : Ayimolou, Fufu, Ablo,
+  Djenkoumé, Wagasi...)
+- Explorer des **parcs et loisirs** (16 lieux : Aqualand, Kéran, Tata Park,
+  O2 Zoo...)
+- Réserver des **guides locaux certifiés** (profils vérifiés, tarifs,
+  avis, paiement Mobile Money — Flooz/T-Money)
 
-## Règle de discipline pour la suite (à respecter à partir de maintenant)
+Le contenu réel (images, textes) existe déjà dans `public/Sites/`,
+`public/Cuisine/`, `public/parks/`, plus les visuels hero (`Hero1.png`,
+`Hero2.png`, `Hero3.png`, `fufuhero`, `deuxlions`). **Toute refonte doit
+utiliser ce contenu réel, jamais de placeholders.**
 
-- **Une seule couleur d'accent.** Jamais deux accents qui se disputent
-  l'attention sur un même écran. Si un bouton a besoin de se distinguer,
-  on joue sur l'opacité ou le contraste clair/foncé de LA MÊME couleur
-  d'accent, pas sur une couleur différente.
-- **Un seul token pour une seule couleur.** Ne jamais créer deux noms de
-  variable CSS pour la même valeur hex.
-- **Jamais de couleur en dur dans un composant.** Toujours `bg-background`,
-  `text-foreground`, `bg-primary`, etc. Si une couleur n'existe pas encore
-  comme token, on l'ajoute au thème — on ne l'écrit jamais en `bg-[#xxxxxx]`
-  dans le JSX.
-- **Un seul bloc `:root` et un seul bloc `[data-theme='dark']` dans tout le
-  fichier.** Avant d'ajouter quoi que ce soit, chercher s'il existe déjà un
-  bloc et l'éditer — ne jamais en empiler un nouveau à la fin du fichier.
-- **Un seul système de radius.** `--radius` et ses dérivés
-  (`--radius-sm/md/lg/xl/full`) couvrent tous les cas. Pas de rayons codés
-  en dur ailleurs.
-- **Pas d'éléments flottants non spécifiés.** Si un bouton/badge n'a pas
-  été explicitement demandé dans le brief, ne pas l'ajouter "au cas où".
+Le backend est Next.js App Router (routes API + Supabase/Prisma), avec un
+schéma de données couvrant profils, guides, réservations, avis, documents
+de vérification (voir `schema.prisma` déjà fourni au projet si disponible
+dans le repo).
+
+Une version mobile (React Native/Expo) est en cours de développement en
+parallèle, avec sa propre identité visuelle en cours de définition — les
+deux plateformes devront converger sur la même palette une fois validée,
+mais **ce briefing concerne uniquement le site web**.
 
 ---
 
-# PROMPT — Refonte visuelle exacte (à copier-coller pour Codex)
+## 1. Ce qui est demandé
 
-Refais entièrement le design d'HeriTogo pour qu'il ressemble **exactement**
-au style de l'image de référence fournie (mockup 3 écrans de téléphone,
-fond clair, cartes blanches à ombre douce, un seul accent doré-orangé,
-typographie sobre, beaucoup d'espace blanc). Palette imposée : **blanc pâle
-et jaune doré uniquement**. Pas de noir en fond, pas de vert, pas d'orange
-vif façon `#FF9700` — un jaune doré plus chaud et plus sobre.
+**Refonte complète de l'UI/UX du site web**, pas un ajustement cosmétique :
 
-## Palette à appliquer (remplace tout ce qui existe dans `globals.css`)
+- Page d'accueil (hero inclus)
+- Toutes les cards (sites, régions, cuisine, guides, parcs)
+- Toutes les sections de contenu
+- Boutons (primaire, secondaire, ghost, etc.) et tout le système d'icônes
+- Cohérence visuelle sur l'ensemble des pages existantes, pas seulement
+  l'accueil
+
+Le design actuel ne convient pas et doit être repensé, pas patché.
+
+---
+
+## 2. Stack technique à utiliser
+
+| Domaine | Choix |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Styling | Tailwind CSS v4 |
+| Composants UI de base | DaisyUI v5 (plugin Tailwind v4) |
+| Icônes | `lucide-react` |
+| Animations | `framer-motion` |
+
+**Point d'attention technique important pour Tailwind v4** : la
+configuration ne passe plus principalement par `tailwind.config.js` mais
+par la directive `@theme` directement dans le CSS global (`globals.css`
+ou équivalent), avec `@import "tailwindcss";`. DaisyUI v5 s'installe comme
+plugin CSS (`@plugin "daisyui";`) et non plus via `plugins: []` dans un
+fichier JS. L'agent doit vérifier la configuration actuelle du projet
+avant de commencer, pour ne pas mélanger l'ancienne syntaxe Tailwind v3
+(`tailwind.config.js` avec `theme.extend.colors`) et la nouvelle syntaxe
+CSS-first de v4 — les deux ne fonctionnent pas de la même façon et un
+mélange incohérent est une source d'erreurs fréquente lors de ce genre de
+migration/refonte.
+
+---
+
+## 3. Direction artistique et palette de couleurs
+
+### Intention générale
+
+Le sujet — patrimoine togolais, architecture Koutammakou, gastronomie,
+guides locaux — appelle une identité **chaude, terreuse, vivante**, pas une
+identité "app corporate" générique (pas de bleu nuit froid, pas de
+noir/orange qui ressemble à n'importe quelle app tech). L'inspiration vient
+des matériaux réels : terre cuite et enduit ocre des cases Tata Somba,
+teintes de la gastronomie locale (fufu, gari, sauce arachide), tissus wax.
+Pas de motifs "tribaux" clichés — la couleur et la typographie suffisent à
+porter cette identité si elles sont bien choisies.
+
+### Palette (à définir en `@theme` CSS, Tailwind v4)
 
 ```css
-:root {
-  --background:       #FBF9F4;
-  --foreground:       #221D17;
-  --card:             #FFFFFF;
-  --card-foreground:  #221D17;
-  --popover:          #FFFFFF;
-  --popover-foreground: #221D17;
+@theme {
+  /* Marque — terre cuite profonde, pas un orange criard */
+  --color-primary: #B5502E;
+  --color-primary-dark: #8A3A20;
+  --color-primary-light: #D97A52;
 
-  --primary:          #D9A441;
-  --primary-foreground: #241A08;
+  /* Accent — doré chaud, réservé aux éléments de valeur */
+  --color-accent: #D9A441;
 
-  --secondary:        #F4EAD4;
-  --secondary-foreground: #6B5324;
+  /* Touche rare — vert forêt, écotourisme/région Plateaux, équilibre visuel */
+  --color-forest: #3E5C45;
 
-  --accent:           #D9A441;
-  --accent-foreground: #241A08;
+  /* Mode clair */
+  --color-background: #FBF6EF;   /* ivoire chaud, jamais blanc pur */
+  --color-surface: #FFFFFF;
+  --color-ink: #2A1E16;
+  --color-ink-muted: #7A6A5C;
 
-  --muted:            #F4EFE4;
-  --muted-foreground: #79726419;
-
-  --border:           #ECE6D8;
-  --input:            #ECE6D8;
-  --ring:              #D9A441;
-  --radius:            1.25rem;
-
-  --destructive:      #DC2626;
-  --destructive-foreground: #FFFFFF;
-
-  --chart-1: #D9A441;
-  --chart-2: #E5BE72;
-  --chart-3: #F0D6A3;
-  --chart-4: #79726B;
-  --chart-5: #F4EFE4;
-}
-
-[data-theme='dark'] {
-  --background:       #1C1710;
-  --foreground:       #F7F1E4;
-  --card:             #262016;
-  --card-foreground:  #F7F1E4;
-  --popover:          #262016;
-  --popover-foreground: #F7F1E4;
-
-  --primary:          #E5BE72;
-  --primary-foreground: #241A08;
-
-  --secondary:        #3A2F1C;
-  --secondary-foreground: #F7F1E4;
-
-  --accent:           #E5BE72;
-  --accent-foreground: #241A08;
-
-  --muted:            #2A2418;
-  --muted-foreground: #B9AF9C;
-
-  --border:           #3A331F;
-  --input:            #3A331F;
-  --ring:              #E5BE72;
-
-  --destructive:      #FCA5A5;
-  --destructive-foreground: #7F1D1D;
+  /* Mode sombre */
+  --color-background-dark: #171009;  /* brun très foncé, jamais noir pur */
+  --color-surface-dark: #241A11;
+  --color-ink-on-dark: #F2E9DC;
+  --color-ink-muted-dark: #B5A390;
 }
 ```
 
-Corrige `--muted-foreground` ci-dessus si la valeur affichée comporte une
-faute de frappe (`#79726419` a 8 caractères, ce n'est pas un hex valide) —
-utilise `#7A7264`.
+Règles d'usage :
+- **Terracotta (`primary`) comme couleur dominante**, pas juste un accent
+  — c'est la couleur des CTA principaux, headers, éléments structurants.
+- **Doré (`accent`) utilisé avec parcimonie** — réservé aux badges de
+  valeur (UNESCO, notes/avis, mise en avant du scanner), jamais en fond
+  large.
+- **Vert forêt en touche rare** — région Écotourisme, icônes nature
+  uniquement. Ne pas en abuser, la palette doit rester dominée par les
+  tons terre/doré.
+- **Jamais de noir ou blanc purs** dans l'UI — utiliser les fonds
+  légèrement teintés définis ci-dessus.
 
-## Ce qu'il faut littéralement supprimer du fichier actuel
+### Typographie
 
-- Les blocs `--color-togo-savane`, `--color-togo-laterite`, `--color-togo-or`
-  et tout ce qui contient "Togo Vivant" — plus aucune couleur verte nulle
-  part dans le projet.
-- **Tous** les blocs `[data-theme='dark']` en double en bas du fichier (il
-  y en a au moins deux après le premier, avec des commentaires du style
-  "HeriTogo mobile" et "Compatibility layer") — un seul bloc `[data-theme=
-  'dark']` doit exister dans tout `globals.css`, celui donné ci-dessus.
-- Toutes les règles avec des sélecteurs `bg-\[#...\]`, `text-\[#...\]`,
-  `border-\[#...\]` et leurs `!important` associés — une fois que les
-  composants utilisent les vrais tokens (`bg-card`, `text-foreground`...),
-  ces rustines n'ont plus de raison d'exister.
-- L'alias `heritage-weave` marqué "Legacy compatibility" — s'il n'est plus
-  utilisé nulle part dans le code, supprime-le. S'il est encore utilisé,
-  renomme les usages vers `togo-underline` et supprime l'alias.
+- **Titres** : une serif à empattements marqués et du caractère (Fraunces
+  en priorité, Lora en alternative plus sobre si Fraunces pose un souci de
+  licence/poids de chargement) — ton "guide patrimoine/livre de voyage",
+  pas "landing page SaaS".
+- **Corps de texte** : Manrope ou Inter — neutre et lisible, laisse la
+  vedette aux titres et aux photos.
 
-## Ce qu'il faut construire, écran par écran, dans l'esprit de la référence
+---
 
-- **Fond de page** : `--background` (blanc cassé chaud), jamais de noir.
-- **Cards** : fond `--card` blanc pur, `box-shadow` doux uniquement
-  (`0 8px 24px rgba(34,29,23,.08)`), pas de bordure dure visible en plus
-  de l'ombre — comme les cards flottantes de la référence.
-- **Un seul bouton d'action visible par écran de contenu** — couleur
-  `--primary` (le jaune doré), forme pilule (`rounded-full`). Les actions
-  secondaires ("Trouver à proximité", filtres) passent en `--secondary`
-  (fond crème clair, texte foncé), jamais en couleur concurrente.
-- **Photos** : coins arrondis cohérents avec `--radius`, jamais de badge
-  numéroté en angle droit à côté d'un bouton en pilule sur le même écran —
-  choisis une seule forme de badge (pastille ronde ou étiquette
-  arrondie, jamais de carré à angle droit).
-- **Supprime les boutons flottants "Boîte à outils"** en bas d'écran tels
-  qu'ils apparaissent actuellement (mal cadrés, coupés) — s'ils doivent
-  exister, ce sera un composant dédié, positionné et testé, pas un ajout
-  flottant improvisé.
-- **Header** : fond clair (`--card` ou `--background`), pas de noir plein
-  comme actuellement — reprends la légèreté du header de la référence.
+## 4. Principes UI/UX à appliquer
 
-## Validation avant de considérer que c'est fini
+- **Photo-first** : le contenu réel (30 sites, 31 plats, 16 parcs) est
+  visuellement fort. Les cards doivent laisser la photo dominer (grand
+  ratio image, texte en overlay ou juste en dessous), pas la noyer dans du
+  chrome UI superflu.
+- **Badge UNESCO visuellement distinct** — Koutammakou est l'argument le
+  plus fort du projet, un badge doré bien identifiable sur les fiches
+  concernées renforce la crédibilité perçue.
+- **Le scanner IA reste l'élément signature** — doit rester mis en avant
+  visuellement (couleur accent/doré, position privilégiée), c'est la
+  fonctionnalité différenciante du produit.
+- **Boutons** : coins arrondis modérés (pas trop ronds, ça infantilise le
+  propos), pas d'ombres portées génériques type Material Design par
+  défaut de DaisyUI sans personnalisation — adapter le thème DaisyUI à la
+  palette ci-dessus plutôt que garder ses couleurs par défaut.
+- **Animations Framer Motion** : subtiles et fonctionnelles (fade-in au
+  scroll, transition douce sur hover des cards, parallax léger sur le
+  hero) — jamais gratuites ou distrayantes. Respecter
+  `prefers-reduced-motion`.
+- **Icônes Lucide** : cohérence de poids de trait sur tout le site, pas de
+  mélange avec d'autres sets d'icônes. Prévoir des icônes custom en SVG
+  uniquement si Lucide ne couvre pas un besoin spécifique (ex. motifs
+  patrimoine togolais).
+- **Accessibilité** : contrastes suffisants même avec la palette chaude
+  (vérifier notamment le texte sur fond `accent` doré, qui peut manquer de
+  contraste en clair — préférer du texte foncé dessus, pas blanc).
 
-- Grep le repo pour `bg-[#`, `text-[#`, `border-[#` — zéro résultat en
-  dehors de `globals.css` lui-même.
-- Grep `globals.css` pour `[data-theme='dark']` — une seule occurrence.
-- Aucune couleur verte (`#2D5A27`, `#81A87B`, ou équivalent) nulle part
-  dans le projet.
-- Compare visuellement chaque écran principal (Home, Lieux, Cuisine,
-  Scanner) à l'image de référence : un seul accent, fond clair, cards
-  blanches à ombre douce, pas de contraste noir/orange/vert.
+---
+
+## 5. Consignes non négociables (rappel du projet)
+
+- **Aucune donnée mock** : chaque section doit continuer à consommer les
+  vraies données existantes (API routes / Supabase), la refonte ne
+  touche que le visuel et la structure des composants, pas la source des
+  données.
+- **Utiliser les vraies images** de `public/Sites/`, `public/Cuisine/`,
+  `public/parks/` et les visuels hero existants — pas de nouvelles images
+  générées ou de placeholders.
+- **Ne pas casser les routes/URLs existantes** (`/lieux`, `/regions`,
+  `/cuisine`, `/scan`, `/guides`...) — la refonte est visuelle et
+  structurelle au niveau des composants, pas une réorganisation de
+  l'architecture des pages sauf si explicitement demandé plus tard.
+
+---
+
+## 6. Ce qui est attendu comme premier livrable
+
+Avant de tout refaire d'un coup, procéder dans cet ordre et rapporter
+l'avancement :
+
+1. Vérifier la configuration actuelle Tailwind v4 / DaisyUI v5 du projet
+   (fichier CSS global, présence ou non de `tailwind.config.js` résiduel
+   de v3 à nettoyer).
+2. Mettre en place la palette (`@theme`) et le thème DaisyUI personnalisé.
+3. Refaire le **hero de la page d'accueil** en premier, comme validation
+   de direction artistique avant de propager sur le reste.
+4. Une fois le hero validé, enchaîner sur : cards génériques (site, plat,
+   parc, guide), sections de la page d'accueil, boutons, puis les pages
+   secondaires (lieux, régions, cuisine, guides).
+
+Ne pas attendre une confirmation entre chaque étape mineure si le compte
+est en mode gratuit — mais s'arrêter après le hero pour validation avant
+de propager à l'ensemble du site.

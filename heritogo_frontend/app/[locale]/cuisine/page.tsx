@@ -2,11 +2,13 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { ArrowRight, ChefHat, Clock, Filter, MapPin, Navigation, Search, Star, Utensils } from 'lucide-react'
+import { ChefHat, Filter, MapPin, Search, Utensils, Sparkles, Navigation, ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
+import DishCard from '@/components/ui/DishCard'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 const categoryFilters = ['all', 'Ayimolou', 'Fufu', 'Djenkoumé', 'Gboma', 'Akoumé', 'Wagasi', 'Gombo', 'Boissons'] as const
 type CategoryFilter = (typeof categoryFilters)[number]
@@ -26,20 +28,9 @@ export default function CuisinePage() {
       case 'Djenkoumé': return t('filters.djenkoume')
       case 'Gboma': return t('filters.gboma')
       case 'Akoumé': return t('filters.akoume')
-      case 'Wagasi': return 'Wagasi'
+      case 'Wagasi': return 'Wagasi (Fromage)'
       case 'Gombo': return 'Gombo (Fétri)'
-      case 'Boissons': return 'Boissons'
-      default: return category
-    }
-  }
-
-  const getCategoryName = (category: string): string => {
-    switch (category) {
-      case 'Accompagnement': return t('categories.accompagnement')
-      case 'Plat Principal': return t('categories.plat_principal')
-      case 'Street Food': return t('categories.street_food')
-      case 'Sauce': return t('categories.sauce')
-      case 'Boisson': return 'Boisson Traditionnelle'
+      case 'Boissons': return 'Boissons locales'
       default: return category
     }
   }
@@ -48,240 +39,186 @@ export default function CuisinePage() {
     const platName = tPlats(`${plat.id}.nom`).toLowerCase()
     const platDescription = tPlats(`${plat.id}.description`).toLowerCase()
     const search = searchInput.toLowerCase()
-    const matchesSearch = platName.includes(search) || platDescription.includes(search) || plat.catégorie.toLowerCase().includes(search)
-    const matchesCategory = selectedCategory === 'all' || platName.includes(selectedCategory.toLowerCase())
+    const matchesSearch =
+      platName.includes(search) ||
+      platDescription.includes(search) ||
+      plat.catégorie.toLowerCase().includes(search)
+    const matchesCategory =
+      selectedCategory === 'all' || platName.includes(selectedCategory.toLowerCase())
     return matchesSearch && matchesCategory
   })
 
-  const categoryRestaurants = useMemo(() => {
-    if (selectedCategory === 'all') return restaurants.slice(0, 4)
-    return restaurants.filter((restaurant) =>
-      restaurant.plats_ids.some((platId) => {
-        const plat = platsTogolais.find((item) => item.id === platId)
-        return plat ? tPlats(`${plat.id}.nom`).toLowerCase().includes(selectedCategory.toLowerCase()) : false
-      })
-    )
-  }, [selectedCategory, tPlats])
+  const featuredRestaurants = useMemo(() => {
+    return restaurants.slice(0, 4)
+  }, [])
 
   return (
-    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-card px-3 pb-28 pt-20 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-7xl min-w-0 space-y-8">
-
-        {/* ── HEADER & FILTRES ── */}
-        {/* Fix débordement mobile : les enfants d'un grid/flex ont une largeur
-            min-content implicite (min-width: auto). Le badge "hero_badge" en
-            inline-flex + uppercase + tracking-wider forçait sa ligne à rester
-            entière et poussait tout le bloc plus large que l'écran. Fix :
-            grid-cols-1 explicite en base + min-w-0 sur chaque item + le badge
-            peut désormais retourner à la ligne (flex-wrap + max-w-full). */}
-        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,1.1fr)] lg:items-stretch">
-
-          {/* Bloc intro */}
-          <div className="min-w-0 overflow-hidden rounded-2xl bg-muted p-5 shadow-[0_4px_14px_rgba(34,29,23,0.05)] sm:p-7">
-            <div className="mb-3 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
-              <ChefHat className="h-4 w-4 shrink-0" />
-              <span className="break-words">{t('hero_badge')}</span>
+    <main className="min-h-screen bg-background pb-28 pt-8 text-foreground">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* ── HEADER & SEARCH BANNER ── */}
+        <section className="app-card relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-card via-card to-primary/5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+                <ChefHat className="h-4 w-4" />
+                <span>{t('hero_badge')}</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
+                {t('page_title')}
+              </h1>
+              <div className="togo-underline" />
+              <p className="text-sm sm:text-base font-medium leading-relaxed text-muted-foreground pt-1">
+                {t('page_subtitle')}
+              </p>
             </div>
-            <h1 className="break-words font-serif text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
-              {t('page_title')}
-            </h1>
-            <div className="togo-underline" />
-            <p className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground">
-              {t('page_subtitle')}
-            </p>
+
+            {/* Search Input */}
+            <div className="w-full lg:w-96 space-y-2">
+              <div className="relative flex items-center rounded-2xl border border-border bg-card px-3.5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={searchInput}
+                  onChange={(e) => startTransition(() => setSearchInput(e.target.value))}
+                  placeholder={t('search_placeholder')}
+                  className="min-h-12 w-full bg-transparent px-3 text-sm font-medium outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              <p className="text-xs font-semibold text-muted-foreground text-right">
+                {filteredPlats.length} spécialité{filteredPlats.length > 1 ? 's' : ''} togolaise{filteredPlats.length > 1 ? 's' : ''}
+              </p>
+            </div>
           </div>
 
-          {/* Recherche & Filtres */}
-          <div className="flex min-w-0 flex-col justify-between rounded-2xl bg-muted p-4 shadow-[0_4px_14px_rgba(34,29,23,0.05)] sm:p-5">
-            <label className="flex min-h-12 min-w-0 items-center rounded-2xl bg-card px-3.5 shadow-[0_1px_4px_rgba(34,29,23,0.06)] transition-all focus-within:ring-2 focus-within:ring-primary/20">
-              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-              <input
-                type="search"
-                value={searchInput}
-                onChange={(event) => startTransition(() => setSearchInput(event.target.value))}
-                placeholder={t('search_placeholder')}
-                className="min-w-0 flex-1 bg-transparent px-3 text-xs font-medium outline-none placeholder:text-muted-foreground"
-              />
-            </label>
-
-            <div className="mt-4 min-w-0">
-              <div className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                <Filter className="h-3.5 w-3.5 shrink-0 text-primary" />
-                <span>{t('filter_category')}</span>
-              </div>
-
-              <div className="-mx-1 flex w-full min-w-0 gap-2 overflow-x-auto px-1 pb-1 scrollbar-none sm:flex-wrap sm:overflow-visible">
-                {categoryFilters.map((category) => {
-                  const active = selectedCategory === category
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() => setSelectedCategory(category)}
-                      className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold transition-all cursor-pointer ${
-                        active
-                          ? 'bg-primary text-primary-foreground shadow-[0_2px_8px_rgba(34,29,23,0.1)]'
-                          : 'bg-card text-foreground hover:bg-primary/10 hover:text-primary'
-                      }`}
-                    >
-                      <Utensils className="h-3 w-3 shrink-0" />
-                      <span className="whitespace-nowrap">{getFilterLabel(category)}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+          {/* Filter Chips */}
+          <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+            <span className="text-xs font-bold text-muted-foreground mr-1 flex items-center gap-1">
+              <Filter className="h-3 w-3" />
+              <span>Spécialités :</span>
+            </span>
+            {categoryFilters.map((category) => {
+              const active = selectedCategory === category
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => startTransition(() => setSelectedCategory(category))}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                    active
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'border border-border bg-card text-foreground hover:border-primary/50'
+                  }`}
+                >
+                  {getFilterLabel(category)}
+                </button>
+              )
+            })}
           </div>
         </section>
 
-        {searchInput && (
-          <p className="break-words rounded-full bg-muted px-4 py-2.5 text-xs font-semibold text-muted-foreground">
-            {t('results_for')} <span className="font-bold text-primary">{searchInput}</span>
-          </p>
-        )}
-
-        {/* ── PLATS TRADITIONNELS ── */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <div className="min-w-0">
-              <h2 className="text-xl font-black text-foreground sm:text-2xl">Plats &amp; Délices du Terroir</h2>
-              <span className="text-xs font-medium text-muted-foreground">
-                {filteredPlats.length} {filteredPlats.length > 1 ? 'spécialités' : 'spécialité'}
-              </span>
-            </div>
-          </div>
+        {/* ── GRILLE DES PLATS ── */}
+        <section className="space-y-6">
+          <SectionHeader
+            kicker="Terroir & Saveurs"
+            title="Spécialités Emblématiques du Togo"
+            subtitle="Explorez les recettes traditionnelles, sauces riches et street-food légendaire du pays."
+            icon={Sparkles}
+          />
 
           {filteredPlats.length === 0 ? (
-            <div className="mx-auto my-12 max-w-md rounded-2xl bg-muted p-8 text-center shadow-[0_4px_14px_rgba(34,29,23,0.05)]">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-                <ChefHat className="h-6 w-6" />
-              </div>
-              <p className="mt-3 font-serif text-lg font-bold text-foreground">{t('no_plats')}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t('try_other')}</p>
+            <div className="app-card flex flex-col items-center justify-center p-12 text-center space-y-3">
+              <ChefHat className="h-10 w-10 text-primary opacity-60" />
+              <h3 className="font-serif text-xl font-bold">{t('empty_search')}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-md">
+                {t('try_other')}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchInput('')
+                  setSelectedCategory('all')
+                }}
+                className="mt-2 inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark"
+              >
+                {t('reset_filters')}
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredPlats.map((plat) => (
-                <Link
+                <DishCard
                   key={plat.id}
-                  href={`/cuisine/${plat.id}`}
-                  className="group flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card shadow-[0_4px_14px_rgba(34,29,23,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(34,29,23,0.12)] active:scale-[0.98]"
-                >
-                  <div className="relative h-48 overflow-hidden bg-muted">
-                    <Image
-                      src={plat.image}
-                      alt={tPlats(`${plat.id}.nom`)}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <span className="absolute left-3 top-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground shadow-sm">
-                      {getCategoryName(plat.catégorie)}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-1 flex-col justify-between space-y-2 p-4">
-                    <div className="min-w-0">
-                      <h3 className="break-words font-bold leading-snug text-foreground">
-                        {tPlats(`${plat.id}.nom`)}
-                      </h3>
-                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                        {tPlats(`${plat.id}.description`)}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between border-t border-border pt-2">
-                      <span className="text-xs font-semibold text-muted-foreground">{t('know_more')}</span>
-                      <ArrowRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </div>
-                </Link>
+                  id={plat.id}
+                  nom={tPlats(`${plat.id}.nom`)}
+                  categorie={plat.catégorie}
+                  description={tPlats(`${plat.id}.description`)}
+                  image={plat.image}
+                />
               ))}
             </div>
           )}
         </section>
 
-        {/* ── RESTAURANTS ── */}
-        {categoryRestaurants.length > 0 && (
-          <section className="space-y-4 rounded-2xl bg-muted p-5 shadow-[0_4px_14px_rgba(34,29,23,0.05)] sm:p-7">
-            <div className="flex flex-col gap-2 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <h2 className="text-xl font-black text-foreground sm:text-2xl">
-                  {selectedCategory === 'all' ? t('top_restaurants') : t('restaurants_available', { count: categoryRestaurants.length })}
-                </h2>
-                <p className="text-xs text-muted-foreground">Adresses recommandées pour déguster ces spécialités</p>
+        {/* ── RESTAURANTS & MAQUIS EN VEDETTE ── */}
+        <section className="app-card p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <Utensils className="h-3.5 w-3.5" />
+                <span>Bonnes Tables</span>
               </div>
-              <span className="w-fit shrink-0 rounded-full bg-primary px-3 py-1 text-[10px] font-black uppercase text-primary-foreground">
-                {selectedCategory === 'all' ? t('selection') : getFilterLabel(selectedCategory)}
-              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">
+                Où déguster la gastronomie togolaise ?
+              </h2>
             </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {categoryRestaurants.map((resto, index) => (
-                <article key={resto.id} className="min-w-0 space-y-3 rounded-2xl bg-card p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-bold text-foreground">{resto.nom}</h3>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
-                        <span className="truncate">{resto.quartier || t('lome_area')}</span>
-                      </p>
-                    </div>
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">
-                      <Star className="h-3 w-3 fill-primary text-primary" />
-                      {resto.note || (4 + index * 0.1).toFixed(1)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <span className="flex min-w-0 items-center gap-1 truncate text-[11px] text-muted-foreground">
-                      <Clock className="h-3 w-3 shrink-0" />
-                      {resto.horaires || t('default_hours')}
-                    </span>
-                    <a
-                      href={`https://maps.google.com/?q=${resto.lat},${resto.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground transition-all hover:brightness-110"
-                    >
-                      <Navigation className="h-3 w-3" />
-                      <span>{t('directions')}</span>
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── CONSEILS GOURMANDS DU TOURISTE ── */}
-        <section className="space-y-4 rounded-3xl bg-card p-6 shadow-[0_4px_14px_rgba(34,29,23,0.05)]">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
-            <Utensils className="h-4 w-4 shrink-0" />
-            <span>Guide Gourmand du Voyageur</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Maquis authentiques & restaurants renommés
+            </span>
           </div>
-          <h2 className="break-words font-serif text-xl font-bold text-foreground">Comment savourer la cuisine togolaise comme un local</h2>
-          <div className="grid gap-3 pt-2 sm:grid-cols-3">
-            <div className="min-w-0 space-y-1.5 rounded-2xl bg-muted p-4">
-              <ChefHat className="h-5 w-5 text-primary" />
-              <h3 className="text-xs font-bold text-foreground">L’art du Maquis &amp; du Bol d’eau</h3>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Avant de manger le Fufu ou l’Akoumé avec les doigts (main droite), on vous apportera toujours un bol d’eau tiède et du savon pour vous laver les mains.
-              </p>
-            </div>
-            <div className="min-w-0 space-y-1.5 rounded-2xl bg-muted p-4">
-              <Utensils className="h-5 w-5 text-primary" />
-              <h3 className="text-xs font-bold text-foreground">Piment selon votre goût</h3>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Si vous craignez le piment fort, demandez toujours <em className="font-bold text-foreground">« sans piment direct »</em> ou demandez le piment noir (Shito/Yébéessé) servi à part dans une coupelle.
-              </p>
-            </div>
-            <div className="min-w-0 space-y-1.5 rounded-2xl bg-muted p-4">
-              <MapPin className="h-5 w-5 text-primary" />
-              <h3 className="text-xs font-bold text-foreground">Petits budgets, grands festins</h3>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Un copieux plat d’Ayimolou ou d’Ablo avec poisson coûte généralement entre 500 et 1 500 FCFA (0,80 € à 2,30 €). Ayez toujours de la petite monnaie.
-              </p>
-            </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredRestaurants.map((resto) => (
+              <div
+                key={resto.id}
+                className="app-card flex flex-col justify-between p-4 bg-muted/40 border-border"
+              >
+                <div className="space-y-2">
+                  <h3 className="font-serif text-base font-bold text-foreground line-clamp-1">
+                    {resto.nom}
+                  </h3>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
+                    <span className="truncate">{resto.adresse}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    {resto.quartier && (
+                      <span className="rounded-full bg-card border border-border px-2.5 py-0.5 text-[10px] font-semibold text-foreground">
+                        {resto.quartier}
+                      </span>
+                    )}
+                    {resto.budget_fcfa && (
+                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
+                        {resto.budget_fcfa} FCFA
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
+                  <span className="font-bold text-primary">{resto.telephone || 'Lomé, Togo'}</span>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resto.nom + ' ' + resto.adresse)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                  >
+                    <span>GPS</span>
+                    <Navigation className="h-3 w-3 text-primary" />
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

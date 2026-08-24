@@ -36,7 +36,7 @@
         "explorers": "{count}+ exploradores",
         "discover": "Descubrir",
         "scroll": "Desplazarse",
-        "hackathon_badge": "#TCCHackDefend2026",
+        "hackathon_badge": "Patrimonio UNESCO",
         "slides": {
             "0": {
                 "title": "Heritogo",
@@ -941,6 +941,7 @@
             "status_cancelled": "Cancelado",
             "booking_type": "Tipo: {type}",
             "offer_label": "Oferta: {amount} FCFA",
+            "accept_quote": "Aceptar presupuesto",
             "view_guide": "Ver guía",
             "leave_review": "Dejar una opinión",
             "review_left": "Opinión dejada ({rating}/5)",

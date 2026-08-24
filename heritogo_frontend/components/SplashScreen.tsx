@@ -64,7 +64,7 @@ export default function SplashScreen() {
             transition={{ delay: 0.3 }}
             className="absolute bottom-7 text-[11px] font-semibold text-white/50 tracking-widest uppercase"
           >
-            TCC Hack &amp; Defend 2026
+            heritogo.codorah.com
           </motion.p>
         </motion.div>
       )}

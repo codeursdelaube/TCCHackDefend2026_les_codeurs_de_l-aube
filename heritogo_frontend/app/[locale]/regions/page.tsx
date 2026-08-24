@@ -4,10 +4,14 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowRight, ChefHat, Compass, Landmark, MapPin, Star, TreePine, Waves
+  ArrowRight, ChefHat, Compass, Landmark, MapPin, Sparkles, TreePine, Waves, Globe2
 } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
+import Badge from '@/components/ui/Badge'
+import SectionHeader from '@/components/ui/SectionHeader'
+import { monuments } from '@/app/LieuxT/site'
+import SiteCard from '@/components/ui/SiteCard'
 
 /* ─── Types ─────────────────────────────────────────── */
 interface RegionSpecialty {
@@ -18,402 +22,393 @@ interface RegionSpecialty {
 interface TogoRegion {
   id: string
   nom: string
+  regionKey: 'Maritime' | 'Plateaux' | 'Centrale' | 'Kara' | 'Savanes'
   capitale: string
   description: string
   tagline: string
-  image: string          // image principale
-  sites: string[]        // noms de sites emblématiques (statiques)
-  plats: string[]        // spécialités culinaires
-  activites: string[]    // choses à faire
+  image: string
+  sites: string[]
+  plats: string[]
+  activites: string[]
   stat: { value: string; label: string }[]
   highlights: RegionSpecialty[]
-  siteIds: string[]      // IDs dans /lieux/[id] pour les liens
 }
 
-/* ─── Données Régions ────────────────────────────────── */
-// NOTE DESIGN : les anciens champs `coverColor` et `accent` valaient
-// toujours `var(--primary)` sur les 5 régions — un seul accent existe dans
-// le système, donc ces champs étaient redondants (et poussaient à du style
-// inline). Supprimés : on utilise directement la classe `bg-primary`.
 const regionsData: TogoRegion[] = [
   {
     id: 'maritime',
     nom: 'Région Maritime',
+    regionKey: 'Maritime',
     capitale: 'Lomé',
-    tagline: 'La porte de l\'Afrique de l\'Ouest',
+    tagline: 'La porte atlantique & l’effervescence côtière',
     description:
-      'La Région Maritime est le cœur économique et culturel du Togo. Lomé, sa capitale, est l\'une des rares capitales africaines situées directement sur la frontière d\'un pays — entre plage et avenue. Elle concentre palais coloniaux, marchés animés, cathédrales historiques et une gastronomie de bord de mer incomparable.',
+      'La Région Maritime est le cœur économique et culturel du Togo. Lomé, sa capitale, est l’une des rares capitales africaines situées directement sur la côte atlantique. Elle concentre palais coloniaux, marchés animés (Assigamé), cathédrales historiques et une gastronomie de bord de mer incomparable.',
     image: '/Sites/palais_de_lome.webp',
-    sites: ['Grand Marché d\'Assigamé', 'Cathédrale de Lomé', 'Palais de Lomé', 'Monument du Centenaire', 'Maison des Esclaves'],
-    plats: ['Soupe de poisson', 'Riz gras', 'Brochettes de viande', 'Agbeli', 'Akpan (bière de mil)'],
-    activites: ['Visite du Grand Marché', 'Promenade sur la plage de Lomé', 'Tour de la Corniche', 'Shopping village artisanal'],
+    sites: ['Grand Marché d’Assigamé', 'Cathédrale de Lomé', 'Palais de Lomé', 'Monument de l’Indépendance', 'Maison des Esclaves (Agbodrafo)'],
+    plats: ['Soupe de poisson frais', 'Ayimolou royal', 'Brochettes de mérou', 'Ablo & Akpan', 'Jus de baobab'],
+    activites: ['Visite du Grand Marché', 'Promenade sur la plage de Lomé', 'Tour du Palais de Lomé', 'Artisanat au Village Artisanal'],
     stat: [
-      { value: '5', label: 'Sites majeurs' },
+      { value: '12', label: 'Monuments majeurs' },
       { value: '2M+', label: 'Habitants' },
-      { value: '50 km', label: 'De côte' },
+      { value: '50 km', label: 'Côte atlantique' },
     ],
     highlights: [
-      { nom: 'Grand Marché d\'Assigamé', type: 'site' },
       { nom: 'Palais de Lomé', type: 'site' },
-      { nom: 'Soupe de poisson', type: 'plat' },
-      { nom: 'Plage de Lomé', type: 'activite' },
+      { nom: 'Grand Marché d’Assigamé', type: 'site' },
+      { nom: 'Ayimolou', type: 'plat' },
+      { nom: 'Plage & Lac Togo', type: 'activite' },
     ],
-    siteIds: ['grand_marche_lome', 'cathedrale_lome', 'palais_de_lome', 'marche_fetiches_akodessewa', 'togoville_sanctuaire', 'aneho_cite_coloniale', 'plage_de_lome'],
   },
   {
     id: 'plateaux',
     nom: 'Région des Plateaux',
+    regionKey: 'Plateaux',
     capitale: 'Atakpamé',
-    tagline: 'La Suisse de l\'Afrique de l\'Ouest',
+    tagline: 'Cascades, montagnes & plantations de café',
     description:
-      'La Région des Plateaux est réputée pour ses paysages montagneux, ses cascades spectaculaires et ses plantations de café et de cacao. Le Mont Agou (986 m), point culminant du Togo, y trône majestueusement. Kpalimé, ville principale, est entourée d\'une forêt tropicale dense traversée par des sentiers de randonnée.',
+      'La Région des Plateaux est réputée pour ses paysages montagneux luxuriants, ses cascades spectaculaires et ses plantations de café et de cacao. Le Mont Agou (986 m), point culminant du Togo, y trône majestueusement au-dessus de Kpalimé et de ses galeries d’artisanat d’art.',
     image: '/Sites/kpalimé.jpg',
-    sites: ['Mont Agou (986 m)', 'Cascades de Kpimé', 'Cascade d\'Aklowa', 'Château Viale', 'Muraille de Notsè'],
-    plats: ['Fufu de montagne', 'Café du Kloto', 'Igname pilée', 'Haricot rouge', 'Mangue sauvage'],
-    activites: ['Randonnée au Mont Agou', 'Visite des cascades', 'Dégustation café artisanal', 'Observation des papillons'],
+    sites: ['Mont Agou (986 m)', 'Cascades de Kpimé', 'Cascade d’Aklowa', 'Château Vial', 'Muraille de Notsè'],
+    plats: ['Fufu traditionnel à la sauce graine', 'Café artisanal du Kloto', 'Djenkoumé', 'Bananes plantains frites (Aloco)'],
+    activites: ['Randonnée au Mont Agou', 'Baignade aux cascades', 'Dégustation de café équitable', 'Observation des papillons tropicaux'],
     stat: [
-      { value: '6', label: 'Sites majeurs' },
-      { value: '986 m', label: 'Mont Agou' },
-      { value: '60+', label: 'Espèces papillons' },
+      { value: '6', label: 'Sites naturels' },
+      { value: '986 m', label: 'Point culminant' },
+      { value: '60+', label: 'Cascades & cours d’eau' },
     ],
     highlights: [
-      { nom: 'Mont Agou', type: 'site' },
-      { nom: 'Cascades de Kpimé', type: 'site' },
-      { nom: 'Café du Kloto', type: 'plat' },
-      { nom: 'Randonnée forêt', type: 'activite' },
+      { nom: 'Cascade de Kpimé', type: 'site' },
+      { nom: 'Château Vial', type: 'site' },
+      { nom: 'Fufu Sauce Graine', type: 'plat' },
+      { nom: 'Randonnée du Kloto', type: 'activite' },
     ],
-    siteIds: ['kpalime', 'chateau_vial', 'cascade_yikpa', 'cascade_kpime', 'cascade_aklowa', 'notse_agbogbo'],
   },
   {
     id: 'centrale',
     nom: 'Région Centrale',
+    regionKey: 'Centrale',
     capitale: 'Sokodé',
-    tagline: 'Le cœur sauvage du Togo',
+    tagline: 'Le sanctuaire sauvage & la culture Kotokoli',
     description:
-      'La Région Centrale abrite le Parc National de Fazao-Malfakassa, l\'un des plus grands parcs protégés d\'Afrique de l\'Ouest. Elle est le berceau de la culture Kotokoli et des traditions de pêche du lac Nangbéto. Une région pour les amoureux de nature sauvage, d\'éléphants et de traditions ancestrales.',
+      'La Région Centrale abrite le Parc National de Fazao-Malfakassa, l’un des plus vastes parcs protégés d’Afrique de l’Ouest. Elle est le berceau de la culture Kotokoli, des danses des couteaux lors de la fête Gadao-Adossa et des traditions de pêche paisible du lac Nangbéto.',
     image: '/Sites/fazao_malfakassa.jpg',
-    sites: ['Parc de Fazao-Malfakassa', 'Lac Nangbéto & Barrage', 'Sokodé Historique', 'Fête Gadao-Adossa'],
-    plats: ['Tô de sorgho', 'Soupe de baobab', 'Beurre de karité', 'Viande de gibier'],
-    activites: ['Safari faune', 'Pêche traditionnelle au lac', 'Rencontre peuple Kotokoli', 'Observation éléphants'],
+    sites: ['Parc National Fazao-Malfakassa', 'Lac Nangbéto & Barrage', 'Sokodé Historique', 'Forêt classée d’Alédjo'],
+    plats: ['Tô de sorgho', 'Soupe de baobab & gombo', 'Viande braisée au beurre de karité', 'Beignets Botokoin'],
+    activites: ['Safari faune sauvage', 'Pêche traditionnelle au lac', 'Festival équestre Gadao-Adossa', 'Observation des éléphants'],
     stat: [
       { value: '192k ha', label: 'Parc protégé' },
       { value: '300+', label: 'Espèces animales' },
-      { value: '5', label: 'Ethnies' },
+      { value: '5', label: 'Cités historiques' },
     ],
     highlights: [
-      { nom: 'Parc de Fazao', type: 'site' },
+      { nom: 'Fazao-Malfakassa', type: 'site' },
       { nom: 'Lac Nangbéto', type: 'site' },
       { nom: 'Tô de sorgho', type: 'plat' },
-      { nom: 'Safari faune', type: 'activite' },
+      { nom: 'Festival Gadao-Adossa', type: 'activite' },
     ],
-    siteIds: ['parc_fazao_malfakassa', 'lac_de_nangbeto', 'sokode_centre'],
   },
   {
     id: 'kara',
     nom: 'Région de la Kara',
+    regionKey: 'Kara',
     capitale: 'Kara',
-    tagline: 'Patrimoine UNESCO & magie Tamberma',
+    tagline: 'Patrimoine mondial UNESCO & forteresses Tata Somba',
     description:
-      'La Région de la Kara est dominée par les impressionnantes tours-châteaux de Koutamakou, inscrites au patrimoine mondial de l\'UNESCO. Ce territoire habité par le peuple Batammariba est un monde à part entière, avec ses châteaux-tours de terre (takienta), ses forgerons ancestraux et ses rites initiatiques.',
+      'La Région de la Kara est dominée par les impressionnants châteaux-tours du Koutammakou, inscrits au Patrimoine Mondial de l’UNESCO. Ce territoire habité par le peuple Batammariba témoigne d’une harmonie unique entre architecture en terre (Takienta), forgerons ancestraux et rites traditionnels.',
     image: '/Sites/koutamakou.jpg',
-    sites: ['Koutamakou (UNESCO)', 'Faille d\'Alédjo', 'Réserve de Sarakawa', 'Forgerons de Tcharè'],
-    plats: ['Djenkoumé', 'Pâte de mil blanc', 'Viande de mouton', 'Bière locale (tchoukoutou)', 'Wagasi'],
-    activites: ['Visite villages Tamberma', 'Rencontre forgerons Tcharè', 'Traversée Faille d\'Alédjo', 'Découverte rites initiatiques'],
+    sites: ['Koutammakou (UNESCO)', 'Faille d’Alédjo', 'Réserve de faune de Sarakawa', 'Forgerons de Tcharè'],
+    plats: ['Wagasi frit (fromage local)', 'Djenkoumé doré', 'Pâte de mil blanc', 'Tchoukoutou traditionnel'],
+    activites: ['Exploration des Tata Somba', 'Rencontre des forgerons de Tcharè', 'Passage de la faille d’Alédjo', 'Lutte traditionnelle Evala'],
     stat: [
       { value: 'UNESCO', label: 'Patrimoine mondial' },
-      { value: '36k ha', label: 'Zone protégée' },
-      { value: '20k', label: 'Batammariba' },
+      { value: '36k ha', label: 'Zone classée' },
+      { value: '4', label: 'Monuments signatures' },
     ],
     highlights: [
-      { nom: 'Koutamakou UNESCO', type: 'site' },
-      { nom: 'Faille d\'Alédjo', type: 'site' },
-      { nom: 'Tchoukoutou', type: 'plat' },
-      { nom: 'Forgerons Tcharè', type: 'activite' },
+      { nom: 'Koutammakou (UNESCO)', type: 'site' },
+      { nom: 'Faille d’Alédjo', type: 'site' },
+      { nom: 'Wagasi & Tchoukoutou', type: 'plat' },
+      { nom: 'Luttes Evala', type: 'activite' },
     ],
-    siteIds: ['koutamakou', 'faille_aledjo', 'reserve_sarakawa', 'forgerons_tchare'],
   },
   {
     id: 'savanes',
     nom: 'Région des Savanes',
+    regionKey: 'Savanes',
     capitale: 'Dapaong',
-    tagline: 'L\'extrême nord, terre de résilience',
+    tagline: 'L’extrême nord, grottes rupestres & réserves sahéliennes',
     description:
-      'La Région des Savanes, à la frontière du Burkina Faso, est la région la plus septentrionale du Togo. Ses immenses étendues de savane, ses termitières géantes, ses peintures rupestres préhistoriques et ses greniers suspendus de Nok en font une destination authentique hors des sentiers battus.',
-    image: '/Sites/oti_mandouri.jpg',
-    sites: ['Réserve Oti-Mandouri', 'Grottes et Greniers de Nok', 'Peintures de Namoundjoga', 'Marché de Dapaong'],
-    plats: ['Gboma (épinards)', 'Soupe d\'arachide', 'Tô blanc de mil', 'Wagasi frit', 'Piment séché'],
-    activites: ['Observation faune sauvage', 'Exploration grottes de Nok', 'Découverte art rupestre', 'Marché artisanal Dapaong'],
+      'La Région des Savanes, aux portes du Sahel, séduit par ses paysages infinis parsemés de baobabs géants. Les célèbres grottes et greniers suspendus de Nok, datant des temps de résistance, et les peintures rupestres de Namoundjoga constituent des trésors archéologiques inestimables.',
+    image: '/Sites/grottes_nok.jpg',
+    sites: ['Grottes & Greniers de Nok', 'Réserve Oti-Mandouri', 'Peintures de Namoundjoga', 'Marché artisanal de Dapaong'],
+    plats: ['Gboma aux épinards locaux', 'Soupe onctueuse d’arachide', 'Tô de mil blanc', 'Wagasi grillé'],
+    activites: ['Exploration des falaises de Nok', 'Safari à Oti-Mandouri', 'Découverte de l’art rupestre', 'Marché traditionnel de Dapaong'],
     stat: [
       { value: '147k ha', label: 'Réserve naturelle' },
       { value: '100+', label: 'Greniers de Nok' },
-      { value: '15+', label: 'Ethnies locales' },
+      { value: '4', label: 'Sites archéologiques' },
     ],
     highlights: [
-      { nom: 'Réserve Oti-Mandouri', type: 'site' },
       { nom: 'Grottes de Nok', type: 'site' },
-      { nom: 'Art Rupestre', type: 'site' },
-      { nom: 'Dapaong', type: 'activite' },
+      { nom: 'Réserve Oti-Mandouri', type: 'site' },
+      { nom: 'Peintures Namoundjoga', type: 'site' },
+      { nom: 'Marché de Dapaong', type: 'activite' },
     ],
-    siteIds: ['reserve_oti_mandouri', 'peintures_namoundjoga', 'grottes_de_nok', 'dapaong_marche'],
   },
 ]
 
-/* ─── Helpers ────────────────────────────────────────── */
 function TypeBadge({ type }: { type: RegionSpecialty['type'] }) {
   const cfg = {
-    site:     { label: 'Site',       icon: Landmark },
-    plat:     { label: 'Spécialité', icon: ChefHat },
-    activite: { label: 'Activité',   icon: Compass  },
+    site: { label: 'Site', icon: Landmark },
+    plat: { label: 'Saveur', icon: ChefHat },
+    activite: { label: 'Activité', icon: Compass },
   }[type]
   const Ic = cfg.icon
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase text-white shadow-xs">
       <Ic className="h-2.5 w-2.5" />
       {cfg.label}
     </span>
   )
 }
 
-/* ─── Page Principale ────────────────────────────────── */
 export default function RegionsPage() {
   const tMonuments = useTranslations('Monuments')
   const [selectedRegion, setSelectedRegion] = useState<string>(regionsData[0].id)
-  const region = regionsData.find(r => r.id === selectedRegion) ?? regionsData[0]
+  const region = regionsData.find((r) => r.id === selectedRegion) ?? regionsData[0]
+
+  const regionMonuments = monuments.filter((m) => m.région === region.regionKey)
 
   return (
-    <main className="min-h-screen bg-card pb-28 pt-16 text-foreground">
+    <main className="min-h-screen bg-background pb-28 pt-20 text-foreground">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        {/* ── HERO BANDEAU ── */}
+        <section className="relative isolate min-h-[340px] sm:min-h-[380px] overflow-hidden rounded-3xl border border-border bg-[#171009] shadow-xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={region.id}
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Image
+                src={region.image}
+                alt={region.nom}
+                fill
+                priority
+                sizes="(max-width: 1200px) 100vw, 1200px"
+                className="object-cover brightness-[0.85]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#171009] via-[#171009]/55 to-transparent" />
+            </motion.div>
+          </AnimatePresence>
 
-      {/* ── HERO RÉGIONS ── */}
-      <section className="relative h-72 w-full overflow-hidden sm:h-80">
-        <AnimatePresence mode="popLayout">
+          <div className="relative z-10 flex min-h-[340px] sm:min-h-[380px] flex-col justify-end p-6 sm:p-10 text-white">
+            <div className="max-w-2xl space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                <Globe2 className="h-3.5 w-3.5" />
+                <span>5 Régions, 5 Univers</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#FBF6EF]">
+                {region.nom}
+              </h1>
+              <p className="text-sm sm:text-base font-medium text-amber-200">
+                {region.tagline}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── ONGLETS RÉGIONS ── */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none sticky top-16 bg-background/95 backdrop-blur-md z-20 pt-2 border-b border-border">
+          {regionsData.map((r) => {
+            const active = selectedRegion === r.id
+            return (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setSelectedRegion(r.id)}
+                className={`shrink-0 rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  active
+                    ? 'bg-primary text-white shadow-md'
+                    : 'bg-card border border-border text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {r.nom.replace('Région ', '').replace('de la ', '').replace('des ', '')}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* ── CONTENU DE LA RÉGION ACTIVE ── */}
+        <AnimatePresence mode="wait">
           <motion.div
             key={region.id}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35 }}
+            className="space-y-10"
           >
-            <Image src={region.image} alt={region.nom} fill priority sizes="100vw" className="object-cover" />
-          </motion.div>
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-scrim/50 via-scrim/30 to-scrim/85" />
-
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-            Explorer le Togo
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-bold leading-tight text-card sm:text-5xl">
-            5 Régions, 5 Univers
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-card/80">
-            Des savanes du nord aux plages du sud, chaque région du Togo a sa propre âme.
-          </p>
-        </div>
-      </section>
-
-      {/* ── ONGLETS RÉGIONS ── */}
-      <div className="sticky top-14 z-30 border-b border-border bg-card/95 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex max-w-5xl gap-0 overflow-x-auto px-4 scrollbar-none">
-          {regionsData.map(r => (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => setSelectedRegion(r.id)}
-              className={`shrink-0 border-b-2 px-4 py-3.5 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                selectedRegion === r.id
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {r.nom.replace('Région ', '').replace('de la ', '').replace('des ', '')}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── CONTENU DE LA RÉGION ACTIVE ── */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={region.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.3 }}
-          className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6"
-        >
-
-          {/* ── HEADER RÉGION ── */}
-          <section className="grid gap-4 lg:grid-cols-[1fr_auto]">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase text-primary-foreground">
-                <MapPin className="h-3.5 w-3.5" />
-                Capitale : {region.capitale}
-              </span>
-              <h2 className="mt-2 font-serif text-3xl font-bold text-foreground sm:text-4xl">{region.nom}</h2>
-              <p className="mt-1 text-sm font-semibold italic text-muted-foreground">{region.tagline}</p>
-              <div className="togo-underline" />
-              <p className="mt-4 text-sm leading-relaxed text-foreground">{region.description}</p>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 lg:grid-cols-1 lg:gap-2">
-              {region.stat.map(s => (
-                <div
-                  key={s.label}
-                  className="flex flex-col items-center justify-center rounded-2xl bg-muted p-3 text-center"
-                >
-                  <p className="text-xl font-black text-primary leading-none">{s.value}</p>
-                  <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{s.label}</p>
+            {/* Présentation & Stats */}
+            <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+              <div className="app-card p-6 sm:p-8 lg:col-span-8 space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span>Chef-lieu : {region.capitale}</span>
                 </div>
-              ))}
-            </div>
-          </section>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">
+                  L’esprit de la {region.nom}
+                </h2>
+                <div className="togo-underline" />
+                <p className="text-sm sm:text-base leading-relaxed text-muted-foreground font-medium pt-2">
+                  {region.description}
+                </p>
+              </div>
 
-          {/* ── HIGHLIGHTS ── */}
-          <section>
-            <h3 className="mb-3 text-lg font-black text-foreground">À ne pas manquer</h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {region.highlights.map(h => (
-                <div
-                  key={h.nom}
-                  className="rounded-2xl bg-card p-4 text-center shadow-[0_4px_14px_rgba(34,29,23,0.06)] transition-all hover:shadow-[0_8px_24px_rgba(34,29,23,0.1)]"
-                >
-                  <div className="mx-auto mb-2 grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary">
-                    {h.type === 'site' ? <Landmark className="h-5 w-5" /> : h.type === 'plat' ? <ChefHat className="h-5 w-5" /> : <Compass className="h-5 w-5" />}
-                  </div>
-                  <TypeBadge type={h.type} />
-                  <p className="mt-1.5 text-xs font-bold text-foreground leading-tight">{h.nom}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* ── GRILLE 3 COLONNES (Sites / Plats / Activités) ── */}
-          <section className="grid gap-4 sm:grid-cols-3">
-
-            {/* Sites */}
-            <div className="rounded-2xl bg-muted p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wide text-foreground">
-                <Landmark className="h-4 w-4 text-primary" />
-                Sites emblématiques
-              </h3>
-              <ul className="space-y-2">
-                {region.sites.map(s => (
-                  <li key={s} className="flex items-center gap-2 text-xs text-foreground">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Plats */}
-            <div className="rounded-2xl bg-muted p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wide text-foreground">
-                <ChefHat className="h-4 w-4 text-primary" />
-                Spécialités culinaires
-              </h3>
-              <ul className="space-y-2">
-                {region.plats.map(p => (
-                  <li key={p} className="flex items-center gap-2 text-xs text-foreground">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {p}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Activités */}
-            <div className="rounded-2xl bg-muted p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-black uppercase tracking-wide text-foreground">
-                <Compass className="h-4 w-4 text-primary" />
-                Que faire ici ?
-              </h3>
-              <ul className="space-y-2">
-                {region.activites.map(a => (
-                  <li key={a} className="flex items-center gap-2 text-xs text-foreground">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {a}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          {/* ── CTA VOIR SITES DE LA RÉGION ── */}
-          <section className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={`/lieux?region=${region.id.charAt(0).toUpperCase() + region.id.slice(1)}`}
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-all hover:brightness-110 active:scale-95"
-            >
-              <Landmark className="h-4 w-4" />
-              Voir tous les sites de la {region.nom.replace('Région ', '')}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/cuisine"
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-muted py-3.5 text-sm font-bold text-foreground transition-all hover:bg-primary hover:text-primary-foreground active:scale-95"
-            >
-              <ChefHat className="h-4 w-4" />
-              Explorer la gastronomie
-            </Link>
-          </section>
-
-          {/* ── SITES RAPIDES LIÉS (si ids disponibles) ── */}
-          {region.siteIds.length > 0 && (
-            <section>
-              <h3 className="mb-3 text-lg font-black text-foreground">
-                Sites à visiter dans cette région
-              </h3>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-                {region.siteIds.map((sid) => (
-                  <Link
-                    key={sid}
-                    href={`/lieux/${sid}`}
-                    className="group flex shrink-0 items-center gap-2 rounded-full bg-muted px-4 py-2.5 text-xs font-bold text-foreground transition-all hover:bg-card hover:shadow-[0_4px_14px_rgba(34,29,23,0.08)]"
+              {/* Stats Chiffres Clés */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1 lg:col-span-4">
+                {region.stat.map((s) => (
+                  <div
+                    key={s.label}
+                    className="app-card flex flex-col items-center justify-center p-5 text-center"
                   >
-                    <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
-                    <span className="whitespace-nowrap">{tMonuments(`${sid}.nom`)}</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                  </Link>
+                    <span className="font-serif text-2xl sm:text-3xl font-bold text-primary leading-none">
+                      {s.value}
+                    </span>
+                    <span className="mt-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      {s.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Incontournables Highlights */}
+            <section className="space-y-4">
+              <SectionHeader
+                kicker="Sélection"
+                title="À ne pas manquer dans la région"
+                icon={Sparkles}
+              />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {region.highlights.map((h) => (
+                  <div
+                    key={h.nom}
+                    className="app-card flex flex-col items-center justify-between p-4 text-center space-y-2 hover:shadow-md transition-shadow"
+                  >
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                      {h.type === 'site' ? (
+                        <Landmark className="h-6 w-6" />
+                      ) : h.type === 'plat' ? (
+                        <ChefHat className="h-6 w-6" />
+                      ) : (
+                        <Compass className="h-6 w-6" />
+                      )}
+                    </div>
+                    <TypeBadge type={h.type} />
+                    <p className="text-xs sm:text-sm font-bold text-foreground leading-snug">
+                      {h.nom}
+                    </p>
+                  </div>
                 ))}
               </div>
             </section>
-          )}
 
-        </motion.div>
-      </AnimatePresence>
-
-      {/* ── NAVIGATION ENTRE RÉGIONS ── */}
-      <div className="mx-auto max-w-5xl border-t border-border px-4 pt-8 pb-4 sm:px-6">
-        <h3 className="mb-4 text-sm font-black uppercase tracking-wide text-muted-foreground">Toutes les régions</h3>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {regionsData.map(r => (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => { setSelectedRegion(r.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-              className={`group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(34,29,23,0.12)] cursor-pointer ${
-                selectedRegion === r.id ? 'ring-2 ring-primary/40' : ''
-              }`}
-            >
-              <Image src={r.image} alt={r.nom} fill sizes="200px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-scrim/85 via-scrim/30 to-transparent" />
-              <div className="relative z-10 p-2">
-                <p className="truncate text-[10px] font-black uppercase text-card leading-tight">
-                  {r.nom.replace('Région ', '').replace('de la ', '').replace('des ', '')}
-                </p>
-                <p className="text-[9px] text-card/70">{r.capitale}</p>
+            {/* Grille 3 Colonnes : Sites / Spécialités / Que faire */}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="app-card p-5 space-y-3">
+                <h3 className="flex items-center gap-2 font-serif text-base font-bold text-foreground">
+                  <Landmark className="h-4 w-4 text-primary" />
+                  <span>Sites emblématiques</span>
+                </h3>
+                <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+                  {region.sites.map((s) => (
+                    <li key={s} className="flex items-start gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                      <span className="font-medium text-foreground">{s}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              {selectedRegion === r.id && (
-                <div className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                  <span className="text-[8px] font-black text-primary-foreground">✓</span>
+
+              <div className="app-card p-5 space-y-3">
+                <h3 className="flex items-center gap-2 font-serif text-base font-bold text-foreground">
+                  <ChefHat className="h-4 w-4 text-primary" />
+                  <span>Spécialités culinaires</span>
+                </h3>
+                <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+                  {region.plats.map((p) => (
+                    <li key={p} className="flex items-start gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                      <span className="font-medium text-foreground">{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="app-card p-5 space-y-3">
+                <h3 className="flex items-center gap-2 font-serif text-base font-bold text-foreground">
+                  <Compass className="h-4 w-4 text-primary" />
+                  <span>Que faire sur place ?</span>
+                </h3>
+                <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+                  {region.activites.map((a) => (
+                    <li key={a} className="flex items-start gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                      <span className="font-medium text-foreground">{a}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Sites réels de cette région */}
+            {regionMonuments.length > 0 && (
+              <section className="space-y-5">
+                <SectionHeader
+                  kicker="Monuments & Trésors"
+                  title={`Monuments de la ${region.nom}`}
+                  subtitle={`Explorez les fiches détaillées des ${regionMonuments.length} sites recensés dans cette région.`}
+                  actionHref="/lieux"
+                  actionLabel="Voir tous les 29 lieux"
+                />
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {regionMonuments.map((m) => (
+                    <SiteCard
+                      key={m.id}
+                      id={m.id}
+                      nom={tMonuments(`${m.id}.nom`)}
+                      region={m.région}
+                      localite={m.localite}
+                      description={tMonuments(`${m.id}.description`)}
+                      image={m.image}
+                    />
+                  ))}
                 </div>
-              )}
-            </button>
-          ))}
-        </div>
+              </section>
+            )}
+
+            {/* CTA Bas de page */}
+            <div className="app-card p-6 sm:p-8 bg-gradient-to-r from-primary/10 via-card to-accent/10 flex flex-col sm:flex-row items-center justify-between gap-4 border-primary/20">
+              <div className="space-y-1 text-center sm:text-left">
+                <h3 className="font-serif text-xl font-bold text-foreground">Préparez votre séjour en {region.nom}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Trouvez un guide local certifié pour une immersion authentique.</p>
+              </div>
+              <Link
+                href="/guides"
+                className="shrink-0 rounded-full bg-primary px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-primary-dark transition-all"
+              >
+                Réserver un guide local →
+              </Link>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
       </div>
     </main>
   )

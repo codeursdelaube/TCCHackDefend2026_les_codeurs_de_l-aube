@@ -3,14 +3,12 @@
 import { useState, useActionState, Suspense } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Link, usePathname } from '@/i18n/navigation'
-import { COLORS } from '@/lib/constants/colors'
-import { Check, Loader2, Map, Moon, Settings, Shield, Sun, UserPlus, X } from 'lucide-react'
+import { Link } from '@/i18n/navigation'
+import { Check, Loader2, Map, Shield, UserPlus, X } from 'lucide-react'
 import { useFormStatus } from 'react-dom'
 import { registerAction } from './actions'
 import { getPasswordStrength } from '@/lib/utils/validation'
 import PrivacyModal from '@/components/PrivacyModal'
-import { useTheme } from '@/hooks/useTheme'
 
 type RegisterRole = 'tourist' | 'guide'
 
@@ -22,8 +20,7 @@ function SubmitButton({ privacyAccepted }: { privacyAccepted: boolean }) {
     <button
       type="submit"
       disabled={pending || !privacyAccepted}
-      className="btn w-full rounded-2xl border-none text-white disabled:cursor-not-allowed disabled:opacity-50"
-      style={{ backgroundColor: COLORS.rust }}
+      className="inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
     >
       {pending ? (
         <span className="flex items-center justify-center gap-2">
@@ -37,28 +34,18 @@ function SubmitButton({ privacyAccepted }: { privacyAccepted: boolean }) {
   )
 }
 
-const strengthColors = ['', 'var(--destructive)', 'var(--primary)', 'var(--primary)', 'var(--primary)']
-const strengthLabels = ['', 'Tres faible', 'Faible', 'Moyen', 'Fort']
-const languages = [
-  { code: 'fr', label: 'FR' },
-  { code: 'en', label: 'EN' },
-  { code: 'es', label: 'ES' },
-  { code: 'zh', label: 'ZH' },
-]
+const strengthColors = ['', '#DC2626', '#B5502E', '#D9A441', '#3E5C45']
+const strengthLabels = ['', 'Très faible', 'Faible', 'Moyen', 'Fort']
 
 function RegisterForm() {
   const t = useTranslations('Auth')
-  const tNav = useTranslations('Navbar')
   const params = useParams<{ locale: string }>()
   const locale = params.locale
-  const pathname = usePathname()
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get('redirect') || ''
-  const { toggle, isDark, mounted } = useTheme()
 
   const [role, setRole] = useState<RegisterRole>('tourist')
   const [password, setPassword] = useState('')
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [privacyOpen, setPrivacyOpen] = useState(false)
   const [privacyError, setPrivacyError] = useState(false)
@@ -74,65 +61,13 @@ function RegisterForm() {
   ]
 
   return (
-    <div className="rounded-xl border border-border bg-base-200 p-6 shadow-xl sm:p-8">
-      <div className="relative mb-4 flex justify-end">
-        <button
-          type="button"
-          onClick={() => setSettingsOpen((v) => !v)}
-          className={`flex h-10 w-10 items-center justify-center rounded-2xl border transition-all ${
-            settingsOpen ? 'border-secondary bg-secondary text-secondary-content' : 'border-border bg-base-100'
-          }`}
-          aria-label={tNav('settings')}
-        >
-          <Settings className="h-4 w-4" />
-        </button>
-
-        {settingsOpen && (
-          <div className="absolute right-0 top-full z-20 mt-3 w-[min(21rem,calc(100vw-3rem))] rounded-xl border border-border bg-base-200 p-4 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
-              <span className="text-xs font-black uppercase tracking-wider">{tNav('settings')}</span>
-              <button type="button" onClick={() => setSettingsOpen(false)} className="rounded-xl p-1 hover:bg-base-300">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {languages.map((lang) => (
-                <Link
-                  key={lang.code}
-                  href={pathname}
-                  locale={lang.code}
-                  onClick={() => setSettingsOpen(false)}
-                  className={`rounded-2xl border px-3 py-3 text-center text-xs font-black ${
-                    locale === lang.code ? 'border-primary bg-primary text-primary-content' : 'border-border bg-base-100'
-                  }`}
-                >
-                  {lang.label}
-                </Link>
-              ))}
-            </div>
-            {mounted && (
-              <button
-                type="button"
-                onClick={toggle}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-base-100 py-3 text-sm font-bold"
-              >
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                {isDark ? tNav('light') : tNav('dark')}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="mb-6 text-center">
-        <div
-          className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white"
-          style={{ backgroundColor: COLORS.rust }}
-        >
+    <div className="app-card p-6 sm:p-8 space-y-6 shadow-xl">
+      <div className="text-center space-y-2">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-sm">
           <UserPlus className="h-7 w-7" />
         </div>
-        <h1 className="font-serif text-3xl font-bold text-base-content">{t('register_title')}</h1>
-        <p className="mt-2 text-sm text-base-content/60">{t('register_subtitle')}</p>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">{t('register_title')}</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">{t('register_subtitle')}</p>
       </div>
 
       <form
@@ -152,62 +87,62 @@ function RegisterForm() {
         <input type="hidden" name="redirect" value={redirectParam} />
         <input type="hidden" name="privacy_accepted" value={privacyAccepted ? 'true' : 'false'} />
 
-        <label className="form-control w-full">
-          <span className="label-text mb-1 text-sm font-semibold">{t('full_name')}</span>
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('full_name')}</label>
           <input
             type="text"
             name="full_name"
             required
-            className="input input-bordered w-full rounded-2xl bg-base-100"
+            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             autoComplete="name"
           />
-        </label>
+        </div>
 
-        <label className="form-control w-full">
-          <span className="label-text mb-1 text-sm font-semibold">{t('email')}</span>
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('email')}</label>
           <input
             type="email"
             name="email"
             required
-            className="input input-bordered w-full rounded-2xl bg-base-100"
+            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             autoComplete="email"
           />
-        </label>
+        </div>
 
         <div>
-          <span className="mb-2 block text-sm font-semibold">{t('role_label')}</span>
+          <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('role_label')}</span>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setRole('tourist')}
-              className={`rounded-2xl border p-4 text-left transition-all ${
+              className={`rounded-2xl border p-4 text-left transition-all cursor-pointer ${
                 role === 'tourist'
-                  ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                  : 'border-border bg-base-100 hover:border-primary/40'
+                  ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+                  : 'border-border bg-card hover:border-primary/40'
               }`}
             >
-              <UserPlus className="h-6 w-6 text-primary" />
-              <p className="mt-2 font-bold text-sm">{t('role_tourist')}</p>
-              <p className="mt-1 text-xs text-base-content/60">{t('role_tourist_desc')}</p>
+              <UserPlus className="h-5 w-5 text-primary" />
+              <p className="mt-2 font-bold text-sm font-serif">{t('role_tourist')}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t('role_tourist_desc')}</p>
             </button>
             <button
               type="button"
               onClick={() => setRole('guide')}
-              className={`rounded-2xl border p-4 text-left transition-all ${
+              className={`rounded-2xl border p-4 text-left transition-all cursor-pointer ${
                 role === 'guide'
-                  ? 'border-secondary bg-secondary/10 ring-2 ring-secondary/30'
-                  : 'border-border bg-base-100 hover:border-secondary/40'
+                  ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+                  : 'border-border bg-card hover:border-primary/40'
               }`}
             >
-              <Map className="h-6 w-6 text-secondary" />
-              <p className="mt-2 font-bold text-sm">{t('role_guide')}</p>
-              <p className="mt-1 text-xs text-base-content/60">{t('role_guide_desc')}</p>
+              <Map className="h-5 w-5 text-primary" />
+              <p className="mt-2 font-bold text-sm font-serif">{t('role_guide')}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t('role_guide_desc')}</p>
             </button>
           </div>
         </div>
 
-        <label className="form-control w-full">
-          <span className="label-text mb-1 text-sm font-semibold">{t('password')}</span>
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('password')}</label>
           <input
             type="password"
             name="password"
@@ -215,7 +150,7 @@ function RegisterForm() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="input input-bordered w-full rounded-2xl bg-base-100"
+            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             autoComplete="new-password"
           />
 
@@ -227,7 +162,7 @@ function RegisterForm() {
                     key={level}
                     className="h-1.5 flex-1 rounded-full transition-all duration-300"
                     style={{
-                      backgroundColor: strength >= level ? strengthColors[strength] : '#e5e7eb',
+                      backgroundColor: strength >= level ? strengthColors[strength] : 'var(--border)',
                     }}
                   />
                 ))}
@@ -240,12 +175,12 @@ function RegisterForm() {
                   {strengthLabels[strength]}
                 </p>
               )}
-              <ul className="space-y-1">
+              <ul className="space-y-1 text-xs">
                 {requirements.map((req) => (
                   <li
                     key={req.label}
-                    className={`flex items-center gap-1.5 text-[11px] font-semibold transition-colors ${
-                      req.met ? 'text-green-600' : 'text-base-content/50'
+                    className={`flex items-center gap-1.5 font-medium transition-colors ${
+                      req.met ? 'text-emerald-600' : 'text-muted-foreground'
                     }`}
                   >
                     {req.met ? (
@@ -253,64 +188,39 @@ function RegisterForm() {
                     ) : (
                       <X className="h-3 w-3 shrink-0" />
                     )}
-                    {req.label}
+                    <span>{req.label}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-        </label>
+        </div>
 
         {state?.error && (
-          <div className="rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
+          <div className="rounded-2xl border border-red-300 bg-red-50/40 dark:bg-red-950/20 px-4 py-3 text-xs font-bold text-red-600">
             {state.error}
           </div>
         )}
 
         {state?.success && (
-          <div className="rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
+          <div className="rounded-2xl border border-emerald-300 bg-emerald-50/40 dark:bg-emerald-950/20 px-4 py-3 text-xs font-bold text-emerald-600">
             {state.success}
           </div>
         )}
 
-        <div className="space-y-2">
-          <label className="flex cursor-pointer items-start gap-3 group">
-            <span className="relative mt-0.5 shrink-0">
-              <input
-                type="checkbox"
-                id="privacy-check"
-                checked={privacyAccepted}
-                onChange={(e) => {
-                  setPrivacyAccepted(e.target.checked)
-                  if (e.target.checked) setPrivacyError(false)
-                }}
-                className="sr-only"
-              />
-              <span
-                className={`flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all ${
-                  privacyAccepted
-                    ? 'border-transparent'
-                    : privacyError
-                      ? 'border-red-500 bg-red-50'
-                      : 'border-border bg-background group-hover:border-primary'
-                }`}
-                style={privacyAccepted ? { backgroundColor: COLORS.forest, borderColor: COLORS.forest } : {}}
-              >
-                {privacyAccepted && (
-                  <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
-                    <path
-                      d="M2 6l3 3 5-5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </span>
-            </span>
-
-            <span className="text-sm leading-relaxed text-base-content/70">
+        <div className="space-y-2 pt-2">
+          <label className="flex cursor-pointer items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="privacy-check"
+              checked={privacyAccepted}
+              onChange={(e) => {
+                setPrivacyAccepted(e.target.checked)
+                if (e.target.checked) setPrivacyError(false)
+              }}
+              className="mt-1 h-4 w-4 rounded accent-primary cursor-pointer"
+            />
+            <span className="text-xs text-muted-foreground leading-relaxed">
               {t('privacy_accept_prefix')}{' '}
               <button
                 type="button"
@@ -318,39 +228,35 @@ function RegisterForm() {
                   e.preventDefault()
                   setPrivacyOpen(true)
                 }}
-                className="inline-flex items-center gap-1 font-semibold underline underline-offset-2 transition-colors"
-                style={{ color: COLORS.forest }}
+                className="font-bold text-primary underline inline-flex items-center gap-1"
               >
-                <Shield className="h-3.5 w-3.5" />
-                {t('privacy_policy_link')}
+                <Shield className="h-3 w-3" />
+                <span>{t('privacy_policy_link')}</span>
               </button>{' '}
               {t('privacy_accept_suffix')}
             </span>
           </label>
 
           {privacyError && (
-            <p className="flex items-center gap-1.5 pl-8 text-xs font-semibold text-red-500">
-              <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
+            <p className="text-xs font-semibold text-red-500">
               {t('privacy_required_error')}
             </p>
           )}
         </div>
 
-        <SubmitButton privacyAccepted={privacyAccepted} />
+        <div className="pt-2">
+          <SubmitButton privacyAccepted={privacyAccepted} />
+        </div>
       </form>
 
-      <div className="mt-4 text-center text-sm">
-        <p className="text-base-content/60">
+      <div className="flex flex-col gap-2 text-center text-xs pt-2 border-t border-border">
+        <p className="text-muted-foreground">
           {t('has_account')}{' '}
-          <Link href="/auth/login" className="font-bold hover:underline" style={{ color: COLORS.forest }}>
+          <Link href="/auth/login" className="font-bold text-primary hover:underline">
             {t('login_link')}
           </Link>
         </p>
-        <Link href="/" className="mt-2 inline-block text-base-content/50 hover:underline">
+        <Link href="/" className="text-muted-foreground hover:text-foreground">
           {t('back_home')}
         </Link>
       </div>
@@ -376,4 +282,3 @@ export default function RegisterPage() {
     </Suspense>
   )
 }
-

@@ -17,7 +17,9 @@ export async function registerAction(
     const fullName = formData.get('full_name') as string
     const email    = formData.get('email') as string
     const password = formData.get('password') as string
-    const role     = (formData.get('role') as string) || 'tourist'
+    const requestedRole = formData.get('role') as string
+    // The client can forge form values: admin accounts must never be self-created.
+    const role: 'tourist' | 'guide' = requestedRole === 'guide' ? 'guide' : 'tourist'
     const locale   = (formData.get('locale') as string) || 'fr'
     const redirectTo = (formData.get('redirect') as string) || ''
     const privacyAccepted = formData.get('privacy_accepted') as string
@@ -73,7 +75,7 @@ export async function registerAction(
           data: {
             id:             data.user.id,
             full_name:      fullName.trim(),
-            role:           role as 'tourist' | 'guide' | 'admin',
+            role,
             preferred_lang: locale,
             is_active:      true,
           },

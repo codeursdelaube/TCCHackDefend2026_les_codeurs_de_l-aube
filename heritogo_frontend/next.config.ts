@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
  
   images: {
     formats: ['image/avif', 'image/webp'], // images 2x plus légères
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'zavdmsyykadplqznsydh.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
   },
   experimental: {
     optimizePackageImports: [

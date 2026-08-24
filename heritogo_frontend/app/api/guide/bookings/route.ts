@@ -3,175 +3,108 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { BookingStatus } from '@prisma/client'
 
-async function getAuthenticatedUser() {
+async function getGuide() {
   const supabase = await createClient()
-  return supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error || !user) return { error: 'Non autorisé', status: 401 } as const
+
+  const guide = await prisma.guideProfile.findUnique({ where: { user_id: user.id } })
+  if (!guide) return { error: 'Profil guide introuvable', status: 404 } as const
+  if (guide.status !== 'approved') return { error: 'Profil guide non approuvé', status: 403 } as const
+  return { user, guide } as const
 }
 
-// GET: Fetch bookings for the logged-in guide
 export async function GET() {
   try {
-    const { data: { user }, error: authError } = await getAuthenticatedUser()
+    const auth = await getGuide()
+    if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status })
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-    }
-
-    // ✅ FIX : include profile + documents
-    const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id },
-      include: {
-        profile: {
-          select: {
-            full_name: true,
-            avatar_url: true,
-            bio: true,
-            phone: true,
-            preferred_lang: true,
-          },
+    const [guideProfile, bookings] = await Promise.all([
+      prisma.guideProfile.findUnique({
+        where: { id: auth.guide.id },
+        include: {
+          profile: { select: { full_name: true, avatar_url: true, bio: true, phone: true, preferred_lang: true } },
+          documents: { orderBy: { created_at: 'desc' } },
         },
-        documents: {
-          orderBy: { created_at: 'desc' },
+      }),
+      prisma.booking.findMany({
+        where: { guide_id: auth.guide.id },
+        include: {
+          tourist: { select: { id: true, full_name: true, avatar_url: true, phone: true, preferred_lang: true } },
+          review: true,
         },
-      },
-    })
-
-    if (!guideProfile) {
-      return NextResponse.json({ error: 'Profil guide introuvable' }, { status: 404 })
-    }
-
-    const bookings = await prisma.booking.findMany({
-      where: { guide_id: guideProfile.id },
-      include: {
-        tourist: {
-          select: {
-            id: true,
-            full_name: true,
-            avatar_url: true,
-            phone: true,
-            preferred_lang: true,
-          },
-        },
-        review: true,
-      },
-      orderBy: { created_at: 'desc' },
-    })
-
+        orderBy: { created_at: 'desc' },
+      }),
+    ])
     return NextResponse.json({ success: true, bookings, guideProfile })
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('[GET /api/guide/bookings]', error)
-    const message = error instanceof Error && error.message.includes('P1001')
-      ? 'Erreur de chargement. Vérifiez votre connexion.'
-      : 'Une erreur est survenue. Veuillez réessayer.'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Veuillez réessayer.' }, { status: 500 })
   }
 }
 
-// POST: Actions on bookings
 export async function POST(request: Request) {
   try {
-    const { data: { user }, error: authError } = await getAuthenticatedUser()
+    const auth = await getGuide()
+    if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status })
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const { bookingId, action, quoteAmount, quoteMessage, cancellationReason } = await request.json()
+    if (typeof bookingId !== 'string' || typeof action !== 'string') {
+      return NextResponse.json({ error: 'Données de réservation invalides.' }, { status: 400 })
     }
 
-    // Pas besoin de profile ici — juste l'id du guide
-    const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id },
-      select: { id: true },
-    })
+    const booking = await prisma.booking.findFirst({ where: { id: bookingId, guide_id: auth.guide.id } })
+    if (!booking) return NextResponse.json({ error: 'Réservation introuvable ou non autorisée' }, { status: 404 })
 
-    if (!guideProfile) {
-      return NextResponse.json({ error: 'Profil guide introuvable' }, { status: 404 })
-    }
-
-    const body = await request.json()
-    const { bookingId, action, quoteAmount, quoteMessage, cancellationReason } = body
-
-    if (!bookingId || !action) {
-      return NextResponse.json({ error: 'bookingId et action sont requis' }, { status: 400 })
-    }
-
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-    })
-
-    if (!booking || booking.guide_id !== guideProfile.id) {
-      return NextResponse.json({ error: 'Réservation introuvable ou non autorisée' }, { status: 404 })
-    }
-
-    let updatedStatus: BookingStatus = booking.status
-    let updateData: Record<string, unknown> = {}
-    let notifTitle = ''
-    let notifBody = ''
+    let status: BookingStatus
+    let updateData: Record<string, unknown>
+    let title: string
+    let body: string
 
     if (action === 'send_quote') {
-      if (!quoteAmount) {
-        return NextResponse.json({ error: 'Le montant du devis est requis' }, { status: 400 })
-      }
-      updatedStatus = 'quote_sent'
-      updateData = {
-        status: updatedStatus,
-        quote_amount: parseFloat(quoteAmount),
-        quote_message: quoteMessage || null,
-        quote_sent_at: new Date(),
-      }
-      notifTitle = 'Nouveau devis reçu'
-      notifBody = `Le guide vous a envoyé un devis de ${quoteAmount} XOF.`
-
+      const amount = Number(quoteAmount)
+      if (booking.status !== 'quote_requested') return NextResponse.json({ error: 'Un devis ne peut être envoyé que pour une nouvelle demande.' }, { status: 409 })
+      if (!Number.isFinite(amount) || amount <= 0 || amount > 10_000_000) return NextResponse.json({ error: 'Montant du devis invalide.' }, { status: 400 })
+      if (quoteMessage !== undefined && (typeof quoteMessage !== 'string' || quoteMessage.length > 2_000)) return NextResponse.json({ error: 'Message de devis invalide.' }, { status: 400 })
+      status = 'quote_sent'
+      updateData = { status, quote_amount: amount, quote_message: quoteMessage?.trim() || null, quote_sent_at: new Date() }
+      title = 'Nouveau devis reçu'
+      body = `Le guide vous a envoyé un devis de ${amount} XOF.`
     } else if (action === 'start_mission') {
-      updatedStatus = 'in_progress'
-      updateData = { status: updatedStatus, started_at: new Date() }
-      notifTitle = 'Mission commencée'
-      notifBody = 'Votre visite guidée a commencé.'
-
+      if (booking.status !== 'confirmed') return NextResponse.json({ error: 'La mission doit être confirmée par le touriste.' }, { status: 409 })
+      status = 'in_progress'
+      updateData = { status, started_at: new Date() }
+      title = 'Mission commencée'
+      body = 'Votre visite guidée a commencé.'
     } else if (action === 'complete_mission') {
-      updatedStatus = 'completed'
-      updateData = { status: updatedStatus, completed_at: new Date() }
-      await prisma.guideProfile.update({
-        where: { id: guideProfile.id },
-        data: { total_missions: { increment: 1 } },
-      })
-      notifTitle = 'Mission terminée'
-      notifBody = "La visite guidée est terminée. N'hésitez pas à laisser un avis."
-
+      if (booking.status !== 'in_progress') return NextResponse.json({ error: 'Seule une mission en cours peut être terminée.' }, { status: 409 })
+      status = 'completed'
+      updateData = { status, completed_at: new Date() }
+      title = 'Mission terminée'
+      body = 'La visite guidée est terminée. Vous pouvez laisser un avis.'
     } else if (action === 'cancel') {
-      updatedStatus = 'cancelled'
-      updateData = {
-        status: updatedStatus,
-        cancelled_at: new Date(),
-        cancelled_by: user.id,
-        cancellation_reason: cancellationReason || 'Annule par le guide',
-      }
-      notifTitle = 'Réservation annulée'
-      notifBody = `Le guide a annulé votre demande : "${cancellationReason || 'Aucun motif fourni'}"`
-
+      if (!['quote_requested', 'quote_sent', 'confirmed'].includes(booking.status)) return NextResponse.json({ error: 'Cette réservation ne peut plus être annulée.' }, { status: 409 })
+      if (cancellationReason !== undefined && (typeof cancellationReason !== 'string' || cancellationReason.length > 1_000)) return NextResponse.json({ error: 'Motif d’annulation invalide.' }, { status: 400 })
+      status = 'cancelled'
+      updateData = { status, cancelled_at: new Date(), cancelled_by: auth.user.id, cancellation_reason: cancellationReason?.trim() || 'Annulée par le guide' }
+      title = 'Réservation annulée'
+      body = 'Le guide a annulé votre demande de réservation.'
     } else {
-      return NextResponse.json({ error: 'Action invalide' }, { status: 400 })
+      return NextResponse.json({ error: 'Action invalide.' }, { status: 400 })
     }
 
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: updateData,
+    const updated = await prisma.$transaction(async (tx) => {
+      const changed = await tx.booking.updateMany({ where: { id: booking.id, guide_id: auth.guide.id, status: booking.status }, data: updateData })
+      if (changed.count !== 1) return null
+      if (status === 'completed') await tx.guideProfile.update({ where: { id: auth.guide.id }, data: { total_missions: { increment: 1 } } })
+      return tx.booking.findUnique({ where: { id: booking.id } })
     })
+    if (!updated) return NextResponse.json({ error: 'La réservation vient d’être modifiée. Actualisez la page.' }, { status: 409 })
 
-    await prisma.notification.create({
-      data: {
-        user_id: booking.tourist_id,
-        type: 'booking',
-        title: notifTitle,
-        body: notifBody,
-        data: { booking_id: booking.id },
-      },
-    })
-
-    return NextResponse.json({ success: true, booking: updatedBooking })
-  } catch (error: unknown) {
+    await prisma.notification.create({ data: { user_id: booking.tourist_id, type: 'booking', title, body, data: { booking_id: booking.id } } })
+    return NextResponse.json({ success: true, booking: updated })
+  } catch (error) {
     console.error('[POST /api/guide/bookings]', error)
-    const message = error instanceof Error && error.message.includes('P1001')
-      ? 'Erreur de chargement. Vérifiez votre connexion.'
-      : 'Une erreur est survenue. Veuillez réessayer.'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Veuillez réessayer.' }, { status: 500 })
   }
 }

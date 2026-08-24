@@ -59,6 +59,18 @@ export async function POST(request: Request) {
     if (virtual_rate !== undefined) guideData.virtual_rate = virtual_rate ? parseFloat(virtual_rate) : null
 
     // 3. Ajouter un document de vérification
+    if (document !== undefined) {
+      const validTypes = Object.values(DocumentType)
+      const isValidDocument = document && validTypes.includes(document.type as DocumentType) &&
+        typeof document.file_url === 'string' && /^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/.test(document.file_url) &&
+        typeof document.file_name === 'string' && document.file_name.length <= 160 &&
+        typeof document.label === 'string' && document.label.trim().length > 0 && document.label.length <= 120
+      if (!isValidDocument) return NextResponse.json({ error: 'Document invalide. Un PDF est requis.' }, { status: 400 })
+      const documentBytes = Buffer.from(document.file_url.split(',')[1], 'base64')
+      if (documentBytes.length === 0 || documentBytes.length > 5 * 1024 * 1024 || !documentBytes.subarray(0, 4).equals(Buffer.from('%PDF'))) {
+        return NextResponse.json({ error: 'Le PDF est invalide ou dépasse 5 Mo.' }, { status: 400 })
+      }
+    }
     let shouldSendDocEmail = false
     if (document && document.file_url && document.type) {
       await prisma.guideDocument.create({

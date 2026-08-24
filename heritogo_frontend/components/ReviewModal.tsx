@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Star, X, Loader2 } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
-import { apiFetch } from '@/lib/utils/http'
+import { apiFetch, clearClientCache } from '@/lib/utils/http'
 
 interface ReviewModalProps {
   bookingId: string
@@ -40,6 +40,8 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
         return
       }
 
+      clearClientCache('public-guide')
+      clearClientCache('public-guides')
       onSuccess()
       onClose()
     } catch {

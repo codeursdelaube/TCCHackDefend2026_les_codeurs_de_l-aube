@@ -40,7 +40,6 @@ export async function GET(request: Request) {
           select: {
             full_name: true,
             avatar_url: true,
-            phone: true,
             preferred_lang: true,
             bio: true
           }
