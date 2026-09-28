@@ -628,7 +628,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                     <div className="relative h-44 overflow-hidden bg-muted">
                       <Image
                         src={ps.image}
-                        alt={tMonuments(`${ps.id}.nom`)}
+                        alt={ps.nom}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -638,7 +638,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                         {ps.localite}
                       </span>
                       <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <p className="truncate text-base font-bold font-serif">{tMonuments(`${ps.id}.nom`)}</p>
+                        <p className="truncate text-base font-bold font-serif">{ps.nom}</p>
                       </div>
                     </div>
                     <div className="p-4 flex items-center justify-between border-t border-border">

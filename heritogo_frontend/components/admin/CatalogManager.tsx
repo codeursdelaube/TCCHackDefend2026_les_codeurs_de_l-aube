@@ -123,7 +123,11 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
       ? await apiFetch<{ places?: CatalogPlace[] }>('/api/admin/places')
       : await apiFetch<{ dishes?: CatalogDish[] }>('/api/admin/dishes')
     if (result.ok && result.data) {
-      setItems(isPlaces ? result.data.places || [] : result.data.dishes || [])
+      if (isPlaces && 'places' in result.data) {
+        setItems(result.data.places || [])
+      } else if (!isPlaces && 'dishes' in result.data) {
+        setItems(result.data.dishes || [])
+      }
     } else {
       toast.error(result.error || 'Chargement impossible')
     }
