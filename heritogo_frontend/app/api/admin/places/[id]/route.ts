@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth/admin'
 import { mapPlace, slugify } from '@/lib/catalog/map'
 import { PLACE_REGIONS } from '@/lib/catalog/types'
+import { catalogDbError, DEFAULT_TOGO_LAT, DEFAULT_TOGO_LNG, logAdminAction, parseCoord } from '@/lib/catalog/admin'
 
 export async function PATCH(
   request: Request,
@@ -44,8 +45,8 @@ export async function PATCH(
         history: body.history !== undefined ? String(body.history).trim() : undefined,
         region: body.region !== undefined ? String(body.region).trim() : undefined,
         locality: body.locality !== undefined ? String(body.locality).trim() : undefined,
-        latitude: body.latitude !== undefined ? Number(body.latitude) : undefined,
-        longitude: body.longitude !== undefined ? Number(body.longitude) : undefined,
+        latitude: body.latitude !== undefined ? parseCoord(body.latitude, DEFAULT_TOGO_LAT) : undefined,
+        longitude: body.longitude !== undefined ? parseCoord(body.longitude, DEFAULT_TOGO_LNG) : undefined,
         image_url: body.image_url !== undefined ? String(body.image_url).trim() : undefined,
         is_unesco: body.is_unesco !== undefined ? Boolean(body.is_unesco) : undefined,
         is_published: body.is_published !== undefined ? Boolean(body.is_published) : undefined,
@@ -60,20 +61,18 @@ export async function PATCH(
       },
     })
 
-    await prisma.adminLog.create({
-      data: {
-        admin_id: auth.profile.id,
-        action: 'update_place',
-        target_type: 'place',
-        target_id: place.id,
-        details: { slug: place.slug },
-      },
+    await logAdminAction({
+      admin_id: auth.profile.id,
+      action: 'update_place',
+      target_type: 'place',
+      target_id: place.id,
+      details: { slug: place.slug },
     })
 
     return NextResponse.json({ place: mapPlace(place) })
   } catch (error) {
     console.error('[PATCH /api/admin/places/:id]', error)
-    return NextResponse.json({ error: 'Impossible de modifier le lieu.' }, { status: 500 })
+    return NextResponse.json({ error: catalogDbError(error) || 'Impossible de modifier le lieu.' }, { status: 500 })
   }
 }
 
@@ -96,19 +95,17 @@ export async function DELETE(
     }
 
     await prisma.place.delete({ where: { id: current.id } })
-    await prisma.adminLog.create({
-      data: {
-        admin_id: auth.profile.id,
-        action: 'delete_place',
-        target_type: 'place',
-        target_id: current.id,
-        details: { slug: current.slug, name: current.name },
-      },
+    await logAdminAction({
+      admin_id: auth.profile.id,
+      action: 'delete_place',
+      target_type: 'place',
+      target_id: current.id,
+      details: { slug: current.slug, name: current.name },
     })
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('[DELETE /api/admin/places/:id]', error)
-    return NextResponse.json({ error: 'Impossible de supprimer le lieu.' }, { status: 500 })
+    return NextResponse.json({ error: catalogDbError(error) || 'Impossible de supprimer le lieu.' }, { status: 500 })
   }
 }

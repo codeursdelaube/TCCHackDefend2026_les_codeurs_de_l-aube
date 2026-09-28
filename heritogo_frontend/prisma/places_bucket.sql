@@ -1,21 +1,27 @@
--- Policy Storage pour le bucket public "places"
--- À exécuter dans Supabase > SQL Editor si l'upload admin est refusé (RLS)
+-- Policies Storage pour le bucket public "places"
+-- SQL Editor Supabase
 
-create policy if not exists "Public read places images"
+drop policy if exists "Public read places images" on storage.objects;
+drop policy if exists "Authenticated upload places images" on storage.objects;
+drop policy if exists "Authenticated update places images" on storage.objects;
+drop policy if exists "Authenticated delete places images" on storage.objects;
+
+create policy "Public read places images"
 on storage.objects for select
 using (bucket_id = 'places');
 
-create policy if not exists "Authenticated upload places images"
+create policy "Authenticated upload places images"
 on storage.objects for insert
 to authenticated
 with check (bucket_id = 'places');
 
-create policy if not exists "Authenticated update places images"
+create policy "Authenticated update places images"
 on storage.objects for update
 to authenticated
-using (bucket_id = 'places');
+using (bucket_id = 'places')
+with check (bucket_id = 'places');
 
-create policy if not exists "Authenticated delete places images"
+create policy "Authenticated delete places images"
 on storage.objects for delete
 to authenticated
 using (bucket_id = 'places');

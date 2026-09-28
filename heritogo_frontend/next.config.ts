@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
       'lucide-react',
       'framer-motion',
     ],
+    proxyClientMaxBodySize: '8mb',
+    serverActions: {
+      bodySizeLimit: '8mb',
+    },
   },
 
  

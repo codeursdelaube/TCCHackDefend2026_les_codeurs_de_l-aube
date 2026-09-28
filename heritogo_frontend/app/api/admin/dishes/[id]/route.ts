@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth/admin'
 import { mapDish, slugify } from '@/lib/catalog/map'
 import { DISH_CATEGORIES } from '@/lib/catalog/types'
+import { catalogDbError, logAdminAction } from '@/lib/catalog/admin'
 
 export async function PATCH(
   request: Request,
@@ -50,20 +51,18 @@ export async function PATCH(
       },
     })
 
-    await prisma.adminLog.create({
-      data: {
-        admin_id: auth.profile.id,
-        action: 'update_dish',
-        target_type: 'dish',
-        target_id: dish.id,
-        details: { slug: dish.slug },
-      },
+    await logAdminAction({
+      admin_id: auth.profile.id,
+      action: 'update_dish',
+      target_type: 'dish',
+      target_id: dish.id,
+      details: { slug: dish.slug },
     })
 
     return NextResponse.json({ dish: mapDish(dish) })
   } catch (error) {
     console.error('[PATCH /api/admin/dishes/:id]', error)
-    return NextResponse.json({ error: 'Impossible de modifier le plat.' }, { status: 500 })
+    return NextResponse.json({ error: catalogDbError(error) || 'Impossible de modifier le plat.' }, { status: 500 })
   }
 }
 
@@ -86,19 +85,17 @@ export async function DELETE(
     }
 
     await prisma.dish.delete({ where: { id: current.id } })
-    await prisma.adminLog.create({
-      data: {
-        admin_id: auth.profile.id,
-        action: 'delete_dish',
-        target_type: 'dish',
-        target_id: current.id,
-        details: { slug: current.slug, name: current.name },
-      },
+    await logAdminAction({
+      admin_id: auth.profile.id,
+      action: 'delete_dish',
+      target_type: 'dish',
+      target_id: current.id,
+      details: { slug: current.slug, name: current.name },
     })
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('[DELETE /api/admin/dishes/:id]', error)
-    return NextResponse.json({ error: 'Impossible de supprimer le plat.' }, { status: 500 })
+    return NextResponse.json({ error: catalogDbError(error) || 'Impossible de supprimer le plat.' }, { status: 500 })
   }
 }

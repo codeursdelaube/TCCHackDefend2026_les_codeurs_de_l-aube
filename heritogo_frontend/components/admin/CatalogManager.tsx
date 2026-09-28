@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Landmark, Loader2, Pencil, Plus, Trash2, Utensils, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiFetch, clearClientCache } from '@/lib/utils/http'
+import { createClient } from '@/lib/supabase/client'
 import { DISH_CATEGORIES, PLACE_REGIONS, type CatalogDish, type CatalogPlace } from '@/lib/catalog/types'
 
 type Kind = 'places' | 'dishes'
@@ -70,6 +71,25 @@ const emptyDish = (): DishForm => ({
   is_published: true,
 })
 
+function slugify(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80)
+}
+
+function fileExt(file: File) {
+  const fromType = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : file.type.includes('jpeg') || file.type === 'image/jpg' ? 'jpg' : null
+  if (fromType) return fromType
+  const name = file.name.split('.').pop()?.toLowerCase()
+  if (name === 'jpeg' || name === 'jpg') return 'jpg'
+  if (name === 'png' || name === 'webp') return name
+  return null
+}
+
 function placeToForm(place: CatalogPlace): PlaceForm {
   return {
     slug: place.slug,
@@ -112,6 +132,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
   const [uploading, setUploading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [formError, setFormError] = useState('')
   const [placeForm, setPlaceForm] = useState<PlaceForm>(emptyPlace())
   const [dishForm, setDishForm] = useState<DishForm>(emptyDish())
 
@@ -141,6 +162,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
 
   const openCreate = () => {
     setEditingId(null)
+    setFormError('')
     setPlaceForm(emptyPlace())
     setDishForm(emptyDish())
     setShowForm(true)
@@ -148,53 +170,126 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
 
   const openEdit = (item: CatalogPlace | CatalogDish) => {
     setEditingId(item.slug)
+    setFormError('')
     if (isPlaces) setPlaceForm(placeToForm(item as CatalogPlace))
     else setDishForm(dishToForm(item as CatalogDish))
     setShowForm(true)
   }
 
+  const applyImageUrl = (url: string) => {
+    if (isPlaces) setPlaceForm((current) => ({ ...current, image_url: url }))
+    else setDishForm((current) => ({ ...current, image_url: url }))
+  }
+
   const uploadImage = async (file: File) => {
+    const ext = fileExt(file)
+    if (!ext) {
+      toast.error('Format invalide. JPG, PNG ou WEBP uniquement.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image trop lourde. Maximum 5 Mo.')
+      return
+    }
+
     setUploading(true)
+    setFormError('')
     try {
+      const folder = isPlaces ? 'lieux' : 'plats'
+      const objectPath = `${folder}/${crypto.randomUUID()}.${ext}`
+      const contentType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
+      const supabase = createClient()
+      const { error: storageError } = await supabase.storage.from('places').upload(objectPath, file, {
+        contentType,
+        upsert: true,
+      })
+
+      if (!storageError) {
+        const { data } = supabase.storage.from('places').getPublicUrl(objectPath)
+        applyImageUrl(data.publicUrl)
+        toast.success('Image envoyée dans le bucket places')
+        return
+      }
+
       const formData = new FormData()
-      formData.append('file', file)
-      formData.append('kind', isPlaces ? 'lieux' : 'plats')
+      formData.append('file', file, file.name || `image.${ext}`)
+      formData.append('kind', folder)
       const result = await apiFetch<{ url?: string }>('/api/admin/upload', {
         method: 'POST',
         body: formData,
+        timeoutMs: 90000,
       })
       if (!result.ok || !result.data?.url) {
-        toast.error(result.error || "Échec de l'upload")
+        const message = result.error || storageError.message || "Échec de l'upload"
+        setFormError(message)
+        toast.error(message)
         return
       }
-      if (isPlaces) setPlaceForm((current) => ({ ...current, image_url: result.data!.url! }))
-      else setDishForm((current) => ({ ...current, image_url: result.data!.url! }))
+      applyImageUrl(result.data.url)
       toast.success('Image envoyée dans le bucket places')
     } finally {
       setUploading(false)
     }
   }
 
+  const setName = (name: string) => {
+    if (isPlaces) {
+      setPlaceForm((current) => ({
+        ...current,
+        name,
+        slug: editingId ? current.slug : slugify(name),
+      }))
+    } else {
+      setDishForm((current) => ({
+        ...current,
+        name,
+        slug: editingId ? current.slug : slugify(name),
+      }))
+    }
+  }
+
   const save = async () => {
+    const imageUrl = isPlaces ? placeForm.image_url.trim() : dishForm.image_url.trim()
+    const name = isPlaces ? placeForm.name.trim() : dishForm.name.trim()
+    const description = isPlaces ? placeForm.description.trim() : dishForm.description.trim()
+    if (!name || !description) {
+      setFormError('Le nom et la description sont requis.')
+      return
+    }
+    if (isPlaces && !placeForm.locality.trim()) {
+      setFormError('La localité est requise.')
+      return
+    }
+    if (!imageUrl) {
+      setFormError("Ajoutez une image (fichier ou URL) avant d'enregistrer.")
+      return
+    }
+
     setSaving(true)
+    setFormError('')
     try {
       const payload = isPlaces
         ? {
             ...placeForm,
-            latitude: Number(placeForm.latitude),
-            longitude: Number(placeForm.longitude),
+            slug: placeForm.slug.trim() || slugify(placeForm.name),
+            history: placeForm.history.trim() || placeForm.description.trim(),
+            latitude: placeForm.latitude.replace(',', '.'),
+            longitude: placeForm.longitude.replace(',', '.'),
           }
-        : dishForm
+        : {
+            ...dishForm,
+            slug: dishForm.slug.trim() || slugify(dishForm.name),
+            history: dishForm.history.trim() || dishForm.description.trim(),
+          }
 
-      const url = editingId
-        ? `/api/admin/${kind}/${editingId}`
-        : `/api/admin/${kind}`
+      const url = editingId ? `/api/admin/${kind}/${editingId}` : `/api/admin/${kind}`
       const result = await apiFetch(url, {
         method: editingId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       if (!result.ok) {
+        setFormError(result.error || 'Enregistrement impossible')
         toast.error(result.error || 'Enregistrement impossible')
         return
       }
@@ -218,6 +313,8 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
     clearClientCache()
     await load()
   }
+
+  const currentImage = isPlaces ? placeForm.image_url : dishForm.image_url
 
   return (
     <div className="space-y-5">
@@ -277,8 +374,14 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-10">
-          <div className="mb-10 w-full max-w-2xl rounded-3xl bg-card p-6 shadow-2xl">
+        <div className="fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-10 pb-28">
+          <form
+            className="mb-10 w-full max-w-2xl rounded-3xl bg-card p-6 shadow-2xl"
+            onSubmit={(event) => {
+              event.preventDefault()
+              void save()
+            }}
+          >
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2 font-serif text-xl font-bold">
                 {isPlaces ? <Landmark className="h-5 w-5 text-primary" /> : <Utensils className="h-5 w-5 text-primary" />}
@@ -289,22 +392,27 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
               </button>
             </div>
 
+            {formError && (
+              <p className="mb-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+                {formError}
+              </p>
+            )}
+
             <div className="grid gap-3">
               <label className="text-xs font-bold">
                 Nom
                 <input
+                  required
                   className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
                   value={isPlaces ? placeForm.name : dishForm.name}
-                  onChange={(e) => isPlaces
-                    ? setPlaceForm({ ...placeForm, name: e.target.value })
-                    : setDishForm({ ...dishForm, name: e.target.value })}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </label>
               <label className="text-xs font-bold">
                 Identifiant (slug)
                 <input
                   className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
-                  placeholder="ex: koutamakou"
+                  placeholder="généré automatiquement depuis le nom"
                   value={isPlaces ? placeForm.slug : dishForm.slug}
                   onChange={(e) => isPlaces
                     ? setPlaceForm({ ...placeForm, slug: e.target.value })
@@ -314,6 +422,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
               <label className="text-xs font-bold">
                 Description
                 <textarea
+                  required
                   className="mt-1 h-20 w-full rounded-xl border border-border bg-background p-3 text-sm"
                   value={isPlaces ? placeForm.description : dishForm.description}
                   onChange={(e) => isPlaces
@@ -325,6 +434,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                 Histoire
                 <textarea
                   className="mt-1 h-24 w-full rounded-xl border border-border bg-background p-3 text-sm"
+                  placeholder="Si vide, la description sera utilisée"
                   value={isPlaces ? placeForm.history : dishForm.history}
                   onChange={(e) => isPlaces
                     ? setPlaceForm({ ...placeForm, history: e.target.value })
@@ -350,6 +460,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                     <label className="text-xs font-bold">
                       Localité
                       <input
+                        required
                         className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
                         value={placeForm.locality}
                         onChange={(e) => setPlaceForm({ ...placeForm, locality: e.target.value })}
@@ -358,7 +469,9 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                     <label className="text-xs font-bold">
                       Latitude
                       <input
+                        inputMode="decimal"
                         className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
+                        placeholder="ex. 6,13 (optionnel)"
                         value={placeForm.latitude}
                         onChange={(e) => setPlaceForm({ ...placeForm, latitude: e.target.value })}
                       />
@@ -366,7 +479,9 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                     <label className="text-xs font-bold">
                       Longitude
                       <input
+                        inputMode="decimal"
                         className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
+                        placeholder="ex. 1,22 (optionnel)"
                         value={placeForm.longitude}
                         onChange={(e) => setPlaceForm({ ...placeForm, longitude: e.target.value })}
                       />
@@ -435,20 +550,31 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
 
               <div className="space-y-2">
                 <p className="text-xs font-bold">Image (bucket places)</p>
-                {(isPlaces ? placeForm.image_url : dishForm.image_url) && (
+                {currentImage && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={isPlaces ? placeForm.image_url : dishForm.image_url} alt="" className="h-28 w-full rounded-xl object-cover" />
+                  <img src={currentImage} alt="" className="h-28 w-full rounded-xl object-cover" />
                 )}
+                <label className="text-xs font-bold">
+                  URL de l’image
+                  <input
+                    className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm font-normal"
+                    placeholder="https://… ou téléversez un fichier ci-dessous"
+                    value={currentImage}
+                    onChange={(e) => applyImageUrl(e.target.value)}
+                  />
+                </label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-bold">
                   {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   Téléverser une image
                   <input
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept="image/jpeg,image/png,image/webp,image/jpg,.jpg,.jpeg,.png,.webp"
                     className="hidden"
+                    disabled={uploading}
                     onChange={(e) => {
                       const file = e.target.files?.[0]
-                      if (file) uploadImage(file)
+                      e.target.value = ''
+                      if (file) void uploadImage(file)
                     }}
                   />
                 </label>
@@ -460,15 +586,14 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                 Annuler
               </button>
               <button
-                type="button"
-                onClick={save}
-                disabled={saving}
+                type="submit"
+                disabled={saving || uploading}
                 className="flex-1 rounded-full bg-primary py-3 text-xs font-bold text-white disabled:opacity-60"
               >
                 {saving ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Enregistrer'}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
     </div>

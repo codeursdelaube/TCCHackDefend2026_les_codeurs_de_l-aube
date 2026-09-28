@@ -3,19 +3,20 @@ import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth/admin'
 import { mapPlace, slugify } from '@/lib/catalog/map'
 import { PLACE_REGIONS } from '@/lib/catalog/types'
+import { catalogDbError, DEFAULT_TOGO_LAT, DEFAULT_TOGO_LNG, logAdminAction, parseCoord } from '@/lib/catalog/admin'
 
 function parsePlaceBody(body: Record<string, unknown>) {
   const name = String(body.name ?? '').trim()
   const description = String(body.description ?? '').trim()
-  const history = String(body.history ?? '').trim()
+  const history = String(body.history ?? '').trim() || description
   const region = String(body.region ?? '').trim()
   const locality = String(body.locality ?? '').trim()
   const image_url = String(body.image_url ?? '').trim()
-  const latitude = Number(body.latitude)
-  const longitude = Number(body.longitude)
+  const latitude = parseCoord(body.latitude, DEFAULT_TOGO_LAT)
+  const longitude = parseCoord(body.longitude, DEFAULT_TOGO_LNG)
 
-  if (!name || !description || !history || !region || !locality || !image_url) {
-    return { error: 'Tous les champs principaux sont requis, y compris une image.' }
+  if (!name || !description || !region || !locality || !image_url) {
+    return { error: 'Nom, description, région, localité et image sont requis.' }
   }
   if (!PLACE_REGIONS.includes(region as (typeof PLACE_REGIONS)[number])) {
     return { error: 'Région invalide.' }
@@ -54,13 +55,18 @@ function parsePlaceBody(body: Record<string, unknown>) {
 }
 
 export async function GET() {
-  const auth = await requireAdmin()
-  if ('error' in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status })
-  }
+  try {
+    const auth = await requireAdmin()
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
 
-  const places = await prisma.place.findMany({ orderBy: { updated_at: 'desc' } })
-  return NextResponse.json({ places: places.map(mapPlace) })
+    const places = await prisma.place.findMany({ orderBy: { updated_at: 'desc' } })
+    return NextResponse.json({ places: places.map(mapPlace) })
+  } catch (error) {
+    console.error('[GET /api/admin/places]', error)
+    return NextResponse.json({ error: catalogDbError(error) || 'Chargement impossible.' }, { status: 500 })
+  }
 }
 
 export async function POST(request: Request) {
@@ -81,19 +87,17 @@ export async function POST(request: Request) {
     }
 
     const place = await prisma.place.create({ data: parsed.data })
-    await prisma.adminLog.create({
-      data: {
-        admin_id: auth.profile.id,
-        action: 'create_place',
-        target_type: 'place',
-        target_id: place.id,
-        details: { slug: place.slug, name: place.name },
-      },
+    await logAdminAction({
+      admin_id: auth.profile.id,
+      action: 'create_place',
+      target_type: 'place',
+      target_id: place.id,
+      details: { slug: place.slug, name: place.name },
     })
 
     return NextResponse.json({ place: mapPlace(place) }, { status: 201 })
   } catch (error) {
     console.error('[POST /api/admin/places]', error)
-    return NextResponse.json({ error: 'Impossible de créer le lieu.' }, { status: 500 })
+    return NextResponse.json({ error: catalogDbError(error) || 'Impossible de créer le lieu.' }, { status: 500 })
   }
 }
