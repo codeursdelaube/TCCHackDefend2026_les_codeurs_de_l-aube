@@ -16,6 +16,7 @@ import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch, apiFetchCached } from '@/lib/utils/http'
 import { toast } from 'sonner'
 import StarRating from '@/components/ui/StarRating'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 
 interface GuideInfo {
   id: string
@@ -35,6 +36,7 @@ interface GuideInfo {
 }
 
 export default function BookingPage() {
+  const { isAuthenticated, loading: authLoading } = useRequireAuth()
   const t = useTranslations('Booking')
   const params = useParams<{ locale: string; guideId: string }>()
   const guideId = params?.guideId
@@ -57,7 +59,7 @@ export default function BookingPage() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    if (!guideId) return
+    if (!guideId || authLoading || !isAuthenticated) return
 
     const fetchGuide = async () => {
       setLoadingGuide(true)
@@ -79,7 +81,7 @@ export default function BookingPage() {
     }
 
     fetchGuide()
-  }, [guideId, t])
+  }, [guideId, t, authLoading, isAuthenticated])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -131,7 +133,7 @@ export default function BookingPage() {
     }
   }
 
-  if (loadingGuide) {
+  if (authLoading || !isAuthenticated || loadingGuide) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center space-y-4">

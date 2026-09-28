@@ -326,3 +326,45 @@ model AdminLog {
 
   @@map("admin_logs")
 }
+
+model Place {
+  id                   String   @id @default(uuid()) @db.Uuid
+  slug                 String   @unique
+  name                 String
+  description          String   @db.Text
+  history              String   @db.Text
+  region               String
+  locality             String
+  latitude             Decimal  @db.Decimal(10, 7)
+  longitude            Decimal  @db.Decimal(10, 7)
+  image_url            String
+  is_unesco            Boolean  @default(false)
+  is_published         Boolean  @default(true)
+  best_time            String?
+  duration             String?
+  outfit               String?
+  access_info          String?
+  fee                  String?
+  related_dish_slugs   String[] @default([])
+  created_at           DateTime @default(now()) @db.Timestamptz
+  updated_at           DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@map("places")
+}
+
+model Dish {
+  id               String   @id @default(uuid()) @db.Uuid
+  slug             String   @unique
+  name             String
+  description      String   @db.Text
+  history          String   @db.Text
+  accompaniments   String?  @db.Text
+  category         String
+  region           String?
+  image_url        String
+  is_published     Boolean  @default(true)
+  created_at       DateTime @default(now()) @db.Timestamptz
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@map("dishes")
+}

@@ -4,14 +4,13 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowRight, ChefHat, Compass, Landmark, MapPin, Sparkles, TreePine, Waves, Globe2
+  ChefHat, Compass, Landmark, MapPin, Sparkles, Globe2
 } from 'lucide-react'
-import { Link } from '@/i18n/navigation'
-import { useTranslations } from 'next-intl'
+import AuthGuardLink from '@/components/AuthGuardLink'
 import Badge from '@/components/ui/Badge'
 import SectionHeader from '@/components/ui/SectionHeader'
-import { monuments } from '@/app/LieuxT/site'
 import SiteCard from '@/components/ui/SiteCard'
+import { usePlaces } from '@/hooks/useCatalog'
 
 /* ─── Types ─────────────────────────────────────────── */
 interface RegionSpecialty {
@@ -173,11 +172,11 @@ function TypeBadge({ type }: { type: RegionSpecialty['type'] }) {
 }
 
 export default function RegionsPage() {
-  const tMonuments = useTranslations('Monuments')
+  const { places } = usePlaces()
   const [selectedRegion, setSelectedRegion] = useState<string>(regionsData[0].id)
   const region = regionsData.find((r) => r.id === selectedRegion) ?? regionsData[0]
 
-  const regionMonuments = monuments.filter((m) => m.région === region.regionKey)
+  const regionMonuments = places.filter((m) => m.région === region.regionKey)
 
   return (
     <main className="min-h-screen bg-background pb-28 pt-20 text-foreground">
@@ -382,11 +381,12 @@ export default function RegionsPage() {
                     <SiteCard
                       key={m.id}
                       id={m.id}
-                      nom={tMonuments(`${m.id}.nom`)}
+                      nom={m.nom}
                       region={m.région}
                       localite={m.localite}
-                      description={tMonuments(`${m.id}.description`)}
+                      description={m.description}
                       image={m.image}
+                      isUnesco={m.isUnesco}
                     />
                   ))}
                 </div>
@@ -399,12 +399,12 @@ export default function RegionsPage() {
                 <h3 className="font-serif text-xl font-bold text-foreground">Préparez votre séjour en {region.nom}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground">Trouvez un guide local certifié pour une immersion authentique.</p>
               </div>
-              <Link
+              <AuthGuardLink
                 href="/guides"
                 className="shrink-0 rounded-full bg-primary px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-primary-dark transition-all"
               >
                 Réserver un guide local →
-              </Link>
+              </AuthGuardLink>
             </div>
           </motion.div>
         </AnimatePresence>

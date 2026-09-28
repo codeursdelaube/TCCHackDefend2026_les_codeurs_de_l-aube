@@ -1,6 +1,5 @@
 'use client'
 
-import { Link } from '@/i18n/navigation'
 import { ShieldCheck, MapPin, Languages, ArrowRight, Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import StarRating from './StarRating'
@@ -119,12 +118,12 @@ export default function GuideCard({
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <Link
+          <AuthGuardLink
             href={`/guides/${id}`}
             className="rounded-full border border-border px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-colors"
           >
             {t('view_profile')}
-          </Link>
+          </AuthGuardLink>
           <AuthGuardLink
             href={`/booking/${id}`}
             className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all"

@@ -8,17 +8,17 @@ import {
   ArrowLeft, BedDouble, Camera, Check, ChevronDown, ChevronUp,
   Clock, Compass, Eye, Footprints, Headphones, History, Info,
   MapPin, Navigation, Pause, Play, Share2, ShieldCheck,
-  ShoppingBag, Landmark, Sun, Utensils, Users, ArrowRight,
+  ShoppingBag, Landmark, Sun, Utensils, Users, ArrowRight, Loader2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { monuments } from '@/app/LieuxT/site'
-import platsTogolais from '@/app/Plats/plat'
+import AuthGuardLink from '@/components/AuthGuardLink'
 import hotels from '@/app/nearbyhotels/hotels'
 import { getSiteRating } from '@/lib/constants/ratings'
 import { getSiteExtraDetails, SiteActivity } from '@/lib/constants/siteDetails'
 import StarRating from '@/components/ui/StarRating'
 import Badge from '@/components/ui/Badge'
+import { useDishes, usePlaces } from '@/hooks/useCatalog'
 
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
@@ -67,11 +67,10 @@ type Tab = (typeof TABS)[number]
 
 export default function SiteDetailPage({ params }: PageProps) {
   const t = useTranslations('Lieux')
-  const tMonuments = useTranslations('Monuments')
-  const tPlats = useTranslations('Plats')
   const resolvedParams = use(params)
-  const site = monuments.find((item) => item.id === resolvedParams.id)
-  if (!site) notFound()
+  const { places, loading: placesLoading } = usePlaces()
+  const { dishes } = useDishes()
+  const site = places.find((item) => item.id === resolvedParams.id || item.slug === resolvedParams.id)
 
   const [activeTab, setActiveTab] = useState<Tab>('apercu')
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
@@ -79,17 +78,17 @@ export default function SiteDetailPage({ params }: PageProps) {
   const [showFullText, setShowFullText] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const siteLat = Number(site.lat)
-  const siteLng = Number(site.lng)
-  const siteName = tMonuments(`${site.id}.nom`)
-  const siteDescription = tMonuments(`${site.id}.description`)
-  const siteHistory = tMonuments(`${site.id}.histoire`)
+  const siteLat = Number(site?.lat)
+  const siteLng = Number(site?.lng)
+  const siteName = site?.nom || ''
+  const siteDescription = site?.description || ''
+  const siteHistory = site?.histoire || ''
 
-  const ratingData = getSiteRating(site.id)
-  const extraDetails = getSiteExtraDetails(site.id, site.région)
-  const isKoutammakou = site.id === 'koutamakou'
+  const ratingData = getSiteRating(resolvedParams.id)
+  const extraDetails = getSiteExtraDetails(resolvedParams.id, site?.région || 'Maritime')
+  const isKoutammakou = site?.isUnesco || resolvedParams.id === 'koutamakou'
 
-  const relatedDishes = platsTogolais.filter((p) => extraDetails.dishesIds.includes(p.id))
+  const relatedDishes = dishes.filter((p) => (site?.relatedDishSlugs || extraDetails.dishesIds).includes(p.id))
 
   const getRegionName = (region: string): string => {
     switch (region) {
@@ -139,8 +138,8 @@ export default function SiteDetailPage({ params }: PageProps) {
     .slice(0, 3)
 
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${siteLat},${siteLng}`
-  const previewSites = monuments.filter((m) => m.id !== site.id && m.région === site.région).slice(0, 4)
-  const otherSites = previewSites.length > 0 ? previewSites : monuments.filter((m) => m.id !== site.id).slice(0, 4)
+  const previewSites = places.filter((m) => m.id !== site?.id && m.région === site?.région).slice(0, 4)
+  const otherSites = previewSites.length > 0 ? previewSites : places.filter((m) => m.id !== site?.id).slice(0, 4)
 
   const tabLabels: Record<Tab, string> = {
     apercu: 'Aperçu',
@@ -148,6 +147,18 @@ export default function SiteDetailPage({ params }: PageProps) {
     guide_pratique: 'Guide Malin',
     carte: 'Carte & GPS',
     similaires: 'À proximité',
+  }
+
+  if (placesLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (!site) {
+    notFound()
   }
 
   return (
@@ -240,13 +251,13 @@ export default function SiteDetailPage({ params }: PageProps) {
             <span>Itinéraire Google Maps (GPS)</span>
           </a>
 
-          <Link
+          <AuthGuardLink
             href="/guides"
             className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-6 font-bold text-foreground transition hover:border-primary hover:text-primary active:scale-[0.98] shadow-xs"
           >
             <Users className="h-4 w-4 text-primary" />
             <span>Réserver un guide pour ce lieu</span>
-          </Link>
+          </AuthGuardLink>
         </div>
 
         {/* Onglets de navigation interactifs */}
@@ -409,14 +420,14 @@ export default function SiteDetailPage({ params }: PageProps) {
                       <div className="relative h-28 overflow-hidden">
                         <Image
                           src={dish.image}
-                          alt={tPlats(`${dish.id}.nom`)}
+                          alt={dish.nom}
                           fill
                           sizes="200px"
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                       <div className="p-3">
-                        <p className="truncate text-xs font-bold text-foreground">{tPlats(`${dish.id}.nom`)}</p>
+                        <p className="truncate text-xs font-bold text-foreground">{dish.nom}</p>
                         <p className="text-[11px] text-muted-foreground capitalize">{dish.catégorie}</p>
                       </div>
                     </Link>
@@ -506,12 +517,12 @@ export default function SiteDetailPage({ params }: PageProps) {
                 <p className="text-base font-bold text-foreground font-serif">Vous souhaitez une visite guidée personnalisée ?</p>
                 <p className="text-xs sm:text-sm text-muted-foreground">Réservez un guide togolais certifié pour des explications immersives.</p>
               </div>
-              <Link
+              <AuthGuardLink
                 href="/guides"
                 className="shrink-0 rounded-full bg-primary px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
               >
                 Trouver un guide
-              </Link>
+              </AuthGuardLink>
             </div>
           </div>
         )}
@@ -532,7 +543,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                   <Sun className="h-4 w-4" />
                   <span>Meilleur moment</span>
                 </div>
-                <p className="text-sm font-bold text-foreground">{extraDetails.practicalInfo.bestTime}</p>
+                <p className="text-sm font-bold text-foreground">{site.bestTime || extraDetails.practicalInfo.bestTime}</p>
               </div>
 
               <div className="app-card p-5 space-y-1.5">
@@ -540,7 +551,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                   <Clock className="h-4 w-4" />
                   <span>Durée recommandée</span>
                 </div>
-                <p className="text-sm font-bold text-foreground">{extraDetails.practicalInfo.duration}</p>
+                <p className="text-sm font-bold text-foreground">{site.duration || extraDetails.practicalInfo.duration}</p>
               </div>
 
               <div className="app-card p-5 space-y-1.5">
@@ -548,7 +559,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                   <Footprints className="h-4 w-4" />
                   <span>Tenue &amp; Équipement</span>
                 </div>
-                <p className="text-sm font-bold text-foreground">{extraDetails.practicalInfo.outfit}</p>
+                <p className="text-sm font-bold text-foreground">{site.outfit || extraDetails.practicalInfo.outfit}</p>
               </div>
 
               <div className="app-card p-5 space-y-1.5">
@@ -556,7 +567,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                   <Navigation className="h-4 w-4" />
                   <span>Accès &amp; Transport</span>
                 </div>
-                <p className="text-sm font-bold text-foreground">{extraDetails.practicalInfo.access}</p>
+                <p className="text-sm font-bold text-foreground">{site.access || extraDetails.practicalInfo.access}</p>
               </div>
             </div>
 
@@ -565,7 +576,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                 <Info className="h-4 w-4 text-primary" />
                 <span>Tarif &amp; Entrée</span>
               </div>
-              <p className="text-sm font-bold text-foreground">{extraDetails.practicalInfo.fee}</p>
+              <p className="text-sm font-bold text-foreground">{site.fee || extraDetails.practicalInfo.fee}</p>
             </div>
           </div>
         )}

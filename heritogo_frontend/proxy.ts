@@ -78,12 +78,11 @@ export default async function proxy(request: NextRequest) {
   // /auth/callback, /auth/confirm, /auth/reset-password restent
   // toujours accessibles (pas de redirection) pour éviter les boucles.
 
-  // Seules ces routes nécessitent une connexion
-  // scan, lieux, cuisine, histoire sont publiques pour les touristes
+  // Guides, réservation et dashboards : connexion obligatoire
   const protectedPaths = [
     '/dashboard',
     '/booking',
-    '/guides/reserve',
+    '/guides',
   ]
   const isProtected = protectedPaths.some(p =>
     pathWithoutLocale.startsWith(p)

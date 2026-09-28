@@ -21,6 +21,7 @@ import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/u
 import StarRating from '@/components/ui/StarRating'
 import Badge from '@/components/ui/Badge'
 import AuthGuardLink from '@/components/AuthGuardLink'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 
 interface GuideDetail {
   id: string
@@ -48,6 +49,7 @@ interface GuideDetail {
 }
 
 export default function GuideDetailPage() {
+  const { isAuthenticated, loading: authLoading } = useRequireAuth()
   const params = useParams<{ locale: string; id: string }>()
   const guideId = params?.id
 
@@ -66,7 +68,7 @@ export default function GuideDetailPage() {
   })
 
   useEffect(() => {
-    if (!guideId) return
+    if (!guideId || authLoading || !isAuthenticated) return
 
     const fetchGuideDetails = async () => {
       setLoading(true)
@@ -89,7 +91,7 @@ export default function GuideDetailPage() {
     }
 
     fetchGuideDetails()
-  }, [guideId])
+  }, [guideId, authLoading, isAuthenticated])
 
   const toggleFavorite = () => {
     if (!guideId) return
@@ -118,7 +120,7 @@ export default function GuideDetailPage() {
     }
   }
 
-  if (loading) {
+  if (authLoading || !isAuthenticated || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center space-y-4">

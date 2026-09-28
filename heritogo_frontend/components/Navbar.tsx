@@ -1,6 +1,7 @@
 'use client'
 
 import { Link, usePathname } from '@/i18n/navigation'
+import AuthGuardLink from '@/components/AuthGuardLink'
 import { useLocale, useTranslations } from 'next-intl'
 import { useParams, useRouter } from 'next/navigation'
 import {
@@ -156,6 +157,8 @@ export default function Navbar() {
     if (profile.role === 'admin') {
       return [
         { href: '/dashboard/admin', label: 'Dashboard', icon: User },
+        { href: '/dashboard/admin?tab=places', label: 'Lieux touristiques', icon: User },
+        { href: '/dashboard/admin?tab=dishes', label: 'Plats culinaires', icon: User },
         { href: '/dashboard/admin?tab=guides', label: 'Gérer les guides', icon: User },
         { href: '/dashboard/admin?tab=reports', label: 'Signalements', icon: User },
         { href: '/dashboard/admin?tab=reviews', label: 'Avis', icon: User },
@@ -205,19 +208,29 @@ export default function Navbar() {
 
           {(!pathname.startsWith('/auth') && (profile || pathname !== '/')) && (
             <nav className="hidden items-center gap-1 lg:flex">
-              {publicLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`rounded-2xl px-4 py-2 text-sm font-bold transition-all ${
+              {publicLinks.map((link) => {
+                const className = `rounded-2xl px-4 py-2 text-sm font-bold transition-all ${
                     isActive(link.href)
                       ? 'bg-primary text-primary-content'
                       : 'text-base-content/70 hover:bg-base-200'
-                  }`}
+                  }`
+                if (link.href === '/guides') {
+                  return (
+                    <AuthGuardLink key={link.href} href={link.href} className={className}>
+                      {link.label}
+                    </AuthGuardLink>
+                  )
+                }
+                return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={className}
                 >
                   {link.label}
                 </Link>
-              ))}
+                )
+              })}
             </nav>
           )}
 

@@ -12,8 +12,9 @@ import { apiFetch } from '@/lib/utils/http'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
-  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink, Star
+  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink, Star, Landmark, Utensils
 } from 'lucide-react'
+import CatalogManager from '@/components/admin/CatalogManager'
 
 interface PendingGuide {
   id: string
@@ -93,7 +94,7 @@ export default function AdminDashboardPage() {
   const searchParams = useSearchParams()
   const t = useTranslations('Dashboard')
 
-  const [activeTab, setActiveTab] = useState<'pending' | 'reports' | 'reviews' | 'logs'>('pending')
+  const [activeTab, setActiveTab] = useState<'pending' | 'reports' | 'reviews' | 'logs' | 'places' | 'dishes'>('pending')
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -105,10 +106,14 @@ export default function AdminDashboardPage() {
       setActiveTab('reviews')
     } else if (tab === 'logs') {
       setActiveTab('logs')
+    } else if (tab === 'places') {
+      setActiveTab('places')
+    } else if (tab === 'dishes') {
+      setActiveTab('dishes')
     }
   }, [searchParams])
 
-  const handleTabChange = (tabName: 'pending' | 'reports' | 'reviews' | 'logs') => {
+  const handleTabChange = (tabName: 'pending' | 'reports' | 'reviews' | 'logs' | 'places' | 'dishes') => {
     setActiveTab(tabName)
     startTransition(() => {
       let newTabParam = tabName === 'pending' ? 'guides' : tabName
@@ -369,6 +374,8 @@ export default function AdminDashboardPage() {
       {/* Tab Switcher */}
       <div className="flex border-b border-border mb-8 overflow-x-auto gap-4">
         {[
+          { id: 'places', label: 'Lieux', icon: Landmark },
+          { id: 'dishes', label: 'Plats', icon: Utensils },
           { id: 'pending', label: t('admin.tab_validation'), icon: ShieldCheck },
           { id: 'reports', label: t('admin.tab_reports'), icon: AlertTriangle },
           { id: 'reviews', label: t('admin.tab_reviews'), icon: MessageSquare },
@@ -395,6 +402,9 @@ export default function AdminDashboardPage() {
 
       {/* Main Tab Content */}
       <div className="space-y-6">
+
+        {activeTab === 'places' && <CatalogManager kind="places" />}
+        {activeTab === 'dishes' && <CatalogManager kind="dishes" />}
 
         {/* Tab 1: Validation of Guides */}
         {activeTab === 'pending' && (

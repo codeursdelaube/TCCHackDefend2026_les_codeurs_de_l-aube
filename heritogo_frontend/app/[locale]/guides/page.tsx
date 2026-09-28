@@ -15,6 +15,7 @@ import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/u
 import { toast } from 'sonner'
 import GuideCard from '@/components/ui/GuideCard'
 import SectionHeader from '@/components/ui/SectionHeader'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 
 interface GuideRow {
   id: string
@@ -37,6 +38,7 @@ const ZONES = ['Lomé', 'Kpalimé', 'Atakpamé', 'Kara', 'Dapaong', 'Aného', 'T
 const LANGUAGES = ['Français', 'English', 'Espagnol', 'Deutsch', 'Éwé', 'Kabyè', 'Mina']
 
 export default function GuidesPage() {
+  const { isAuthenticated, loading: authLoading } = useRequireAuth()
   const t = useTranslations('GuidesPage')
   const [guides, setGuides] = useState<GuideRow[]>()
   const [loading, setLoading] = useState(true)
@@ -82,8 +84,9 @@ export default function GuidesPage() {
   }, [t])
 
   useEffect(() => {
+    if (authLoading || !isAuthenticated) return
     fetchGuides()
-  }, [fetchGuides])
+  }, [fetchGuides, authLoading, isAuthenticated])
 
 
   const toggleFavorite = (guideId: string) => {
@@ -116,6 +119,14 @@ export default function GuidesPage() {
 
     return matchesSearch && matchesZone && matchesLang && matchesPrice
   })
+
+  if (authLoading || !isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-background pb-28 pt-20 text-foreground">

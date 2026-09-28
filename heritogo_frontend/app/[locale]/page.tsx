@@ -321,16 +321,14 @@ export default function AccueilPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {categories.map(({ href, label, icon: Icon, count, highlight }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`app-card group relative flex flex-col justify-between p-4 transition-all duration-300 hover:-translate-y-1 ${
+            {categories.map(({ href, label, icon: Icon, count, highlight }) => {
+              const className = `app-card group relative flex flex-col justify-between p-4 transition-all duration-300 hover:-translate-y-1 ${
                   highlight
                     ? 'border-accent/50 bg-amber-50/40 dark:bg-amber-950/20'
                     : ''
-                }`}
-              >
+                }`
+              const inner = (
+                <>
                 <div className="flex items-center justify-between mb-4">
                   <span
                     className={`grid h-11 w-11 place-items-center rounded-2xl transition-colors ${
@@ -353,8 +351,25 @@ export default function AccueilPage() {
                   </h3>
                   <p className="mt-0.5 text-[11px] text-muted-foreground font-medium">{count}</p>
                 </div>
+                </>
+              )
+              if (href === '/guides') {
+                return (
+                  <AuthGuardLink key={href} href={href} className={className}>
+                    {inner}
+                  </AuthGuardLink>
+                )
+              }
+              return (
+              <Link
+                key={href}
+                href={href}
+                className={className}
+              >
+                {inner}
               </Link>
-            ))}
+              )
+            })}
           </div>
         </section>
 

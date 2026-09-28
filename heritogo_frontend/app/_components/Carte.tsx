@@ -7,7 +7,7 @@ import { COLORS } from "@/lib/constants/colors";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import "leaflet/dist/leaflet.css";
-import { Monument } from "../LieuxT/site";
+import { Monument } from "@/lib/catalog/types";
 
 // Création d'épingles personnalisées élégantes aux couleurs de la palette Café (Expresso, Caramel, Crema)
 function createCoffeePin(pinColor: string, dotColor: string) {
@@ -84,8 +84,8 @@ export default function Carte({ monumentsList }: CarteProps) {
 
         {monumentsList &&
           monumentsList.map((site) => {
-            const siteNom = tMonuments(`${site.id}.nom`);
-            const siteDesc = tMonuments(`${site.id}.description`);
+            const siteNom = site.nom || tMonuments(`${site.id}.nom`);
+            const siteDesc = site.description || tMonuments(`${site.id}.description`);
             const pinIcon = getPinByRegion(site.région);
 
             return (

@@ -2,20 +2,20 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { ChefHat, Filter, MapPin, Search, Utensils, Sparkles, Navigation, ArrowRight } from 'lucide-react'
+import { ChefHat, Filter, MapPin, Search, Utensils, Sparkles, Navigation, ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
 import DishCard from '@/components/ui/DishCard'
 import SectionHeader from '@/components/ui/SectionHeader'
+import { useDishes } from '@/hooks/useCatalog'
 
 const categoryFilters = ['all', 'Ayimolou', 'Fufu', 'Djenkoumé', 'Gboma', 'Akoumé', 'Wagasi', 'Gombo', 'Boissons'] as const
 type CategoryFilter = (typeof categoryFilters)[number]
 
 export default function CuisinePage() {
   const t = useTranslations('Cuisine')
-  const tPlats = useTranslations('Plats')
+  const { dishes, loading } = useDishes()
   const [searchInput, setSearchInput] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all')
   const [, startTransition] = useTransition()
@@ -35,9 +35,9 @@ export default function CuisinePage() {
     }
   }
 
-  const filteredPlats = platsTogolais.filter((plat) => {
-    const platName = tPlats(`${plat.id}.nom`).toLowerCase()
-    const platDescription = tPlats(`${plat.id}.description`).toLowerCase()
+  const filteredPlats = dishes.filter((plat) => {
+    const platName = plat.nom.toLowerCase()
+    const platDescription = plat.description.toLowerCase()
     const search = searchInput.toLowerCase()
     const matchesSearch =
       platName.includes(search) ||
@@ -126,7 +126,11 @@ export default function CuisinePage() {
             icon={Sparkles}
           />
 
-          {filteredPlats.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : filteredPlats.length === 0 ? (
             <div className="app-card flex flex-col items-center justify-center p-12 text-center space-y-3">
               <ChefHat className="h-10 w-10 text-primary opacity-60" />
               <h3 className="font-serif text-xl font-bold">{t('empty_search')}</h3>
@@ -150,10 +154,11 @@ export default function CuisinePage() {
                 <DishCard
                   key={plat.id}
                   id={plat.id}
-                  nom={tPlats(`${plat.id}.nom`)}
+                  nom={plat.nom}
                   categorie={plat.catégorie}
-                  description={tPlats(`${plat.id}.description`)}
+                  description={plat.description}
                   image={plat.image}
+                  region={plat.region || undefined}
                 />
               ))}
             </div>

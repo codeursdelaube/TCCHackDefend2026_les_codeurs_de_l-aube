@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, Banknote, ChefHat, ChevronRight, Flame, MapPin, Navigation, Phone, Soup, Utensils } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
-import platsTogolais from '@/app/Plats/plat'
 import restaurants from '@/app/Resto/restaurants'
 import TTSButton from '@/app/_components/TTSButton'
 import Badge from '@/components/ui/Badge'
 import StarRating from '@/components/ui/StarRating'
+import { prisma } from '@/lib/prisma'
+import { mapDish } from '@/lib/catalog/map'
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>
@@ -16,9 +17,14 @@ interface PageProps {
 export default async function PlatDetailPage({ params }: PageProps) {
   const resolvedParams = await params
   const t = await getTranslations({ locale: resolvedParams.locale, namespace: 'Cuisine' })
-  const tPlats = await getTranslations({ locale: resolvedParams.locale, namespace: 'Plats' })
-  const plat = platsTogolais.find((item) => item.id === resolvedParams.id)
-  if (!plat) notFound()
+  const dish = await prisma.dish.findFirst({
+    where: {
+      is_published: true,
+      slug: resolvedParams.id,
+    },
+  })
+  if (!dish) notFound()
+  const plat = mapDish(dish)
 
   const getCategoryName = (category: string): string => {
     switch (category) {
@@ -31,12 +37,16 @@ export default async function PlatDetailPage({ params }: PageProps) {
     }
   }
 
-  const suggestions = platsTogolais.filter((item) => item.catégorie === plat.catégorie && item.id !== plat.id).slice(0, 3)
+  const suggestionRows = await prisma.dish.findMany({
+    where: { is_published: true, category: plat.catégorie, slug: { not: plat.slug } },
+    take: 3,
+  })
+  const suggestions = suggestionRows.map(mapDish)
   const nearbyRestaurants = restaurants.filter((restaurant) => restaurant.plats_ids.includes(plat.id))
-  const platName = tPlats(`${plat.id}.nom`)
-  const platDescription = tPlats(`${plat.id}.description`)
-  const platHistory = tPlats(`${plat.id}.histoire`)
-  const platAcc = tPlats(`${plat.id}.accompagnementsIdaux`)
+  const platName = plat.nom
+  const platDescription = plat.description
+  const platHistory = plat.histoire
+  const platAcc = plat.accompaniments || ''
 
   return (
     <main className="min-h-screen bg-background pb-28 pt-8 text-foreground">
@@ -203,7 +213,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                       <div className="relative h-32 overflow-hidden bg-muted">
                         <Image
                           src={suggestion.image}
-                          alt={tPlats(`${suggestion.id}.nom`)}
+                          alt={suggestion.nom}
                           fill
                           sizes="240px"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -211,7 +221,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                       </div>
                       <div className="flex items-center justify-between p-3">
                         <p className="line-clamp-1 text-xs font-bold font-serif text-foreground group-hover:text-primary transition-colors">
-                          {tPlats(`${suggestion.id}.nom`)}
+                          {suggestion.nom}
                         </p>
                         <ChevronRight className="h-4 w-4 shrink-0 text-primary" />
                       </div>

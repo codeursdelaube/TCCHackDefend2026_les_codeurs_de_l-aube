@@ -10,11 +10,12 @@ import {
   MapPin,
   Search,
   Sparkles,
+  Loader2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Monument, monuments } from '@/app/LieuxT/site'
 import SiteCard from '@/components/ui/SiteCard'
-import SectionHeader from '@/components/ui/SectionHeader'
+import { usePlaces } from '@/hooks/useCatalog'
+import type { CatalogPlace } from '@/lib/catalog/types'
 
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
@@ -33,7 +34,7 @@ type RegionFilter = (typeof regionsTogo)[number]
 
 export default function ToutPage() {
   const t = useTranslations('Lieux')
-  const tMonuments = useTranslations('Monuments')
+  const { places, loading } = usePlaces()
   const [searchInput, setSearchInput] = useState('')
   const [selectedRegion, setSelectedRegion] = useState<RegionFilter>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
@@ -51,9 +52,9 @@ export default function ToutPage() {
     }
   }
 
-  const filteredSites = monuments.filter((site: Monument) => {
-    const siteName = tMonuments(`${site.id}.nom`).toLowerCase()
-    const siteDescription = tMonuments(`${site.id}.description`).toLowerCase()
+  const filteredSites = places.filter((site: CatalogPlace) => {
+    const siteName = site.nom.toLowerCase()
+    const siteDescription = site.description.toLowerCase()
     const search = searchInput.toLowerCase()
     const matchesSearch =
       siteName.includes(search) ||
@@ -160,7 +161,11 @@ export default function ToutPage() {
         </section>
 
         {/* ── CONTENT (GRID OR MAP) ── */}
-        {viewMode === 'map' ? (
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : viewMode === 'map' ? (
           <section className="app-card overflow-hidden p-2 sm:p-4">
             <div className="overflow-hidden rounded-2xl border border-border">
               <DynamicCarte monumentsList={filteredSites} />
@@ -192,11 +197,12 @@ export default function ToutPage() {
                   <SiteCard
                     key={site.id}
                     id={site.id}
-                    nom={tMonuments(`${site.id}.nom`)}
+                    nom={site.nom}
                     region={site.région}
                     localite={site.localite}
-                    description={tMonuments(`${site.id}.description`)}
+                    description={site.description}
                     image={site.image}
+                    isUnesco={site.isUnesco}
                     priority={index < 3}
                   />
                 ))}

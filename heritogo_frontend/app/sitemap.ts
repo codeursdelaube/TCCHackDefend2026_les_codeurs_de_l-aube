@@ -1,9 +1,8 @@
 import type { MetadataRoute } from 'next'
-import { monuments } from '@/app/LieuxT/site'
-import { platsTogolais } from '@/app/Plats/plat'
+import { prisma } from '@/lib/prisma'
 import { routing } from '@/i18n/routing'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://heritogo.codorah.com'
   const locales = routing.locales
   const lastModified = new Date()
@@ -22,7 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const entries: MetadataRoute.Sitemap = []
 
-  // Static routes for each locale with alternates
   for (const page of staticPages) {
     for (const locale of locales) {
       const url = `${baseUrl}/${locale}${page}`
@@ -42,44 +40,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Dynamic monument pages
-  for (const monument of monuments) {
-    for (const locale of locales) {
-      const pagePath = `/lieux/${monument.id}`
-      const url = `${baseUrl}/${locale}${pagePath}`
-      const alternates = {
-        languages: Object.fromEntries(
-          locales.map((loc) => [loc, `${baseUrl}/${loc}${pagePath}`])
-        ),
-      }
+  const [places, dishes] = await Promise.all([
+    prisma.place.findMany({ where: { is_published: true }, select: { slug: true, updated_at: true } }).catch(() => []),
+    prisma.dish.findMany({ where: { is_published: true }, select: { slug: true, updated_at: true } }).catch(() => []),
+  ])
 
+  for (const monument of places) {
+    for (const locale of locales) {
+      const pagePath = `/lieux/${monument.slug}`
+      const url = `${baseUrl}/${locale}${pagePath}`
       entries.push({
         url,
-        lastModified,
+        lastModified: monument.updated_at,
         changeFrequency: 'monthly',
         priority: 0.7,
-        alternates,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((loc) => [loc, `${baseUrl}/${loc}${pagePath}`])
+          ),
+        },
       })
     }
   }
 
-  // Dynamic cuisine / dishes pages
-  for (const plat of platsTogolais) {
+  for (const plat of dishes) {
     for (const locale of locales) {
-      const pagePath = `/cuisine/${plat.id}`
+      const pagePath = `/cuisine/${plat.slug}`
       const url = `${baseUrl}/${locale}${pagePath}`
-      const alternates = {
-        languages: Object.fromEntries(
-          locales.map((loc) => [loc, `${baseUrl}/${loc}${pagePath}`])
-        ),
-      }
-
       entries.push({
         url,
-        lastModified,
+        lastModified: plat.updated_at,
         changeFrequency: 'monthly',
         priority: 0.7,
-        alternates,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((loc) => [loc, `${baseUrl}/${loc}${pagePath}`])
+          ),
+        },
       })
     }
   }
