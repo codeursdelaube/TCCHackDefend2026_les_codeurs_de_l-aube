@@ -444,6 +444,8 @@
         "search_placeholder": "搜索 fufu, ablo, 酱汁...",
         "results_for": "搜索结果：",
         "no_plats": "未找到相关传统菜肴",
+        "empty_search": "没有符合搜索条件的菜肴",
+        "reset_filters": "重置筛选",
         "try_other": "请尝试其他拼写（例如 come, djenkoume）或分类。",
         "categories": {
             "accompagnement": "配菜",

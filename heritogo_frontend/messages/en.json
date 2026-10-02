@@ -444,6 +444,8 @@
         "search_placeholder": "Search for fufu, ablo, a sauce...",
         "results_for": "Results for:",
         "no_plats": "No traditional dishes found",
+        "empty_search": "No dish matches your search",
+        "reset_filters": "Reset filters",
         "try_other": "Try another spelling (e.g. come, djenkoume) or category.",
         "categories": {
             "accompagnement": "Side Dish",

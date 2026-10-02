@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { apiFetch } from '@/lib/utils/http'
+import { getLocalDishes } from '@/lib/catalog/dishes'
 import type { CatalogDish, CatalogPlace } from '@/lib/catalog/types'
 
 export function usePlaces() {
@@ -31,7 +32,7 @@ export function useDishes() {
     let cancelled = false
     apiFetch<{ dishes?: CatalogDish[] }>('/api/dishes').then((result) => {
       if (cancelled) return
-      setDishes(result.ok && result.data?.dishes ? result.data.dishes : [])
+      setDishes(result.ok && result.data?.dishes?.length ? result.data.dishes : getLocalDishes())
       setLoading(false)
     })
     return () => {

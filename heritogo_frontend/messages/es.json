@@ -444,6 +444,8 @@
         "search_placeholder": "Buscar fufu, ablo, una salsa...",
         "results_for": "Resultados para:",
         "no_plats": "No se encontraron platos tradicionales",
+        "empty_search": "Ningún plato coincide con su búsqueda",
+        "reset_filters": "Restablecer filtros",
         "try_other": "Intente otra ortografía (ej: come, djenkoume) o categoría.",
         "categories": {
             "accompagnement": "Acompañamiento",

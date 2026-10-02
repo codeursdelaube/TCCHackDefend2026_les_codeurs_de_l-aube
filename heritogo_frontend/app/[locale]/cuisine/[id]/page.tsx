@@ -1,14 +1,13 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Banknote, ChefHat, ChevronRight, Flame, MapPin, Navigation, Phone, Soup, Utensils } from 'lucide-react'
+import { ArrowLeft, Banknote, ChefHat, ChevronRight, Flame, MapPin, Navigation, Soup, Utensils } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import restaurants from '@/app/Resto/restaurants'
 import TTSButton from '@/app/_components/TTSButton'
 import Badge from '@/components/ui/Badge'
 import StarRating from '@/components/ui/StarRating'
-import { prisma } from '@/lib/prisma'
-import { mapDish } from '@/lib/catalog/map'
+import { dishLookupIds, dishMatches, findPublishedDish, getLocalDishes } from '@/lib/catalog/dishes'
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>
@@ -17,14 +16,9 @@ interface PageProps {
 export default async function PlatDetailPage({ params }: PageProps) {
   const resolvedParams = await params
   const t = await getTranslations({ locale: resolvedParams.locale, namespace: 'Cuisine' })
-  const dish = await prisma.dish.findFirst({
-    where: {
-      is_published: true,
-      slug: resolvedParams.id,
-    },
-  })
-  if (!dish) notFound()
-  const plat = mapDish(dish)
+  const tPlats = await getTranslations({ locale: resolvedParams.locale, namespace: 'Plats' })
+  const plat = await findPublishedDish(resolvedParams.id)
+  if (!plat) notFound()
 
   const getCategoryName = (category: string): string => {
     switch (category) {
@@ -37,16 +31,24 @@ export default async function PlatDetailPage({ params }: PageProps) {
     }
   }
 
-  const suggestionRows = await prisma.dish.findMany({
-    where: { is_published: true, category: plat.catégorie, slug: { not: plat.slug } },
-    take: 3,
-  })
-  const suggestions = suggestionRows.map(mapDish)
-  const nearbyRestaurants = restaurants.filter((restaurant) => restaurant.plats_ids.includes(plat.id))
-  const platName = plat.nom
-  const platDescription = plat.description
-  const platHistory = plat.histoire
-  const platAcc = plat.accompaniments || ''
+  const suggestions = getLocalDishes()
+    .filter((item) =>
+      item.catégorie === plat.catégorie &&
+      !dishMatches(item, plat.slug) &&
+      item.nom.toLowerCase() !== plat.nom.toLowerCase()
+    )
+    .slice(0, 3)
+  const lookupIds = dishLookupIds(plat)
+  const nearbyRestaurants = restaurants.filter((restaurant) =>
+    restaurant.plats_ids.some((id) => lookupIds.has(id))
+  )
+  const copyKey = plat.id
+  const platName = tPlats.has(`${copyKey}.nom`) ? tPlats(`${copyKey}.nom`) : plat.nom
+  const platDescription = tPlats.has(`${copyKey}.description`) ? tPlats(`${copyKey}.description`) : plat.description
+  const platHistory = tPlats.has(`${copyKey}.histoire`) ? tPlats(`${copyKey}.histoire`) : plat.histoire
+  const platAcc = tPlats.has(`${copyKey}.accompagnementsIdaux`)
+    ? tPlats(`${copyKey}.accompagnementsIdaux`)
+    : plat.accompaniments || ''
 
   return (
     <main className="min-h-screen bg-background pb-28 pt-8 text-foreground">
@@ -207,7 +209,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                   {suggestions.map((suggestion) => (
                     <Link
                       key={suggestion.id}
-                      href={`/cuisine/${suggestion.id}`}
+                      href={`/cuisine/${suggestion.slug}`}
                       className="app-card group overflow-hidden transition-all hover:shadow-md"
                     >
                       <div className="relative h-32 overflow-hidden bg-muted">
