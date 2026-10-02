@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, Shield, Zap, ArrowRight, Star, Sparkles } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i18n/navigation'
 import { safeLocalStorageSet } from '@/lib/utils/storage'
 import { toast } from 'sonner'
-import Badge from '@/components/ui/Badge'
 
 export default function SubscriptionPage() {
+  const t = useTranslations('Subscription')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -17,7 +18,7 @@ export default function SubscriptionPage() {
     setTimeout(() => {
       safeLocalStorageSet('heritogo_premium', 'true')
       setIsLoading(false)
-      toast.success('Abonnement Premium activé avec succès !')
+      toast.success(t('success'))
       router.push('/dashboard/tourist')
     }, 1200)
   }
@@ -30,17 +31,17 @@ export default function SubscriptionPage() {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
             <Sparkles className="h-4 w-4 text-accent" />
-            <span>Formules & Tarifs</span>
+            <span>{t('kicker')}</span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-foreground">
-            Débloquez l’expérience complète HeriTogo
+            {t('title')}
           </h1>
 
           <div className="togo-underline mx-auto" />
 
           <p className="mx-auto max-w-2xl text-sm sm:text-base font-medium text-muted-foreground pt-1">
-            Profitez de scans illimités par vision artificielle, d’audio-guides multilingues immersifs et d’un contact direct avec nos meilleurs guides locaux.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -54,31 +55,31 @@ export default function SubscriptionPage() {
           >
             <div className="space-y-4">
               <div>
-                <h2 className="font-serif text-2xl font-bold text-foreground">Formule Découverte</h2>
-                <p className="text-xs text-muted-foreground mt-1">Idéal pour explorer les monuments de base.</p>
+                <h2 className="font-serif text-2xl font-bold text-foreground">{t('free_title')}</h2>
+                <p className="text-xs text-muted-foreground mt-1">{t('free_sub')}</p>
               </div>
 
               <div className="pt-2">
                 <span className="font-serif text-4xl sm:text-5xl font-bold text-foreground">0 FCFA</span>
-                <span className="text-xs font-semibold text-muted-foreground"> / mois</span>
+                <span className="text-xs font-semibold text-muted-foreground"> {t('per_month')}</span>
               </div>
 
               <ul className="space-y-3.5 pt-4 border-t border-border text-xs sm:text-sm font-medium text-muted-foreground">
                 <li className="flex items-center gap-3 text-foreground font-semibold">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>3 scans de monuments IA gratuits / mois</span>
+                  <span>{t('free_f1')}</span>
                 </li>
                 <li className="flex items-center gap-3 text-foreground font-semibold">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>Consultation des 29 sites patrimoniaux et 31 plats</span>
+                  <span>{t('free_f2')}</span>
                 </li>
                 <li className="flex items-center gap-3 text-foreground font-semibold">
                   <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>Demande de réservation de guides locaux certifiés</span>
+                  <span>{t('free_f3')}</span>
                 </li>
                 <li className="flex items-center gap-3 opacity-40">
                   <Check className="h-4 w-4 shrink-0" />
-                  <span>Scans illimités non inclus</span>
+                  <span>{t('free_f4')}</span>
                 </li>
               </ul>
             </div>
@@ -87,7 +88,7 @@ export default function SubscriptionPage() {
               disabled
               className="rounded-full border border-border bg-muted/40 py-3 text-xs font-bold text-muted-foreground w-full cursor-not-allowed"
             >
-              Formule actuelle
+              {t('current_plan')}
             </button>
           </motion.div>
 
@@ -100,7 +101,7 @@ export default function SubscriptionPage() {
           >
             <div className="absolute -top-3.5 right-6">
               <span className="unesco-badge rounded-full px-4 py-1 text-xs uppercase tracking-wider">
-                ✦ Recommandé
+                {t('recommended')}
               </span>
             </div>
 
@@ -108,32 +109,32 @@ export default function SubscriptionPage() {
               <div>
                 <h2 className="font-serif text-2xl font-bold text-foreground flex items-center gap-2">
                   <Star className="h-5 w-5 text-accent fill-accent" />
-                  <span>HeriTogo Premium</span>
+                  <span>{t('premium_title')}</span>
                 </h2>
-                <p className="text-xs text-muted-foreground mt-1">Pour les passionnés de culture et les voyageurs au Togo.</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('premium_sub')}</p>
               </div>
 
               <div className="pt-2">
                 <span className="font-serif text-4xl sm:text-5xl font-bold text-primary">2 000 FCFA</span>
-                <span className="text-xs font-semibold text-muted-foreground"> / mois</span>
+                <span className="text-xs font-semibold text-muted-foreground"> {t('per_month')}</span>
               </div>
 
               <ul className="space-y-3.5 pt-4 border-t border-border text-xs sm:text-sm font-medium text-foreground">
                 <li className="flex items-center gap-3 font-semibold">
                   <Shield className="h-4 w-4 text-primary shrink-0" />
-                  <span>Scans de monuments IA illimités</span>
+                  <span>{t('premium_f1')}</span>
                 </li>
                 <li className="flex items-center gap-3 font-semibold">
                   <Zap className="h-4 w-4 text-accent shrink-0" />
-                  <span>Audio-guides multilingues complets (TTS haute qualité)</span>
+                  <span>{t('premium_f2')}</span>
                 </li>
                 <li className="flex items-center gap-3 font-semibold">
-                  <Star className="h-4 w-4 text-accent fill-accent shrink-0" />
-                  <span>Réservation prioritaire de guides vérifiés</span>
+                  <Star className="h-4 w-4 text-accent fill-accent" />
+                  <span>{t('premium_f3')}</span>
                 </li>
                 <li className="flex items-center gap-3 font-semibold">
                   <Shield className="h-4 w-4 text-primary shrink-0" />
-                  <span>Historique des scans et navigation hors-ligne</span>
+                  <span>{t('premium_f4')}</span>
                 </li>
               </ul>
             </div>
@@ -141,7 +142,7 @@ export default function SubscriptionPage() {
             <div className="space-y-3 pt-2">
               <div className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent/15 py-1.5 px-3 text-[11px] font-bold text-[#8A3A20] dark:text-amber-200">
                 <Zap className="h-3.5 w-3.5 text-accent" />
-                <span>Activation instantanée en mode démo</span>
+                <span>{t('instant')}</span>
               </div>
 
               <button
@@ -153,7 +154,7 @@ export default function SubscriptionPage() {
                   <span className="loading loading-spinner"></span>
                 ) : (
                   <>
-                    <span>Activer l’accès Premium</span>
+                    <span>{t('cta')}</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}

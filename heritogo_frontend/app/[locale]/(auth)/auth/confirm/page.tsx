@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type ConfirmStatus = 'loading' | 'success' | 'error'
 
 export default function AuthConfirmPage() {
+  const t = useTranslations('Auth')
   const { locale } = useParams<{ locale: string }>()
   const [status, setStatus] = useState<ConfirmStatus>('loading')
   const [message, setMessage] = useState('')
@@ -27,7 +29,7 @@ export default function AuthConfirmPage() {
 
     const markSuccess = () => {
       setStatus('success')
-      setMessage('Email confirmé ! Redirection vers votre espace...')
+      setMessage(t('confirm_success_message'))
       redirectToDashboard()
     }
 
@@ -93,17 +95,17 @@ export default function AuthConfirmPage() {
           }
         }
 
-        markError('Lien invalide ou expiré. Veuillez vous reconnecter.')
+        markError(t('confirm_error_invalid'))
       } catch (confirmError) {
         const errorMessage = confirmError instanceof Error
           ? confirmError.message
-          : 'Impossible de confirmer votre email.'
+          : t('confirm_error_generic')
         markError(errorMessage, true)
       }
     }
 
     handleConfirmation()
-  }, [locale])
+  }, [locale, t])
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-base-100 px-4 text-base-content">
@@ -111,15 +113,15 @@ export default function AuthConfirmPage() {
         {status === 'loading' && (
           <>
             <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
-            <h1 className="font-serif text-xl font-bold">Confirmation en cours...</h1>
-            <p className="mt-2 text-sm text-base-content/60">Patientez quelques secondes.</p>
+            <h1 className="font-serif text-xl font-bold">{t('confirm_loading_title')}</h1>
+            <p className="mt-2 text-sm text-base-content/60">{t('confirm_loading_sub')}</p>
           </>
         )}
 
         {status === 'success' && (
           <>
             <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-primary" />
-            <h1 className="font-serif text-xl font-bold">Compte confirmé !</h1>
+            <h1 className="font-serif text-xl font-bold">{t('confirm_success_title')}</h1>
             <p className="mt-2 text-sm text-base-content/60">{message}</p>
           </>
         )}
@@ -127,9 +129,9 @@ export default function AuthConfirmPage() {
         {status === 'error' && (
           <>
             <XCircle className="mx-auto mb-4 h-12 w-12 text-error" />
-            <h1 className="font-serif text-xl font-bold">Lien expiré</h1>
+            <h1 className="font-serif text-xl font-bold">{t('confirm_error_title')}</h1>
             <p className="mt-2 text-sm text-base-content/60">{message}</p>
-            <p className="mt-1 text-xs text-base-content/45">Redirection automatique...</p>
+            <p className="mt-1 text-xs text-base-content/45">{t('confirm_redirect')}</p>
           </>
         )}
       </div>

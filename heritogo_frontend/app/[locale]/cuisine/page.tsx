@@ -28,9 +28,9 @@ export default function CuisinePage() {
       case 'Djenkoumé': return t('filters.djenkoume')
       case 'Gboma': return t('filters.gboma')
       case 'Akoumé': return t('filters.akoume')
-      case 'Wagasi': return 'Wagasi (Fromage)'
-      case 'Gombo': return 'Gombo (Fétri)'
-      case 'Boissons': return 'Boissons locales'
+      case 'Wagasi': return t('filters.wagasi')
+      case 'Gombo': return t('filters.gombo')
+      case 'Boissons': return t('filters.boissons')
       default: return category
     }
   }

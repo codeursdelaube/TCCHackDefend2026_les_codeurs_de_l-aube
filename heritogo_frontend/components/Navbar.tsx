@@ -131,7 +131,7 @@ export default function Navbar() {
 
   const publicLinks: NavLinkItem[] = [
     { href: '/lieux', label: t('lieux'), icon: Map },
-    { href: '/regions', label: 'Régions', icon: Compass },
+    { href: '/regions', label: t('regions'), icon: Compass },
     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
     { href: '/guides', label: t('guides'), icon: User },
     { href: '/scan', label: t('scan'), icon: ScanLine },
@@ -140,7 +140,7 @@ export default function Navbar() {
   const bottomLinks: NavLinkItem[] = [
     { href: '/accueil', label: t('accueil'), icon: Home },
     { href: '/lieux', label: t('lieux'), icon: Map },
-    { href: '/regions', label: 'Régions', icon: Compass },
+    { href: '/regions', label: t('regions'), icon: Compass },
     { href: '/scan', label: t('scan'), icon: ScanLine },
     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
   ]
@@ -402,7 +402,7 @@ export default function Navbar() {
             {(isAuthenticated && profile ? bottomLinks : [
               { href: '/accueil', label: t('accueil'), icon: Home },
               { href: '/lieux', label: t('lieux'), icon: Map },
-              { href: '/regions', label: 'Régions', icon: Compass },
+              { href: '/regions', label: t('regions'), icon: Compass },
               { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
               { href: '/scan', label: t('scan'), icon: ScanLine },
             ]).map((link) => {
@@ -458,7 +458,7 @@ export default function Navbar() {
                   {(isAuthenticated && profile ? bottomLinks : [
                     { href: '/accueil', label: t('accueil'), icon: Home },
                     { href: '/lieux', label: t('lieux'), icon: Map },
-                    { href: '/regions', label: 'Régions', icon: Compass },
+                    { href: '/regions', label: t('regions'), icon: Compass },
                     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
                     { href: '/scan', label: t('scan'), icon: ScanLine },
                   ]).map((link) => {

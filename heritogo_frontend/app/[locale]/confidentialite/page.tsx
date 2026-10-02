@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { PRIVACY_POLICY, type PrivacyPolicyLocale } from '@/lib/privacy-policy'
 
 export default async function ConfidentialitePage({
@@ -6,11 +7,12 @@ export default async function ConfidentialitePage({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
+  const t = await getTranslations('Privacy')
   const policy = PRIVACY_POLICY[(locale as PrivacyPolicyLocale)] || PRIVACY_POLICY.fr
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-28 pt-28">
-      <p className="text-xs font-bold uppercase tracking-wider text-primary">RGPD</p>
+      <p className="text-xs font-bold uppercase tracking-wider text-primary">{t('gdpr_kicker')}</p>
       <h1 className="mt-2 font-serif text-3xl font-bold">{policy.title}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         {policy.updatedLabel} : {policy.lastUpdated}

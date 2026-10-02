@@ -19,7 +19,8 @@
         "login": "登录",
         "register": "注册",
         "discover": "发现",
-        "logout": "退出登录"
+        "logout": "退出登录",
+        "regions": "大区"
     },
     "Accueil": {
         "categories": {
@@ -30,7 +31,8 @@
             "guides": "认证本地导游",
             "scan": "智能AI扫描",
             "plages": "海滩与多哥湖",
-            "histoire": "历史与博物馆"
+            "histoire": "历史与博物馆",
+            "parks": "公园与休闲"
         },
         "offline_banner": "离线模式 — 可用缓存数据",
         "explorers": "{count}+ 探索者",
@@ -317,7 +319,53 @@
         "interactive_map_desc": "根据您的兴趣与实时GPS定位，快速查找附近的古迹、瀑布与自然景观。",
         "interactive_map_all_regions": "所有区域",
         "interactive_map_btn_gps": "附近的景点",
-        "interactive_map_open_view": "打开交互式地图"
+        "interactive_map_open_view": "打开交互式地图",
+        "live_badge": "多哥遗产实时呈现",
+        "cta_scan_ia": "AI 扫描",
+        "explore_kicker": "探索多哥",
+        "explore_title": "您想发现什么？",
+        "signature_ia": "AI 特色",
+        "counts": {
+            "sites": "29 处遗址",
+            "scan": "AI 识别",
+            "dishes": "31 道菜肴",
+            "parks": "16 处场所",
+            "guides": "认证导游"
+        },
+        "heritage_kicker": "活态遗产",
+        "treasures_heading": "必访珍宝",
+        "all_sites": "全部 29 处遗址 →",
+        "region_prefix": "{name} 大区",
+        "explore_sheet": "查看详情",
+        "signature_feature": "标志功能",
+        "scan_feature_title": "拍摄一座纪念建筑，AI 为您讲述它的故事。",
+        "scan_feature_desc": "将镜头对准多哥历史纪念建筑，或导入一张照片。我们的计算机视觉模型会识别建筑并即时启动沉浸式语音讲解。",
+        "try_scanner": "试用 AI 扫描",
+        "audio_included": "含多语种语音导览",
+        "scan_preview_alt": "HeriTogo AI 扫描",
+        "confidence": "置信度 99.4%",
+        "deux_lions": "双狮纪念碑",
+        "lome_maritime": "洛美，滨海大区",
+        "slide_tags": {
+            "0": "AI 创新",
+            "1": "教科文与古迹",
+            "2": "美食与风土"
+        },
+        "stats_landing": {
+            "sites": "遗产遗址",
+            "sites_sub": "已收录纪念建筑",
+            "regions": "旅游大区",
+            "regions_sub": "从海岸到萨瓦纳",
+            "dishes": "美食特产",
+            "dishes_sub": "食谱与风土",
+            "pwa": "离线 PWA",
+            "pwa_sub": "无网络亦可访问"
+        },
+        "featured": {
+            "koutammakou_desc": "文化景观与塔塔松巴设防民居建筑。",
+            "palais_desc": "昔日总督府，现为重要文化中心。",
+            "kpime_desc": "多哥最高瀑布，掩映在茂密植被之中。"
+        }
     },
     "Scan": {
         "title": "Heritogo 扫描器",
@@ -347,7 +395,13 @@
         "premium_tts": "高质量多语言 TTS 语音导览",
         "premium_history": "持久保存访问历史",
         "premium_cta": "升级到高级版（模拟）",
-        "free_continue": "继续使用免费版"
+        "free_continue": "继续使用免费版",
+        "steps": {
+            "0": "正在数字化建筑纹样…",
+            "1": "正在检索多哥遗产记忆库…",
+            "2": "AI 视觉分析与地理文化比对…",
+            "3": "正在生成轶事与历史细节…"
+        }
     },
     "Lieux": {
         "all": "全部",
@@ -436,7 +490,10 @@
             "fufu": "Fufu",
             "djenkoume": "Djenkoume",
             "gboma": "Gboma",
-            "akoume": "Akoume"
+            "akoume": "Akoume",
+            "wagasi": "Wagasi（奶酪）",
+            "gombo": "秋葵（Fétri）",
+            "boissons": "本地饮品"
         },
         "filter_category": "按菜品筛选"
     },
@@ -887,7 +944,15 @@
         "or_continue_with": "或使用以下方式继续",
         "google_continue": "使用 Google 继续",
         "google_privacy_hint": "请先接受隐私政策，再使用 Google 注册。",
-        "error_oauth": "Google 登录失败或链接已失效，请重试。"
+        "error_oauth": "Google 登录失败或链接已失效，请重试。",
+        "confirm_loading_title": "正在确认…",
+        "confirm_loading_sub": "请稍候片刻。",
+        "confirm_success_title": "账户已确认！",
+        "confirm_success_message": "邮箱已确认！正在进入您的空间…",
+        "confirm_error_title": "链接已过期",
+        "confirm_error_invalid": "链接无效或已过期。请重新登录。",
+        "confirm_error_generic": "无法确认您的邮箱。",
+        "confirm_redirect": "正在自动跳转…"
     },
     "Dashboard": {
         "common": {
@@ -1259,5 +1324,166 @@
         "view_profile": "查看资料",
         "book": "预订"
     },
-  "TravelTools": {"drawer":{"button":"旅行工具","open":"打开旅行工具","title":"旅行者工具箱","close":"关闭","privacy":"您的清单保存在此设备上"},"checklist":{"kicker":"准备抵达","title":"出发前必备事项","description":"简洁明了的清单，保存在您的设备上。","progress":"{done}/{total}","items":{"documents":{"title":"随身携带证件","detail":"护照、住宿联系方式和安全的电子副本。"},"entry":{"title":"已核查入境要求","detail":"出发前请查阅官方信息：手续可能会变化。"},"offline":{"title":"已保存地图和联系方式","detail":"下载离线区域并保留当地联系人。"},"money":{"title":"准备初始预算","detail":"准备抵达所需费用，并在乘车前先确认价格。"}}},"planner":{"kicker":"轻松规划行程","title":"即刻出发的行程","description":"选择您的兴趣，在旅行中遵循清晰的路线。","styleLabel":"您的兴趣","duration":"时长","oneDay":"1 天","twoDays":"2 天","threeDays":"3 天","save":"保存我的行程","saved":"行程已保存在此设备上","map":"在地图上查看地点","itineraries":{"essentiel":{"label":"精华","description":"首次到访多哥的精选体验。","days":{"1":"洛美：大市场、大教堂和海滨","2":"卡帕利梅：手工艺、咖啡可可和沃梅瀑布","3":"库塔马库：巴塔马里巴村落和北部风光"}},"nature":{"label":"自然","description":"按自己的节奏探索瀑布、山脉和广阔空间。","days":{"1":"洛美：泻湖和多哥湖","2":"卡帕利梅：阿古山和沃梅瀑布","3":"法扎奥-马尔法卡萨：徒步和野生动物"}},"culture":{"label":"文化","description":"相遇、手工艺与鲜活遗产。","days":{"1":"洛美：博物馆、巫术市场和当地美食","2":"卡帕利梅：手工作坊和当地特产","3":"库塔马库：传统建筑和当地社区"}}}}}
+    "TravelTools": {
+        "drawer": {
+            "button": "旅行工具",
+            "open": "打开旅行工具",
+            "title": "旅行者工具箱",
+            "close": "关闭",
+            "privacy": "您的清单保存在此设备上"
+        },
+        "checklist": {
+            "kicker": "准备抵达",
+            "title": "出发前必备事项",
+            "description": "简洁明了的清单，保存在您的设备上。",
+            "progress": "{done}/{total}",
+            "items": {
+                "documents": {
+                    "title": "随身携带证件",
+                    "detail": "护照、住宿联系方式和安全的电子副本。"
+                },
+                "entry": {
+                    "title": "已核查入境要求",
+                    "detail": "出发前请查阅官方信息：手续可能会变化。"
+                },
+                "offline": {
+                    "title": "已保存地图和联系方式",
+                    "detail": "下载离线区域并保留当地联系人。"
+                },
+                "money": {
+                    "title": "准备初始预算",
+                    "detail": "准备抵达所需费用，并在乘车前先确认价格。"
+                }
+            }
+        },
+        "planner": {
+            "kicker": "轻松规划行程",
+            "title": "即刻出发的行程",
+            "description": "选择您的兴趣，在旅行中遵循清晰的路线。",
+            "styleLabel": "您的兴趣",
+            "duration": "时长",
+            "oneDay": "1 天",
+            "twoDays": "2 天",
+            "threeDays": "3 天",
+            "save": "保存我的行程",
+            "saved": "行程已保存在此设备上",
+            "map": "在地图上查看地点",
+            "itineraries": {
+                "essentiel": {
+                    "label": "精华",
+                    "description": "首次到访多哥的精选体验。",
+                    "days": {
+                        "1": "洛美：大市场、大教堂和海滨",
+                        "2": "卡帕利梅：手工艺、咖啡可可和沃梅瀑布",
+                        "3": "库塔马库：巴塔马里巴村落和北部风光"
+                    }
+                },
+                "nature": {
+                    "label": "自然",
+                    "description": "按自己的节奏探索瀑布、山脉和广阔空间。",
+                    "days": {
+                        "1": "洛美：泻湖和多哥湖",
+                        "2": "卡帕利梅：阿古山和沃梅瀑布",
+                        "3": "法扎奥-马尔法卡萨：徒步和野生动物"
+                    }
+                },
+                "culture": {
+                    "label": "文化",
+                    "description": "相遇、手工艺与鲜活遗产。",
+                    "days": {
+                        "1": "洛美：博物馆、巫术市场和当地美食",
+                        "2": "卡帕利梅：手工作坊和当地特产",
+                        "3": "库塔马库：传统建筑和当地社区"
+                    }
+                }
+            }
+        }
+    },
+    "Splash": {
+        "tagline": "多哥遗产与旅行"
+    },
+    "Cookie": {
+        "title": "HeriTogo Cookie",
+        "body": "必要 Cookie：会话（HttpOnly）与语言。非必要 Cookie（主题）可选。定位与通知需另行同意。",
+        "policy": "隐私政策",
+        "refuse": "拒绝",
+        "accept": "接受",
+        "close": "关闭"
+    },
+    "Privacy": {
+        "gdpr_kicker": "GDPR",
+        "geo_title": "用位置优化扫描？",
+        "geo_body": "位置仅在扫描期间保存在内存中，不会写入我们的数据库；您也可以拒绝，扫描器仍可使用。",
+        "allow": "允许",
+        "deny": "拒绝",
+        "settings_title": "隐私与同意",
+        "settings_intro": "您可随时撤回同意。这不会阻止您使用扫描、地图或预订。",
+        "geo_label": "地理位置",
+        "geo_hint": "仅在扫描时临时使用，从不写入数据库。",
+        "notif_label": "通知",
+        "notif_hint": "仅在您开启时发送与预订相关的提醒。",
+        "read_policy": "阅读隐私政策",
+        "erasure_title": "被遗忘权",
+        "erasure_body": "删除将清除您的资料、预订与状态文件。身份证件从未存放在我们这边。",
+        "delete_account": "永久删除我的账户",
+        "deleting": "正在删除…",
+        "delete_confirm": "此操作不可撤销。您的 HeriTogo 账户与数据将被删除。继续？",
+        "delete_error": "无法删除。"
+    },
+    "Subscription": {
+        "kicker": "套餐与价格",
+        "title": "解锁完整 HeriTogo 体验",
+        "subtitle": "享受无限计算机视觉扫描、沉浸式多语种语音导览，并直接联系我们的优秀本地导游。",
+        "free_title": "探索套餐",
+        "free_sub": "适合游览核心纪念建筑。",
+        "per_month": "/ 月",
+        "free_f1": "每月 3 次免费 AI 纪念建筑扫描",
+        "free_f2": "查阅 29 处遗产遗址与 31 道菜肴",
+        "free_f3": "申请预订认证本地导游",
+        "free_f4": "不含无限扫描",
+        "current_plan": "当前套餐",
+        "recommended": "✦ 推荐",
+        "premium_title": "HeriTogo Premium",
+        "premium_sub": "面向文化爱好者与多哥旅行者。",
+        "premium_f1": "无限 AI 纪念建筑扫描",
+        "premium_f2": "完整多语种语音导览（高质量 TTS）",
+        "premium_f3": "认证导游优先预订",
+        "premium_f4": "扫描历史与离线导航",
+        "instant": "演示模式即时开通",
+        "cta": "开通 Premium",
+        "success": "Premium 订阅已成功开通！"
+    },
+    "Regions": {
+        "hero_badge": "五大区，五种风貌",
+        "capital": "首府：{name}",
+        "spirit": "{name} 的精神",
+        "selection": "精选",
+        "highlights": "本区不可错过",
+        "sites": "标志性遗址",
+        "dishes": "美食特产",
+        "activities": "当地可做之事",
+        "type_site": "遗址",
+        "type_dish": "风味",
+        "type_activity": "活动",
+        "cta_title": "规划您在 {name} 的行程",
+        "cta_sub": "寻找认证本地导游，沉浸式体验当地文化。",
+        "cta_button": "预订本地导游 →",
+        "stats": {
+            "monuments": "主要纪念建筑",
+            "inhabitants": "居民",
+            "coast": "大西洋海岸",
+            "nature": "自然景观",
+            "summit": "最高点",
+            "waterfalls": "瀑布与河道",
+            "park": "保护区",
+            "species": "动物物种",
+            "cities": "历史城镇",
+            "unesco": "世界遗产",
+            "listed": "列入区域",
+            "signatures": "标志建筑",
+            "reserve": "自然保护区",
+            "granaries": "Nok 粮仓",
+            "archaeology": "考古遗址"
+        }
+    }
 }

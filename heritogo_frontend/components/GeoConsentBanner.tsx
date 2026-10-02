@@ -1,9 +1,11 @@
 'use client'
 
 import { MapPin } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { usePrivacyConsent } from '@/hooks/usePrivacyConsent'
 
 export default function GeoConsentBanner() {
+  const t = useTranslations('Privacy')
   const { consent, setGeoConsent } = usePrivacyConsent()
   if (consent.geo !== null) return null
 
@@ -12,9 +14,9 @@ export default function GeoConsentBanner() {
       <div className="flex items-start gap-3">
         <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
         <div className="flex-1">
-          <p className="font-bold text-foreground">Affiner le scan avec votre position ?</p>
+          <p className="font-bold text-foreground">{t('geo_title')}</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            La position reste en mémoire le temps du scan, n’est pas enregistrée dans notre base, et vous pouvez la refuser : le scanner fonctionne quand même.
+            {t('geo_body')}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
@@ -22,14 +24,14 @@ export default function GeoConsentBanner() {
               onClick={() => setGeoConsent(true)}
               className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white"
             >
-              Autoriser
+              {t('allow')}
             </button>
             <button
               type="button"
               onClick={() => setGeoConsent(false)}
               className="rounded-full border border-border px-4 py-2 text-xs font-bold"
             >
-              Refuser
+              {t('deny')}
             </button>
           </div>
         </div>

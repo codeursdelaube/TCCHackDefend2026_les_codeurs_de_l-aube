@@ -224,9 +224,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
         className="min-h-full flex flex-col pb-20 bg-base-100 h-full antialiased"
       >
         <ThemeProvider>
-          <SplashScreen />
           <AuthProvider>
-            <NextIntlClientProvider messages={messages}>
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <SplashScreen />
               <ServiceWorkerRegister />
               <Navbar />
               <OnboardingTooltip />

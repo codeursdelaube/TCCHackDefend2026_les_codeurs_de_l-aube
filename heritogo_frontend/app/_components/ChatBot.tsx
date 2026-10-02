@@ -303,7 +303,7 @@ export default function ChatBot() {
                      hover:scale-105 active:scale-95 hover:shadow-2xl
                      border border-white/10"
           style={{ backgroundColor: COLORS.forest }}
-          aria-label="Ouvrir l'assistant IA"
+          aria-label={t('open')}
         >
           <Bot className="h-6 w-6" />
         </button>

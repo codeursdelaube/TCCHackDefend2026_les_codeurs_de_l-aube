@@ -48,10 +48,10 @@ export default function ScanPage() {
   // Message évolutif d'analyse
   const [scanStepIndex, setScanStepIndex] = useState(0)
   const scanStepMessages = [
-    'Numérisation des motifs architecturaux…',
-    'Recherche dans la mémoire patrimoniale du Togo…',
-    'Analyse par vision IA & recoupement géoculturel…',
-    'Génération des anecdotes et secrets historiques…',
+    t('steps.0'),
+    t('steps.1'),
+    t('steps.2'),
+    t('steps.3'),
   ]
 
   // Paywall & Limit States

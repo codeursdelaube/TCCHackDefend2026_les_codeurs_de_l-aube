@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 
 const SPLASH_KEY = 'heritogo_splash_shown'
 const SPLASH_MS = 2800
 
 export default function SplashScreen() {
+  const t = useTranslations('Splash')
   const [visible, setVisible] = useState(true)
   const reduceMotion = useReducedMotion()
 
@@ -61,7 +63,7 @@ export default function SplashScreen() {
                 HeriTogo
               </p>
               <p className="mt-2 text-sm font-medium tracking-wide text-[#7A6A5C]">
-                Patrimoine &amp; voyages au Togo
+                {t('tagline')}
               </p>
             </div>
           </div>

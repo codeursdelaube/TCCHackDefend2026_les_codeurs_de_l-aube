@@ -12,7 +12,6 @@ import {
   Globe2,
   Headphones,
   Landmark,
-  Languages,
   MapPin,
   Sparkles,
   TreePine,
@@ -49,7 +48,7 @@ export default function AccueilPage() {
       cta: t('slides.1.buttonText'),
       href: '/lieux',
       icon: Landmark,
-      tag: 'UNESCO & Monuments',
+      tag: t('slide_tags.1'),
     },
     {
       image: '/deuxlions.png',
@@ -59,7 +58,7 @@ export default function AccueilPage() {
       cta: t('slides.0.buttonText'),
       href: '/scan',
       icon: Camera,
-      tag: 'Innovation IA',
+      tag: t('slide_tags.0'),
     },
     {
       image: '/fufuhero.png',
@@ -69,7 +68,7 @@ export default function AccueilPage() {
       cta: t('slides.2.buttonText'),
       href: '/cuisine',
       icon: Utensils,
-      tag: 'Gastronomie & Terroir',
+      tag: t('slide_tags.2'),
     },
   ], [t])
 
@@ -87,11 +86,11 @@ export default function AccueilPage() {
   const SlideIcon = slide.icon
 
   const categories = [
-    { href: '/lieux' as const, label: t('categories.monuments'), icon: Landmark, count: '29 sites' },
-    { href: '/scan' as const, label: t('categories.scan'), icon: Camera, count: 'Reconnaissance IA', highlight: true },
-    { href: '/cuisine' as const, label: t('categories.cuisine'), icon: Utensils, count: '31 plats' },
-    { href: '/loisirs' as const, label: 'Parcs & Loisirs', icon: TreePine, count: '16 espaces' },
-    { href: '/guides' as const, label: t('categories.guides'), icon: Users, count: 'Guides certifiés' },
+    { href: '/lieux' as const, label: t('categories.monuments'), icon: Landmark, count: t('counts.sites') },
+    { href: '/scan' as const, label: t('categories.scan'), icon: Camera, count: t('counts.scan'), highlight: true },
+    { href: '/cuisine' as const, label: t('categories.cuisine'), icon: Utensils, count: t('counts.dishes') },
+    { href: '/loisirs' as const, label: t('categories.parks'), icon: TreePine, count: t('counts.parks') },
+    { href: '/guides' as const, label: t('categories.guides'), icon: Users, count: t('counts.guides') },
   ]
 
   const featuredDestinations = [
@@ -100,23 +99,23 @@ export default function AccueilPage() {
       region: 'Kara',
       tag: 'UNESCO',
       image: '/Sites/koutamakou.jpg',
-      desc: 'Paysage culturel et architecture fortifiée des Tata Somba.',
+      desc: t('featured.koutammakou_desc'),
       href: '/lieux' as const,
     },
     {
       title: 'Palais de Lomé',
       region: 'Maritime',
-      tag: 'Art & Histoire',
+      tag: t('regions.maritime.badge'),
       image: '/Sites/palais_de_lome.webp',
-      desc: 'Ancien palais des gouverneurs transformé en centre culturel majeur.',
+      desc: t('featured.palais_desc'),
       href: '/lieux' as const,
     },
     {
       title: 'Cascade de Kpimé',
       region: 'Plateaux',
-      tag: 'Écotourisme',
+      tag: t('regions.plateaux.badge'),
       image: '/Sites/kpime.jpg',
-      desc: 'Plus haute chute d’eau du Togo au cœur d’une végétation luxuriante.',
+      desc: t('featured.kpime_desc'),
       href: '/lieux' as const,
     },
   ]
@@ -162,11 +161,11 @@ export default function AccueilPage() {
             <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3.5 py-1.5 backdrop-blur-md">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] font-semibold text-white/90">Patrimoine togolais en direct</span>
+                <span className="text-[11px] font-semibold text-white/90">{t('live_badge')}</span>
               </div>
               <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-950/60 px-3.5 py-1.5 backdrop-blur-md">
                 <Sparkles className="h-3.5 w-3.5 text-accent" />
-                <span className="text-[11px] font-bold text-amber-200">Patrimoine UNESCO</span>
+                <span className="text-[11px] font-bold text-amber-200">{t('unesco_badge')}</span>
               </div>
             </div>
 
@@ -218,7 +217,7 @@ export default function AccueilPage() {
                         className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/20 px-5 py-3.5 text-sm font-bold text-amber-200 backdrop-blur-md transition-all hover:bg-accent/30 hover:border-accent"
                       >
                         <Camera className="h-4 w-4 text-accent" />
-                        <span>Scanner IA</span>
+                        <span>{t('cta_scan_ia')}</span>
                       </AuthGuardLink>
                     </div>
                   </motion.div>
@@ -274,10 +273,10 @@ export default function AccueilPage() {
         ══════════════════════════════════════════════════ */}
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {[
-            { value: '29', label: 'Sites Patrimoniaux', sub: 'Monuments répertoriés', icon: Landmark },
-            { value: '5', label: 'Régions Touristiques', sub: 'Du Littoral aux Savanes', icon: Globe2 },
-            { value: '31', label: 'Spécialités Culinaires', sub: 'Recettes & Terroirs', icon: Utensils },
-            { value: '100%', label: 'PWA Hors-Ligne', sub: 'Accès sans réseau', icon: Wifi },
+            { value: '29', label: t('stats_landing.sites'), sub: t('stats_landing.sites_sub'), icon: Landmark },
+            { value: '5', label: t('stats_landing.regions'), sub: t('stats_landing.regions_sub'), icon: Globe2 },
+            { value: '31', label: t('stats_landing.dishes'), sub: t('stats_landing.dishes_sub'), icon: Utensils },
+            { value: '100%', label: t('stats_landing.pwa'), sub: t('stats_landing.pwa_sub'), icon: Wifi },
           ].map(({ value, label, sub, icon: Icon }) => (
             <div
               key={label}
@@ -304,10 +303,10 @@ export default function AccueilPage() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-primary">
-                Explorez le Togo
+                {t('explore_kicker')}
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                Que souhaitez-vous découvrir ?
+                {t('explore_title')}
               </h2>
             </div>
             <AuthGuardLink
@@ -340,7 +339,7 @@ export default function AccueilPage() {
                   </span>
                   {highlight && (
                     <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
-                      Signature IA
+                      {t('signature_ia')}
                     </span>
                   )}
                 </div>
@@ -369,17 +368,17 @@ export default function AccueilPage() {
             <div>
               <div className="inline-flex items-center gap-1.5 mb-1 text-xs font-bold uppercase tracking-wider text-primary">
                 <Compass className="h-3.5 w-3.5" />
-                <span>Patrimoine Vivant</span>
+                <span>{t('heritage_kicker')}</span>
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                Trésors Incontournables
+                {t('treasures_heading')}
               </h2>
             </div>
             <AuthGuardLink
               href="/lieux"
               className="text-xs sm:text-sm font-bold text-primary hover:underline"
             >
-              Tous les 29 sites →
+              {t('all_sites')}
             </AuthGuardLink>
           </div>
 
@@ -405,7 +404,7 @@ export default function AccueilPage() {
                   <div className="absolute top-3 left-3 flex items-center gap-1.5">
                     {dest.tag === 'UNESCO' ? (
                       <span className="unesco-badge rounded-full px-3 py-1 text-[11px] uppercase tracking-wider">
-                        ✦ Patrimoine UNESCO
+                        ✦ {t('unesco_badge')}
                       </span>
                     ) : (
                       <span className="rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md">
@@ -417,7 +416,7 @@ export default function AccueilPage() {
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-200">
                       <MapPin className="h-3 w-3" />
-                      Région {dest.region}
+                      {t('region_prefix', { name: dest.region })}
                     </span>
                     <h3 className="font-serif text-xl font-bold text-white leading-tight">
                       {dest.title}
@@ -431,7 +430,7 @@ export default function AccueilPage() {
                     {dest.desc}
                   </p>
                   <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                    <span className="text-xs font-semibold text-primary">Explorer la fiche</span>
+                    <span className="text-xs font-semibold text-primary">{t('explore_sheet')}</span>
                     <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-primary transition-transform group-hover:translate-x-1">
                       <ArrowRight className="h-3.5 w-3.5" />
                     </span>
@@ -450,13 +449,13 @@ export default function AccueilPage() {
             <div className="space-y-4 lg:col-span-7">
               <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
                 <Sparkles className="h-3.5 w-3.5 text-accent" />
-                <span>Fonctionnalité Signature</span>
+                <span>{t('signature_feature')}</span>
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
-                Photographiez un monument, l’IA vous raconte son histoire.
+                {t('scan_feature_title')}
               </h2>
               <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
-                Pointez votre appareil vers un monument historique togolais ou importez une photo. Notre modèle de vision par ordinateur identifie l’édifice et lance la synthèse vocale immersive en direct.
+                {t('scan_feature_desc')}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -465,12 +464,12 @@ export default function AccueilPage() {
                   className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary-dark"
                 >
                   <Camera className="h-4 w-4" />
-                  <span>Essayer le Scanner IA</span>
+                  <span>{t('try_scanner')}</span>
                 </AuthGuardLink>
 
                 <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                   <Headphones className="h-4 w-4 text-primary" />
-                  <span>Audio-guide multilingue inclus</span>
+                  <span>{t('audio_included')}</span>
                 </div>
               </div>
             </div>
@@ -479,17 +478,17 @@ export default function AccueilPage() {
               <div className="relative h-64 w-full max-w-sm overflow-hidden rounded-2xl border border-border shadow-lg bg-black/10">
                 <Image
                   src="/deuxlions.png"
-                  alt="Scanner IA HeriTogo"
+                  alt={t('scan_preview_alt')}
                   fill
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600/90 px-2.5 py-1 text-[11px] font-bold">
-                    <span>99.4% confiance</span>
+                    <span>{t('confidence')}</span>
                   </div>
-                  <p className="mt-1 font-serif text-base font-bold">Monument des Deux Lions</p>
-                  <p className="text-xs text-white/80">Lomé, Région Maritime</p>
+                  <p className="mt-1 font-serif text-base font-bold">{t('deux_lions')}</p>
+                  <p className="text-xs text-white/80">{t('lome_maritime')}</p>
                 </div>
               </div>
             </div>

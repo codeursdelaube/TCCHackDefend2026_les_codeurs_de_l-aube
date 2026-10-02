@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChefHat, Compass, Landmark, MapPin, Sparkles, Globe2
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import AuthGuardLink from '@/components/AuthGuardLink'
-import Badge from '@/components/ui/Badge'
 import SectionHeader from '@/components/ui/SectionHeader'
 import SiteCard from '@/components/ui/SiteCard'
 import { usePlaces } from '@/hooks/useCatalog'
@@ -29,7 +29,7 @@ interface TogoRegion {
   sites: string[]
   plats: string[]
   activites: string[]
-  stat: { value: string; label: string }[]
+  stat: { value: string; labelKey: string }[]
   highlights: RegionSpecialty[]
 }
 
@@ -47,9 +47,9 @@ const regionsData: TogoRegion[] = [
     plats: ['Soupe de poisson frais', 'Ayimolou royal', 'Brochettes de mérou', 'Ablo & Akpan', 'Jus de baobab'],
     activites: ['Visite du Grand Marché', 'Promenade sur la plage de Lomé', 'Tour du Palais de Lomé', 'Artisanat au Village Artisanal'],
     stat: [
-      { value: '12', label: 'Monuments majeurs' },
-      { value: '2M+', label: 'Habitants' },
-      { value: '50 km', label: 'Côte atlantique' },
+      { value: '12', labelKey: 'monuments' },
+      { value: '2M+', labelKey: 'inhabitants' },
+      { value: '50 km', labelKey: 'coast' },
     ],
     highlights: [
       { nom: 'Palais de Lomé', type: 'site' },
@@ -71,9 +71,9 @@ const regionsData: TogoRegion[] = [
     plats: ['Fufu traditionnel à la sauce graine', 'Café artisanal du Kloto', 'Djenkoumé', 'Bananes plantains frites (Aloco)'],
     activites: ['Randonnée au Mont Agou', 'Baignade aux cascades', 'Dégustation de café équitable', 'Observation des papillons tropicaux'],
     stat: [
-      { value: '6', label: 'Sites naturels' },
-      { value: '986 m', label: 'Point culminant' },
-      { value: '60+', label: 'Cascades & cours d’eau' },
+      { value: '6', labelKey: 'nature' },
+      { value: '986 m', labelKey: 'summit' },
+      { value: '60+', labelKey: 'waterfalls' },
     ],
     highlights: [
       { nom: 'Cascade de Kpimé', type: 'site' },
@@ -95,9 +95,9 @@ const regionsData: TogoRegion[] = [
     plats: ['Tô de sorgho', 'Soupe de baobab & gombo', 'Viande braisée au beurre de karité', 'Beignets Botokoin'],
     activites: ['Safari faune sauvage', 'Pêche traditionnelle au lac', 'Festival équestre Gadao-Adossa', 'Observation des éléphants'],
     stat: [
-      { value: '192k ha', label: 'Parc protégé' },
-      { value: '300+', label: 'Espèces animales' },
-      { value: '5', label: 'Cités historiques' },
+      { value: '192k ha', labelKey: 'park' },
+      { value: '300+', labelKey: 'species' },
+      { value: '5', labelKey: 'cities' },
     ],
     highlights: [
       { nom: 'Fazao-Malfakassa', type: 'site' },
@@ -119,9 +119,9 @@ const regionsData: TogoRegion[] = [
     plats: ['Wagasi frit (fromage local)', 'Djenkoumé doré', 'Pâte de mil blanc', 'Tchoukoutou traditionnel'],
     activites: ['Exploration des Tata Somba', 'Rencontre des forgerons de Tcharè', 'Passage de la faille d’Alédjo', 'Lutte traditionnelle Evala'],
     stat: [
-      { value: 'UNESCO', label: 'Patrimoine mondial' },
-      { value: '36k ha', label: 'Zone classée' },
-      { value: '4', label: 'Monuments signatures' },
+      { value: 'UNESCO', labelKey: 'unesco' },
+      { value: '36k ha', labelKey: 'listed' },
+      { value: '4', labelKey: 'signatures' },
     ],
     highlights: [
       { nom: 'Koutammakou (UNESCO)', type: 'site' },
@@ -143,9 +143,9 @@ const regionsData: TogoRegion[] = [
     plats: ['Gboma aux épinards locaux', 'Soupe onctueuse d’arachide', 'Tô de mil blanc', 'Wagasi grillé'],
     activites: ['Exploration des falaises de Nok', 'Safari à Oti-Mandouri', 'Découverte de l’art rupestre', 'Marché traditionnel de Dapaong'],
     stat: [
-      { value: '147k ha', label: 'Réserve naturelle' },
-      { value: '100+', label: 'Greniers de Nok' },
-      { value: '4', label: 'Sites archéologiques' },
+      { value: '147k ha', labelKey: 'reserve' },
+      { value: '100+', labelKey: 'granaries' },
+      { value: '4', labelKey: 'archaeology' },
     ],
     highlights: [
       { nom: 'Grottes de Nok', type: 'site' },
@@ -157,10 +157,11 @@ const regionsData: TogoRegion[] = [
 ]
 
 function TypeBadge({ type }: { type: RegionSpecialty['type'] }) {
+  const t = useTranslations('Regions')
   const cfg = {
-    site: { label: 'Site', icon: Landmark },
-    plat: { label: 'Saveur', icon: ChefHat },
-    activite: { label: 'Activité', icon: Compass },
+    site: { label: t('type_site'), icon: Landmark },
+    plat: { label: t('type_dish'), icon: ChefHat },
+    activite: { label: t('type_activity'), icon: Compass },
   }[type]
   const Ic = cfg.icon
   return (
@@ -172,9 +173,14 @@ function TypeBadge({ type }: { type: RegionSpecialty['type'] }) {
 }
 
 export default function RegionsPage() {
+  const t = useTranslations('Regions')
+  const tHome = useTranslations('Accueil')
   const { places } = usePlaces()
   const [selectedRegion, setSelectedRegion] = useState<string>(regionsData[0].id)
   const region = regionsData.find((r) => r.id === selectedRegion) ?? regionsData[0]
+  const regionName = tHome(`regions.${region.id}.name`)
+  const regionTag = tHome(`regions.${region.id}.tag`)
+  const regionDesc = tHome(`regions.${region.id}.desc`)
 
   const regionMonuments = places.filter((m) => m.région === region.regionKey)
 
@@ -209,13 +215,13 @@ export default function RegionsPage() {
             <div className="max-w-2xl space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full bg-primary px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white">
                 <Globe2 className="h-3.5 w-3.5" />
-                <span>5 Régions, 5 Univers</span>
+                <span>{t('hero_badge')}</span>
               </div>
               <h1 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#FBF6EF]">
-                {region.nom}
+                {regionName}
               </h1>
               <p className="text-sm sm:text-base font-medium text-amber-200">
-                {region.tagline}
+                {regionTag}
               </p>
             </div>
           </div>
@@ -236,7 +242,7 @@ export default function RegionsPage() {
                     : 'bg-card border border-border text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {r.nom.replace('Région ', '').replace('de la ', '').replace('des ', '')}
+                {tHome(`regions.${r.id}.name`)}
               </button>
             )
           })}
@@ -257,14 +263,14 @@ export default function RegionsPage() {
               <div className="app-card p-6 sm:p-8 lg:col-span-8 space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                   <MapPin className="h-3.5 w-3.5" />
-                  <span>Chef-lieu : {region.capitale}</span>
+                  <span>{t('capital', { name: region.capitale })}</span>
                 </div>
                 <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">
-                  L’esprit de la {region.nom}
+                  {t('spirit', { name: regionName })}
                 </h2>
                 <div className="togo-underline" />
                 <p className="text-sm sm:text-base leading-relaxed text-muted-foreground font-medium pt-2">
-                  {region.description}
+                  {regionDesc}
                 </p>
               </div>
 
@@ -272,14 +278,14 @@ export default function RegionsPage() {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1 lg:col-span-4">
                 {region.stat.map((s) => (
                   <div
-                    key={s.label}
+                    key={s.labelKey}
                     className="app-card flex flex-col items-center justify-center p-5 text-center"
                   >
                     <span className="font-serif text-2xl sm:text-3xl font-bold text-primary leading-none">
                       {s.value}
                     </span>
                     <span className="mt-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      {s.label}
+                      {t(`stats.${s.labelKey}`)}
                     </span>
                   </div>
                 ))}
@@ -289,8 +295,8 @@ export default function RegionsPage() {
             {/* Incontournables Highlights */}
             <section className="space-y-4">
               <SectionHeader
-                kicker="Sélection"
-                title="À ne pas manquer dans la région"
+                kicker={t('selection')}
+                title={t('highlights')}
                 icon={Sparkles}
               />
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -322,7 +328,7 @@ export default function RegionsPage() {
               <div className="app-card p-5 space-y-3">
                 <h3 className="flex items-center gap-2 font-serif text-base font-bold text-foreground">
                   <Landmark className="h-4 w-4 text-primary" />
-                  <span>Sites emblématiques</span>
+                  <span>{t('sites')}</span>
                 </h3>
                 <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                   {region.sites.map((s) => (
@@ -337,7 +343,7 @@ export default function RegionsPage() {
               <div className="app-card p-5 space-y-3">
                 <h3 className="flex items-center gap-2 font-serif text-base font-bold text-foreground">
                   <ChefHat className="h-4 w-4 text-primary" />
-                  <span>Spécialités culinaires</span>
+                  <span>{t('dishes')}</span>
                 </h3>
                 <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                   {region.plats.map((p) => (
@@ -352,7 +358,7 @@ export default function RegionsPage() {
               <div className="app-card p-5 space-y-3">
                 <h3 className="flex items-center gap-2 font-serif text-base font-bold text-foreground">
                   <Compass className="h-4 w-4 text-primary" />
-                  <span>Que faire sur place ?</span>
+                  <span>{t('activities')}</span>
                 </h3>
                 <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                   {region.activites.map((a) => (
@@ -396,14 +402,14 @@ export default function RegionsPage() {
             {/* CTA Bas de page */}
             <div className="app-card p-6 sm:p-8 bg-gradient-to-r from-primary/10 via-card to-accent/10 flex flex-col sm:flex-row items-center justify-between gap-4 border-primary/20">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="font-serif text-xl font-bold text-foreground">Préparez votre séjour en {region.nom}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">Trouvez un guide local certifié pour une immersion authentique.</p>
+                <h3 className="font-serif text-xl font-bold text-foreground">{t('cta_title', { name: regionName })}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('cta_sub')}</p>
               </div>
               <AuthGuardLink
                 href="/guides"
                 className="shrink-0 rounded-full bg-primary px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-primary-dark transition-all"
               >
-                Réserver un guide local →
+                {t('cta_button')}
               </AuthGuardLink>
             </div>
           </motion.div>

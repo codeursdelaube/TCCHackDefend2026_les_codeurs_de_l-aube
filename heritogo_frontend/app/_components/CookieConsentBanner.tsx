@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Cookie, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import PrivacyModal from '@/components/PrivacyModal'
 
@@ -22,6 +23,7 @@ function saveConsent(value: 'accepted' | 'refused') {
 }
 
 export default function CookieConsentBanner() {
+  const t = useTranslations('Cookie')
   const [visible, setVisible] = useState(false)
   const [policyOpen, setPolicyOpen] = useState(false)
 
@@ -51,12 +53,11 @@ export default function CookieConsentBanner() {
             <Cookie className="h-5 w-5" />
           </span>
           <div>
-            <p className="text-sm font-black">Cookies Heritogo</p>
+            <p className="text-sm font-black">{t('title')}</p>
             <p className="mt-1 text-xs leading-5 text-base-content/65">
-              Cookies essentiels : session (HttpOnly) et langue. Les cookies non essentiels (thème) sont optionnels.
-              Géolocalisation et notifications font l’objet d’un consentement séparé.{' '}
+              {t('body')}{' '}
               <button type="button" className="font-bold underline" onClick={() => setPolicyOpen(true)}>
-                Politique de confidentialité
+                {t('policy')}
               </button>
             </p>
           </div>
@@ -68,7 +69,7 @@ export default function CookieConsentBanner() {
             onClick={() => answer('refused')}
             className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border px-4 text-xs font-black hover:bg-base-200"
           >
-            Refuser
+            {t('refuse')}
           </button>
           <button
             type="button"
@@ -76,13 +77,13 @@ export default function CookieConsentBanner() {
             className="inline-flex min-h-10 items-center justify-center rounded-xl px-4 text-xs font-black text-white hover:brightness-110"
             style={{ backgroundColor: COLORS.rust }}
           >
-            Accepter
+            {t('accept')}
           </button>
           <button
             type="button"
             onClick={() => answer('refused')}
             className="flex h-10 w-10 items-center justify-center rounded-xl text-base-content/60 hover:bg-base-200 hover:text-base-content"
-            aria-label="Fermer"
+            aria-label={t('close')}
           >
             <X className="h-4 w-4" />
           </button>

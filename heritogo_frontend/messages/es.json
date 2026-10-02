@@ -19,7 +19,8 @@
         "login": "Iniciar sesión",
         "register": "Registrarse",
         "discover": "Descubrir",
-        "logout": "Cerrar sesión"
+        "logout": "Cerrar sesión",
+        "regions": "Regiones"
     },
     "Accueil": {
         "categories": {
@@ -30,7 +31,8 @@
             "guides": "Guías Locales Certificados",
             "scan": "Escáner IA",
             "plages": "Playas y Lago Togo",
-            "histoire": "Historia y Museos"
+            "histoire": "Historia y Museos",
+            "parks": "Parques y ocio"
         },
         "offline_banner": "Modo sin conexión — datos guardados disponibles",
         "explorers": "{count}+ exploradores",
@@ -317,7 +319,53 @@
         "interactive_map_desc": "Localice al instante monumentos, cascadas y tesoros según sus gustos y su posición GPS en tiempo real.",
         "interactive_map_all_regions": "Todas las regiones",
         "interactive_map_btn_gps": "Monumentos cercanos",
-        "interactive_map_open_view": "Abrir mapa interactivo"
+        "interactive_map_open_view": "Abrir mapa interactivo",
+        "live_badge": "Patrimonio togolés en directo",
+        "cta_scan_ia": "Escáner IA",
+        "explore_kicker": "Explore Togo",
+        "explore_title": "¿Qué desea descubrir?",
+        "signature_ia": "Firma IA",
+        "counts": {
+            "sites": "29 sitios",
+            "scan": "Reconocimiento IA",
+            "dishes": "31 platos",
+            "parks": "16 espacios",
+            "guides": "Guías certificados"
+        },
+        "heritage_kicker": "Patrimonio vivo",
+        "treasures_heading": "Tesoros imprescindibles",
+        "all_sites": "Los 29 sitios →",
+        "region_prefix": "Región {name}",
+        "explore_sheet": "Ver la ficha",
+        "signature_feature": "Función estrella",
+        "scan_feature_title": "Fotografie un monumento y la IA cuenta su historia.",
+        "scan_feature_desc": "Apunte su cámara a un monumento histórico togolés o importe una foto. Nuestro modelo de visión identifica el edificio y lanza la síntesis de voz inmersiva en directo.",
+        "try_scanner": "Probar el escáner IA",
+        "audio_included": "Audioguía multilingüe incluida",
+        "scan_preview_alt": "Escáner IA HeriTogo",
+        "confidence": "99,4% de confianza",
+        "deux_lions": "Monumento de los Dos Leones",
+        "lome_maritime": "Lomé, Región Marítima",
+        "slide_tags": {
+            "0": "Innovación IA",
+            "1": "UNESCO y monumentos",
+            "2": "Gastronomía y terroir"
+        },
+        "stats_landing": {
+            "sites": "Sitios patrimoniales",
+            "sites_sub": "Monumentos registrados",
+            "regions": "Regiones turísticas",
+            "regions_sub": "Del litoral a las Savanes",
+            "dishes": "Especialidades culinarias",
+            "dishes_sub": "Recetas y terroirs",
+            "pwa": "PWA sin conexión",
+            "pwa_sub": "Acceso sin red"
+        },
+        "featured": {
+            "koutammakou_desc": "Paisaje cultural y arquitectura fortificada de los Tata Somba.",
+            "palais_desc": "Antiguo palacio de gobernadores convertido en gran centro cultural.",
+            "kpime_desc": "La cascada más alta de Togo, en plena vegetación exuberante."
+        }
     },
     "Scan": {
         "title": "Escáner Heritogo",
@@ -347,7 +395,13 @@
         "premium_tts": "Audioguía TTS multilingüe de alta calidad",
         "premium_history": "Historial de visitas persistente",
         "premium_cta": "Pasar a Premium (Simulado)",
-        "free_continue": "Continuar con la versión gratuita"
+        "free_continue": "Continuar con la versión gratuita",
+        "steps": {
+            "0": "Digitalización de motivos arquitectónicos…",
+            "1": "Búsqueda en la memoria patrimonial de Togo…",
+            "2": "Análisis de visión IA y cruce geocultural…",
+            "3": "Generación de anécdotas y secretos históricos…"
+        }
     },
     "Lieux": {
         "all": "Todos",
@@ -436,7 +490,10 @@
             "fufu": "Fufu",
             "djenkoume": "Djenkoumé",
             "gboma": "Gboma",
-            "akoume": "Akoumé"
+            "akoume": "Akoumé",
+            "wagasi": "Wagasi (queso)",
+            "gombo": "Gombo (fétri)",
+            "boissons": "Bebidas locales"
         },
         "filter_category": "Filtrar por plato"
     },
@@ -887,7 +944,15 @@
         "or_continue_with": "O continuar con",
         "google_continue": "Continuar con Google",
         "google_privacy_hint": "Acepta la política de privacidad para registrarte con Google.",
-        "error_oauth": "La conexión con Google falló o el enlace ya no es válido. Inténtalo de nuevo."
+        "error_oauth": "La conexión con Google falló o el enlace ya no es válido. Inténtalo de nuevo.",
+        "confirm_loading_title": "Confirmación en curso...",
+        "confirm_loading_sub": "Espere unos segundos.",
+        "confirm_success_title": "¡Cuenta confirmada!",
+        "confirm_success_message": "¡Correo confirmado! Redirigiendo a su espacio...",
+        "confirm_error_title": "Enlace caducado",
+        "confirm_error_invalid": "Enlace inválido o caducado. Vuelva a iniciar sesión.",
+        "confirm_error_generic": "No se pudo confirmar su correo.",
+        "confirm_redirect": "Redirección automática..."
     },
     "Dashboard": {
         "common": {
@@ -1207,5 +1272,166 @@
         "error_loading": "No se pueden cargar los guías. Inténtalo de nuevo.",
         "loading": "Cargando guías..."
     },
-  "TravelTools": {"drawer":{"button":"Herramientas","open":"Abrir herramientas de viaje","title":"Herramientas del viajero","close":"Cerrar","privacy":"Tus listas se guardan en este dispositivo"},"checklist":{"kicker":"Prepara tu llegada","title":"Lo esencial antes de salir","description":"Una lista breve y clara guardada en tu dispositivo.","progress":"{done}/{total}","items":{"documents":{"title":"Documentos a mano","detail":"Pasaporte, datos del alojamiento y copias digitales seguras."},"entry":{"title":"Requisitos de entrada verificados","detail":"Consulta fuentes oficiales antes de salir: los requisitos pueden cambiar."},"offline":{"title":"Mapa y contactos guardados","detail":"Descarga la zona útil sin conexión y conserva un contacto local."},"money":{"title":"Presupuesto inicial preparado","detail":"Prepara lo necesario para la llegada y acuerda siempre el precio antes del trayecto."}}},"planner":{"kicker":"Tu estancia, simplemente","title":"Un itinerario listo para vivir","description":"Elige lo que te apetece y sigue un recorrido claro durante el viaje.","styleLabel":"Tu interés","duration":"Duración","oneDay":"1 día","twoDays":"2 días","threeDays":"3 días","save":"Guardar mi itinerario","saved":"Itinerario guardado en este dispositivo","map":"Ver lugares en el mapa","itineraries":{"essentiel":{"label":"Imprescindibles","description":"Lo mejor de Togo para una primera visita.","days":{"1":"Lomé: Gran Mercado, catedral y paseo marítimo","2":"Kpalimé: artesanía, café-cacao y cascada de Womé","3":"Koutammakou: pueblos Batammariba y paisajes del norte"}},"nature":{"label":"Naturaleza","description":"Cascadas, montañas y grandes espacios a tu ritmo.","days":{"1":"Lomé: laguna y lago Togo","2":"Kpalimé: monte Agou y cascada de Womé","3":"Fazao-Malfakassa: senderismo y fauna"}},"culture":{"label":"Cultura","description":"Encuentros, saber hacer y patrimonio vivo.","days":{"1":"Lomé: museos, mercado de fetiches y cocina local","2":"Kpalimé: talleres artesanales y productos locales","3":"Koutammakou: arquitectura tradicional y comunidades locales"}}}}}
+    "TravelTools": {
+        "drawer": {
+            "button": "Herramientas",
+            "open": "Abrir herramientas de viaje",
+            "title": "Herramientas del viajero",
+            "close": "Cerrar",
+            "privacy": "Tus listas se guardan en este dispositivo"
+        },
+        "checklist": {
+            "kicker": "Prepara tu llegada",
+            "title": "Lo esencial antes de salir",
+            "description": "Una lista breve y clara guardada en tu dispositivo.",
+            "progress": "{done}/{total}",
+            "items": {
+                "documents": {
+                    "title": "Documentos a mano",
+                    "detail": "Pasaporte, datos del alojamiento y copias digitales seguras."
+                },
+                "entry": {
+                    "title": "Requisitos de entrada verificados",
+                    "detail": "Consulta fuentes oficiales antes de salir: los requisitos pueden cambiar."
+                },
+                "offline": {
+                    "title": "Mapa y contactos guardados",
+                    "detail": "Descarga la zona útil sin conexión y conserva un contacto local."
+                },
+                "money": {
+                    "title": "Presupuesto inicial preparado",
+                    "detail": "Prepara lo necesario para la llegada y acuerda siempre el precio antes del trayecto."
+                }
+            }
+        },
+        "planner": {
+            "kicker": "Tu estancia, simplemente",
+            "title": "Un itinerario listo para vivir",
+            "description": "Elige lo que te apetece y sigue un recorrido claro durante el viaje.",
+            "styleLabel": "Tu interés",
+            "duration": "Duración",
+            "oneDay": "1 día",
+            "twoDays": "2 días",
+            "threeDays": "3 días",
+            "save": "Guardar mi itinerario",
+            "saved": "Itinerario guardado en este dispositivo",
+            "map": "Ver lugares en el mapa",
+            "itineraries": {
+                "essentiel": {
+                    "label": "Imprescindibles",
+                    "description": "Lo mejor de Togo para una primera visita.",
+                    "days": {
+                        "1": "Lomé: Gran Mercado, catedral y paseo marítimo",
+                        "2": "Kpalimé: artesanía, café-cacao y cascada de Womé",
+                        "3": "Koutammakou: pueblos Batammariba y paisajes del norte"
+                    }
+                },
+                "nature": {
+                    "label": "Naturaleza",
+                    "description": "Cascadas, montañas y grandes espacios a tu ritmo.",
+                    "days": {
+                        "1": "Lomé: laguna y lago Togo",
+                        "2": "Kpalimé: monte Agou y cascada de Womé",
+                        "3": "Fazao-Malfakassa: senderismo y fauna"
+                    }
+                },
+                "culture": {
+                    "label": "Cultura",
+                    "description": "Encuentros, saber hacer y patrimonio vivo.",
+                    "days": {
+                        "1": "Lomé: museos, mercado de fetiches y cocina local",
+                        "2": "Kpalimé: talleres artesanales y productos locales",
+                        "3": "Koutammakou: arquitectura tradicional y comunidades locales"
+                    }
+                }
+            }
+        }
+    },
+    "Splash": {
+        "tagline": "Patrimonio y viajes en Togo"
+    },
+    "Cookie": {
+        "title": "Cookies de HeriTogo",
+        "body": "Cookies esenciales: sesión (HttpOnly) e idioma. Las cookies no esenciales (tema) son opcionales. La geolocalización y las notificaciones requieren un consentimiento aparte.",
+        "policy": "Política de privacidad",
+        "refuse": "Rechazar",
+        "accept": "Aceptar",
+        "close": "Cerrar"
+    },
+    "Privacy": {
+        "gdpr_kicker": "RGPD",
+        "geo_title": "¿Afinar el escaneo con su posición?",
+        "geo_body": "La posición permanece en memoria durante el escaneo, no se guarda en nuestra base, y puede rechazarla: el escáner funciona igual.",
+        "allow": "Permitir",
+        "deny": "Rechazar",
+        "settings_title": "Privacidad y consentimientos",
+        "settings_intro": "Puede retirar un consentimiento en cualquier momento. Eso no impide usar el escáner, el mapa o las reservas.",
+        "geo_label": "Geolocalización",
+        "geo_hint": "Se usa solo al vuelo para afinar un escaneo. Nunca se historializa en base.",
+        "notif_label": "Notificaciones",
+        "notif_hint": "Alertas sobre sus reservas, solo si las activa.",
+        "read_policy": "Leer la política de privacidad",
+        "erasure_title": "Derecho al olvido",
+        "erasure_body": "La eliminación borra su perfil, reservas y documentos de estado. Los documentos de identidad nunca se almacenaron con nosotros.",
+        "delete_account": "Eliminar definitivamente mi cuenta",
+        "deleting": "Eliminando…",
+        "delete_confirm": "Esta acción es definitiva. Su cuenta y datos de HeriTogo se eliminarán. ¿Continuar?",
+        "delete_error": "No se pudo eliminar."
+    },
+    "Subscription": {
+        "kicker": "Planes y tarifas",
+        "title": "Desbloquee la experiencia completa de HeriTogo",
+        "subtitle": "Disfrute de escaneos ilimitados por visión artificial, audioguías inmersivas multilingües y contacto directo con nuestros mejores guías locales.",
+        "free_title": "Plan Descubrimiento",
+        "free_sub": "Ideal para explorar los monumentos esenciales.",
+        "per_month": "/ mes",
+        "free_f1": "3 escaneos IA de monumentos gratis / mes",
+        "free_f2": "Consulta de 29 sitios patrimoniales y 31 platos",
+        "free_f3": "Solicitud de reserva de guías locales certificados",
+        "free_f4": "Escaneos ilimitados no incluidos",
+        "current_plan": "Plan actual",
+        "recommended": "✦ Recomendado",
+        "premium_title": "HeriTogo Premium",
+        "premium_sub": "Para amantes de la cultura y viajeros en Togo.",
+        "premium_f1": "Escaneos IA de monumentos ilimitados",
+        "premium_f2": "Audioguías multilingües completas (TTS de alta calidad)",
+        "premium_f3": "Reserva prioritaria de guías verificados",
+        "premium_f4": "Historial de escaneos y navegación sin conexión",
+        "instant": "Activación instantánea en modo demo",
+        "cta": "Activar el acceso Premium",
+        "success": "¡Suscripción Premium activada con éxito!"
+    },
+    "Regions": {
+        "hero_badge": "5 regiones, 5 universos",
+        "capital": "Capital: {name}",
+        "spirit": "El espíritu de {name}",
+        "selection": "Selección",
+        "highlights": "Imprescindibles de la región",
+        "sites": "Sitios emblemáticos",
+        "dishes": "Especialidades culinarias",
+        "activities": "Qué hacer allí",
+        "type_site": "Sitio",
+        "type_dish": "Sabor",
+        "type_activity": "Actividad",
+        "cta_title": "Prepare su estancia en {name}",
+        "cta_sub": "Encuentre un guía local certificado para una inmersión auténtica.",
+        "cta_button": "Reservar un guía local →",
+        "stats": {
+            "monuments": "Monumentos mayores",
+            "inhabitants": "Habitantes",
+            "coast": "Costa atlántica",
+            "nature": "Sitios naturales",
+            "summit": "Punto culminante",
+            "waterfalls": "Cascadas y ríos",
+            "park": "Parque protegido",
+            "species": "Especies animales",
+            "cities": "Ciudades históricas",
+            "unesco": "Patrimonio mundial",
+            "listed": "Zona clasificada",
+            "signatures": "Monumentos emblemáticos",
+            "reserve": "Reserva natural",
+            "granaries": "Graneros de Nok",
+            "archaeology": "Sitios arqueológicos"
+        }
+    }
 }
