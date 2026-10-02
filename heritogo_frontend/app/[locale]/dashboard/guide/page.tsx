@@ -739,6 +739,7 @@ export default function GuideDashboard() {
 
         {/* Tab 2: Edit Profile */}
         {activeTab === 'profile' && (
+          <>
           <form onSubmit={handleUpdateProfile} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
             <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.tab_profile')}</h3>
 
@@ -992,7 +993,8 @@ export default function GuideDashboard() {
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save_changes')}
             </button>
           </form>
-          {activeTab === 'profile' && <div className="mt-6"><PrivacySettings /></div>}
+          <div className="mt-6"><PrivacySettings /></div>
+          </>
         )}
 
         {/* Tab 3: Documents */}
