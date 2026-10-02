@@ -48,7 +48,16 @@ export async function GET() {
             phone: true
           }
         },
-        documents: true
+        documents: {
+          select: {
+            id: true,
+            type: true,
+            label: true,
+            file_name: true,
+            is_verified: true,
+            created_at: true,
+          },
+        },
       },
       orderBy: { submitted_at: 'asc' }
     })

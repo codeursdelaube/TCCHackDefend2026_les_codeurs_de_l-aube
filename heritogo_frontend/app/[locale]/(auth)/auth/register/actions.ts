@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { getSafeAuthErrorMessage } from '@/lib/utils/errors'
 
 
@@ -36,7 +37,10 @@ export async function registerAction(
       return { error: 'Vous devez accepter la politique de confidentialité.' }
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const headersList = await headers()
+    const host = headersList.get('host') || 'localhost:3000'
+    const protocol = headersList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https')
+    const siteUrl = `${protocol}://${host}`
 
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),

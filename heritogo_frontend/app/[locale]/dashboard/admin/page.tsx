@@ -12,7 +12,7 @@ import { apiFetch } from '@/lib/utils/http'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
-  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink, Star, Landmark, Utensils
+  Loader2, FileText, Ban, EyeOff, Eye, Star, Landmark, Utensils
 } from 'lucide-react'
 import CatalogManager from '@/components/admin/CatalogManager'
 
@@ -29,7 +29,7 @@ interface PendingGuide {
     id: string
     type: string
     label: string
-    file_url: string
+    file_name?: string
   }[]
 }
 
@@ -438,15 +438,13 @@ export default function AdminDashboardPage() {
                           <span className="block text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.docs_provided')}</span>
                           <div className="flex flex-wrap gap-2">
                             {g.documents.map(doc => (
-                              <a 
+                              <span
                                 key={doc.id}
-                                href={doc.file_url}
-                                download={`${doc.label.replace(/\s+/g, '_') || 'document'}.pdf`}
-                                className="badge bg-base-100 border-border text-base-content hover:border-primary py-3 px-3 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-semibold"
+                                className="badge bg-base-100 border-border text-base-content py-3 px-3 rounded-lg text-xs flex items-center gap-1.5 font-semibold"
                               >
                                 <FileText className="h-3.5 w-3.5 text-base-content/40" />
-                                {doc.label} ({t('admin.download_pdf')}) <ExternalLink className="h-3 w-3 shrink-0 text-base-content/30" />
-                              </a>
+                                {doc.label} (KYC prestataire)
+                              </span>
                             ))}
                           </div>
                         </div>

@@ -11,6 +11,8 @@ import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
 import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { usePrivacyConsent } from '@/hooks/usePrivacyConsent'
+import GeoConsentBanner from '@/components/GeoConsentBanner'
 import { toast } from 'sonner'
 import Badge from '@/components/ui/Badge'
 
@@ -75,7 +77,8 @@ export default function ScanPage() {
   })
   const [showPaywall, setShowPaywall] = useState(false)
 
-  const { position: geoPosition } = useGeolocation()
+  const { consent } = usePrivacyConsent()
+  const { position: geoPosition } = useGeolocation({ enabled: consent.geo === true })
 
   useEffect(() => {
     if (geoPosition) {
@@ -105,7 +108,7 @@ export default function ScanPage() {
         monument: result.data.monument,
         histoire: result.data.histoire,
         date: new Date().toISOString(),
-        localite: userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : t('default_location')
+        localite: result.data.monument
       }
       safeLocalStorageSet('heritogo_scans', JSON.stringify([newScan, ...history]))
     }
@@ -265,6 +268,8 @@ export default function ScanPage() {
             </div>
           </div>
         </section>
+
+        <GeoConsentBanner />
 
         {/* ── SCANNER WORKSPACE ── */}
         <section className="grid gap-6 lg:grid-cols-12 lg:items-start">

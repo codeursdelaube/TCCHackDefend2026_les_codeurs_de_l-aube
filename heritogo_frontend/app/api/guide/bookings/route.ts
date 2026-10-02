@@ -24,7 +24,17 @@ export async function GET() {
         where: { id: auth.guide.id },
         include: {
           profile: { select: { full_name: true, avatar_url: true, bio: true, phone: true, preferred_lang: true } },
-          documents: { orderBy: { created_at: 'desc' } },
+          documents: {
+            orderBy: { created_at: 'desc' },
+            select: {
+              id: true,
+              type: true,
+              label: true,
+              file_name: true,
+              is_verified: true,
+              created_at: true,
+            },
+          },
         },
       }),
       prisma.booking.findMany({

@@ -1,4 +1,4 @@
--- Tables catalogue (à exécuter dans Supabase SQL Editor si prisma db push est inaccessible)
+-- Tables catalogue (à exécuter via le pooler ou l'éditeur SQL Supabase)
 
 create table if not exists places (
   id uuid primary key default gen_random_uuid(),
@@ -37,3 +37,30 @@ create table if not exists dishes (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table places enable row level security;
+alter table dishes enable row level security;
+
+drop policy if exists "Public read published places" on places;
+create policy "Public read published places"
+on places for select
+using (is_published = true);
+
+drop policy if exists "Public read published dishes" on dishes;
+create policy "Public read published dishes"
+on dishes for select
+using (is_published = true);
+
+drop policy if exists "Authenticated manage places" on places;
+create policy "Authenticated manage places"
+on places for all
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated manage dishes" on dishes;
+create policy "Authenticated manage dishes"
+on dishes for all
+to authenticated
+using (true)
+with check (true);

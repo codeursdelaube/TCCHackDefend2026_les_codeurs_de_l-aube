@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation'
 import { Loader2, LogIn } from 'lucide-react'
 import { useFormStatus } from 'react-dom'
 import { loginAction } from './actions'
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -29,8 +30,13 @@ function LoginForm() {
   const locale = params?.locale || 'fr'
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get('redirect') || ''
+  const oauthError = searchParams.get('error')
 
   const [state, formAction] = useActionState(loginAction, null)
+  const oauthMessage =
+    oauthError === 'oauth' || oauthError === 'lien_expire'
+      ? t('error_oauth')
+      : null
 
   return (
     <div className="app-card p-6 sm:p-8 space-y-6 shadow-xl">
@@ -73,9 +79,9 @@ function LoginForm() {
           />
         </div>
 
-        {state?.error && (
+        {(state?.error || oauthMessage) && (
           <div className="rounded-2xl border border-red-300 bg-red-50/40 dark:bg-red-950/20 px-4 py-3 text-xs font-bold text-red-600">
-            {state.error}
+            {state?.error || oauthMessage}
           </div>
         )}
 
@@ -83,6 +89,21 @@ function LoginForm() {
           <SubmitButton />
         </div>
       </form>
+
+      <div className="relative py-1">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <p className="relative mx-auto w-fit bg-card px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {t('or_continue_with')}
+        </p>
+      </div>
+
+      <GoogleAuthButton
+        locale={locale}
+        redirectTo={redirectParam}
+        label={t('google_continue')}
+      />
 
       <div className="flex flex-col gap-2 text-center text-xs pt-2 border-t border-border">
         <Link href="/auth/forgot-password" className="font-bold text-primary hover:underline">

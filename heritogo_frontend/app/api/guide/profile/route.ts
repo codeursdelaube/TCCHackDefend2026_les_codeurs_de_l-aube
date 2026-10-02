@@ -58,29 +58,33 @@ export async function POST(request: Request) {
     if (full_day_rate !== undefined) guideData.full_day_rate = full_day_rate ? parseFloat(full_day_rate) : null
     if (virtual_rate !== undefined) guideData.virtual_rate = virtual_rate ? parseFloat(virtual_rate) : null
 
-    // 3. Ajouter un document de vérification
+    // 3. Ajouter un document de vérification — jamais de pièce d'identité en clair chez nous
     if (document !== undefined) {
       const validTypes = Object.values(DocumentType)
+      const kycRef = typeof document.kyc_session_id === 'string' ? document.kyc_session_id.trim() : ''
+      const fileUrl = typeof document.file_url === 'string' ? document.file_url : ''
+      if (fileUrl.startsWith('data:') || fileUrl.includes('base64,')) {
+        return NextResponse.json(
+          { error: 'Les pièces d’identité ne sont pas stockées par HeriTogo. Utilisez la vérification KYC.' },
+          { status: 400 }
+        )
+      }
       const isValidDocument = document && validTypes.includes(document.type as DocumentType) &&
-        typeof document.file_url === 'string' && /^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/.test(document.file_url) &&
+        kycRef.length > 8 && kycRef.length <= 180 &&
         typeof document.file_name === 'string' && document.file_name.length <= 160 &&
         typeof document.label === 'string' && document.label.trim().length > 0 && document.label.length <= 120
-      if (!isValidDocument) return NextResponse.json({ error: 'Document invalide. Un PDF est requis.' }, { status: 400 })
-      const documentBytes = Buffer.from(document.file_url.split(',')[1], 'base64')
-      if (documentBytes.length === 0 || documentBytes.length > 5 * 1024 * 1024 || !documentBytes.subarray(0, 4).equals(Buffer.from('%PDF'))) {
-        return NextResponse.json({ error: 'Le PDF est invalide ou dépasse 5 Mo.' }, { status: 400 })
-      }
+      if (!isValidDocument) return NextResponse.json({ error: 'Vérification KYC invalide.' }, { status: 400 })
     }
     let shouldSendDocEmail = false
-    if (document && document.file_url && document.type) {
+    if (document && document.kyc_session_id && document.type) {
       await prisma.guideDocument.create({
         data: {
           guide_id: guideProfile.id,
           type: document.type as DocumentType,
           label: document.label || null,
-          file_url: document.file_url,
-          file_name: document.file_name || 'document',
-          file_size: document.file_size ? parseInt(document.file_size, 10) : null
+          file_url: `kyc:${document.kyc_session_id}`,
+          file_name: document.file_name || 'kyc-session',
+          file_size: null
         }
       })
 
@@ -97,7 +101,16 @@ export async function POST(request: Request) {
       data: guideData,
       include: {
         profile: true,
-        documents: true
+        documents: {
+          select: {
+            id: true,
+            type: true,
+            label: true,
+            file_name: true,
+            is_verified: true,
+            created_at: true,
+          },
+        },
       }
     })
 

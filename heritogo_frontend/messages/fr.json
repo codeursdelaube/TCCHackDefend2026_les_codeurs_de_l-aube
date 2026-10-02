@@ -36,7 +36,7 @@
         "explorers": "{count}+ explorateurs",
         "discover": "Découvrir",
         "scroll": "Scroll",
-        "hackathon_badge": "Patrimoine UNESCO",
+        "unesco_badge": "Patrimoine UNESCO",
         "slides": {
             "0": {
                 "title": "Héritogo",
@@ -882,7 +882,11 @@
         "error_password_short": "Le mot de passe doit contenir au moins 6 caractères.",
         "success_register": "Compte créé ! Redirection...",
         "success_forgot": "Email envoyé. Vérifiez votre boîte de réception.",
-        "check_email": "Vérifiez votre email pour confirmer votre compte."
+        "check_email": "Vérifiez votre email pour confirmer votre compte.",
+        "or_continue_with": "Ou continuer avec",
+        "google_continue": "Continuer avec Google",
+        "google_privacy_hint": "Acceptez la politique de confidentialité pour vous inscrire avec Google.",
+        "error_oauth": "La connexion Google a échoué ou le lien n'est plus valide. Réessayez."
     },
     "Dashboard": {
         "common": {
@@ -1017,7 +1021,7 @@
             "doc_title_label": "Libellé / Titre",
             "doc_title_placeholder": "Ex: Licence Ministère du Tourisme 2026",
             "doc_file_label": "Fichier justificatif (PDF uniquement)",
-            "doc_upload_hint": "Veuillez uploader un fichier officiel au format PDF (max. 5 Mo). Le document sera directement accessible et téléchargeable pour validation par l'équipe d'administration.",
+            "doc_upload_hint": "La pièce d’identité est vérifiée par un prestataire KYC (Stripe Identity). Le fichier ne transite pas et n’est pas stocké sur les serveurs HeriTogo.",
             "submit_for_verification": "Soumettre pour vérification",
             "docs_submitted_title": "Documents soumis",
             "no_docs": "Aucun document soumis pour le moment.",

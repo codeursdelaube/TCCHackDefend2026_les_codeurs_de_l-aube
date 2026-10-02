@@ -21,7 +21,6 @@ import {
   Wifi,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
 import AuthGuardLink from '@/components/AuthGuardLink'
 
 type Slide = {
@@ -206,21 +205,21 @@ export default function AccueilPage() {
 
                     {/* Primary CTA & Secondary Action */}
                     <div className="pt-2 flex flex-wrap items-center gap-3">
-                      <Link
+                      <AuthGuardLink
                         href={slide.href}
                         className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-primary-dark hover:scale-[1.02] active:scale-[0.98]"
                       >
                         <span>{slide.cta}</span>
                         <ArrowRight className="h-4 w-4" />
-                      </Link>
+                      </AuthGuardLink>
 
-                      <Link
+                      <AuthGuardLink
                         href="/scan"
                         className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/20 px-5 py-3.5 text-sm font-bold text-amber-200 backdrop-blur-md transition-all hover:bg-accent/30 hover:border-accent"
                       >
                         <Camera className="h-4 w-4 text-accent" />
                         <span>Scanner IA</span>
-                      </Link>
+                      </AuthGuardLink>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -311,13 +310,13 @@ export default function AccueilPage() {
                 Que souhaitez-vous découvrir ?
               </h2>
             </div>
-            <Link
+            <AuthGuardLink
               href="/lieux"
               className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-primary hover:text-primary-dark transition-colors"
             >
               <span>{t('incontournables_see_all')}</span>
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </AuthGuardLink>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -353,21 +352,10 @@ export default function AccueilPage() {
                 </div>
                 </>
               )
-              if (href === '/guides') {
-                return (
-                  <AuthGuardLink key={href} href={href} className={className}>
-                    {inner}
-                  </AuthGuardLink>
-                )
-              }
               return (
-              <Link
-                key={href}
-                href={href}
-                className={className}
-              >
-                {inner}
-              </Link>
+                <AuthGuardLink key={href} href={href} className={className}>
+                  {inner}
+                </AuthGuardLink>
               )
             })}
           </div>
@@ -387,17 +375,17 @@ export default function AccueilPage() {
                 Trésors Incontournables
               </h2>
             </div>
-            <Link
+            <AuthGuardLink
               href="/lieux"
               className="text-xs sm:text-sm font-bold text-primary hover:underline"
             >
               Tous les 29 sites →
-            </Link>
+            </AuthGuardLink>
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {featuredDestinations.map((dest) => (
-              <Link
+              <AuthGuardLink
                 key={dest.title}
                 href={dest.href}
                 className="app-card group relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
@@ -449,7 +437,7 @@ export default function AccueilPage() {
                     </span>
                   </div>
                 </div>
-              </Link>
+              </AuthGuardLink>
             ))}
           </div>
         </section>
@@ -472,13 +460,13 @@ export default function AccueilPage() {
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link
+                <AuthGuardLink
                   href="/scan"
                   className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary-dark"
                 >
                   <Camera className="h-4 w-4" />
                   <span>Essayer le Scanner IA</span>
-                </Link>
+                </AuthGuardLink>
 
                 <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                   <Headphones className="h-4 w-4 text-primary" />

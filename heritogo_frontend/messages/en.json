@@ -36,7 +36,7 @@
         "explorers": "{count}+ explorers",
         "discover": "Discover",
         "scroll": "Scroll",
-        "hackathon_badge": "UNESCO Heritage",
+        "unesco_badge": "UNESCO Heritage",
         "slides": {
             "0": {
                 "title": "Heritogo",
@@ -883,7 +883,11 @@
         "error_password_short": "Password must be at least 6 characters.",
         "success_register": "Account created! Redirecting...",
         "success_forgot": "Email sent. Check your inbox.",
-        "check_email": "Check your email to confirm your account."
+        "check_email": "Check your email to confirm your account.",
+        "or_continue_with": "Or continue with",
+        "google_continue": "Continue with Google",
+        "google_privacy_hint": "Accept the privacy policy to sign up with Google.",
+        "error_oauth": "Google sign-in failed or the link is no longer valid. Please try again."
     },
     "Dashboard": {
         "common": {

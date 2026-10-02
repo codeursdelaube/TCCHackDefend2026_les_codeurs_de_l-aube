@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// Retry automatique optimisé pour le Hackathon (Évite de dépasser les 10s de timeout Vercel)
+// Retry automatique (évite de dépasser le timeout Vercel)
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // CORRECTION DANGER TAILLE : Vérification de la taille limite de Vercel (4.5 Mo max)
-    // Évite que Vercel ne coupe brutalement la fonction avec une erreur obscure pour le jury
+    // Évite que Vercel ne coupe la fonction avec une erreur de payload trop volumineux.
     const MAX_SIZE_BYTES = 4.5 * 1024 * 1024 // 4.5 Mo
     if (imageFile.size > MAX_SIZE_BYTES) {
       console.error(`[HériTogo] L'image est trop lourde (${(imageFile.size / (1024 * 1024)).toFixed(2)} Mo).`)

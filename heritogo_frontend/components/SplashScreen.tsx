@@ -2,20 +2,27 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+
+const SPLASH_KEY = 'heritogo_splash_shown'
+const SPLASH_MS = 2800
 
 export default function SplashScreen() {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true)
+  const reduceMotion = useReducedMotion()
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const KEY = 'heritogo_splash_shown'
-    if (!sessionStorage.getItem(KEY)) {
-      setVisible(true)
-      sessionStorage.setItem(KEY, '1')
-      const id = window.setTimeout(() => setVisible(false), 2400)
-      return () => window.clearTimeout(id)
+    if (sessionStorage.getItem(SPLASH_KEY)) {
+      setVisible(false)
+      return
     }
+
+    const id = window.setTimeout(() => {
+      sessionStorage.setItem(SPLASH_KEY, '1')
+      setVisible(false)
+    }, SPLASH_MS)
+
+    return () => window.clearTimeout(id)
   }, [])
 
   return (
@@ -23,49 +30,50 @@ export default function SplashScreen() {
       {visible && (
         <motion.div
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
-          style={{ background: 'var(--primary)' }}
+          style={{ backgroundColor: '#FBF6EF' }}
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.4, ease: 'easeOut' } }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0.15 : 0.45, ease: 'easeOut' }}
         >
-          {/* Logo */}
-          <motion.div
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.05 }}
-            className="flex flex-col items-center gap-4"
-          >
-            <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-3xl bg-white shadow-2xl">
-              <Image src="/logo.png" alt="HeriTogo" fill className="object-contain p-2" priority />
-            </div>
-
-            <div className="text-center">
-              <h1 className="font-serif text-4xl font-bold tracking-tight text-white">HeriTogo</h1>
-              <p className="mt-1 text-sm font-medium text-white/75">Découvrez le Togo authentique</p>
-            </div>
-          </motion.div>
-
-          {/* Barre de progression */}
-          <motion.div
-            className="absolute bottom-14 left-0 right-0 mx-auto w-28 overflow-hidden rounded-full bg-white/20"
-            style={{ height: 3 }}
-          >
+          <div className="flex flex-col items-center px-6">
             <motion.div
-              className="h-full rounded-full bg-white"
-              initial={{ width: '0%' }}
-              animate={{ width: '100%' }}
-              transition={{ duration: 2, ease: 'easeInOut' }}
-            />
-          </motion.div>
+              initial={reduceMotion ? false : { scale: 0.96 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="relative flex h-28 w-28 items-center justify-center"
+            >
+              <span className="absolute inset-0 rounded-full border border-accent/35" />
+              <span className="absolute inset-2 rounded-full bg-white shadow-[0_12px_40px_rgba(42,30,22,0.08)]" />
+              <div className="relative h-20 w-20 overflow-hidden rounded-full">
+                <Image
+                  src="/icons/icon-512x512.png"
+                  alt="HeriTogo"
+                  fill
+                  priority
+                  sizes="80px"
+                  className="object-contain"
+                />
+              </div>
+            </motion.div>
 
-          {/* Footer */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="absolute bottom-7 text-[11px] font-semibold text-white/50 tracking-widest uppercase"
-          >
-            heritogo.codorah.com
-          </motion.p>
+            <div className="mt-7 text-center">
+              <p className="font-serif text-3xl font-semibold tracking-tight text-[#2A1E16]">
+                HeriTogo
+              </p>
+              <p className="mt-2 text-sm font-medium tracking-wide text-[#7A6A5C]">
+                Patrimoine &amp; voyages au Togo
+              </p>
+            </div>
+          </div>
+
+          <div className="absolute bottom-16 left-1/2 w-32 -translate-x-1/2 overflow-hidden rounded-full bg-[#B5502E]/15">
+            <motion.div
+              className="h-[3px] rounded-full bg-[#B5502E]"
+              initial={{ width: reduceMotion ? '100%' : '0%' }}
+              animate={{ width: '100%' }}
+              transition={{ duration: reduceMotion ? 0 : 1.9, ease: 'easeInOut' }}
+            />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

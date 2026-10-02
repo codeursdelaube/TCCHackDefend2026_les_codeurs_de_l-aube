@@ -36,7 +36,7 @@
         "explorers": "{count}+ 探索者",
         "discover": "发现",
         "scroll": "滚动",
-        "hackathon_badge": "UNESCO世界遗产",
+        "unesco_badge": "UNESCO世界遗产",
         "slides": {
             "0": {
                 "title": "Heritogo",
@@ -883,7 +883,11 @@
         "error_password_short": "密码至少需要6个字符。",
         "success_register": "账户已创建！正在跳转...",
         "success_forgot": "邮件已发送，请检查收件箱。",
-        "check_email": "请检查电子邮件以确认您的账户。"
+        "check_email": "请检查电子邮件以确认您的账户。",
+        "or_continue_with": "或使用以下方式继续",
+        "google_continue": "使用 Google 继续",
+        "google_privacy_hint": "请先接受隐私政策，再使用 Google 注册。",
+        "error_oauth": "Google 登录失败或链接已失效，请重试。"
     },
     "Dashboard": {
         "common": {

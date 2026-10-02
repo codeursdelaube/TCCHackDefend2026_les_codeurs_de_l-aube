@@ -9,6 +9,7 @@ import { useFormStatus } from 'react-dom'
 import { registerAction } from './actions'
 import { getPasswordStrength } from '@/lib/utils/validation'
 import PrivacyModal from '@/components/PrivacyModal'
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
 
 type RegisterRole = 'tourist' | 'guide'
 
@@ -248,6 +249,28 @@ function RegisterForm() {
           <SubmitButton privacyAccepted={privacyAccepted} />
         </div>
       </form>
+
+      <div className="relative py-1">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <p className="relative mx-auto w-fit bg-card px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {t('or_continue_with')}
+        </p>
+      </div>
+
+      <GoogleAuthButton
+        locale={locale}
+        redirectTo={redirectParam}
+        role={role}
+        label={t('google_continue')}
+        disabled={!privacyAccepted}
+      />
+      {!privacyAccepted && (
+        <p className="text-center text-[11px] text-muted-foreground">
+          {t('google_privacy_hint')}
+        </p>
+      )}
 
       <div className="flex flex-col gap-2 text-center text-xs pt-2 border-t border-border">
         <p className="text-muted-foreground">

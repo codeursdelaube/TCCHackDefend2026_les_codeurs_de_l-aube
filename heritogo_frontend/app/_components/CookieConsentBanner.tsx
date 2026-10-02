@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Cookie, X } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
+import PrivacyModal from '@/components/PrivacyModal'
 
 const COOKIE_NAME = 'heritogo_cookie_consent'
 const MAX_AGE = 60 * 60 * 24 * 365
@@ -16,11 +17,13 @@ function getCookie(name: string) {
 }
 
 function saveConsent(value: 'accepted' | 'refused') {
-  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${MAX_AGE}; SameSite=Lax`
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${MAX_AGE}; SameSite=Lax${secure}`
 }
 
 export default function CookieConsentBanner() {
   const [visible, setVisible] = useState(false)
+  const [policyOpen, setPolicyOpen] = useState(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -50,8 +53,11 @@ export default function CookieConsentBanner() {
           <div>
             <p className="text-sm font-black">Cookies Heritogo</p>
             <p className="mt-1 text-xs leading-5 text-base-content/65">
-              Nous utilisons des cookies pour garder votre session, votre langue et votre theme.
-              Vous pouvez accepter ou refuser les cookies non essentiels.
+              Cookies essentiels : session (HttpOnly) et langue. Les cookies non essentiels (thème) sont optionnels.
+              Géolocalisation et notifications font l’objet d’un consentement séparé.{' '}
+              <button type="button" className="font-bold underline" onClick={() => setPolicyOpen(true)}>
+                Politique de confidentialité
+              </button>
             </p>
           </div>
         </div>
@@ -82,6 +88,7 @@ export default function CookieConsentBanner() {
           </button>
         </div>
       </div>
+      <PrivacyModal isOpen={policyOpen} onClose={() => setPolicyOpen(false)} />
     </div>
   )
 }

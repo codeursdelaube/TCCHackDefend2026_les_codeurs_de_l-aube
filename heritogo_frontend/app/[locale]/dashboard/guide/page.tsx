@@ -15,6 +15,7 @@ import {
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import PrivacySettings from '@/components/PrivacySettings'
 
 interface BookingRow {
   id: string
@@ -283,21 +284,16 @@ export default function GuideDashboard() {
   const handleUploadDocument = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    if (!selectedFile) {
-      setError(t('guide.error_pdf_required'))
-      return
-    }
     setActionLoading(true)
 
     try {
-      // Lire le fichier en base64
-      const reader = new FileReader()
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = (err) => reject(err)
+      const kyc = await apiFetch<{ sessionId?: string; hostedUrl?: string | null }>('/api/kyc/session', {
+        method: 'POST',
       })
-      reader.readAsDataURL(selectedFile)
-      const base64Data = await base64Promise
+      if (!kyc.ok || !kyc.data?.sessionId) {
+        setError(kyc.error || t('guide.error_doc_submit'))
+        return
+      }
 
       const result = await apiFetch<{ guide?: GuideProfileData }>('/api/guide/profile', {
         method: 'POST',
@@ -306,9 +302,8 @@ export default function GuideDashboard() {
           document: {
             type: docType,
             label: docLabel || t('guide.default_doc_label'),
-            file_url: base64Data,
-            file_name: selectedFile.name,
-            file_size: selectedFile.size
+            kyc_session_id: kyc.data.sessionId,
+            file_name: selectedFile?.name || 'kyc-session',
           }
         })
       })
@@ -320,6 +315,10 @@ export default function GuideDashboard() {
       if (result.data.guide) setGuide(result.data.guide)
       setDocLabel('')
       setSelectedFile(null)
+      if (kyc.data.hostedUrl) {
+        window.location.href = kyc.data.hostedUrl
+        return
+      }
       alert(t('guide.success_doc_submit'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
@@ -993,6 +992,7 @@ export default function GuideDashboard() {
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save_changes')}
             </button>
           </form>
+          {activeTab === 'profile' && <div className="mt-6"><PrivacySettings /></div>}
         )}
 
         {/* Tab 3: Documents */}
@@ -1054,7 +1054,6 @@ export default function GuideDashboard() {
                     }
                   }}
                   className="file-input file-input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
-                  required
                 />
               </label>
 
@@ -1091,9 +1090,9 @@ export default function GuideDashboard() {
                         <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">
                           {t('common.status')} : {doc.type}
                         </p>
-                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="inline-block text-[10px] font-bold text-primary underline">
-                          {t('guide.open_doc')}
-                        </a>
+                        <p className="text-[10px] font-bold text-primary">
+                          Vérification chez le prestataire KYC
+                        </p>
                       </div>
 
                       <span className={`badge badge-sm font-extrabold uppercase text-[8px] py-2.5 px-2 rounded-lg ${

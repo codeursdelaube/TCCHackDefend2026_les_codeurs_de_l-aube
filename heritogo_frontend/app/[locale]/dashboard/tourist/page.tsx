@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
 import ShareItinerary from '@/components/ShareItinerary'
+import PrivacySettings from '@/components/PrivacySettings'
 import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
@@ -389,6 +390,7 @@ export default function TouristDashboardPage() {
                 </button>
               </form>
             </div>
+            <PrivacySettings />
           </div>
         )}
 

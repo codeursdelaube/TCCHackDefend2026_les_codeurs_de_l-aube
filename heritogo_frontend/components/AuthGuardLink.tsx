@@ -34,11 +34,11 @@ export default function AuthGuardLink({
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!requireAuth) return
 
-    if (!loading && !isAuthenticated) {
-      e.preventDefault()
-      // Redirige vers login avec paramètre de retour
-      router.push(`/${locale}/auth/login?redirect=${encodeURIComponent(targetPath)}`)
-    }
+    if (isAuthenticated && !loading) return
+
+    e.preventDefault()
+    if (loading) return
+    router.push(`/${locale}/auth/login?redirect=${encodeURIComponent(targetPath)}`)
   }
 
   return (
