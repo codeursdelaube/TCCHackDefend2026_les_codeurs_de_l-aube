@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/auth/admin'
 import { slugify } from '@/lib/catalog/map'
 import { PLACE_REGIONS } from '@/lib/catalog/types'
 import { catalogDbError, DEFAULT_TOGO_LAT, DEFAULT_TOGO_LNG, logAdminAction, parseCoord } from '@/lib/catalog/admin'
-import { parsePlaceTranslations } from '@/lib/catalog/libretranslate'
+import { parsePlaceTranslations, placeCopyFromFrench, translatePlaceCopy } from '@/lib/catalog/translate'
 import { deletePlaceRow, findPlaceBySlug, findPlaceBySlugOrId, updatePlaceRow } from '@/lib/catalog/store'
 
 export const dynamic = 'force-dynamic'
@@ -38,11 +38,49 @@ export async function PATCH(
       }
     }
 
+    const nextName = body.name !== undefined ? String(body.name).trim() : current.name
+    const nextDescription = body.description !== undefined ? String(body.description).trim() : current.description
+    const nextHistory = body.history !== undefined ? String(body.history).trim() : current.history
+    const nextBestTime = body.best_time !== undefined ? String(body.best_time).trim() || null : current.best_time
+    const nextDuration = body.duration !== undefined ? String(body.duration).trim() || null : current.duration
+    const nextOutfit = body.outfit !== undefined ? String(body.outfit).trim() || null : current.outfit
+    const nextAccess = body.access_info !== undefined ? String(body.access_info).trim() || null : current.access_info
+    const nextFee = body.fee !== undefined ? String(body.fee).trim() || null : current.fee
+
+    let nextTranslations = body.translations !== undefined ? parsePlaceTranslations(body.translations) : undefined
+
+    // Si le texte français a été modifié et qu'aucune traduction manuelle n'a été transmise,
+    // on régénère automatiquement les traductions pour remplacer directement l'ancien contenu en BD
+    const frChanged =
+      (body.name !== undefined && body.name.trim() !== current.name) ||
+      (body.description !== undefined && body.description.trim() !== current.description) ||
+      (body.history !== undefined && body.history.trim() !== current.history) ||
+      (body.best_time !== undefined && body.best_time !== current.best_time) ||
+      (body.duration !== undefined && body.duration !== current.duration) ||
+      (body.outfit !== undefined && body.outfit !== current.outfit) ||
+      (body.access_info !== undefined && body.access_info !== current.access_info) ||
+      (body.fee !== undefined && body.fee !== current.fee)
+
+    if (frChanged && nextTranslations === undefined) {
+      nextTranslations = await translatePlaceCopy(
+        placeCopyFromFrench({
+          name: nextName,
+          description: nextDescription,
+          history: nextHistory,
+          best_time: nextBestTime,
+          duration: nextDuration,
+          outfit: nextOutfit,
+          access_info: nextAccess,
+          fee: nextFee,
+        }),
+      )
+    }
+
     const updated = await updatePlaceRow(String(current.id), {
       slug: nextSlug,
-      name: body.name !== undefined ? String(body.name).trim() : undefined,
-      description: body.description !== undefined ? String(body.description).trim() : undefined,
-      history: body.history !== undefined ? String(body.history).trim() : undefined,
+      name: body.name !== undefined ? nextName : undefined,
+      description: body.description !== undefined ? nextDescription : undefined,
+      history: body.history !== undefined ? nextHistory : undefined,
       region: body.region !== undefined ? String(body.region).trim() : undefined,
       locality: body.locality !== undefined ? String(body.locality).trim() : undefined,
       latitude: body.latitude !== undefined ? parseCoord(body.latitude, DEFAULT_TOGO_LAT) : undefined,
@@ -50,15 +88,15 @@ export async function PATCH(
       image_url: body.image_url !== undefined ? String(body.image_url).trim() : undefined,
       is_unesco: body.is_unesco !== undefined ? Boolean(body.is_unesco) : undefined,
       is_published: body.is_published !== undefined ? Boolean(body.is_published) : undefined,
-      best_time: body.best_time !== undefined ? String(body.best_time).trim() || null : undefined,
-      duration: body.duration !== undefined ? String(body.duration).trim() || null : undefined,
-      outfit: body.outfit !== undefined ? String(body.outfit).trim() || null : undefined,
-      access_info: body.access_info !== undefined ? String(body.access_info).trim() || null : undefined,
-      fee: body.fee !== undefined ? String(body.fee).trim() || null : undefined,
+      best_time: body.best_time !== undefined ? nextBestTime : undefined,
+      duration: body.duration !== undefined ? nextDuration : undefined,
+      outfit: body.outfit !== undefined ? nextOutfit : undefined,
+      access_info: body.access_info !== undefined ? nextAccess : undefined,
+      fee: body.fee !== undefined ? nextFee : undefined,
       related_dish_slugs: Array.isArray(body.related_dish_slugs)
         ? body.related_dish_slugs.map((item: unknown) => String(item))
         : undefined,
-      translations: body.translations !== undefined ? parsePlaceTranslations(body.translations) : undefined,
+      translations: nextTranslations,
     })
 
     await logAdminAction({

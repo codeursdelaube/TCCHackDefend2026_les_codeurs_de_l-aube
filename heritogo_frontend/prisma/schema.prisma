@@ -364,6 +364,7 @@ model Dish {
   region           String?
   image_url        String
   is_published     Boolean  @default(true)
+  translations     Json     @default("{}")
   created_at       DateTime @default(now()) @db.Timestamptz
   updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz
 

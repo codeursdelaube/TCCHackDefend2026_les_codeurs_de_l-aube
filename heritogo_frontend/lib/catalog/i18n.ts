@@ -15,3 +15,12 @@ export type PlaceCopy = {
 }
 
 export type PlaceTranslations = Partial<Record<TranslatableLocale, PlaceCopy>>
+
+export type DishCopy = {
+  nom: string
+  description: string
+  histoire: string
+  accompaniments?: string | null
+}
+
+export type DishTranslations = Partial<Record<TranslatableLocale, DishCopy>>

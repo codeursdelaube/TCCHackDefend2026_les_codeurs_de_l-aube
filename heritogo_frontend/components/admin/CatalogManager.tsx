@@ -6,7 +6,14 @@ import { toast } from 'sonner'
 import { apiFetch, clearClientCache } from '@/lib/utils/http'
 import { createClient } from '@/lib/supabase/client'
 import { DISH_CATEGORIES, PLACE_REGIONS, type CatalogDish, type CatalogPlace } from '@/lib/catalog/types'
-import { TRANSLATABLE_LOCALES, type PlaceCopy, type PlaceTranslations, type TranslatableLocale } from '@/lib/catalog/i18n'
+import {
+  TRANSLATABLE_LOCALES,
+  type DishCopy,
+  type DishTranslations,
+  type PlaceCopy,
+  type PlaceTranslations,
+  type TranslatableLocale,
+} from '@/lib/catalog/i18n'
 
 type Kind = 'places' | 'dishes'
 
@@ -40,6 +47,7 @@ type DishForm = {
   region: string
   image_url: string
   is_published: boolean
+  translations: DishTranslations
 }
 
 const emptyPlace = (): PlaceForm => ({
@@ -72,6 +80,7 @@ const emptyDish = (): DishForm => ({
   region: '',
   image_url: '',
   is_published: true,
+  translations: {},
 })
 
 function slugify(value: string) {
@@ -126,6 +135,7 @@ function dishToForm(dish: CatalogDish): DishForm {
     region: dish.region || '',
     image_url: dish.image,
     is_published: dish.isPublished,
+    translations: dish.translations || {},
   }
 }
 
@@ -261,36 +271,55 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
   }
 
   const generateTranslations = async () => {
-    if (!placeForm.name.trim() || !placeForm.description.trim()) {
+    const isPlat = !isPlaces
+    const currentName = isPlaces ? placeForm.name : dishForm.name
+    const currentDesc = isPlaces ? placeForm.description : dishForm.description
+
+    if (!currentName.trim() || !currentDesc.trim()) {
       setFormError('Renseignez d’abord le nom et la description en français.')
       return
     }
     setTranslating(true)
     setFormError('')
     try {
-      const result = await apiFetch<{ translations?: PlaceTranslations }>('/api/admin/translate', {
+      const payload = isPlaces
+        ? {
+            kind: 'place',
+            name: placeForm.name,
+            description: placeForm.description,
+            history: placeForm.history || placeForm.description,
+            best_time: placeForm.best_time,
+            duration: placeForm.duration,
+            outfit: placeForm.outfit,
+            access_info: placeForm.access_info,
+            fee: placeForm.fee,
+          }
+        : {
+            kind: 'dish',
+            name: dishForm.name,
+            description: dishForm.description,
+            history: dishForm.history || dishForm.description,
+            accompaniments: dishForm.accompaniments,
+          }
+
+      const result = await apiFetch<{ translations?: PlaceTranslations | DishTranslations }>('/api/admin/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: placeForm.name,
-          description: placeForm.description,
-          history: placeForm.history || placeForm.description,
-          best_time: placeForm.best_time,
-          duration: placeForm.duration,
-          outfit: placeForm.outfit,
-          access_info: placeForm.access_info,
-          fee: placeForm.fee,
-        }),
+        body: JSON.stringify(payload),
         timeoutMs: 90000,
       })
       if (!result.ok || !result.data?.translations) {
-        const message = result.error || 'LibreTranslate n’a pas pu traduire.'
+        const message = result.error || "Google Translate n'a pas pu traduire."
         setFormError(message)
         toast.error(message)
         return
       }
-      setPlaceForm((current) => ({ ...current, translations: result.data!.translations! }))
-      toast.success('Traductions EN / ES / ZH générées. Relisez-les avant d’enregistrer.')
+      if (isPlaces) {
+        setPlaceForm((current) => ({ ...current, translations: result.data!.translations! as PlaceTranslations }))
+      } else {
+        setDishForm((current) => ({ ...current, translations: result.data!.translations! as DishTranslations }))
+      }
+      toast.success("Traductions EN / ES / ZH générées via Google Translate. Relisez-les avant d'enregistrer.")
     } finally {
       setTranslating(false)
     }
@@ -310,6 +339,22 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
           outfit: current.translations[locale]?.outfit ?? current.outfit,
           access: current.translations[locale]?.access ?? current.access_info,
           fee: current.translations[locale]?.fee ?? current.fee,
+          [field]: value,
+        },
+      },
+    }))
+  }
+
+  const updateDishTranslation = (locale: TranslatableLocale, field: keyof DishCopy, value: string) => {
+    setDishForm((current) => ({
+      ...current,
+      translations: {
+        ...current.translations,
+        [locale]: {
+          nom: current.translations[locale]?.nom || current.name,
+          description: current.translations[locale]?.description || current.description,
+          histoire: current.translations[locale]?.histoire || current.history,
+          accompaniments: current.translations[locale]?.accompaniments ?? current.accompaniments,
           [field]: value,
         },
       },
@@ -586,7 +631,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
 
                   <div className="rounded-2xl border border-border bg-background/70 p-4">
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-xs font-bold">Traductions (LibreTranslate)</p>
+                      <p className="text-xs font-bold">Traductions (Google Translate)</p>
                       <button
                         type="button"
                         onClick={() => void generateTranslations()}
@@ -665,6 +710,73 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                     Accompagnements
                     <textarea className="mt-1 h-20 w-full rounded-xl border border-border bg-background p-3 text-sm" value={dishForm.accompaniments} onChange={(e) => setDishForm({ ...dishForm, accompaniments: e.target.value })} />
                   </label>
+
+                  <div className="rounded-2xl border border-border bg-background/70 p-4">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-xs font-bold">Traductions (Google Translate)</p>
+                      <button
+                        type="button"
+                        onClick={() => void generateTranslations()}
+                        disabled={translating || saving}
+                        className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold disabled:opacity-60"
+                      >
+                        {translating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Languages className="h-3.5 w-3.5" />}
+                        Générer EN / ES / ZH
+                      </button>
+                    </div>
+                    <p className="mb-3 text-[11px] text-muted-foreground">
+                      Le français ci-dessus reste la version de référence. Les visiteurs voient la langue du site, avec repli sur le français.
+                    </p>
+                    <div className="mb-3 flex gap-2">
+                      {TRANSLATABLE_LOCALES.map((locale) => (
+                        <button
+                          key={locale}
+                          type="button"
+                          onClick={() => setI18nTab(locale)}
+                          className={`rounded-full px-3 py-1 text-[11px] font-bold ${
+                            i18nTab === locale ? 'bg-primary text-white' : 'border border-border'
+                          }`}
+                        >
+                          {locale.toUpperCase()}
+                          {dishForm.translations[locale]?.nom ? ' ✓' : ''}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid gap-3">
+                      <label className="text-xs font-bold">
+                        Nom {i18nTab.toUpperCase()}
+                        <input
+                          className="mt-1 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={dishForm.translations[i18nTab]?.nom || ''}
+                          onChange={(e) => updateDishTranslation(i18nTab, 'nom', e.target.value)}
+                        />
+                      </label>
+                      <label className="text-xs font-bold">
+                        Description {i18nTab.toUpperCase()}
+                        <textarea
+                          className="mt-1 h-20 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={dishForm.translations[i18nTab]?.description || ''}
+                          onChange={(e) => updateDishTranslation(i18nTab, 'description', e.target.value)}
+                        />
+                      </label>
+                      <label className="text-xs font-bold">
+                        Histoire {i18nTab.toUpperCase()}
+                        <textarea
+                          className="mt-1 h-24 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={dishForm.translations[i18nTab]?.histoire || ''}
+                          onChange={(e) => updateDishTranslation(i18nTab, 'histoire', e.target.value)}
+                        />
+                      </label>
+                      <label className="text-xs font-bold">
+                        Accompagnements {i18nTab.toUpperCase()}
+                        <textarea
+                          className="mt-1 h-20 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={dishForm.translations[i18nTab]?.accompaniments || ''}
+                          onChange={(e) => updateDishTranslation(i18nTab, 'accompaniments', e.target.value)}
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </>
               )}
 

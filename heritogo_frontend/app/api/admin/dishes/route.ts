@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/auth/admin'
 import { slugify } from '@/lib/catalog/map'
 import { DISH_CATEGORIES } from '@/lib/catalog/types'
 import { catalogDbError, logAdminAction } from '@/lib/catalog/admin'
+import { parseDishTranslations } from '@/lib/catalog/translate'
 import { createDishRow, findDishBySlug, listDishesAdmin } from '@/lib/catalog/store'
 
 export const dynamic = 'force-dynamic'
@@ -36,6 +37,7 @@ function parseDishBody(body: Record<string, unknown>) {
       accompaniments: String(body.accompaniments ?? '').trim() || null,
       region: String(body.region ?? '').trim() || null,
       is_published: body.is_published !== false,
+      translations: parseDishTranslations(body.translations),
     },
   }
 }

@@ -156,28 +156,28 @@ export default function Navbar() {
     if (!profile) return []
     if (profile.role === 'admin') {
       return [
-        { href: '/dashboard/admin', label: 'Dashboard', icon: User },
-        { href: '/dashboard/admin?tab=places', label: 'Lieux touristiques', icon: User },
-        { href: '/dashboard/admin?tab=dishes', label: 'Plats culinaires', icon: User },
-        { href: '/dashboard/admin?tab=guides', label: 'Gérer les guides', icon: User },
-        { href: '/dashboard/admin?tab=reports', label: 'Signalements', icon: User },
-        { href: '/dashboard/admin?tab=reviews', label: 'Avis', icon: User },
-        { href: '/dashboard/admin?tab=bans', label: 'Bannissements', icon: User },
+        { href: '/dashboard/admin', label: t('dashboard_admin'), icon: User },
+        { href: '/dashboard/admin?tab=places', label: t('admin_places'), icon: User },
+        { href: '/dashboard/admin?tab=dishes', label: t('admin_dishes'), icon: User },
+        { href: '/dashboard/admin?tab=guides', label: t('admin_guides'), icon: User },
+        { href: '/dashboard/admin?tab=reports', label: t('admin_reports'), icon: User },
+        { href: '/dashboard/admin?tab=reviews', label: t('admin_reviews'), icon: User },
+        { href: '/dashboard/admin?tab=bans', label: t('admin_bans'), icon: User },
       ]
     }
     if (profile.role === 'guide') {
       return [
-        { href: '/dashboard/guide', label: 'Mon profil public', icon: User },
-        { href: '/dashboard/guide?tab=quotes', label: 'Demandes reçues', icon: Calendar },
-        { href: '/dashboard/guide?tab=missions', label: 'Mes missions', icon: Compass },
-        { href: '/dashboard/guide?tab=subscription', label: 'Mon abonnement', icon: Settings },
+        { href: '/dashboard/guide', label: t('guide_profile'), icon: User },
+        { href: '/dashboard/guide?tab=quotes', label: t('guide_quotes'), icon: Calendar },
+        { href: '/dashboard/guide?tab=missions', label: t('guide_missions'), icon: Compass },
+        { href: '/dashboard/guide?tab=subscription', label: t('guide_subscription'), icon: Settings },
       ]
     }
     return [
-      { href: '/dashboard/tourist', label: 'Mon profil', icon: User },
-      { href: '/dashboard/tourist?tab=bookings', label: 'Mes réservations', icon: Calendar },
-      { href: '/dashboard/tourist?tab=favorites', label: 'Mes favoris', icon: Heart },
-      { href: '/dashboard/tourist?tab=scans', label: 'Historique scans', icon: History },
+      { href: '/dashboard/tourist', label: t('tourist_profile'), icon: User },
+      { href: '/dashboard/tourist?tab=bookings', label: t('tourist_bookings'), icon: Calendar },
+      { href: '/dashboard/tourist?tab=favorites', label: t('tourist_favorites'), icon: Heart },
+      { href: '/dashboard/tourist?tab=scans', label: t('tourist_scans'), icon: History },
     ]
   }
 

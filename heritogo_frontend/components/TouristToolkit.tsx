@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 
 const EMERGENCY_CONTACTS = [
   { name: 'Police Nationale', number: '117', desc: 'Secours & assistance sécurité 24/7' },
@@ -52,6 +53,7 @@ const TRANSPORT_TIPS = [
 ]
 
 export default function TouristToolkit() {
+  const t = useTranslations('TravelTools.toolkit')
   const [activeTab, setActiveTab] = useState<'convertisseur' | 'lexique' | 'transport' | 'urgence'>('convertisseur')
   const [eurAmount, setEurAmount] = useState<string>('10')
   const [fcfaAmount, setFcfaAmount] = useState<string>('6500')
@@ -85,10 +87,10 @@ export default function TouristToolkit() {
         <div>
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
             <Compass className="h-4 w-4" />
-            <span>Boîte à outils du voyageur</span>
+            <span>{t('kicker')}</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-serif font-bold text-foreground mt-1">
-            Facilitez votre séjour au Togo
+            {t('title')}
           </h2>
         </div>
         <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
@@ -100,7 +102,7 @@ export default function TouristToolkit() {
                 : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
-            <DollarSign className="h-3.5 w-3.5" /> Devises FCFA
+            <DollarSign className="h-3.5 w-3.5" /> {t('tab_currency')}
           </button>
           <button
             onClick={() => setActiveTab('lexique')}
@@ -110,7 +112,7 @@ export default function TouristToolkit() {
                 : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Languages className="h-3.5 w-3.5" /> Parler local
+            <Languages className="h-3.5 w-3.5" /> {t('tab_lexicon')}
           </button>
           <button
             onClick={() => setActiveTab('transport')}
@@ -120,7 +122,7 @@ export default function TouristToolkit() {
                 : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Bus className="h-3.5 w-3.5" /> Transports
+            <Bus className="h-3.5 w-3.5" /> {t('tab_transport')}
           </button>
           <button
             onClick={() => setActiveTab('urgence')}
@@ -130,7 +132,7 @@ export default function TouristToolkit() {
                 : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Phone className="h-3.5 w-3.5" /> Urgences
+            <Phone className="h-3.5 w-3.5" /> {t('tab_emergency')}
           </button>
         </div>
       </div>
@@ -140,7 +142,7 @@ export default function TouristToolkit() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Montant en Euros (€)</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('eur_label')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -154,7 +156,7 @@ export default function TouristToolkit() {
             </div>
 
             <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Équivalent en Francs CFA (FCFA)</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('fcfa_label')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -169,8 +171,8 @@ export default function TouristToolkit() {
           </div>
 
           <div className="rounded-2xl bg-primary border border-border p-3.5 flex items-center justify-between text-xs text-foreground">
-            <span className="flex items-center gap-2"><Info className="h-4 w-4 shrink-0" /><span><strong>Repère rapide :</strong> 1 000 FCFA ≈ 1,52 € · 5 000 FCFA ≈ 7,62 € · 10 000 FCFA ≈ 15,24 €</span></span>
-            <span className="font-bold text-primary shrink-0 ml-2">Taux fixe BCEAO</span>
+            <span className="flex items-center gap-2"><Info className="h-4 w-4 shrink-0" /><span>{t('rate_info')}</span></span>
+            <span className="font-bold text-primary shrink-0 ml-2">{t('rate_fixed')}</span>
           </div>
         </div>
       )}
@@ -179,7 +181,7 @@ export default function TouristToolkit() {
       {activeTab === 'lexique' && (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Les Togolais adorent quand les visiteurs saluent dans les langues locales. Voici les expressions clés :
+            {t('lexicon_intro')}
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {SURVIVAL_VOCABULARY.map((item, i) => (
@@ -190,11 +192,11 @@ export default function TouristToolkit() {
                 </div>
                 <div className="flex items-center gap-3 pt-1 border-t border-border border-border text-xs">
                   <div>
-                    <span className="text-[10px] font-bold uppercase text-primary">Éwé (Sud) : </span>
+                    <span className="text-[10px] font-bold uppercase text-primary">{t('ewe_label')} : </span>
                     <strong className="text-foreground">{item.ewe}</strong>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase text-primary">Kabyè (Nord) : </span>
+                    <span className="text-[10px] font-bold uppercase text-primary">{t('kabye_label')} : </span>
                     <strong className="text-foreground">{item.kabye}</strong>
                   </div>
                 </div>
@@ -216,7 +218,7 @@ export default function TouristToolkit() {
               </div>
               <div className="pt-2 border-t border-border border-border space-y-1">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground">Tarif moyen :</span>
+                  <span className="text-muted-foreground">{t('avg_fare')}</span>
                   <strong className="text-primary">{tr.price}</strong>
                 </div>
                 <p className="text-[10px] text-foreground italic bg-card p-2 rounded-lg border border-border">
@@ -232,7 +234,7 @@ export default function TouristToolkit() {
       {activeTab === 'urgence' && (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Numéros officiels d’assistance et de secours au Togo, accessibles gratuitement 24h/24 :
+            {t('emergency_intro')}
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {EMERGENCY_CONTACTS.map((c, i) => (

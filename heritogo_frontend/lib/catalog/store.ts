@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createServiceClient } from '@/lib/supabase/service'
 import { prisma } from '@/lib/prisma'
 import type { CatalogDish, CatalogPlace } from './types'
@@ -35,12 +35,18 @@ type DishWrite = {
   region: string | null
   image_url: string
   is_published: boolean
+  translations?: Record<string, unknown>
 }
 
-async function catalogClient() {
+function catalogClient() {
   const service = createServiceClient()
   if (service) return service
-  return createClient()
+  // Fallback: anon client (no cookies/headers needed — safe for any context)
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  )
 }
 
 function throwIfError(error: { message?: string; code?: string; details?: string } | null) {
@@ -55,6 +61,7 @@ function isUuid(value: string) {
 }
 
 let translationsColumnReady = false
+let dishTranslationsColumnReady = false
 
 export async function ensurePlaceTranslationsColumn() {
   if (translationsColumnReady) return
@@ -65,6 +72,18 @@ export async function ensurePlaceTranslationsColumn() {
     translationsColumnReady = true
   } catch (error) {
     console.error('[ensurePlaceTranslationsColumn]', error)
+  }
+}
+
+export async function ensureDishTranslationsColumn() {
+  if (dishTranslationsColumnReady) return
+  try {
+    await prisma.$executeRawUnsafe(
+      `alter table dishes add column if not exists translations jsonb not null default '{}'::jsonb`,
+    )
+    dishTranslationsColumnReady = true
+  } catch (error) {
+    console.error('[ensureDishTranslationsColumn]', error)
   }
 }
 
@@ -85,7 +104,7 @@ export async function listPlacesAdmin(): Promise<CatalogPlace[]> {
       return places.map((place) => mapPlace(place, 'fr'))
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('places').select('*').order('updated_at', { ascending: false })
       throwIfError(error)
       return (data ?? []).map((row) => mapPlace(row, 'fr'))
@@ -99,7 +118,7 @@ export async function findPlaceBySlugOrId(id: string) {
       where: isUuid(id) ? { OR: [{ slug: id }, { id }] } : { slug: id },
     }),
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const query = supabase.from('places').select('*')
       const { data, error } = isUuid(id)
         ? await query.or(`slug.eq.${id},id.eq.${id}`).maybeSingle()
@@ -114,7 +133,7 @@ export async function findPlaceBySlug(slug: string) {
   return withPrismaFallback(
     async () => prisma.place.findUnique({ where: { slug } }),
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('places').select('*').eq('slug', slug).maybeSingle()
       throwIfError(error)
       return data
@@ -126,11 +145,12 @@ export async function createPlaceRow(input: PlaceWrite): Promise<{ place: Catalo
   await ensurePlaceTranslationsColumn()
   return withPrismaFallback(
     async () => {
-      const place = await prisma.place.create({ data: input })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const place = await (prisma.place as any).create({ data: input })
       return { place: mapPlace(place, 'fr'), id: place.id }
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('places').insert(input).select('*').single()
       throwIfError(error)
       return { place: mapPlace(data, 'fr'), id: String(data.id) }
@@ -142,11 +162,12 @@ export async function updatePlaceRow(id: string, input: Partial<PlaceWrite>): Pr
   await ensurePlaceTranslationsColumn()
   return withPrismaFallback(
     async () => {
-      const place = await prisma.place.update({ where: { id }, data: input })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const place = await (prisma.place as any).update({ where: { id }, data: input })
       return { place: mapPlace(place, 'fr'), id: place.id }
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('places').update(input).eq('id', id).select('*').single()
       throwIfError(error)
       return { place: mapPlace(data, 'fr'), id: String(data.id) }
@@ -160,7 +181,7 @@ export async function deletePlaceRow(id: string) {
       await prisma.place.delete({ where: { id } })
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { error } = await supabase.from('places').delete().eq('id', id)
       throwIfError(error)
     },
@@ -168,16 +189,17 @@ export async function deletePlaceRow(id: string) {
 }
 
 export async function listDishesAdmin(): Promise<CatalogDish[]> {
+  await ensureDishTranslationsColumn()
   return withPrismaFallback(
     async () => {
       const dishes = await prisma.dish.findMany({ orderBy: { updated_at: 'desc' } })
-      return dishes.map(mapDish)
+      return dishes.map((dish) => mapDish(dish, 'fr'))
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('dishes').select('*').order('updated_at', { ascending: false })
       throwIfError(error)
-      return (data ?? []).map((row) => mapDish(row))
+      return (data ?? []).map((row) => mapDish(row, 'fr'))
     },
   )
 }
@@ -188,7 +210,7 @@ export async function findDishBySlugOrId(id: string) {
       where: isUuid(id) ? { OR: [{ slug: id }, { id }] } : { slug: id },
     }),
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const query = supabase.from('dishes').select('*')
       const { data, error } = isUuid(id)
         ? await query.or(`slug.eq.${id},id.eq.${id}`).maybeSingle()
@@ -203,7 +225,7 @@ export async function findDishBySlug(slug: string) {
   return withPrismaFallback(
     async () => prisma.dish.findUnique({ where: { slug } }),
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('dishes').select('*').eq('slug', slug).maybeSingle()
       throwIfError(error)
       return data
@@ -212,31 +234,35 @@ export async function findDishBySlug(slug: string) {
 }
 
 export async function createDishRow(input: DishWrite): Promise<{ dish: CatalogDish; id: string }> {
+  await ensureDishTranslationsColumn()
   return withPrismaFallback(
     async () => {
-      const dish = await prisma.dish.create({ data: input })
-      return { dish: mapDish(dish), id: dish.id }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dish = await (prisma.dish as any).create({ data: input })
+      return { dish: mapDish(dish, 'fr'), id: dish.id }
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('dishes').insert(input).select('*').single()
       throwIfError(error)
-      return { dish: mapDish(data), id: String(data.id) }
+      return { dish: mapDish(data, 'fr'), id: String(data.id) }
     },
   )
 }
 
 export async function updateDishRow(id: string, input: Partial<DishWrite>): Promise<{ dish: CatalogDish; id: string }> {
+  await ensureDishTranslationsColumn()
   return withPrismaFallback(
     async () => {
-      const dish = await prisma.dish.update({ where: { id }, data: input })
-      return { dish: mapDish(dish), id: dish.id }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dish = await (prisma.dish as any).update({ where: { id }, data: input })
+      return { dish: mapDish(dish, 'fr'), id: dish.id }
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { data, error } = await supabase.from('dishes').update(input).eq('id', id).select('*').single()
       throwIfError(error)
-      return { dish: mapDish(data), id: String(data.id) }
+      return { dish: mapDish(data, 'fr'), id: String(data.id) }
     },
   )
 }
@@ -247,7 +273,7 @@ export async function deleteDishRow(id: string) {
       await prisma.dish.delete({ where: { id } })
     },
     async () => {
-      const supabase = await catalogClient()
+      const supabase = catalogClient()
       const { error } = await supabase.from('dishes').delete().eq('id', id)
       throwIfError(error)
     },

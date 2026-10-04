@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useLocale } from 'next-intl'
 import { apiFetch } from '@/lib/utils/http'
-import { getLocalDishes } from '@/lib/catalog/dishes'
 import type { CatalogDish, CatalogPlace } from '@/lib/catalog/types'
 
 export function usePlaces() {
@@ -27,20 +26,21 @@ export function usePlaces() {
 }
 
 export function useDishes() {
+  const locale = useLocale()
   const [dishes, setDishes] = useState<CatalogDish[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
-    apiFetch<{ dishes?: CatalogDish[] }>('/api/dishes').then((result) => {
+    apiFetch<{ dishes?: CatalogDish[] }>(`/api/dishes?locale=${locale}`).then((result) => {
       if (cancelled) return
-      setDishes(result.ok && result.data?.dishes?.length ? result.data.dishes : getLocalDishes())
+      setDishes(result.ok && result.data?.dishes ? result.data.dishes : [])
       setLoading(false)
     })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [locale])
 
   return { dishes, loading }
 }

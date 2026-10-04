@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/auth/admin'
 import { slugify } from '@/lib/catalog/map'
 import { PLACE_REGIONS } from '@/lib/catalog/types'
 import { catalogDbError, DEFAULT_TOGO_LAT, DEFAULT_TOGO_LNG, logAdminAction, parseCoord } from '@/lib/catalog/admin'
-import { parsePlaceTranslations } from '@/lib/catalog/libretranslate'
+import { parsePlaceTranslations } from '@/lib/catalog/translate'
 import { createPlaceRow, findPlaceBySlug, listPlacesAdmin } from '@/lib/catalog/store'
 
 export const dynamic = 'force-dynamic'

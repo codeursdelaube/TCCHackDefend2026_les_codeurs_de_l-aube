@@ -375,11 +375,11 @@ export default function RegionsPage() {
             {regionMonuments.length > 0 && (
               <section className="space-y-5">
                 <SectionHeader
-                  kicker="Monuments & Trésors"
-                  title={`Monuments de la ${region.nom}`}
-                  subtitle={`Explorez les fiches détaillées des ${regionMonuments.length} sites recensés dans cette région.`}
+                  kicker={t('monuments_kicker')}
+                  title={t('monuments_title', { name: region.nom })}
+                  subtitle={t('monuments_subtitle', { count: regionMonuments.length })}
                   actionHref="/lieux"
-                  actionLabel="Voir tous les 29 lieux"
+                  actionLabel={t('see_all_sites', { count: places.length })}
                 />
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
-import { findPublishedDish, listPublishedDishes } from '@/lib/catalog/dishes'
+import { listPublishedDishes } from '@/lib/catalog/dishes'
+import { resolveCatalogLocale } from '@/lib/catalog/map'
 
-export async function GET() {
+export const dynamic = 'force-dynamic'
+
+export async function GET(request: Request) {
   try {
-    const dishes = await listPublishedDishes()
+    const locale = resolveCatalogLocale(new URL(request.url).searchParams.get('locale'))
+    const dishes = await listPublishedDishes(locale)
     return NextResponse.json({ dishes })
   } catch (error) {
     console.error('[GET /api/dishes]', error)

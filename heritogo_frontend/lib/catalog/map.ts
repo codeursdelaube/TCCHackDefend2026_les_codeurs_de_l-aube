@@ -1,5 +1,5 @@
 import type { CatalogDish, CatalogPlace } from './types'
-import { parsePlaceTranslations } from './libretranslate'
+import { parseDishTranslations, parsePlaceTranslations } from './translate'
 import type { CatalogLocale } from './i18n'
 
 type PlaceRecord = {
@@ -33,6 +33,7 @@ type DishRecord = {
   region?: string | null
   image_url: string
   is_published: boolean
+  translations?: unknown
 }
 
 function toNumber(value: unknown) {
@@ -71,18 +72,22 @@ export function mapPlace(place: PlaceRecord, locale: string = 'fr'): CatalogPlac
   }
 }
 
-export function mapDish(dish: DishRecord): CatalogDish {
+export function mapDish(dish: DishRecord, locale: string = 'fr'): CatalogDish {
+  const translations = parseDishTranslations(dish.translations)
+  const localized = locale !== 'fr' ? translations[locale as Exclude<CatalogLocale, 'fr'>] : undefined
+
   return {
     id: dish.slug,
     slug: dish.slug,
-    nom: dish.name,
-    description: dish.description,
-    histoire: dish.history,
-    accompaniments: dish.accompaniments,
+    nom: localized?.nom || dish.name,
+    description: localized?.description || dish.description,
+    histoire: localized?.histoire || dish.history,
+    accompaniments: localized?.accompaniments ?? dish.accompaniments,
     catégorie: dish.category,
     region: dish.region,
     image: dish.image_url,
     isPublished: dish.is_published !== false,
+    translations,
   }
 }
 

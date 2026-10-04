@@ -1,4 +1,4 @@
-import type { PlaceTranslations } from './i18n'
+import type { DishTranslations, PlaceTranslations } from './i18n'
 
 export const PLACE_REGIONS = ['Maritime', 'Plateaux', 'Centrale', 'Kara', 'Savanes'] as const
 export type PlaceRegion = (typeof PLACE_REGIONS)[number]
@@ -45,6 +45,7 @@ export type CatalogDish = {
   region?: string | null
   image: string
   isPublished: boolean
+  translations?: DishTranslations
 }
 
 export type Monument = {

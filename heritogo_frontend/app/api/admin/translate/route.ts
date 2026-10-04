@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth/admin'
-import { placeCopyFromFrench, translatePlaceCopy } from '@/lib/catalog/libretranslate'
+import { dishCopyFromFrench, placeCopyFromFrench, translateDishCopy, translatePlaceCopy } from '@/lib/catalog/translate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -20,18 +20,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Nom et description français sont requis pour traduire.' }, { status: 400 })
     }
 
-    const translations = await translatePlaceCopy(
-      placeCopyFromFrench({
-        name,
-        description,
-        history: String(body.history ?? '').trim() || description,
-        best_time: String(body.best_time ?? '').trim() || null,
-        duration: String(body.duration ?? '').trim() || null,
-        outfit: String(body.outfit ?? '').trim() || null,
-        access_info: String(body.access_info ?? '').trim() || null,
-        fee: String(body.fee ?? '').trim() || null,
-      }),
-    )
+    const isDish = body.type === 'dish' || body.kind === 'dish'
+
+    const translations = isDish
+      ? await translateDishCopy(
+          dishCopyFromFrench({
+            name,
+            description,
+            history: String(body.history ?? '').trim() || description,
+            accompaniments: String(body.accompaniments ?? '').trim() || null,
+          }),
+        )
+      : await translatePlaceCopy(
+          placeCopyFromFrench({
+            name,
+            description,
+            history: String(body.history ?? '').trim() || description,
+            best_time: String(body.best_time ?? '').trim() || null,
+            duration: String(body.duration ?? '').trim() || null,
+            outfit: String(body.outfit ?? '').trim() || null,
+            access_info: String(body.access_info ?? '').trim() || null,
+            fee: String(body.fee ?? '').trim() || null,
+          }),
+        )
 
     return NextResponse.json({ translations })
   } catch (error) {

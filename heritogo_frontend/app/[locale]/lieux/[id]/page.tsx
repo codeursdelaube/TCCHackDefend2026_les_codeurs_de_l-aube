@@ -142,11 +142,11 @@ export default function SiteDetailPage({ params }: PageProps) {
   const otherSites = previewSites.length > 0 ? previewSites : places.filter((m) => m.id !== site?.id).slice(0, 4)
 
   const tabLabels: Record<Tab, string> = {
-    apercu: 'Aperçu',
-    activites: 'Que faire ici ?',
-    guide_pratique: 'Guide Malin',
-    carte: 'Carte & GPS',
-    similaires: 'À proximité',
+    apercu: t('tab_apercu'),
+    activites: t('tab_activites'),
+    guide_pratique: t('tab_guide_pratique'),
+    carte: t('tab_carte'),
+    similaires: t('tab_similaires'),
   }
 
   if (placesLoading) {
@@ -201,7 +201,7 @@ export default function SiteDetailPage({ params }: PageProps) {
           <div className="absolute bottom-6 left-6 right-6 z-10 text-white space-y-2">
             <div className="flex flex-wrap gap-2 items-center">
               {isKoutammakou ? (
-                <Badge variant="unesco">✦ Patrimoine Mondial UNESCO</Badge>
+                <Badge variant="unesco">{t('unesco_badge_full')}</Badge>
               ) : (
                 <Badge variant="primary">{getRegionName(site.région)}</Badge>
               )}
@@ -248,7 +248,7 @@ export default function SiteDetailPage({ params }: PageProps) {
             className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 font-bold text-white shadow-md transition hover:bg-primary-dark active:scale-[0.98]"
           >
             <Navigation className="h-4 w-4" />
-            <span>Itinéraire Google Maps (GPS)</span>
+            <span>{t('gps_button')}</span>
           </a>
 
           <AuthGuardLink
@@ -339,13 +339,13 @@ export default function SiteDetailPage({ params }: PageProps) {
 
             {/* Fiche Description & Histoire */}
             <div className="app-card p-6 space-y-4">
-              <h2 className="font-serif text-xl font-bold text-foreground">Présentation &amp; Histoire</h2>
+              <h2 className="font-serif text-xl font-bold text-foreground">{t('desc_title')}</h2>
               <p className="text-sm sm:text-base leading-relaxed text-muted-foreground font-medium">
                 {siteDescription}
               </p>
               {siteHistory && (
                 <div className={`mt-4 pt-4 border-t border-border space-y-2 ${showFullText ? 'block' : 'hidden'}`}>
-                  <p className="text-xs font-bold uppercase tracking-wider text-primary">Contexte Historique Approfondi</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-primary">{t('history_extended')}</p>
                   <p className="text-sm sm:text-base leading-relaxed text-muted-foreground font-medium">
                     {siteHistory}
                   </p>
@@ -358,9 +358,9 @@ export default function SiteDetailPage({ params }: PageProps) {
                   className="pt-2 flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer"
                 >
                   {showFullText ? (
-                    <><span>Réduire</span><ChevronUp className="h-3.5 w-3.5" /></>
+                    <><span>{t('read_less')}</span><ChevronUp className="h-3.5 w-3.5" /></>
                   ) : (
-                    <><span>Lire toute l&apos;histoire complète…</span><ChevronDown className="h-3.5 w-3.5" /></>
+                    <><span>{t('read_more')}</span><ChevronDown className="h-3.5 w-3.5" /></>
                   )}
                 </button>
               )}
@@ -370,13 +370,13 @@ export default function SiteDetailPage({ params }: PageProps) {
             <div className="app-card p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="font-serif text-xl font-bold text-foreground">
-                  Expériences recommandées
+                  {t('recommended_experiences')}
                 </h2>
                 <button
                   onClick={() => setActiveTab('activites')}
                   className="text-xs font-bold text-primary hover:underline cursor-pointer"
                 >
-                  Tout voir ({extraDetails.activities.length}) →
+                  {t('see_all_activities', { count: extraDetails.activities.length })}
                 </button>
               </div>
 
@@ -402,11 +402,11 @@ export default function SiteDetailPage({ params }: PageProps) {
                   <div className="flex items-center gap-2">
                     <Utensils className="h-5 w-5 text-primary" />
                     <h2 className="font-serif text-xl font-bold text-foreground">
-                      À déguster dans les environs
+                      {t('eat_nearby')}
                     </h2>
                   </div>
                   <Link href="/cuisine" className="text-xs font-bold text-primary hover:underline">
-                    Guide gastronomique →
+                    {t('gastro_guide')}
                   </Link>
                 </div>
 
@@ -448,7 +448,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                     <div key={hotel.id} className="flex items-center justify-between rounded-2xl border border-border bg-card p-3.5 text-xs">
                       <div>
                         <p className="font-bold text-foreground text-sm">{hotel.nom}</p>
-                        <p className="text-muted-foreground">{formatDistance(hotel.distance_km)} du monument</p>
+                        <p className="text-muted-foreground">{formatDistance(hotel.distance_km)} {t('distance')}</p>
                       </div>
                       <span className="font-bold text-primary text-sm">{hotel.nuit_fcfa_min.toLocaleString('fr-FR')} FCFA</span>
                     </div>
@@ -461,7 +461,7 @@ export default function SiteDetailPage({ params }: PageProps) {
             <div className="app-card p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-serif text-xl font-bold text-foreground">Avis des explorateurs</h2>
+                  <h2 className="font-serif text-xl font-bold text-foreground">{t('explorer_reviews')}</h2>
                   <div className="flex items-center gap-2 mt-1">
                     <StarRating rating={ratingData.rating} count={ratingData.count} size="md" />
                   </div>
@@ -490,8 +490,8 @@ export default function SiteDetailPage({ params }: PageProps) {
         {activeTab === 'activites' && (
           <div className="space-y-6">
             <div>
-              <h2 className="font-serif text-2xl font-bold text-foreground">Activités &amp; Choses à faire</h2>
-              <p className="text-sm text-muted-foreground">Suggestions pour tirer le meilleur parti de votre visite sur ce site</p>
+              <h2 className="font-serif text-2xl font-bold text-foreground">{t('things_to_do')}</h2>
+              <p className="text-sm text-muted-foreground">{t('things_to_do_sub')}</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -512,16 +512,16 @@ export default function SiteDetailPage({ params }: PageProps) {
             <div className="app-card p-6 border-primary/30 bg-gradient-to-r from-primary/10 via-card to-accent/10 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-center sm:text-left">
                 <p className="text-xs font-bold uppercase text-primary flex items-center justify-center sm:justify-start gap-1.5">
-                  <ShieldCheck className="h-4 w-4" /> Guide Local Certifié
+                  <ShieldCheck className="h-4 w-4" /> {t('certified_guide_badge')}
                 </p>
-                <p className="text-base font-bold text-foreground font-serif">Vous souhaitez une visite guidée personnalisée ?</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Réservez un guide togolais certifié pour des explications immersives.</p>
+                <p className="text-base font-bold text-foreground font-serif">{t('guided_tour_title')}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('guided_tour_desc')}</p>
               </div>
               <AuthGuardLink
                 href="/guides"
                 className="shrink-0 rounded-full bg-primary px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
               >
-                Trouver un guide
+                {t('find_guide_btn')}
               </AuthGuardLink>
             </div>
           </div>
@@ -533,15 +533,15 @@ export default function SiteDetailPage({ params }: PageProps) {
         {activeTab === 'guide_pratique' && (
           <div className="space-y-6">
             <div>
-              <h2 className="font-serif text-2xl font-bold text-foreground">Conseils Pratiques du Voyageur</h2>
-              <p className="text-sm text-muted-foreground">Toutes les informations utiles pour organiser votre venue sereinement</p>
+              <h2 className="font-serif text-2xl font-bold text-foreground">{t('practical_tips')}</h2>
+              <p className="text-sm text-muted-foreground">{t('practical_tips_sub')}</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="app-card p-5 space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase text-primary">
                   <Sun className="h-4 w-4" />
-                  <span>Meilleur moment</span>
+                  <span>{t('best_time_title')}</span>
                 </div>
                 <p className="text-sm font-bold text-foreground">{site.bestTime || extraDetails.practicalInfo.bestTime}</p>
               </div>
@@ -549,7 +549,7 @@ export default function SiteDetailPage({ params }: PageProps) {
               <div className="app-card p-5 space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase text-primary">
                   <Clock className="h-4 w-4" />
-                  <span>Durée recommandée</span>
+                  <span>{t('duration_title')}</span>
                 </div>
                 <p className="text-sm font-bold text-foreground">{site.duration || extraDetails.practicalInfo.duration}</p>
               </div>
@@ -557,7 +557,7 @@ export default function SiteDetailPage({ params }: PageProps) {
               <div className="app-card p-5 space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase text-primary">
                   <Footprints className="h-4 w-4" />
-                  <span>Tenue &amp; Équipement</span>
+                  <span>{t('outfit_title')}</span>
                 </div>
                 <p className="text-sm font-bold text-foreground">{site.outfit || extraDetails.practicalInfo.outfit}</p>
               </div>
@@ -565,7 +565,7 @@ export default function SiteDetailPage({ params }: PageProps) {
               <div className="app-card p-5 space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase text-primary">
                   <Navigation className="h-4 w-4" />
-                  <span>Accès &amp; Transport</span>
+                  <span>{t('access_title')}</span>
                 </div>
                 <p className="text-sm font-bold text-foreground">{site.access || extraDetails.practicalInfo.access}</p>
               </div>
@@ -574,7 +574,7 @@ export default function SiteDetailPage({ params }: PageProps) {
             <div className="app-card p-5 space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-bold uppercase text-muted-foreground">
                 <Info className="h-4 w-4 text-primary" />
-                <span>Tarif &amp; Entrée</span>
+                <span>{t('fee_title')}</span>
               </div>
               <p className="text-sm font-bold text-foreground">{site.fee || extraDetails.practicalInfo.fee}</p>
             </div>
@@ -600,7 +600,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                 rel="noopener noreferrer"
                 className="font-bold text-primary hover:underline"
               >
-                Lancer le guidage →
+                {t('start_nav')}
               </a>
             </div>
           </div>
@@ -612,8 +612,8 @@ export default function SiteDetailPage({ params }: PageProps) {
         {activeTab === 'similaires' && (
           <div className="space-y-6">
             <div>
-              <h2 className="font-serif text-2xl font-bold text-foreground">Autres trésors dans la région</h2>
-              <p className="text-sm text-muted-foreground">Continuez votre exploration à proximité de {site.localite}</p>
+              <h2 className="font-serif text-2xl font-bold text-foreground">{t('other_treasures')}</h2>
+              <p className="text-sm text-muted-foreground">{t('continue_explore', { city: site.localite })}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
