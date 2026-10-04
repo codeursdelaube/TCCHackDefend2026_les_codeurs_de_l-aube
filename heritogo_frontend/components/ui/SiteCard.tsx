@@ -6,6 +6,7 @@ import { Headphones, MapPin, ArrowRight } from 'lucide-react'
 import StarRating from './StarRating'
 import Badge from './Badge'
 import { getSiteRating } from '@/lib/constants/ratings'
+import { useTranslations } from 'next-intl'
 
 interface SiteCardProps {
   id: string
@@ -28,6 +29,7 @@ export default function SiteCard({
   isUnesco = false,
   priority = false,
 }: SiteCardProps) {
+  const t = useTranslations('Lieux')
   const ratingData = getSiteRating(id)
   const isKoutammakou = isUnesco || id === 'koutamakou'
 
@@ -86,7 +88,7 @@ export default function SiteCard({
           <StarRating rating={ratingData.rating} count={ratingData.count} />
 
           <span className="inline-flex items-center gap-1 text-xs font-bold text-primary group-hover:text-primary-dark transition-colors">
-            <span>Découvrir</span>
+            <span>{t('card_discover')}</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
           </span>
         </div>

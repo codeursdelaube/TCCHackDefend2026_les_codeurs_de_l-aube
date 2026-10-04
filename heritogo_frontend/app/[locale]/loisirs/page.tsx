@@ -67,7 +67,7 @@ export default function ParcsZoosPage() {
                 />
               </div>
               <p className="text-xs font-semibold text-muted-foreground text-right">
-                {filteredParcs.length} parc{filteredParcs.length > 1 ? 's' : ''} & espace{filteredParcs.length > 1 ? 's' : ''} répertorié{filteredParcs.length > 1 ? 's' : ''}
+                {t('parcs_found', { count: filteredParcs.length })}
               </p>
             </div>
           </div>
@@ -76,8 +76,8 @@ export default function ParcsZoosPage() {
         {/* ── LISTE DES PARCS ── */}
         <section className="space-y-6">
           <SectionHeader
-            kicker="Nature & Safari"
-            title="Espaces Verts, Réserves & Loisirs du Togo"
+            kicker={t('section_kicker')}
+            title={t('section_title')}
             icon={Sparkles}
           />
 
@@ -93,7 +93,7 @@ export default function ParcsZoosPage() {
                 onClick={() => setSearchInput('')}
                 className="mt-2 inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark"
               >
-                Réinitialiser la recherche
+                {t('reset_search')}
               </button>
             </div>
           ) : (

@@ -11,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function PwaInstallButton({ className = '' }: { className?: string }) {
+  const t = useTranslations('Common')
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
   const [isIos, setIsIos] = useState(false)
@@ -74,7 +75,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
     return (
       <div className={`inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 ${className}`}>
         <Check className="h-4 w-4" />
-        <span>Application installée</span>
+        <span>{t('pwa_installed')}</span>
       </div>
     )
   }
@@ -87,7 +88,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
         className={`group inline-flex items-center justify-center gap-2.5 rounded-2xl border border-secondary/30 bg-secondary/10 px-5 py-3 text-xs font-black uppercase tracking-wider text-secondary transition-all hover:bg-secondary hover:text-white active:scale-95 shadow-sm cursor-pointer ${className}`}
       >
         <Smartphone className="h-4 w-4 transition-transform group-hover:scale-110" />
-        <span>Installer l&apos;application</span>
+        <span>{t('pwa_install_btn')}</span>
         <Download className="h-3.5 w-3.5 opacity-70" />
       </button>
 
@@ -114,10 +115,10 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
               </div>
 
               <h3 className="text-center font-serif text-xl font-bold">
-                Installer HeriTogo sur votre écran
+                {t('pwa_modal_title')}
               </h3>
               <p className="mt-2 text-center text-xs font-medium text-base-content/70 leading-relaxed">
-                Accédez à tous vos guides et monuments instantanément depuis votre écran d&apos;accueil, même sans connexion.
+                {t('pwa_modal_desc')}
               </p>
 
               <div className="mt-6 space-y-3 rounded-2xl bg-base-200 p-4 text-xs font-semibold">
@@ -126,7 +127,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
                     1
                   </div>
                   <p>
-                    Appuyez sur le bouton <strong className="text-primary font-bold">Partager</strong> (<Share className="inline h-3.5 w-3.5 align-middle mx-1 text-primary" />) en bas de Safari.
+                    {t('pwa_step_1_prefix')} <strong className="text-primary font-bold">{t('pwa_share_btn')}</strong> (<Share className="inline h-3.5 w-3.5 align-middle mx-1 text-primary" />) {t('pwa_step_1_suffix')}
                   </p>
                 </div>
 
@@ -135,7 +136,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
                     2
                   </div>
                   <p>
-                    Faites défiler puis choisissez <strong className="text-primary font-bold">&laquo; Sur l&apos;écran d&apos;accueil &raquo;</strong> (<PlusSquare className="inline h-3.5 w-3.5 align-middle mx-1 text-primary" />).
+                    {t('pwa_step_2_prefix')} <strong className="text-primary font-bold">&laquo; {t('pwa_add_home')} &raquo;</strong> (<PlusSquare className="inline h-3.5 w-3.5 align-middle mx-1 text-primary" />).
                   </p>
                 </div>
 
@@ -144,7 +145,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
                     3
                   </div>
                   <p>
-                    Appuyez sur <strong className="text-primary font-bold">&laquo; Ajouter &raquo;</strong> en haut à droite.
+                    {t('pwa_step_3_prefix')} <strong className="text-primary font-bold">&laquo; {t('pwa_add_btn')} &raquo;</strong> {t('pwa_step_3_suffix')}
                   </p>
                 </div>
               </div>
@@ -153,7 +154,7 @@ export default function PwaInstallButton({ className = '' }: { className?: strin
                 onClick={() => setShowIosModal(false)}
                 className="mt-6 w-full rounded-2xl bg-primary py-3 text-xs font-black uppercase tracking-wider text-primary-content shadow-md transition-all hover:brightness-110 active:scale-95 cursor-pointer"
               >
-                J&apos;ai compris
+                {t('pwa_got_it')}
               </button>
             </motion.div>
           </div>

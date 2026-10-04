@@ -91,7 +91,7 @@ export default function GuideCard({
           <StarRating rating={rating} count={reviewsCount} className="min-w-0" />
           {experienceYears !== undefined && (
             <span className="shrink-0 whitespace-nowrap font-semibold text-muted-foreground">
-              {experienceYears} ans d’exp.
+              {t('experience_short', { years: experienceYears })}
             </span>
           )}
         </div>

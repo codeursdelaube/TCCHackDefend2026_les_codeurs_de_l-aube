@@ -253,7 +253,7 @@ export default function GuidesPage() {
                   onClick={fetchGuides}
                   className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white"
                 >
-                  Réessayer
+                  {t('retry')}
                 </button>
               </div>
             ) : filteredGuides && filteredGuides.length > 0 ? (

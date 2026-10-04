@@ -132,7 +132,7 @@ export default function ScanPage() {
 
         setResult(res.data)
         setTranslatedText({ fr: res.data.data.histoire })
-        toast.success(`Monument identifié : ${res.data.data.monument}`)
+        toast.success(t('toast_identified', { name: res.data.data.monument }))
         return null
       } catch (scanError: unknown) {
         console.error(scanError)
@@ -231,7 +231,7 @@ export default function ScanPage() {
     safeLocalStorageSet('heritogo_premium', 'true')
     setIsPremium(true)
     setShowPaywall(false)
-    toast.success('Accès Premium activé ! Scans illimités débloqués.')
+    toast.success(t('toast_premium_activated'))
   }
 
   return (
@@ -244,7 +244,7 @@ export default function ScanPage() {
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
                 <Sparkles className="h-4 w-4 text-accent" />
-                <span>Technologie Signature HeriTogo</span>
+                <span>{t('signature_tech')}</span>
               </div>
               <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
                 {t('title')}
@@ -283,7 +283,7 @@ export default function ScanPage() {
               {userLocation && (
                 <div className="flex items-center gap-1 text-xs font-bold text-emerald-600">
                   <MapPin className="h-3.5 w-3.5" />
-                  <span>GPS Actif</span>
+                  <span>{t('gps_active_short')}</span>
                 </div>
               )}
             </div>
@@ -407,7 +407,7 @@ export default function ScanPage() {
             {result.data.latitude && result.data.longitude && (
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
                 <MapPin className="h-4 w-4" />
-                <span>Coordonnées : {Number(result.data.latitude).toFixed(4)}, {Number(result.data.longitude).toFixed(4)}</span>
+                <span>{t('coordinates', { lat: Number(result.data.latitude).toFixed(4), lng: Number(result.data.longitude).toFixed(4) })}</span>
               </div>
             )}
           </section>

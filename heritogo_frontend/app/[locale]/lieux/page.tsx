@@ -23,6 +23,7 @@ const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
     <div className="flex h-96 w-full flex-col items-center justify-center gap-3 rounded-3xl border border-border bg-card animate-pulse">
       <MapPin className="h-8 w-8 text-primary animate-bounce" />
       <span className="text-xs font-semibold text-muted-foreground">
+        {/* map loading text - handled after t() is available */}
         Chargement de la carte interactive du Togo…
       </span>
     </div>
@@ -101,7 +102,7 @@ export default function ToutPage() {
               {/* View Toggle */}
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-muted-foreground">
-                  {filteredSites.length} site{filteredSites.length > 1 ? 's' : ''} trouvé{filteredSites.length > 1 ? 's' : ''}
+                  {filteredSites.length} {t('sites_found', { count: filteredSites.length, s: filteredSites.length > 1 ? 's' : '' })}
                 </span>
 
                 <div className="flex items-center rounded-xl border border-border bg-card p-1">
@@ -115,7 +116,7 @@ export default function ToutPage() {
                     }`}
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
-                    <span>Grille</span>
+                    <span>{t('grid_view')}</span>
                   </button>
                   <button
                     type="button"
@@ -127,7 +128,7 @@ export default function ToutPage() {
                     }`}
                   >
                     <MapIcon className="h-3.5 w-3.5" />
-                    <span>Carte</span>
+                    <span>{t('map_view')}</span>
                   </button>
                 </div>
               </div>
@@ -138,7 +139,7 @@ export default function ToutPage() {
           <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4">
             <span className="text-xs font-bold text-muted-foreground mr-1 flex items-center gap-1">
               <Filter className="h-3 w-3" />
-              <span>Régions :</span>
+              <span>{t('regions_label')}</span>
             </span>
             {regionsTogo.map((rf) => {
               const active = selectedRegion === rf

@@ -22,6 +22,7 @@ import StarRating from '@/components/ui/StarRating'
 import Badge from '@/components/ui/Badge'
 import AuthGuardLink from '@/components/AuthGuardLink'
 import { useRequireAuth } from '@/hooks/useRequireAuth'
+import { useTranslations } from 'next-intl'
 
 interface GuideDetail {
   id: string
@@ -49,6 +50,7 @@ interface GuideDetail {
 }
 
 export default function GuideDetailPage() {
+  const t = useTranslations('GuidesPage')
   const { isAuthenticated, loading: authLoading } = useRequireAuth()
   const params = useParams<{ locale: string; id: string }>()
   const guideId = params?.id
@@ -125,7 +127,7 @@ export default function GuideDetailPage() {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-          <p className="text-sm font-semibold text-muted-foreground">Chargement du profil de votre guide...</p>
+          <p className="text-sm font-semibold text-muted-foreground">{t('loading_profile')}</p>
         </div>
       </div>
     )
@@ -138,17 +140,16 @@ export default function GuideDetailPage() {
           <UserCheck className="h-8 w-8 opacity-40" />
         </div>
         <h2 className="font-serif text-xl font-bold text-foreground">
-          Guide momentanément indisponible
+          {t('guide_unavailable')}
         </h2>
         <p className="text-sm text-muted-foreground max-w-sm">
-          Erreur de chargement. Vérifiez votre connexion internet
-          et réessayez dans quelques instants.
+          {t('error_loading_sub')}
         </p>
         <Link
           href="/guides"
           className="rounded-full bg-primary px-6 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark mt-2"
         >
-          ← Retour à l'annuaire
+          {t('back_to_directory')}
         </Link>
       </main>
     )
@@ -165,7 +166,7 @@ export default function GuideDetailPage() {
             className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Retour aux guides</span>
+            <span>{t('back_to_guides')}</span>
           </Link>
         </div>
 
@@ -192,13 +193,12 @@ export default function GuideDetailPage() {
                   <ShieldCheck className="h-5 w-5" />
                 </div>
               </div>
-              
-              <div className="space-y-2">
+                   <div className="space-y-2">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                   <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
                     {guide.profile.full_name}
                   </h1>
-                  <Badge variant="forest">Guide Certifié</Badge>
+                  <Badge variant="forest">{t('certified')}</Badge>
                 </div>
                 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1.5 text-xs text-muted-foreground font-semibold">
@@ -206,13 +206,13 @@ export default function GuideDetailPage() {
                   <span className="text-muted-foreground hidden sm:inline">•</span>
                   <span className="flex items-center gap-1">
                     <Briefcase className="h-4 w-4 text-primary" />
-                    <span>{guide.experience_years} {guide.experience_years > 1 ? 'ans d’expérience' : 'an d’expérience'}</span>
+                    <span>{t('experience_years', { years: guide.experience_years })}</span>
                   </span>
                 </div>
 
                 {guide.profile.preferred_lang && (
                   <p className="text-xs font-semibold text-muted-foreground">
-                    Langue d’échange : <span className="text-foreground font-bold capitalize">{guide.profile.preferred_lang}</span>
+                    {t('exchange_language')} <span className="text-foreground font-bold capitalize">{guide.profile.preferred_lang}</span>
                   </p>
                 )}
               </div>
@@ -225,23 +225,22 @@ export default function GuideDetailPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground hover:border-primary transition-colors cursor-pointer"
               >
                 <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-                <span>{isFavorite ? 'Favori' : 'Ajouter aux favoris'}</span>
+                <span>{isFavorite ? t('in_favorites') : t('add_to_favorites')}</span>
               </button>
               <button
                 onClick={shareGuide}
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground hover:border-primary transition-colors cursor-pointer"
               >
                 <Share2 className="h-4 w-4" />
-                <span>Partager</span>
+                <span>{t('share_guide')}</span>
               </button>
               <AuthGuardLink
                 href={`/booking/${guide.id}`}
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
               >
-                <span>Réserver ce guide</span>
+                <span>{t('book_guide')}</span>
               </AuthGuardLink>
             </div>
-
           </div>
         </section>
 
@@ -255,25 +254,25 @@ export default function GuideDetailPage() {
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-xl font-bold flex items-center gap-2 text-foreground">
                   <Compass className="h-5 w-5 text-primary" />
-                  <span>À propos de {guide.profile.full_name}</span>
+                  <span>{t('about_guide')}</span>
                 </h3>
-                <TextToSpeech text={guide.profile.bio || 'Guide certifié togolais validé pour assurer des visites authentiques et sécurisées.'} className="min-h-9 px-3 text-xs" />
+                <TextToSpeech text={guide.profile.bio || t('default_bio')} className="min-h-9 px-3 text-xs" />
               </div>
               <p className="text-sm sm:text-base leading-relaxed text-muted-foreground whitespace-pre-line font-medium">
-                {guide.profile.bio || 'Ce guide certifié a été validé par notre équipe pour assurer des visites touristiques et patrimoniales immersives, sécurisées et authentiques.'}
+                {guide.profile.bio || t('default_bio')}
               </p>
             </div>
 
             {/* Details Section */}
             <div className="app-card p-6 sm:p-8 space-y-6">
-              <h3 className="font-serif text-xl font-bold text-foreground">Compétences & Zones</h3>
+              <h3 className="font-serif text-xl font-bold text-foreground">{t('skills_and_zones')}</h3>
               
               <div className="grid gap-6 sm:grid-cols-2">
                 {/* Languages */}
                 <div className="space-y-2">
                   <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     <Languages className="h-4 w-4 text-primary" />
-                    <span>Langues parlées</span>
+                    <span>{t('spoken_languages')}</span>
                   </span>
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {guide.languages.length > 0 ? (
@@ -283,7 +282,7 @@ export default function GuideDetailPage() {
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-muted-foreground italic">Non spécifié</span>
+                      <span className="text-xs text-muted-foreground italic">{t('not_specified')}</span>
                     )}
                   </div>
                 </div>
@@ -292,7 +291,7 @@ export default function GuideDetailPage() {
                 <div className="space-y-2">
                   <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     <MapPin className="h-4 w-4 text-primary" />
-                    <span>Zones de couverture</span>
+                    <span>{t('coverage_zones')}</span>
                   </span>
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {guide.coverage_zones.length > 0 ? (
@@ -302,7 +301,7 @@ export default function GuideDetailPage() {
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-muted-foreground italic">Toutes les zones</span>
+                      <span className="text-xs text-muted-foreground italic">{t('all_zones')}</span>
                     )}
                   </div>
                 </div>
@@ -311,7 +310,7 @@ export default function GuideDetailPage() {
               <div className="border-t border-border pt-6 space-y-3">
                 <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   <Compass className="h-4 w-4 text-primary" />
-                  <span>Spécialités touristiques</span>
+                  <span>{t('tourist_specialties')}</span>
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {guide.specialties.length > 0 ? (
@@ -322,7 +321,7 @@ export default function GuideDetailPage() {
                     ))
                   ) : (
                     <span className="rounded-full bg-primary px-3.5 py-1 text-xs font-bold text-white">
-                      Tourisme Culturel & Nature
+                      {t('default_specialty')}
                     </span>
                   )}
                 </div>
@@ -333,10 +332,10 @@ export default function GuideDetailPage() {
             <div className="app-card p-6 sm:p-8 space-y-4">
               <h3 className="font-serif text-xl font-bold flex items-center gap-2 text-foreground">
                 <Calendar className="h-5 w-5 text-primary" />
-                <span>Disponibilités prévues</span>
+                <span>{t('planned_availabilities')}</span>
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Dates confirmées par le guide. Vous pouvez également soumettre une demande libre.
+                {t('availability_sub')}
               </p>
               
               {guide.availability && guide.availability.length > 0 ? (
@@ -349,19 +348,19 @@ export default function GuideDetailPage() {
                         className="rounded-2xl border border-border bg-muted/40 p-3 text-center"
                       >
                         <p className="text-[10px] font-bold uppercase text-muted-foreground">
-                          {dateObj.toLocaleDateString('fr-FR', { weekday: 'short' })}
+                          {dateObj.toLocaleDateString(undefined, { weekday: 'short' })}
                         </p>
                         <p className="text-base font-bold text-foreground font-serif mt-0.5">
-                          {dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                          {dateObj.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                         </p>
-                        <p className="text-[10px] font-bold text-emerald-600 mt-1 uppercase">Disponible</p>
+                        <p className="text-[10px] font-bold text-emerald-600 mt-1 uppercase">{t('available')}</p>
                       </div>
                     )
                   })}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-                  <p className="text-sm font-semibold text-muted-foreground">Réservation disponible sur demande libre.</p>
+                  <p className="text-sm font-semibold text-muted-foreground">{t('on_request')}</p>
                 </div>
               )}
             </div>
@@ -373,13 +372,13 @@ export default function GuideDetailPage() {
             <div className="app-card p-6 space-y-6">
               <h3 className="font-serif text-lg font-bold flex items-center gap-2 text-foreground">
                 <BadgeCent className="h-5 w-5 text-primary" />
-                <span>Grille tarifaire indicative</span>
+                <span>{t('indicative_pricing')}</span>
               </h3>
               
               <div className="space-y-3 text-xs">
                 {guide.full_day_rate && (
                   <div className="flex justify-between items-center pb-2.5 border-b border-border">
-                    <span className="font-medium text-muted-foreground">Journée complète</span>
+                    <span className="font-medium text-muted-foreground">{t('full_day')}</span>
                     <span className="font-bold text-foreground text-sm">
                       {Number(guide.full_day_rate).toLocaleString()} XOF
                     </span>
@@ -388,7 +387,7 @@ export default function GuideDetailPage() {
 
                 {guide.half_day_rate && (
                   <div className="flex justify-between items-center pb-2.5 border-b border-border">
-                    <span className="font-medium text-muted-foreground">Demi-journée</span>
+                    <span className="font-medium text-muted-foreground">{t('half_day')}</span>
                     <span className="font-bold text-foreground text-sm">
                       {Number(guide.half_day_rate).toLocaleString()} XOF
                     </span>
@@ -397,7 +396,7 @@ export default function GuideDetailPage() {
 
                 {guide.hourly_rate && (
                   <div className="flex justify-between items-center pb-2.5 border-b border-border">
-                    <span className="font-medium text-muted-foreground">Tarif horaire</span>
+                    <span className="font-medium text-muted-foreground">{t('hourly_rate')}</span>
                     <span className="font-bold text-foreground text-sm">
                       {Number(guide.hourly_rate).toLocaleString()} XOF
                     </span>
@@ -408,7 +407,7 @@ export default function GuideDetailPage() {
               <div className="rounded-2xl bg-muted/40 p-4 border border-border flex items-start gap-2">
                 <Info className="h-4 w-4 shrink-0 text-primary mt-0.5" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Paiement sécurisé avec validation à la fin de la visite.
+                  {t('secure_payment_note')}
                 </p>
               </div>
               
@@ -416,7 +415,7 @@ export default function GuideDetailPage() {
                 href={`/booking/${guide.id}`}
                 className="inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm"
               >
-                <span>Faire une demande de devis</span>
+                <span>{t('quote_request')}</span>
               </AuthGuardLink>
             </div>
 
@@ -424,13 +423,13 @@ export default function GuideDetailPage() {
             <div className="app-card p-6 space-y-3">
               <h4 className="font-serif text-sm font-bold flex items-center gap-1.5 text-foreground">
                 <CheckCircle className="h-4 w-4 text-emerald-600" />
-                <span>Charte confiance HeriTogo</span>
+                <span>{t('trust_charter')}</span>
               </h4>
               <ul className="text-xs space-y-2 text-muted-foreground font-medium pl-1.5 list-disc list-inside">
-                <li>Guide certifié et identité vérifiée.</li>
-                <li>Paiement sécurisé (Flooz / T-Money).</li>
-                <li>Fonds bloqués jusqu'à la fin de la visite.</li>
-                <li>Assistance support HeriTogo 24h/7j.</li>
+                <li>{t('trust_1')}</li>
+                <li>{t('trust_2')}</li>
+                <li>{t('trust_3')}</li>
+                <li>{t('trust_4')}</li>
               </ul>
             </div>
 
@@ -438,22 +437,22 @@ export default function GuideDetailPage() {
             <div className="app-card p-5 space-y-3 border-red-300 bg-red-50/20 dark:bg-red-950/10">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-red-500" />
-                <h4 className="font-serif text-sm font-bold text-red-700 dark:text-red-300">Signaler ce profil</h4>
+                <h4 className="font-serif text-sm font-bold text-red-700 dark:text-red-300">{t('report_profile')}</h4>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Un problème avec ce profil ou un comportement inapproprié ? Signalez-le à l’équipe.
+                {t('report_sub')}
               </p>
               
               {reportSuccess ? (
                 <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-center text-xs font-bold text-emerald-600">
-                  Signalement envoyé. Merci !
+                  {t('report_success')}
                 </div>
               ) : (
                 <button
                   onClick={() => setIsReportOpen(true)}
                   className="rounded-full border border-red-300 px-4 py-1.5 text-xs font-bold text-red-600 hover:bg-red-500 hover:text-white transition-all w-full cursor-pointer"
                 >
-                  Signaler ce guide
+                  {t('report_guide')}
                 </button>
               )}
             </div>

@@ -86,7 +86,7 @@ export default function CuisinePage() {
                 />
               </div>
               <p className="text-xs font-semibold text-muted-foreground text-right">
-                {filteredPlats.length} spécialité{filteredPlats.length > 1 ? 's' : ''} togolaise{filteredPlats.length > 1 ? 's' : ''}
+                {filteredPlats.length} {t('specialties_label')}
               </p>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function CuisinePage() {
           <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4">
             <span className="text-xs font-bold text-muted-foreground mr-1 flex items-center gap-1">
               <Filter className="h-3 w-3" />
-              <span>Spécialités :</span>
+              <span>{t('specialties_label')}</span>
             </span>
             {categoryFilters.map((category) => {
               const active = selectedCategory === category
@@ -120,9 +120,9 @@ export default function CuisinePage() {
         {/* ── GRILLE DES PLATS ── */}
         <section className="space-y-6">
           <SectionHeader
-            kicker="Terroir & Saveurs"
-            title="Spécialités Emblématiques du Togo"
-            subtitle="Explorez les recettes traditionnelles, sauces riches et street-food légendaire du pays."
+            kicker={t('section_kicker')}
+            title={t('section_title')}
+            subtitle={t('section_subtitle')}
             icon={Sparkles}
           />
 
@@ -171,14 +171,14 @@ export default function CuisinePage() {
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
                 <Utensils className="h-3.5 w-3.5" />
-                <span>Bonnes Tables</span>
+                <span>{t('restaurants_kicker')}</span>
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">
-                Où déguster la gastronomie togolaise ?
+                {t('restaurants_title')}
               </h2>
             </div>
             <span className="text-xs font-semibold text-muted-foreground">
-              Maquis authentiques & restaurants renommés
+              {t('restaurants_sub')}
             </span>
           </div>
 
