@@ -19,11 +19,21 @@ export function catalogDbError(error: unknown) {
   if (
     code === 'P2021' ||
     code === 'P2022' ||
+    code === '42P01' ||
+    code === 'PGRST205' ||
     /does not exist/i.test(message) ||
-    /relation .* does not exist/i.test(message)
+    /relation .* does not exist/i.test(message) ||
+    /could not find the table/i.test(message)
   ) {
     return 'Les tables lieux/plats sont absentes. Exécutez prisma/places_tables.sql dans l’éditeur SQL Supabase.'
   }
+  if (code === 'P2002' || code === '23505' || /duplicate key/i.test(message) || /unique constraint/i.test(message)) {
+    return 'Cet identifiant existe déjà.'
+  }
+  if (/row-level security|permission denied|not allowed/i.test(message)) {
+    return 'La base refuse l’écriture (RLS). Vérifiez les policies SQL des tables places/dishes.'
+  }
+  if (message) return message.slice(0, 240)
   return null
 }
 
@@ -35,6 +45,7 @@ export async function logAdminAction(input: {
   details: Record<string, string>
 }) {
   try {
+    if (!/^[0-9a-f-]{36}$/i.test(input.target_id)) return
     const { prisma } = await import('@/lib/prisma')
     await prisma.adminLog.create({ data: input })
   } catch (error) {

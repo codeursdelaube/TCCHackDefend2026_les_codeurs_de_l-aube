@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Landmark, Loader2, Pencil, Plus, Trash2, Utensils, Upload, X } from 'lucide-react'
+import { Landmark, Loader2, Pencil, Plus, Trash2, Utensils, Upload, X, Languages } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiFetch, clearClientCache } from '@/lib/utils/http'
 import { createClient } from '@/lib/supabase/client'
 import { DISH_CATEGORIES, PLACE_REGIONS, type CatalogDish, type CatalogPlace } from '@/lib/catalog/types'
+import { TRANSLATABLE_LOCALES, type PlaceCopy, type PlaceTranslations, type TranslatableLocale } from '@/lib/catalog/i18n'
 
 type Kind = 'places' | 'dishes'
 
@@ -26,6 +27,7 @@ type PlaceForm = {
   outfit: string
   access_info: string
   fee: string
+  translations: PlaceTranslations
 }
 
 type DishForm = {
@@ -57,6 +59,7 @@ const emptyPlace = (): PlaceForm => ({
   outfit: '',
   access_info: '',
   fee: '',
+  translations: {},
 })
 
 const emptyDish = (): DishForm => ({
@@ -108,6 +111,7 @@ function placeToForm(place: CatalogPlace): PlaceForm {
     outfit: place.outfit || '',
     access_info: place.access || '',
     fee: place.fee || '',
+    translations: place.translations || {},
   }
 }
 
@@ -128,6 +132,7 @@ function dishToForm(dish: CatalogDish): DishForm {
 export default function CatalogManager({ kind }: { kind: Kind }) {
   const [items, setItems] = useState<(CatalogPlace | CatalogDish)[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -135,11 +140,14 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
   const [formError, setFormError] = useState('')
   const [placeForm, setPlaceForm] = useState<PlaceForm>(emptyPlace())
   const [dishForm, setDishForm] = useState<DishForm>(emptyDish())
+  const [translating, setTranslating] = useState(false)
+  const [i18nTab, setI18nTab] = useState<TranslatableLocale>('en')
 
   const isPlaces = kind === 'places'
 
   const load = async () => {
     setLoading(true)
+    setLoadError('')
     const result = isPlaces
       ? await apiFetch<{ places?: CatalogPlace[] }>('/api/admin/places')
       : await apiFetch<{ dishes?: CatalogDish[] }>('/api/admin/dishes')
@@ -150,7 +158,9 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
         setItems(result.data.dishes || [])
       }
     } else {
-      toast.error(result.error || 'Chargement impossible')
+      const message = result.error || 'Chargement impossible'
+      setLoadError(message)
+      toast.error(message)
     }
     setLoading(false)
   }
@@ -165,6 +175,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
     setFormError('')
     setPlaceForm(emptyPlace())
     setDishForm(emptyDish())
+    setI18nTab('en')
     setShowForm(true)
   }
 
@@ -173,6 +184,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
     setFormError('')
     if (isPlaces) setPlaceForm(placeToForm(item as CatalogPlace))
     else setDishForm(dishToForm(item as CatalogDish))
+    setI18nTab('en')
     setShowForm(true)
   }
 
@@ -246,6 +258,62 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
         slug: editingId ? current.slug : slugify(name),
       }))
     }
+  }
+
+  const generateTranslations = async () => {
+    if (!placeForm.name.trim() || !placeForm.description.trim()) {
+      setFormError('Renseignez d’abord le nom et la description en français.')
+      return
+    }
+    setTranslating(true)
+    setFormError('')
+    try {
+      const result = await apiFetch<{ translations?: PlaceTranslations }>('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: placeForm.name,
+          description: placeForm.description,
+          history: placeForm.history || placeForm.description,
+          best_time: placeForm.best_time,
+          duration: placeForm.duration,
+          outfit: placeForm.outfit,
+          access_info: placeForm.access_info,
+          fee: placeForm.fee,
+        }),
+        timeoutMs: 90000,
+      })
+      if (!result.ok || !result.data?.translations) {
+        const message = result.error || 'LibreTranslate n’a pas pu traduire.'
+        setFormError(message)
+        toast.error(message)
+        return
+      }
+      setPlaceForm((current) => ({ ...current, translations: result.data!.translations! }))
+      toast.success('Traductions EN / ES / ZH générées. Relisez-les avant d’enregistrer.')
+    } finally {
+      setTranslating(false)
+    }
+  }
+
+  const updateTranslation = (locale: TranslatableLocale, field: keyof PlaceCopy, value: string) => {
+    setPlaceForm((current) => ({
+      ...current,
+      translations: {
+        ...current.translations,
+        [locale]: {
+          nom: current.translations[locale]?.nom || current.name,
+          description: current.translations[locale]?.description || current.description,
+          histoire: current.translations[locale]?.histoire || current.history,
+          bestTime: current.translations[locale]?.bestTime ?? current.best_time,
+          duration: current.translations[locale]?.duration ?? current.duration,
+          outfit: current.translations[locale]?.outfit ?? current.outfit,
+          access: current.translations[locale]?.access ?? current.access_info,
+          fee: current.translations[locale]?.fee ?? current.fee,
+          [field]: value,
+        },
+      },
+    }))
   }
 
   const save = async () => {
@@ -341,6 +409,10 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
         <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
+      ) : loadError ? (
+        <p className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-sm text-red-700">
+          {loadError}
+        </p>
       ) : items.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           Aucune fiche pour le moment.
@@ -511,6 +583,65 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                     <input type="checkbox" checked={placeForm.is_unesco} onChange={(e) => setPlaceForm({ ...placeForm, is_unesco: e.target.checked })} />
                     Site UNESCO
                   </label>
+
+                  <div className="rounded-2xl border border-border bg-background/70 p-4">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-xs font-bold">Traductions (LibreTranslate)</p>
+                      <button
+                        type="button"
+                        onClick={() => void generateTranslations()}
+                        disabled={translating || saving}
+                        className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold disabled:opacity-60"
+                      >
+                        {translating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Languages className="h-3.5 w-3.5" />}
+                        Générer EN / ES / ZH
+                      </button>
+                    </div>
+                    <p className="mb-3 text-[11px] text-muted-foreground">
+                      Le français ci-dessus reste la version de référence. Les visiteurs voient la langue du site, avec repli sur le français.
+                    </p>
+                    <div className="mb-3 flex gap-2">
+                      {TRANSLATABLE_LOCALES.map((locale) => (
+                        <button
+                          key={locale}
+                          type="button"
+                          onClick={() => setI18nTab(locale)}
+                          className={`rounded-full px-3 py-1 text-[11px] font-bold ${
+                            i18nTab === locale ? 'bg-primary text-white' : 'border border-border'
+                          }`}
+                        >
+                          {locale.toUpperCase()}
+                          {placeForm.translations[locale]?.nom ? ' ✓' : ''}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid gap-3">
+                      <label className="text-xs font-bold">
+                        Nom {i18nTab.toUpperCase()}
+                        <input
+                          className="mt-1 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={placeForm.translations[i18nTab]?.nom || ''}
+                          onChange={(e) => updateTranslation(i18nTab, 'nom', e.target.value)}
+                        />
+                      </label>
+                      <label className="text-xs font-bold">
+                        Description {i18nTab.toUpperCase()}
+                        <textarea
+                          className="mt-1 h-20 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={placeForm.translations[i18nTab]?.description || ''}
+                          onChange={(e) => updateTranslation(i18nTab, 'description', e.target.value)}
+                        />
+                      </label>
+                      <label className="text-xs font-bold">
+                        Histoire {i18nTab.toUpperCase()}
+                        <textarea
+                          className="mt-1 h-24 w-full rounded-xl border border-border bg-card p-3 text-sm font-normal"
+                          value={placeForm.translations[i18nTab]?.histoire || ''}
+                          onChange={(e) => updateTranslation(i18nTab, 'histoire', e.target.value)}
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>
@@ -587,7 +718,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
               </button>
               <button
                 type="submit"
-                disabled={saving || uploading}
+                disabled={saving || uploading || translating}
                 className="flex-1 rounded-full bg-primary py-3 text-xs font-bold text-white disabled:opacity-60"
               >
                 {saving ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Enregistrer'}

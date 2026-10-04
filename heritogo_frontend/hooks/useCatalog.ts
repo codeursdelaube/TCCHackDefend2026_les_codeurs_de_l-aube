@@ -1,17 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useLocale } from 'next-intl'
 import { apiFetch } from '@/lib/utils/http'
 import { getLocalDishes } from '@/lib/catalog/dishes'
 import type { CatalogDish, CatalogPlace } from '@/lib/catalog/types'
 
 export function usePlaces() {
+  const locale = useLocale()
   const [places, setPlaces] = useState<CatalogPlace[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
-    apiFetch<{ places?: CatalogPlace[] }>('/api/places').then((result) => {
+    apiFetch<{ places?: CatalogPlace[] }>(`/api/places?locale=${locale}`).then((result) => {
       if (cancelled) return
       setPlaces(result.ok && result.data?.places ? result.data.places : [])
       setLoading(false)
@@ -19,7 +21,7 @@ export function usePlaces() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [locale])
 
   return { places, loading }
 }

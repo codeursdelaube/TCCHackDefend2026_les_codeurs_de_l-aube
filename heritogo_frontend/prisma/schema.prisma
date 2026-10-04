@@ -346,6 +346,7 @@ model Place {
   access_info          String?
   fee                  String?
   related_dish_slugs   String[] @default([])
+  translations         Json     @default("{}")
   created_at           DateTime @default(now()) @db.Timestamptz
   updated_at           DateTime @default(now()) @updatedAt @db.Timestamptz
 

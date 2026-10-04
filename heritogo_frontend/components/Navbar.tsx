@@ -194,13 +194,13 @@ export default function Navbar() {
     <>
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-border border-border bg-card/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/accueil" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
+          <Link href="/accueil" aria-label="HeriTogo" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
             <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-border bg-base-200 shadow-sm">
               <Image src="/icons/icon-192x192.png" alt="HeriTogo" width={32} height={32} className="h-8 w-8 object-contain" />
             </div>
-            <div className="leading-none">
+            <div className="hidden leading-none lg:block">
               <span className="block text-lg font-black text-base-content">HeriTogo</span>
-              <span className="mt-1 hidden text-[10px] font-bold uppercase tracking-wider text-base-content/50 sm:block">
+              <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-base-content/50">
                 {t('tagline')}
               </span>
             </div>

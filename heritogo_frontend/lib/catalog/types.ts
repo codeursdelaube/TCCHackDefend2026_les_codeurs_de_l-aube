@@ -1,3 +1,5 @@
+import type { PlaceTranslations } from './i18n'
+
 export const PLACE_REGIONS = ['Maritime', 'Plateaux', 'Centrale', 'Kara', 'Savanes'] as const
 export type PlaceRegion = (typeof PLACE_REGIONS)[number]
 
@@ -29,6 +31,7 @@ export type CatalogPlace = {
   access?: string | null
   fee?: string | null
   relatedDishSlugs: string[]
+  translations?: PlaceTranslations
 }
 
 export type CatalogDish = {

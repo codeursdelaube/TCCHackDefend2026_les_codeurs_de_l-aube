@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth/admin'
-import { mapPlace, slugify } from '@/lib/catalog/map'
+import { slugify } from '@/lib/catalog/map'
 import { PLACE_REGIONS } from '@/lib/catalog/types'
 import { catalogDbError, DEFAULT_TOGO_LAT, DEFAULT_TOGO_LNG, logAdminAction, parseCoord } from '@/lib/catalog/admin'
+import { parsePlaceTranslations } from '@/lib/catalog/libretranslate'
+import { createPlaceRow, findPlaceBySlug, listPlacesAdmin } from '@/lib/catalog/store'
+
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 function parsePlaceBody(body: Record<string, unknown>) {
   const name = String(body.name ?? '').trim()
@@ -50,6 +54,7 @@ function parsePlaceBody(body: Record<string, unknown>) {
       related_dish_slugs: Array.isArray(body.related_dish_slugs)
         ? body.related_dish_slugs.map((item) => String(item)).filter(Boolean)
         : [],
+      translations: parsePlaceTranslations(body.translations),
     },
   }
 }
@@ -61,8 +66,8 @@ export async function GET() {
       return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    const places = await prisma.place.findMany({ orderBy: { updated_at: 'desc' } })
-    return NextResponse.json({ places: places.map(mapPlace) })
+    const places = await listPlacesAdmin()
+    return NextResponse.json({ places })
   } catch (error) {
     console.error('[GET /api/admin/places]', error)
     return NextResponse.json({ error: catalogDbError(error) || 'Chargement impossible.' }, { status: 500 })
@@ -81,21 +86,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: parsed.error }, { status: 400 })
     }
 
-    const existing = await prisma.place.findUnique({ where: { slug: parsed.data.slug } })
+    const existing = await findPlaceBySlug(parsed.data.slug)
     if (existing) {
       return NextResponse.json({ error: 'Un lieu avec cet identifiant existe déjà.' }, { status: 409 })
     }
 
-    const place = await prisma.place.create({ data: parsed.data })
+    const created = await createPlaceRow(parsed.data)
     await logAdminAction({
       admin_id: auth.profile.id,
       action: 'create_place',
       target_type: 'place',
-      target_id: place.id,
-      details: { slug: place.slug, name: place.name },
+      target_id: created.id,
+      details: { slug: created.place.slug, name: created.place.nom },
     })
 
-    return NextResponse.json({ place: mapPlace(place) }, { status: 201 })
+    return NextResponse.json({ place: created.place }, { status: 201 })
   } catch (error) {
     console.error('[POST /api/admin/places]', error)
     return NextResponse.json({ error: catalogDbError(error) || 'Impossible de créer le lieu.' }, { status: 500 })

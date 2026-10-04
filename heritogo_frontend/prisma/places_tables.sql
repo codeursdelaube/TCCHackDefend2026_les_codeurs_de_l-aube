@@ -19,9 +19,12 @@ create table if not exists places (
   access_info text,
   fee text,
   related_dish_slugs text[] not null default '{}',
+  translations jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table places add column if not exists translations jsonb not null default '{}'::jsonb;
 
 create table if not exists dishes (
   id uuid primary key default gen_random_uuid(),
@@ -37,6 +40,9 @@ create table if not exists dishes (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+grant select, insert, update, delete on table places to authenticated, service_role;
+grant select, insert, update, delete on table dishes to authenticated, service_role;
 
 alter table places enable row level security;
 alter table dishes enable row level security;

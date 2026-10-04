@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth/admin'
-import { mapDish, slugify } from '@/lib/catalog/map'
+import { slugify } from '@/lib/catalog/map'
 import { DISH_CATEGORIES } from '@/lib/catalog/types'
 import { catalogDbError, logAdminAction } from '@/lib/catalog/admin'
+import { createDishRow, findDishBySlug, listDishesAdmin } from '@/lib/catalog/store'
+
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 function parseDishBody(body: Record<string, unknown>) {
   const name = String(body.name ?? '').trim()
@@ -44,8 +47,8 @@ export async function GET() {
       return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    const dishes = await prisma.dish.findMany({ orderBy: { updated_at: 'desc' } })
-    return NextResponse.json({ dishes: dishes.map(mapDish) })
+    const dishes = await listDishesAdmin()
+    return NextResponse.json({ dishes })
   } catch (error) {
     console.error('[GET /api/admin/dishes]', error)
     return NextResponse.json({ error: catalogDbError(error) || 'Chargement impossible.' }, { status: 500 })
@@ -64,21 +67,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: parsed.error }, { status: 400 })
     }
 
-    const existing = await prisma.dish.findUnique({ where: { slug: parsed.data.slug } })
+    const existing = await findDishBySlug(parsed.data.slug)
     if (existing) {
       return NextResponse.json({ error: 'Un plat avec cet identifiant existe déjà.' }, { status: 409 })
     }
 
-    const dish = await prisma.dish.create({ data: parsed.data })
+    const created = await createDishRow(parsed.data)
     await logAdminAction({
       admin_id: auth.profile.id,
       action: 'create_dish',
       target_type: 'dish',
-      target_id: dish.id,
-      details: { slug: dish.slug, name: dish.name },
+      target_id: created.id,
+      details: { slug: created.dish.slug, name: created.dish.nom },
     })
 
-    return NextResponse.json({ dish: mapDish(dish) }, { status: 201 })
+    return NextResponse.json({ dish: created.dish }, { status: 201 })
   } catch (error) {
     console.error('[POST /api/admin/dishes]', error)
     return NextResponse.json({ error: catalogDbError(error) || 'Impossible de créer le plat.' }, { status: 500 })
