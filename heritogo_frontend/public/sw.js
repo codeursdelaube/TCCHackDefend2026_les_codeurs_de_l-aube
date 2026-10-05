@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heritogo-v4';
+const CACHE_NAME = 'heritogo-v5';
 const LOCALES = ['fr', 'en', 'es', 'zh'];
 
 const STATIC_ASSETS = LOCALES.flatMap((locale) => [

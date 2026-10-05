@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Fraunces, Manrope } from "next/font/google";
 import "@/app/globals.css";
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-fraunces",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-manrope",
+});
 import Navbar from "@/app/_components/Navbar";
 import ServiceWorkerRegister from '@/app/_components/ServiceWorkerRegister';
 import OnboardingTooltip from '@/app/_components/OnboardingTooltip';
@@ -183,7 +196,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
       lang={locale}
       data-scroll-behavior="smooth"
       style={{ fontFamily: 'var(--font-body)' }}
-      className={isDark ? 'dark' : ''}
+      className={`${isDark ? 'dark' : ''} ${fraunces.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
       <head>

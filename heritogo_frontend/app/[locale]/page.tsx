@@ -41,7 +41,7 @@ export default function AccueilPage() {
 
   const slides = useMemo<Slide[]>(() => [
     {
-      image: '/Hero2.png',
+      image: '/Hero2.webp',
       title: t('slides.1.title'),
       subtitle: t('slides.1.subtitle'),
       description: t('slides.1.description'),
@@ -51,7 +51,7 @@ export default function AccueilPage() {
       tag: t('slide_tags.1'),
     },
     {
-      image: '/deuxlions.png',
+      image: '/deuxlions.webp',
       title: t('slides.0.title'),
       subtitle: t('slides.0.subtitle'),
       description: t('slides.0.description'),
@@ -61,7 +61,7 @@ export default function AccueilPage() {
       tag: t('slide_tags.0'),
     },
     {
-      image: '/fufuhero.png',
+      image: '/fufuhero.webp',
       title: t('slides.2.title'),
       subtitle: t('slides.2.subtitle'),
       description: t('slides.2.description'),

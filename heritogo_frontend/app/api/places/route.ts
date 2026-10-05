@@ -66,7 +66,14 @@ export async function GET(request: Request) {
       )
     }
 
-    return NextResponse.json({ places: places.map((place) => mapPlace(place, locale)) })
+    return NextResponse.json(
+      { places: places.map((place) => mapPlace(place, locale)) },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=86400',
+        },
+      }
+    )
   } catch (error) {
     console.error('[GET /api/places]', error)
     return NextResponse.json({ error: 'Impossible de charger les lieux.' }, { status: 500 })
