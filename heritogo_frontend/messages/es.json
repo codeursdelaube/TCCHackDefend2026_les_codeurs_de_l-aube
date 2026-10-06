@@ -388,7 +388,8 @@
     "change_image": "Cambiar imagen",
     "select_capture": "Seleccione su captura",
     "compatible_info": "Compatible con cámara en vivo e imágenes de su galería.",
-    "open_gallery": "Abrir Cámara / Galería",
+    "open_gallery": "Galería",
+    "open_camera": "Cámara",
     "analyzing": "Análisis por IA",
     "identify": "Identificar Monumento",
     "tts_stop": "Detener lectura",
@@ -496,7 +497,13 @@
     "empty_desc": "Intente otra ortografía o cambie los filtros.",
     "reset_filters": "Restablecer filtros",
     "map_loading": "Cargando el mapa interactivo de Togo...",
-    "card_discover": "Descubrir"
+    "card_discover": "Descubrir",
+    "vocal_narration": "Guía de Audio",
+    "listen_monument": "Escuchar la historia del monumento",
+    "reserve_guide_here": "Reservar un guía para este lugar",
+    "gps_coords": "Coordenadas GPS:",
+    "explore_link": "Explorar",
+    "map_loading_text": "Cargando mapa interactivo…"
   },
   "Cuisine": {
     "title": "Sabores de Togo",
@@ -511,11 +518,13 @@
       "accompagnement": "Acompañamiento",
       "plat_principal": "Plato Principal",
       "street_food": "Comida Callejera",
-      "sauce": "Salsa"
+      "sauce": "Salsa",
+      "boisson": "Bebida Tradicional"
     },
     "know_more": "Saber más",
     "acc_prefix": "Acomp.:",
     "back_to_cuisine": "Volver a Sabores",
+    "back_mobile": "Volver",
     "cuisine_title": "Patrimoine Culinario · Togo",
     "find_nearby": "Buscar Cerca",
     "origin_tradition": "Origen y Tradición",
@@ -1431,7 +1440,9 @@
     "report_sub": "¿Un problema con este perfil o comportamiento inapropiado? Infórmalo al equipo.",
     "report_success": "Reporte enviado. ¡Gracias!",
     "report_guide": "Reportar este guía",
-    "exchange_language": "Idioma de intercambio:"
+    "exchange_language": "Idioma de intercambio:",
+    "fav_added": "Guía añadido a favoritos",
+    "fav_removed": "Guía eliminado de favoritos"
   },
   "TravelTools": {
     "drawer": {

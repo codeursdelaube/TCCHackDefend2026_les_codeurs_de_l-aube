@@ -388,7 +388,8 @@
     "change_image": "更换图片",
     "select_capture": "选择您的照片",
     "compatible_info": "支持实时相机拍摄及相册图片导入。",
-    "open_gallery": "打开相机 / 相册",
+    "open_gallery": "相册",
+    "open_camera": "拍照",
     "analyzing": "AI 智能分析中",
     "identify": "识别纪念碑",
     "tts_stop": "停止朗读",
@@ -496,7 +497,13 @@
     "empty_desc": "请尝试其他拼写或更改筛选条件。",
     "reset_filters": "重置筛选",
     "map_loading": "正在加载多哥互动地图...",
-    "card_discover": "探索"
+    "card_discover": "探索",
+    "vocal_narration": "语音讲解",
+    "listen_monument": "收听纪念碑的历史",
+    "reserve_guide_here": "为此地预订导游",
+    "gps_coords": "GPS坐标：",
+    "explore_link": "探索",
+    "map_loading_text": "正在加载互动地图…"
   },
   "Cuisine": {
     "title": "多哥风味",
@@ -511,11 +518,13 @@
       "accompagnement": "配菜",
       "plat_principal": "主菜",
       "street_food": "街头小吃",
-      "sauce": "酱汁"
+      "sauce": "酱汁",
+      "boisson": "传统饮品"
     },
     "know_more": "了解更多",
     "acc_prefix": "搭配：",
     "back_to_cuisine": "返回美食列表",
+    "back_mobile": "返回",
     "cuisine_title": "烹饪遗产 · 多哥",
     "find_nearby": "寻找附近餐厅",
     "origin_tradition": "起源与传统",
@@ -1483,7 +1492,9 @@
     "report_sub": "对此资料或不当行为有疑问？向团队举报。",
     "report_success": "举报已发送。谢谢！",
     "report_guide": "举报此导游",
-    "exchange_language": "交流语言："
+    "exchange_language": "交流语言：",
+    "fav_added": "导游已添加到收藏",
+    "fav_removed": "导游已从收藏中移除"
   },
   "TravelTools": {
     "drawer": {

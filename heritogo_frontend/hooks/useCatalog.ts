@@ -5,12 +5,14 @@ import { useLocale } from 'next-intl'
 import { apiFetchCached } from '@/lib/utils/http'
 import type { CatalogDish, CatalogPlace } from '@/lib/catalog/types'
 
+import { getLocalPlaces } from '@/lib/catalog/places'
+
 const CATALOG_CACHE_TTL_MS = 30 * 60 * 1000 // 30 minutes
 
 export function usePlaces() {
   const locale = useLocale()
-  const [places, setPlaces] = useState<CatalogPlace[]>([])
-  const [loading, setLoading] = useState(true)
+  const [places, setPlaces] = useState<CatalogPlace[]>(() => getLocalPlaces(locale))
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -20,7 +22,11 @@ export function usePlaces() {
       storage: 'session',
     }).then((result) => {
       if (cancelled) return
-      setPlaces(result.ok && result.data?.places ? result.data.places : [])
+      if (result.ok && result.data?.places && result.data.places.length > 0) {
+        setPlaces(result.data.places)
+      } else {
+        setPlaces(getLocalPlaces(locale))
+      }
       setLoading(false)
     })
     return () => {

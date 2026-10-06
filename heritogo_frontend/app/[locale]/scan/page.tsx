@@ -44,6 +44,7 @@ export default function ScanPage() {
   const [isTranslating, setIsTranslating] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
 
   // Message évolutif d'analyse
   const [scanStepIndex, setScanStepIndex] = useState(0)
@@ -289,14 +290,30 @@ export default function ScanPage() {
             </div>
 
             <div className="space-y-3">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full bg-card border-2 border-dashed border-primary/40 px-6 font-bold text-primary shadow-sm hover:border-primary hover:bg-primary/5 transition-all text-sm cursor-pointer"
-              >
-                <Upload className="h-5 w-5" />
-                <span>{preview ? t('change_image') : t('open_gallery')}</span>
-              </button>
+              {/* Sur mobile : deux boutons (caméra + galerie) / Sur desktop : galerie seulement */}
+              <div className="flex gap-3">
+                {/* Bouton Appareil Photo — visible uniquement sur mobile */}
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="sm:hidden inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer"
+                  aria-label={t('open_camera')}
+                >
+                  <Camera className="h-5 w-5" />
+                  <span className="hidden xs:inline">{t('open_camera')}</span>
+                  <span className="xs:hidden">{t('open_camera')}</span>
+                </button>
+
+                {/* Bouton Galerie */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex h-13 flex-1 sm:w-full items-center justify-center gap-3 rounded-full bg-card border-2 border-dashed border-primary/40 px-6 font-bold text-primary shadow-sm hover:border-primary hover:bg-primary/5 transition-all text-sm cursor-pointer"
+                >
+                  <Upload className="h-5 w-5" />
+                  <span>{preview ? t('change_image') : t('open_gallery')}</span>
+                </button>
+              </div>
 
               {preview && !result && (
                 <button
@@ -311,7 +328,10 @@ export default function ScanPage() {
               )}
             </div>
 
+            {/* Input galerie (sans capture) */}
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+            {/* Input caméra directe (mobile uniquement via capture) */}
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="hidden" />
           </div>
 
           {/* Right Preview Card */}

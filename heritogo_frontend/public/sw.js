@@ -1,23 +1,33 @@
-const CACHE_NAME = 'heritogo-v5';
+// ── Cache version — à incrémenter à chaque déploiement ──────────────────────
+// IMPORTANT : changer ce nom force le SW à se réinstaller et vider l'ancien cache.
+// Cela évite les 404 causés par des HTML périmées qui référencent des chunks obsolètes.
+const CACHE_NAME = 'heritogo-v7';
+
 const LOCALES = ['fr', 'en', 'es', 'zh'];
 
-const STATIC_ASSETS = LOCALES.flatMap((locale) => [
-  `/${locale}`,
-  `/${locale}/lieux`,
-  `/${locale}/cuisine`,
-  `/${locale}/scan`,
-  `/${locale}/loisirs`,
-  `/${locale}/histoire`,
-  `/${locale}/guides`,
-]).concat([
+// Seuls les ASSETS STATIQUES sont mis en cache (images, manifest, page offline).
+// Les pages HTML de navigation NE sont PAS mises en cache pour éviter de servir
+// une version périmée après un nouveau déploiement (ce qui cause les 404 JS chunks).
+const STATIC_ASSETS = [
   '/manifest.json',
   '/offline.html',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-]);
+];
 
-function shouldBypassCache(requestUrl) {
-  return requestUrl.origin !== self.location.origin || requestUrl.pathname.startsWith('/api');
+function shouldBypassCache(requestUrl, request) {
+  // Ignorer les requêtes externes
+  if (requestUrl.origin !== self.location.origin) return true;
+  // Ne jamais cacher les routes API
+  if (requestUrl.pathname.startsWith('/api')) return true;
+  // Ne jamais intercepter les chunks et assets Next.js (gérés par le cache HTTP immuable de Next)
+  if (requestUrl.pathname.startsWith('/_next/')) return true;
+  // Ne jamais cacher les requêtes RSC (React Server Components payload pour la navigation client)
+  if (requestUrl.searchParams.has('_rsc')) return true;
+  if (request && request.headers && request.headers.get('RSC') === '1') return true;
+  // Ne pas cacher les routes d'authentification
+  if (requestUrl.pathname.startsWith('/auth/')) return true;
+  return false;
 }
 
 async function cacheStaticAssets() {
@@ -30,27 +40,27 @@ async function deleteOldCaches() {
   await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
 }
 
-async function networkFirstNavigation(request) {
-  const cache = await caches.open(CACHE_NAME);
-
+// Navigation : toujours réseau en premier, fallback offline uniquement si hors ligne.
+// On NE MET PAS en cache les pages HTML pour éviter de servir du contenu périmé.
+async function networkOnlyNavigation(request) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
-      await cache.put(request, response.clone());
-    }
+    // Si le serveur répond 404 ou 500, ne pas mettre en cache
+    if (!response.ok) return response;
     return response;
   } catch {
-    const cached = await caches.match(request);
-    return cached || caches.match('/offline.html');
+    // Hors ligne → fallback sur la page offline
+    const cached = await caches.match('/offline.html');
+    return cached || Response.error();
   }
 }
 
 async function staleWhileRevalidate(request) {
-  const cached = await caches.match(request);
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
   const network = fetch(request)
     .then(async (response) => {
       if (response.ok) {
-        const cache = await caches.open(CACHE_NAME);
         await cache.put(request, response.clone());
       }
       return response;
@@ -62,6 +72,8 @@ async function staleWhileRevalidate(request) {
 
 self.addEventListener('install', (event) => {
   event.waitUntil(cacheStaticAssets());
+  // Activer immédiatement sans attendre que les anciens clients se ferment
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -78,12 +90,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
-  if (shouldBypassCache(url)) return;
+  if (shouldBypassCache(url, event.request)) return;
 
+  // Navigation HTML → toujours réseau, jamais de cache
   if (event.request.mode === 'navigate') {
-    event.respondWith(networkFirstNavigation(event.request));
+    event.respondWith(networkOnlyNavigation(event.request));
     return;
   }
 
+  // Assets statiques → stale-while-revalidate
   event.respondWith(staleWhileRevalidate(event.request));
-});
+});

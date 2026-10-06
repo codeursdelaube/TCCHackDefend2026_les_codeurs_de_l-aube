@@ -388,7 +388,8 @@
     "change_image": "Changer d'image",
     "select_capture": "Sélectionnez votre capture",
     "compatible_info": "Compatible avec l'appareil photo en direct et les images de votre galerie.",
-    "open_gallery": "Ouvrir l'appareil / Galerie",
+    "open_gallery": "Galerie",
+    "open_camera": "Appareil photo",
     "analyzing": "Analyse par IA",
     "identify": "Identifier le monument",
     "tts_stop": "Arrêter la lecture",
@@ -495,7 +496,13 @@
     "start_nav": "Lancer le guidage →",
     "other_treasures": "Autres trésors dans la région",
     "continue_explore": "Continuez votre exploration à proximité de {city}",
-    "card_discover": "Découvrir"
+    "card_discover": "Découvrir",
+    "vocal_narration": "Narration Vocale",
+    "listen_monument": "Écouter l'histoire du monument",
+    "reserve_guide_here": "Réserver un guide pour ce lieu",
+    "gps_coords": "Coordonnées GPS :",
+    "explore_link": "Explorer",
+    "map_loading_text": "Chargement de la carte interactive…"
   },
   "Cuisine": {
     "title": "Saveurs du Togo",
@@ -510,11 +517,13 @@
       "accompagnement": "Accompagnement",
       "plat_principal": "Plat Principal",
       "street_food": "Street Food",
-      "sauce": "Sauce"
+      "sauce": "Sauce",
+      "boisson": "Boisson Traditionnelle"
     },
     "know_more": "Savoir plus",
     "acc_prefix": "Acc. :",
     "back_to_cuisine": "Retour aux saveurs",
+    "back_mobile": "Retour",
     "cuisine_title": "Patrimoine Culinaire · Togo",
     "find_nearby": "Trouver à proximité",
     "origin_tradition": "Origine & Tradition",
@@ -1430,7 +1439,9 @@
     "report_sub": "Un problème avec ce profil ou un comportement inapproprié ? Signalez-le à l’équipe.",
     "report_success": "Signalement envoyé. Merci !",
     "report_guide": "Signaler ce guide",
-    "exchange_language": "Langue d’échange :"
+    "exchange_language": "Langue d’échange :",
+    "fav_added": "Guide ajouté aux favoris",
+    "fav_removed": "Guide retiré des favoris"
   },
   "TravelTools": {
     "drawer": {

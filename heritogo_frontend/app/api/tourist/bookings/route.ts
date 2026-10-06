@@ -48,14 +48,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error || !user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const auth = await requireUser()
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
+    const user = auth.user
 
     const { bookingId, action } = await request.json()
     if (typeof bookingId !== 'string' || action !== 'accept_quote') {
       return NextResponse.json({ error: 'Action invalide.' }, { status: 400 })
     }
+
 
     const booking = await prisma.booking.findFirst({ where: { id: bookingId, tourist_id: user.id } })
     if (!booking) return NextResponse.json({ error: 'Réservation introuvable.' }, { status: 404 })

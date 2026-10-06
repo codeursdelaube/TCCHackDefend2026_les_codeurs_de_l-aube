@@ -10,7 +10,7 @@ import {
   MapPin, Navigation, Pause, Play, Share2, ShieldCheck,
   ShoppingBag, Landmark, Sun, Utensils, Users, ArrowRight, Loader2,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import AuthGuardLink from '@/components/AuthGuardLink'
 import hotels from '@/app/nearbyhotels/hotels'
@@ -19,6 +19,7 @@ import { getSiteExtraDetails, SiteActivity } from '@/lib/constants/siteDetails'
 import StarRating from '@/components/ui/StarRating'
 import Badge from '@/components/ui/Badge'
 import { useDishes, usePlaces } from '@/hooks/useCatalog'
+import { findLocalPlace } from '@/lib/catalog/places'
 
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
@@ -67,10 +68,13 @@ type Tab = (typeof TABS)[number]
 
 export default function SiteDetailPage({ params }: PageProps) {
   const t = useTranslations('Lieux')
+  const locale = useLocale()
   const resolvedParams = use(params)
   const { places, loading: placesLoading } = usePlaces()
   const { dishes } = useDishes()
-  const site = places.find((item) => item.id === resolvedParams.id || item.slug === resolvedParams.id)
+  const site =
+    places.find((item) => item.id === resolvedParams.id || item.slug === resolvedParams.id) ||
+    findLocalPlace(resolvedParams.id, locale)
 
   const [activeTab, setActiveTab] = useState<Tab>('apercu')
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
@@ -149,7 +153,7 @@ export default function SiteDetailPage({ params }: PageProps) {
     similaires: t('tab_similaires'),
   }
 
-  if (placesLoading) {
+  if (!site && placesLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -256,7 +260,7 @@ export default function SiteDetailPage({ params }: PageProps) {
             className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-6 font-bold text-foreground transition hover:border-primary hover:text-primary active:scale-[0.98] shadow-xs"
           >
             <Users className="h-4 w-4 text-primary" />
-            <span>Réserver un guide pour ce lieu</span>
+            <span>{t('reserve_guide_here')}</span>
           </AuthGuardLink>
         </div>
 
@@ -283,19 +287,19 @@ export default function SiteDetailPage({ params }: PageProps) {
         ══════════════════════════════════════════════════ */}
         {activeTab === 'apercu' && (
           <div className="space-y-6">
-            {/* Audioguide TTS interactif */}
-            <div className="app-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5">
-              <div className="flex items-center gap-3.5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-sm shrink-0">
-                  <Headphones className="h-5 w-5" />
+            {/* Audioguide TTS interactif compact */}
+            <div className="app-card flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-xs shrink-0">
+                  <Headphones className="h-4 w-4" />
                 </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-primary">Narration Vocale</p>
-                  <p className="text-base font-bold text-foreground font-serif">Écouter l’histoire du monument</p>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-primary truncate">{t('vocal_narration')}</p>
+                  <p className="text-sm font-bold text-foreground font-serif truncate">{t('listen_monument')}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
                 {['fr-FR', 'en-US', 'es-ES'].map((l) => (
                   <button
                     key={l}
@@ -306,7 +310,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                         setIsPlayingAudio(false)
                       }
                     }}
-                    className={`rounded-xl px-2.5 py-1 text-xs font-bold cursor-pointer transition-all ${
+                    className={`rounded-lg px-2 py-1 text-[11px] font-bold cursor-pointer transition-all ${
                       selectedLang === l
                         ? 'bg-primary text-white shadow-xs'
                         : 'bg-card text-muted-foreground border border-border hover:border-primary/50'
@@ -316,10 +320,12 @@ export default function SiteDetailPage({ params }: PageProps) {
                   </button>
                 ))}
                 <button
+                  type="button"
                   onClick={toggleAudio}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white transition hover:scale-105 active:scale-95 cursor-pointer shadow-md ml-1"
+                  aria-label={isPlayingAudio ? 'Pause' : 'Play'}
+                  className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary text-white transition hover:scale-105 active:scale-95 cursor-pointer shadow-md ml-1 shrink-0"
                 >
-                  {isPlayingAudio ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current ml-0.5" />}
+                  {isPlayingAudio ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current ml-0.5" />}
                 </button>
               </div>
             </div>
@@ -593,7 +599,7 @@ export default function SiteDetailPage({ params }: PageProps) {
             </div>
 
             <div className="app-card flex items-center justify-between p-4 text-xs">
-              <span className="text-muted-foreground">Coordonnées GPS : <strong className="text-foreground">{siteLat.toFixed(5)}, {siteLng.toFixed(5)}</strong></span>
+              <span className="text-muted-foreground">{t('gps_coords')} <strong className="text-foreground">{siteLat.toFixed(5)}, {siteLng.toFixed(5)}</strong></span>
               <a
                 href={googleMapsUrl}
                 target="_blank"
@@ -644,7 +650,7 @@ export default function SiteDetailPage({ params }: PageProps) {
                     <div className="p-4 flex items-center justify-between border-t border-border">
                       <StarRating rating={pr.rating} count={pr.count} />
                       <span className="text-xs font-bold text-primary flex items-center gap-1">
-                        <span>Explorer</span>
+                        <span>{t('explore_link')}</span>
                         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                       </span>
                     </div>

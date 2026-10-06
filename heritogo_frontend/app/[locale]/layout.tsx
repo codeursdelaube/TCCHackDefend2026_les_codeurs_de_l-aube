@@ -222,6 +222,36 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               })();
           `}
         </Script>
+        <Script id="chunk-error-recovery" strategy="beforeInteractive">
+          {`
+            (function() {
+              window.addEventListener('error', function(e) {
+                if (e && e.message && (
+                  e.message.indexOf('Loading chunk') !== -1 ||
+                  e.message.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+                  e.message.indexOf('ChunkLoadError') !== -1
+                )) {
+                  if (!window.__heritogo_chunk_reloaded) {
+                    window.__heritogo_chunk_reloaded = true;
+                    window.location.reload();
+                  }
+                }
+              });
+              window.addEventListener('unhandledrejection', function(e) {
+                if (e && e.reason && e.reason.message && (
+                  e.reason.message.indexOf('Loading chunk') !== -1 ||
+                  e.reason.message.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+                  e.reason.message.indexOf('ChunkLoadError') !== -1
+                )) {
+                  if (!window.__heritogo_chunk_reloaded) {
+                    window.__heritogo_chunk_reloaded = true;
+                    window.location.reload();
+                  }
+                }
+              });
+            })();
+          `}
+        </Script>
         <meta name="theme-color" content="#1C2D52" />
         <meta name="google-site-verification" content="7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A" />
         <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />

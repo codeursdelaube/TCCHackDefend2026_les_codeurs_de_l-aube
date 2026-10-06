@@ -17,7 +17,8 @@ export default async function PlatDetailPage({ params }: PageProps) {
   const resolvedParams = await params
   const t = await getTranslations({ locale: resolvedParams.locale, namespace: 'Cuisine' })
   const tPlats = await getTranslations({ locale: resolvedParams.locale, namespace: 'Plats' })
-  const plat = await findPublishedDish(resolvedParams.id)
+  const decodedId = decodeURIComponent(resolvedParams.id)
+  const plat = await findPublishedDish(decodedId, resolvedParams.locale)
   if (!plat) notFound()
 
   const getCategoryName = (category: string): string => {
@@ -26,7 +27,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
       case 'Plat Principal': return t('categories.plat_principal')
       case 'Street Food': return t('categories.street_food')
       case 'Sauce': return t('categories.sauce')
-      case 'Boisson': return 'Boisson Traditionnelle'
+      case 'Boisson': return t('categories.boisson')
       default: return category
     }
   }
@@ -51,55 +52,54 @@ export default async function PlatDetailPage({ params }: PageProps) {
     : plat.accompaniments || ''
 
   return (
-    <main className="min-h-screen bg-background pb-28 pt-8 text-foreground">
-      {/* ── HERO BANNER ── */}
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="relative h-80 sm:h-96 md:h-[420px] w-full overflow-hidden rounded-3xl border border-border shadow-lg">
-          <Image
-            src={plat.image}
-            alt={platName}
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 1024px"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40" />
+    <main className="min-h-screen bg-background pb-28 text-foreground">
+      {/* ── HERO BANNER — plein bord sur mobile, encadré sur desktop ── */}
+      <div className="relative h-64 sm:h-80 md:h-[420px] w-full overflow-hidden sm:mx-auto sm:max-w-5xl sm:rounded-3xl sm:border sm:border-border sm:shadow-lg">
+        <Image
+          src={plat.image}
+          alt={platName}
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 1024px"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
-          {/* Top Bar inside Hero */}
-          <div className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between">
-            <Link
-              href="/cuisine"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-xs font-bold text-white backdrop-blur-md transition hover:scale-105 active:scale-95"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>{t('back_to_cuisine')}</span>
-            </Link>
-            <Badge variant="primary">{getCategoryName(plat.catégorie)}</Badge>
-          </div>
+        {/* Top Bar inside Hero */}
+        <div className="absolute left-3 right-3 top-3 z-10 flex items-center justify-between sm:left-4 sm:right-4 sm:top-4">
+          <Link
+            href="/cuisine"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md transition hover:scale-105 active:scale-95 sm:gap-2 sm:px-4 sm:py-2"
+          >
+            <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{t('back_to_cuisine')}</span>
+            <span className="sm:hidden">{t('back_mobile')}</span>
+          </Link>
+          <Badge variant="primary">{getCategoryName(plat.catégorie)}</Badge>
+        </div>
 
-          <div className="absolute bottom-6 left-6 right-6 z-10 text-white space-y-2">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-200">
-              <ChefHat className="h-4 w-4" />
-              <span>Gastronomie Togolaise Authentique</span>
-            </div>
-            <h1 className="font-serif text-3xl sm:text-5xl font-bold leading-tight text-[#FBF6EF] drop-shadow-sm">
-              {platName}
-            </h1>
+        <div className="absolute bottom-4 left-4 right-4 z-10 text-white space-y-1.5 sm:bottom-6 sm:left-6 sm:right-6 sm:space-y-2">
+          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-200 sm:text-xs">
+            <ChefHat className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>{t('togo_authentic')}</span>
           </div>
+          <h1 className="font-serif text-2xl font-bold leading-tight text-[#FBF6EF] drop-shadow-sm sm:text-4xl md:text-5xl">
+            {platName}
+          </h1>
         </div>
       </div>
 
       {/* ── CORPS DE LA FICHE ── */}
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
+      <div className="mx-auto max-w-5xl px-3 pt-4 pb-8 sm:px-6 sm:pt-6 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
           
-          <div className="space-y-6 lg:col-span-8">
+          <div className="order-last space-y-6 lg:col-span-8 lg:order-first">
             {/* Barre d'action rapide */}
-            <div className="app-card flex flex-wrap items-center justify-between gap-3 p-4">
+            <div className="app-card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <TTSButton text={`${platName}. ${platDescription}. ${platHistory}`} />
               <a
                 href="#restaurants"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all sm:w-auto"
               >
                 <Utensils className="h-4 w-4" />
                 <span>{t('find_nearby')}</span>
@@ -108,7 +108,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
 
             {/* Description générale */}
             <article className="app-card p-6 sm:p-8 space-y-3">
-              <h2 className="font-serif text-xl font-bold text-foreground">Saveurs &amp; Texture</h2>
+              <h2 className="font-serif text-xl font-bold text-foreground">{t('flavors_texture')}</h2>
               <p className="text-sm sm:text-base font-medium leading-relaxed text-muted-foreground">
                 {platDescription}
               </p>
@@ -176,7 +176,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                       <div className="space-y-1.5 text-xs text-muted-foreground border-t border-border pt-3">
                         <p className="flex items-start gap-1.5">
                           <MapPin className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
-                          <span className="truncate">{restaurant.adresse}</span>
+                          <span className="line-clamp-2">{restaurant.adresse}</span>
                         </p>
                         <p className="flex items-center gap-1.5 font-bold text-primary">
                           <Banknote className="h-3.5 w-3.5" />
@@ -234,27 +234,30 @@ export default async function PlatDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* ── ASIDE FICHE SYNTHÈSE ── */}
-          <aside className="app-card p-6 lg:col-span-4 lg:sticky lg:top-24 space-y-4">
-            <h2 className="font-serif text-lg font-bold text-foreground">{t('sheet_title')}</h2>
-            <div className="space-y-3 text-xs">
-              <div className="rounded-2xl border border-border bg-muted/40 p-3.5">
-                <p className="font-bold uppercase tracking-wider text-muted-foreground text-[10px]">{t('sheet.name')}</p>
-                <p className="mt-1 font-bold text-foreground font-serif text-sm">{platName}</p>
+          {/* ── ASIDE FICHE SYNTHÈSE — premier sur mobile en compact, colonne droite sur desktop ── */}
+          <aside className="order-first app-card p-4 sm:p-5 lg:col-span-4 lg:sticky lg:top-24 lg:order-last space-y-4">
+            <h2 className="font-serif text-base font-bold text-foreground lg:text-lg">{t('sheet_title')}</h2>
+
+            {/* Sur mobile : 3 colonnes côte à côte | Sur desktop : empilées */}
+            <div className="grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3 text-xs">
+              <div className="rounded-xl border border-border bg-muted/40 p-2.5 lg:rounded-2xl lg:p-3.5">
+                <p className="font-bold uppercase tracking-wider text-muted-foreground text-[9px] lg:text-[10px]">{t('sheet.name')}</p>
+                <p className="mt-1 font-bold text-foreground font-serif text-xs line-clamp-2 lg:text-sm">{platName}</p>
               </div>
-              <div className="rounded-2xl border border-border bg-muted/40 p-3.5">
-                <p className="font-bold uppercase tracking-wider text-muted-foreground text-[10px]">{t('sheet.category')}</p>
-                <p className="mt-1 font-bold text-foreground text-sm">{getCategoryName(plat.catégorie)}</p>
+              <div className="rounded-xl border border-border bg-muted/40 p-2.5 lg:rounded-2xl lg:p-3.5">
+                <p className="font-bold uppercase tracking-wider text-muted-foreground text-[9px] lg:text-[10px]">{t('sheet.category')}</p>
+                <p className="mt-1 font-bold text-foreground text-xs line-clamp-2 lg:text-sm">{getCategoryName(plat.catégorie)}</p>
               </div>
-              <div className="rounded-2xl border border-border bg-muted/40 p-3.5">
-                <p className="font-bold uppercase tracking-wider text-muted-foreground text-[10px]">{t('sheet.origin')}</p>
-                <p className="mt-1 font-bold text-foreground text-sm">{t('origin_country')}</p>
+              <div className="rounded-xl border border-border bg-muted/40 p-2.5 lg:rounded-2xl lg:p-3.5">
+                <p className="font-bold uppercase tracking-wider text-muted-foreground text-[9px] lg:text-[10px]">{t('sheet.origin')}</p>
+                <p className="mt-1 font-bold text-foreground text-xs line-clamp-2 lg:text-sm">{t('origin_country')}</p>
               </div>
             </div>
 
+            {/* CTA masqué sur mobile (déjà disponible dans la barre d'action) */}
             <a
               href="#restaurants"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
+              className="hidden lg:inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
             >
               <Utensils className="h-4 w-4" />
               <span>{t('view_restos')}</span>

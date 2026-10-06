@@ -5,6 +5,7 @@ import { mapPlace, resolveCatalogLocale } from '@/lib/catalog/map'
 import { ensurePlaceTranslationsColumn } from '@/lib/catalog/store'
 import { parsePlaceTranslations, placeCopyFromFrench, translatePlaceSingleLocale } from '@/lib/catalog/translate'
 import type { TranslatableLocale } from '@/lib/catalog/i18n'
+import { getLocalPlaces } from '@/lib/catalog/places'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,8 +67,10 @@ export async function GET(request: Request) {
       )
     }
 
+    const finalPlaces = places.length > 0 ? places.map((place) => mapPlace(place, locale)) : getLocalPlaces(locale)
+
     return NextResponse.json(
-      { places: places.map((place) => mapPlace(place, locale)) },
+      { places: finalPlaces },
       {
         headers: {
           'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=86400',
@@ -76,6 +79,7 @@ export async function GET(request: Request) {
     )
   } catch (error) {
     console.error('[GET /api/places]', error)
-    return NextResponse.json({ error: 'Impossible de charger les lieux.' }, { status: 500 })
+    const locale = resolveCatalogLocale(new URL(request.url).searchParams.get('locale'))
+    return NextResponse.json({ places: getLocalPlaces(locale) })
   }
 }
