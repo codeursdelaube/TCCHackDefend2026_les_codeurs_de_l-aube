@@ -17,7 +17,7 @@ class AuthSettings(BaseSettings):
         "http://localhost:3000,"
         "http://127.0.0.1:3000"
     )
-    environment: str = "production"
+    environment: str = "development"
     enable_embeddings_init: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
