@@ -181,7 +181,7 @@ def get_points_interet_proches(
     decouvertes = []
 
     for h in BASE_HOTEL:
-        dist = calcul_de_l_haversine(lat, long, h["lat"], h["long"])
+        dist = calcul_de_l_haversine(lat, long, h["latitude"], h["longitude"])
         if dist <= 5.0:
             h_data = h.copy()
             h_data["distance_km"] = dist
