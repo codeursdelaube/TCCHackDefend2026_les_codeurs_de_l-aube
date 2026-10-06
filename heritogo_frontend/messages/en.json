@@ -388,7 +388,8 @@
     "change_image": "Change image",
     "select_capture": "Select your capture",
     "compatible_info": "Compatible with live camera and gallery images.",
-    "open_gallery": "Open Camera / Gallery",
+    "open_gallery": "Gallery",
+    "open_camera": "Camera",
     "analyzing": "AI Analysis",
     "identify": "Identify Monument",
     "tts_stop": "Stop reading",
@@ -496,7 +497,13 @@
     "start_nav": "Start GPS navigation →",
     "other_treasures": "Other treasures in the region",
     "continue_explore": "Continue your exploration near {city}",
-    "card_discover": "Discover"
+    "card_discover": "Discover",
+    "vocal_narration": "Vocal Guide",
+    "listen_monument": "Listen to the monument story",
+    "reserve_guide_here": "Book a guide for this site",
+    "gps_coords": "GPS Coordinates:",
+    "explore_link": "Explore",
+    "map_loading_text": "Loading interactive map…"
   },
   "Cuisine": {
     "title": "Tastes of Togo",
@@ -511,11 +518,13 @@
       "accompagnement": "Side Dish",
       "plat_principal": "Main Dish",
       "street_food": "Street Food",
-      "sauce": "Sauce"
+      "sauce": "Sauce",
+      "boisson": "Traditional Drink"
     },
     "know_more": "Learn More",
     "acc_prefix": "Side:",
     "back_to_cuisine": "Back to Flavors",
+    "back_mobile": "Back",
     "cuisine_title": "Culinary Heritage · Togo",
     "find_nearby": "Find Nearby",
     "origin_tradition": "Origin & Tradition",
@@ -1431,7 +1440,9 @@
     "report_sub": "An issue with this profile or inappropriate behavior? Report it to the team.",
     "report_success": "Report sent. Thank you!",
     "report_guide": "Report this guide",
-    "exchange_language": "Spoken language:"
+    "exchange_language": "Spoken language:",
+    "fav_added": "Guide added to favorites",
+    "fav_removed": "Guide removed from favorites"
   },
   "TravelTools": {
     "drawer": {

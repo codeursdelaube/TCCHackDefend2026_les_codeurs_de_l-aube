@@ -93,10 +93,10 @@ export default function GuidesPage() {
     let updatedFavs = [...favIds]
     if (favIds.includes(guideId)) {
       updatedFavs = updatedFavs.filter(id => id !== guideId)
-      toast.info('Guide retiré des favoris')
+      toast.info(t('fav_removed'))
     } else {
       updatedFavs.push(guideId)
-      toast.success('Guide ajouté aux favoris')
+      toast.success(t('fav_added'))
     }
     setFavIds(updatedFavs)
     safeLocalStorageSet('heritogo_favorites', JSON.stringify(updatedFavs))

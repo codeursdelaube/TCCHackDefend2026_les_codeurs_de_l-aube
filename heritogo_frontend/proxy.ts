@@ -5,99 +5,120 @@ import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
-export default async function proxy(request: NextRequest) {
-  const response = NextResponse.next({ request })
+// Routes publiques → pas d'appel Supabase nécessaire
+const PUBLIC_PREFIXES = [
+  '/cuisine',
+  '/lieux',
+  '/histoire',
+  '/loisirs',
+  '/scan',
+  '/offline',
+  '/auth/callback',
+  '/auth/confirm',
+  '/auth/reset-password',
+  '/auth/error',
+]
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            response.cookies.set(name, value, {
-              ...options,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              maxAge: 60 * 60 * 24 * 7,
-              path: '/',
-            })
-          })
-        },
-      },
-    }
-  )
+// Routes qui nécessitent une vérification de session
+const PROTECTED_PREFIXES = ['/dashboard', '/booking', '/guides']
+const LOGIN_PREFIXES = ['/auth/login', '/auth/register', '/auth/forgot-password']
 
-  // UN SEUL appel — rafraîchit le token ET récupère l'user
-  const { data: { user } } = await supabase.auth.getUser()
-
+function extractLocaleAndPath(pathname: string): { locale: string; pathWithoutLocale: string } {
   const locales = ['fr', 'en', 'es', 'zh']
-  const pathname = request.nextUrl.pathname
-
-  let pathWithoutLocale = pathname
-  let currentLocale = 'fr'
   for (const locale of locales) {
     if (pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`) {
-      pathWithoutLocale = pathname.replace(`/${locale}`, '') || '/'
-      currentLocale = locale
-      break
+      return {
+        locale,
+        pathWithoutLocale: pathname.replace(`/${locale}`, '') || '/',
+      }
     }
+  }
+  return { locale: 'fr', pathWithoutLocale: pathname }
+}
+
+export default async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+  const { locale: currentLocale, pathWithoutLocale } = extractLocaleAndPath(pathname)
+
+  // ── Fast path : routes publiques → i18n directement, sans appel Supabase ──────
+  // Cela évite les timeouts Edge qui causent des 404 intermittents en production
+  const isPublic = PUBLIC_PREFIXES.some((p) => pathWithoutLocale.startsWith(p))
+  if (isPublic) {
+    return intlMiddleware(request)
   }
 
   const isRoot = pathWithoutLocale === '/' || pathWithoutLocale === ''
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathWithoutLocale.startsWith(p))
+  const isLoginOrRegister = LOGIN_PREFIXES.some(
+    (p) => pathWithoutLocale === p || pathWithoutLocale.startsWith(`${p}/`)
+  )
 
-  // Accueil avec session -> profil/dashboard, accueil public sinon
-  if (user && isRoot) {
-    return NextResponse.redirect(
-      new URL(`/${currentLocale}/dashboard`, request.url)
-    )
+  // Routes qui n'ont pas besoin d'auth check → passer directement à i18n
+  if (!isRoot && !isProtected && !isLoginOrRegister) {
+    return intlMiddleware(request)
   }
 
+  // ── Appel Supabase uniquement pour root / pages protégées / login ────────────
+  const response = NextResponse.next({ request })
 
-  // Pages login/register : rediriger vers dashboard si déjà connecté
-  const loginRegisterPaths = [
-    '/auth/login',
-    '/auth/register',
-    '/auth/forgot-password',
-  ]
-  const isLoginOrRegister = loginRegisterPaths.some(p =>
-    pathWithoutLocale === p || pathWithoutLocale.startsWith(`${p}/`)
-  )
+  let user = null
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value)
+              response.cookies.set(name, value, {
+                ...options,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 60 * 60 * 24 * 7,
+                path: '/',
+              })
+            })
+          },
+        },
+      }
+    )
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch {
+    // Si Supabase est indisponible : fail-open sur les routes non protégées
+    // Les routes protégées redirigent vers login par sécurité
+    if (isProtected) {
+      const loginUrl = new URL(`/${currentLocale}/auth/login`, request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
+
+  // Accueil avec session → dashboard
+  if (user && isRoot) {
+    return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, request.url))
+  }
 
   // Connecté sur login/register → dashboard
   if (user && isLoginOrRegister) {
-    return NextResponse.redirect(
-      new URL(`/${currentLocale}/dashboard`, request.url)
-    )
+    return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, request.url))
   }
-  // /auth/callback, /auth/confirm, /auth/reset-password restent
-  // toujours accessibles (pas de redirection) pour éviter les boucles.
 
-  // Guides, réservation et dashboards : connexion obligatoire
-  const protectedPaths = [
-    '/dashboard',
-    '/booking',
-    '/guides',
-  ]
-  const isProtected = protectedPaths.some(p =>
-    pathWithoutLocale.startsWith(p)
-  )
-
+  // Non connecté sur route protégée → login
   if (!user && isProtected) {
     const loginUrl = new URL(`/${currentLocale}/auth/login`, request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  // Appliquer i18n et propager les cookies de session
+  // ── Appliquer i18n et propager les cookies de session ───────────────────────
   const intlResponse = intlMiddleware(request)
-
-  response.cookies.getAll().forEach(cookie => {
+  response.cookies.getAll().forEach((cookie) => {
     intlResponse.cookies.set(cookie.name, cookie.value)
   })
 
@@ -105,8 +126,14 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
- 
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
-
-
+  matcher: [
+    /*
+     * Intercepter toutes les routes SAUF :
+     * - /api/*       → routes API Next.js
+     * - /_next/*     → assets statiques Next.js (JS, CSS, images optimisées)
+     * - /_vercel/*   → infra Vercel interne
+     * - /.*\..*      → fichiers avec extension (favicon.ico, manifest.json…)
+     */
+    '/((?!api|_next|_vercel|.*\\..*).*)',
+  ],
 }
