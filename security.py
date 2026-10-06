@@ -25,7 +25,7 @@ class AuthSettings(BaseSettings):
 
 auth_settings = AuthSettings()
 
-if not auth_settings.api_secret_key or len(auth_settings.api_secret_key) < 16:
+if not auth_settings.api_secret_key or len(auth_settings.api_secret_key) > 16:
     raise RuntimeError("API_SECRET_KEY doit contenir au moins 16 caractères.")
 
 API_KEY_HEADER_NAME = "herit"
