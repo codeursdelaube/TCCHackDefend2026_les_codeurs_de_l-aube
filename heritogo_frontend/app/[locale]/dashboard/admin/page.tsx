@@ -9,10 +9,12 @@ import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/utils/http'
+import { getUserFriendlyError } from '@/lib/utils/errors'
 import { 
   ShieldCheck, Users, AlertTriangle, MessageSquare, History, 
-  Loader2, FileText, Ban, EyeOff, Eye, ExternalLink 
+  Loader2, FileText, Ban, EyeOff, Eye, Star, Landmark, Utensils
 } from 'lucide-react'
+import CatalogManager from '@/components/admin/CatalogManager'
 
 interface PendingGuide {
   id: string
@@ -27,7 +29,7 @@ interface PendingGuide {
     id: string
     type: string
     label: string
-    file_url: string
+    file_name?: string
   }[]
 }
 
@@ -92,7 +94,7 @@ export default function AdminDashboardPage() {
   const searchParams = useSearchParams()
   const t = useTranslations('Dashboard')
 
-  const [activeTab, setActiveTab] = useState<'pending' | 'reports' | 'reviews' | 'logs'>('pending')
+  const [activeTab, setActiveTab] = useState<'pending' | 'reports' | 'reviews' | 'logs' | 'places' | 'dishes'>('pending')
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -104,10 +106,14 @@ export default function AdminDashboardPage() {
       setActiveTab('reviews')
     } else if (tab === 'logs') {
       setActiveTab('logs')
+    } else if (tab === 'places') {
+      setActiveTab('places')
+    } else if (tab === 'dishes') {
+      setActiveTab('dishes')
     }
   }, [searchParams])
 
-  const handleTabChange = (tabName: 'pending' | 'reports' | 'reviews' | 'logs') => {
+  const handleTabChange = (tabName: 'pending' | 'reports' | 'reviews' | 'logs' | 'places' | 'dishes') => {
     setActiveTab(tabName)
     startTransition(() => {
       let newTabParam = tabName === 'pending' ? 'guides' : tabName
@@ -134,19 +140,37 @@ export default function AdminDashboardPage() {
 
   const checkAccess = async () => {
     setLoading(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      window.location.href = `/${params.locale}/auth/login`
-      return
+    try {
+      const supabase = createClient()
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        window.location.href = `/${params.locale}/auth/login`
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError) {
+        alert(getUserFriendlyError(profileError))
+        setLoading(false)
+        return
+      }
+
+      if (profile?.role !== 'admin') {
+        window.location.href = `/${params.locale}/dashboard`
+        return
+      }
+      setIsAdmin(true)
+      await loadAdminData()
+    } catch (err: unknown) {
+      console.error('Erreur acces admin:', err)
+      alert(getUserFriendlyError(err))
+      setLoading(false)
     }
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (profile?.role !== 'admin') {
-      window.location.href = `/${params.locale}/dashboard`
-      return
-    }
-    setIsAdmin(true)
-    await loadAdminData()
   }
 
   const loadAdminData = async () => {
@@ -350,6 +374,8 @@ export default function AdminDashboardPage() {
       {/* Tab Switcher */}
       <div className="flex border-b border-border mb-8 overflow-x-auto gap-4">
         {[
+          { id: 'places', label: 'Lieux', icon: Landmark },
+          { id: 'dishes', label: 'Plats', icon: Utensils },
           { id: 'pending', label: t('admin.tab_validation'), icon: ShieldCheck },
           { id: 'reports', label: t('admin.tab_reports'), icon: AlertTriangle },
           { id: 'reviews', label: t('admin.tab_reviews'), icon: MessageSquare },
@@ -376,6 +402,9 @@ export default function AdminDashboardPage() {
 
       {/* Main Tab Content */}
       <div className="space-y-6">
+
+        {activeTab === 'places' && <CatalogManager kind="places" />}
+        {activeTab === 'dishes' && <CatalogManager kind="dishes" />}
 
         {/* Tab 1: Validation of Guides */}
         {activeTab === 'pending' && (
@@ -409,15 +438,13 @@ export default function AdminDashboardPage() {
                           <span className="block text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('admin.docs_provided')}</span>
                           <div className="flex flex-wrap gap-2">
                             {g.documents.map(doc => (
-                              <a 
+                              <span
                                 key={doc.id}
-                                href={doc.file_url}
-                                download={`${doc.label.replace(/\s+/g, '_') || 'document'}.pdf`}
-                                className="badge bg-base-100 border-border text-base-content hover:border-primary py-3 px-3 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-semibold"
+                                className="badge bg-base-100 border-border text-base-content py-3 px-3 rounded-lg text-xs flex items-center gap-1.5 font-semibold"
                               >
                                 <FileText className="h-3.5 w-3.5 text-base-content/40" />
-                                {doc.label} ({t('admin.download_pdf')}) <ExternalLink className="h-3 w-3 shrink-0 text-base-content/30" />
-                              </a>
+                                {doc.label} (KYC prestataire)
+                              </span>
                             ))}
                           </div>
                         </div>
@@ -447,7 +474,7 @@ export default function AdminDashboardPage() {
             {/* List of all guides */}
             <div className="border-t border-border/55 pt-6">
               <h3 className="font-serif text-lg font-bold mb-4">{t('admin.manage_guides')}</h3>
-              <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
+              <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
                 <table className="table w-full text-xs font-semibold">
                   <thead>
                     <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
@@ -582,7 +609,7 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 text-amber-500">
                           {Array.from({ length: r.rating_overall }).map((_, i) => (
-                            <span key={i}>★</span>
+                            <Star key={i} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                           ))}
                         </div>
                         <span className="text-[10px] text-base-content/40 font-bold">{new Date(r.created_at).toLocaleDateString()}</span>
@@ -637,7 +664,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-4">
             <h3 className="font-serif text-lg font-bold mb-2">{t('admin.logs_title')}</h3>
             
-            <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
+            <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
               <table className="table w-full text-xs font-semibold">
                 <thead>
                   <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
@@ -674,7 +701,7 @@ export default function AdminDashboardPage() {
       {/* Reject Guide Modal */}
       {rejectionGuideId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-4">
             <h3 className="font-serif text-xl font-bold text-base-content">{t('admin.reject_modal_title')}</h3>
             <p className="text-xs text-base-content/60">
               {t('admin.reject_modal_subtitle')}
@@ -712,7 +739,7 @@ export default function AdminDashboardPage() {
       {/* Hide Review Modal */}
       {hideReviewId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-4">
             <h3 className="font-serif text-xl font-bold text-base-content">{t('admin.hide_modal_title')}</h3>
             <p className="text-xs text-base-content/60">
               {t('admin.hide_modal_subtitle')}

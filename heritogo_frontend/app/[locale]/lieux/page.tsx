@@ -1,21 +1,44 @@
-﻿'use client'
+'use client'
 
 import { useState, useTransition } from 'react'
-import Image from 'next/image'
-import { ArrowRight, Compass, Filter, MapPin, Search, Sparkles } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import {
+  Compass,
+  Filter,
+  LayoutGrid,
+  Map as MapIcon,
+  MapPin,
+  Search,
+  Sparkles,
+  Loader2,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
-import { Monument, monuments } from '@/app/LieuxT/site'
+import SiteCard from '@/components/ui/SiteCard'
+import { usePlaces } from '@/hooks/useCatalog'
+import type { CatalogPlace } from '@/lib/catalog/types'
+
+const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-96 w-full flex-col items-center justify-center gap-3 rounded-3xl border border-border bg-card animate-pulse">
+      <MapPin className="h-8 w-8 text-primary animate-bounce" />
+      <span className="text-xs font-semibold text-muted-foreground">
+        {/* map loading text - handled after t() is available */}
+        Chargement de la carte interactive du Togo…
+      </span>
+    </div>
+  ),
+})
 
 const regionsTogo = ['all', 'Maritime', 'Plateaux', 'Centrale', 'Kara', 'Savanes'] as const
-
 type RegionFilter = (typeof regionsTogo)[number]
 
 export default function ToutPage() {
   const t = useTranslations('Lieux')
-  const tMonuments = useTranslations('Monuments')
+  const { places, loading } = usePlaces()
   const [searchInput, setSearchInput] = useState('')
   const [selectedRegion, setSelectedRegion] = useState<RegionFilter>('all')
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
   const [, startTransition] = useTransition()
 
   const getRegionName = (region: string): string => {
@@ -30,130 +53,165 @@ export default function ToutPage() {
     }
   }
 
-  const filteredSites = monuments.filter((site: Monument) => {
-    const siteName = tMonuments(`${site.id}.nom`).toLowerCase()
-    const siteDescription = tMonuments(`${site.id}.description`).toLowerCase()
+  const filteredSites = places.filter((site: CatalogPlace) => {
+    const siteName = site.nom.toLowerCase()
+    const siteDescription = site.description.toLowerCase()
     const search = searchInput.toLowerCase()
-    const matchesSearch = siteName.includes(search) || siteDescription.includes(search) || site.localite.toLowerCase().includes(search)
+    const matchesSearch =
+      siteName.includes(search) ||
+      siteDescription.includes(search) ||
+      site.localite.toLowerCase().includes(search)
     const matchesRegion = selectedRegion === 'all' || site.région === selectedRegion
     return matchesSearch && matchesRegion
   })
 
   return (
-    <main className="min-h-screen bg-base-100 px-3 pb-28 pt-24 text-base-content sm:px-6 lg:px-8 w-full overflow-hidden">
-      <section className="mx-auto max-w-7xl">
-        <div className="grid gap-4 sm:gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(22rem,1.08fr)] lg:items-stretch">
-          
-          {/* Bloc d'introduction */}
-          <div className="overflow-hidden rounded-[28px] border border-border bg-base-200 p-5 shadow-sm sm:rounded-[32px] sm:p-7 lg:min-h-[18rem]">
-            <div className="mb-4 inline-flex max-w-full items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:text-[11px]">
-              <Compass className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('hero_badge')}</span>
+    <main className="min-h-screen bg-background px-3 pb-28 pt-8 text-foreground sm:px-6 lg:px-8 w-full">
+      <div className="mx-auto max-w-7xl space-y-8">
+        
+        {/* ── HEADER & SEARCH BAR ── */}
+        <section className="app-card relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-card via-card to-primary/5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+                <Compass className="h-4 w-4" />
+                <span>{t('hero_badge')}</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
+                {t('title')}
+              </h1>
+              <div className="togo-underline" />
+              <p className="text-sm sm:text-base font-medium leading-relaxed text-muted-foreground pt-1">
+                {t('subtitle')}
+              </p>
             </div>
-            
-            <h1 className="max-w-3xl text-2xl sm:text-4xl lg:text-6xl font-black leading-tight tracking-normal text-base-content">
-              {t('title')}
-            </h1>
-            <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-base-content/65 sm:text-base">{t('subtitle')}</p>
-          </div>
 
-          {/* Bloc de recherche et Filtres */}
-          <div className="rounded-[28px] border border-border bg-base-200 p-4 shadow-sm sm:rounded-[32px] lg:self-end w-full max-w-full overflow-hidden">
-            <label className="relative flex min-h-14 items-center rounded-[22px] border border-border bg-base-100 px-4 transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/15 sm:rounded-[24px]">
-              <Search className="h-5 w-5 shrink-0 text-base-content/40" />
-              <input
-                type="search"
-                value={searchInput}
-                onChange={(event) => startTransition(() => setSearchInput(event.target.value))}
-                placeholder={t('search_placeholder')}
-                className="min-w-0 flex-1 bg-transparent px-3 text-sm font-semibold outline-hidden placeholder:text-base-content/38"
-              />
-            </label>
+            {/* Search Input & View Mode Switch */}
+            <div className="w-full lg:w-96 space-y-3">
+              <div className="relative flex items-center rounded-2xl border border-border bg-card px-3.5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={searchInput}
+                  onChange={(e) => startTransition(() => setSearchInput(e.target.value))}
+                  placeholder={t('search_placeholder')}
+                  className="min-h-12 w-full bg-transparent px-3 text-sm font-medium outline-none placeholder:text-muted-foreground"
+                />
+              </div>
 
-            <div className="mt-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-wide text-base-content/50">
-              <Filter className="h-3.5 w-3.5 shrink-0 text-secondary" />
-              {t('filter_region')}
-            </div>
-            
-            <div className="mt-3 flex w-full max-w-full gap-2 overflow-x-auto pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible">
-              {regionsTogo.map((region) => {
-                const active = selectedRegion === region
-                return (
+              {/* View Toggle */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {filteredSites.length} {t('sites_found', { count: filteredSites.length, s: filteredSites.length > 1 ? 's' : '' })}
+                </span>
+
+                <div className="flex items-center rounded-xl border border-border bg-card p-1">
                   <button
-                    key={region}
                     type="button"
-                    onClick={() => setSelectedRegion(region)}
-                    className={`min-h-11 shrink-0 rounded-2xl border px-4 text-xs font-black transition-all active:scale-95 cursor-pointer ${
-                      active
-                        ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
-                        : 'border-border bg-base-100 text-base-content/65 hover:border-secondary/50'
+                    onClick={() => setViewMode('grid')}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition-colors ${
+                      viewMode === 'grid'
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    {getRegionName(region)}
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                    <span>{t('grid_view')}</span>
                   </button>
-                )
-              })}
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('map')}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition-colors ${
+                      viewMode === 'map'
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <MapIcon className="h-3.5 w-3.5" />
+                    <span>{t('map_view')}</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {searchInput && (
-          <p className="mt-5 rounded-2xl bg-base-200 px-4 py-3 text-sm font-semibold text-base-content/55">
-            {t('results_for')} <span className="text-secondary">{searchInput}</span>
-          </p>
-        )}
-
-        {/* Liste des monuments */}
-        {filteredSites.length === 0 ? (
-          <div className="mx-auto mt-8 max-w-md rounded-[28px] border border-border bg-base-200 p-8 text-center shadow-sm sm:rounded-[32px]">
-            <Sparkles className="mx-auto h-8 w-8 text-secondary" />
-            <p className="mt-4 text-lg font-black">{t('no_sites')}</p>
-            <p className="mt-2 text-sm font-medium text-base-content/55">{t('try_other')}</p>
-          </div>
-        ) : (
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            {filteredSites.map((site, index) => {
-              const featured = index === 0
+          {/* Region Chips */}
+          <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+            <span className="text-xs font-bold text-muted-foreground mr-1 flex items-center gap-1">
+              <Filter className="h-3 w-3" />
+              <span>{t('regions_label')}</span>
+            </span>
+            {regionsTogo.map((rf) => {
+              const active = selectedRegion === rf
               return (
-                <Link
-                  key={site.id}
-                  href={`/lieux/${site.id}`}
-                  className={`group flex min-w-0 overflow-hidden rounded-[28px] border border-border bg-base-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:rounded-[32px] ${featured ? 'lg:col-span-2 lg:row-span-2' : ''}`}
+                <button
+                  key={rf}
+                  type="button"
+                  onClick={() => startTransition(() => setSelectedRegion(rf))}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                    active
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'border border-border bg-card text-foreground hover:border-primary/50'
+                  }`}
                 >
-                  <article className="flex min-w-0 flex-1 flex-col w-full">
-                    <figure className={`${featured ? 'h-56 sm:h-72 lg:h-[28rem]' : 'h-48 sm:h-52'} relative shrink-0 overflow-hidden bg-base-300`}>
-                      <Image 
-                        src={site.image} 
-                        alt={tMonuments(`${site.id}.nom`)} 
-                        fill 
-                        placeholder="blur" 
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" 
-                        className="object-cover transition-transform duration-700 group-hover:scale-105" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/15 to-transparent" />
-                      <span className="absolute right-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-2xl bg-secondary px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-secondary-content sm:right-4 sm:top-4">
-                        {getRegionName(site.région)}
-                      </span>
-                    </figure>
-                    <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
-                      <h2 className="line-clamp-2 text-lg font-black leading-tight tracking-normal text-base-content group-hover:text-secondary sm:text-xl">{tMonuments(`${site.id}.nom`)}</h2>
-                      <p className="mt-3 inline-flex w-fit max-w-full items-center gap-1.5 rounded-2xl border border-border bg-base-100 px-3 py-1.5 text-xs font-bold text-base-content/65">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-secondary" />
-                        <span className="truncate">{site.localite}</span>
-                      </p>
-                      <p className="mt-3 line-clamp-3 text-sm font-medium leading-6 text-base-content/60">{tMonuments(`${site.id}.description`)}</p>
-                      <span className="mt-auto pt-5 inline-flex items-center gap-2 text-sm font-black text-secondary">
-                        {t('discover')}
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </span>
-                    </div>
-                  </article>
-                </Link>
+                  {getRegionName(rf)}
+                </button>
               )
             })}
           </div>
+        </section>
+
+        {/* ── CONTENT (GRID OR MAP) ── */}
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : viewMode === 'map' ? (
+          <section className="app-card overflow-hidden p-2 sm:p-4">
+            <div className="overflow-hidden rounded-2xl border border-border">
+              <DynamicCarte monumentsList={filteredSites} />
+            </div>
+          </section>
+        ) : (
+          <section>
+            {filteredSites.length === 0 ? (
+              <div className="app-card flex flex-col items-center justify-center p-12 text-center space-y-3">
+                <Compass className="h-10 w-10 text-primary opacity-60" />
+                <h3 className="font-serif text-xl font-bold">{t('empty_title')}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground max-w-md">
+                  {t('empty_desc')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput('')
+                    setSelectedRegion('all')
+                  }}
+                  className="mt-2 inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark"
+                >
+                  {t('reset_filters')}
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredSites.map((site, index) => (
+                  <SiteCard
+                    key={site.id}
+                    id={site.id}
+                    nom={site.nom}
+                    region={site.région}
+                    localite={site.localite}
+                    description={site.description}
+                    image={site.image}
+                    isUnesco={site.isUnesco}
+                    priority={index < 3}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
         )}
-      </section>
+      </div>
     </main>
   )
 }

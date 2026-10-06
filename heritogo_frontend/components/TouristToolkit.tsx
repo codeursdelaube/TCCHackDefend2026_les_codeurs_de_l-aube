@@ -1,0 +1,261 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  AlertCircle, ArrowRight, Bus, Calculator, Check, ChevronRight,
+  Compass, DollarSign, HeartHandshake, HelpCircle, Info,
+  Languages, MapPin, Phone, PhoneCall, ShieldAlert, X, Zap
+} from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
+
+const EMERGENCY_CONTACTS = [
+  { name: 'Police Nationale', number: '117', desc: 'Secours & assistance sécurité 24/7' },
+  { name: 'Sapeurs-Pompiers', number: '118', desc: 'Incendies, secours d’urgence & sauvetage' },
+  { name: 'Gendarmerie Nationale', number: '172', desc: 'Sécurité routière & zones interurbaines' },
+  { name: 'SAMU / Urgences CHU Sylvanus Olympio', number: '+228 22 21 25 01', desc: 'Urgences médicales Lomé' },
+  { name: 'Assistance Tourisme Togo', number: '+228 22 21 43 13', desc: 'Direction Générale du Tourisme' },
+]
+
+const SURVIVAL_VOCABULARY = [
+  { fr: 'Bienvenue', ewe: 'Wôézo', kabye: 'Kazaou', tip: 'À dire et entendre partout' },
+  { fr: 'Bonjour (matin)', ewe: 'Ndi na wò', kabye: 'Ŋgɔnɔɔ', tip: 'Salutation matinale' },
+  { fr: 'Comment ça va ?', ewe: 'Efɔa ?', kabye: 'Ɛzɩmwaa ?', tip: 'Réponse : Efɔ nyuie (Je vais bien)' },
+  { fr: 'Merci beaucoup', ewe: 'Akpé kaaka', kabye: 'Esɔ sɛ', tip: 'Politesse très appréciée' },
+  { fr: 'Combien ça coûte ?', ewe: 'Nényé wònye ?', kabye: 'Pɩkɛ ɛzɩmta ?', tip: 'Indispensable au marché' },
+  { fr: 'C’est trop cher !', ewe: 'Ega la sɔgbɔ !', kabye: 'Pɩlɩɩ kpem !', tip: 'Pour négocier avec le sourire' },
+  { fr: 'Au revoir', ewe: 'Mia dogo', kabye: 'Dɩkaatɩ', tip: 'À bientôt' },
+]
+
+const TRANSPORT_TIPS = [
+  {
+    mode: 'Zémidjan (Zem)',
+    icon: <MapPin className="h-6 w-6 text-primary" />,
+    desc: 'Moto-taxi avec gilet jaune ou numéroté.',
+    price: '200 à 600 FCFA',
+    tip: 'Négociez le prix avant de monter en indiquant clairement votre destination.'
+  },
+  {
+    mode: 'Taxi collectif de ville',
+    icon: <Compass className="h-6 w-6 text-primary" />,
+    desc: 'Taxis jaunes urbains à Lomé.',
+    price: '300 à 500 FCFA / course',
+    tip: 'Idéal pour les longs trajets sur les grands axes.'
+  },
+  {
+    mode: 'Bus & Minibus Interurbains',
+    icon: <Bus className="h-6 w-6 text-primary" />,
+    desc: 'Gares routières d’Agbalépédogan, Kpalimé, Sokodé.',
+    price: '2 500 à 10 000 FCFA',
+    tip: 'Privilégiez les départs matinaux (6h-8h) pour voyager au frais.'
+  }
+]
+
+export default function TouristToolkit() {
+  const t = useTranslations('TravelTools.toolkit')
+  const [activeTab, setActiveTab] = useState<'convertisseur' | 'lexique' | 'transport' | 'urgence'>('convertisseur')
+  const [eurAmount, setEurAmount] = useState<string>('10')
+  const [fcfaAmount, setFcfaAmount] = useState<string>('6500')
+
+  // Taux officiel : 1 EUR = 655.957 XOF / FCFA
+  const RATE_EUR_FCFA = 655.957
+
+  const handleEurChange = (val: string) => {
+    setEurAmount(val)
+    const num = parseFloat(val)
+    if (!isNaN(num)) {
+      setFcfaAmount(Math.round(num * RATE_EUR_FCFA).toString())
+    } else {
+      setFcfaAmount('')
+    }
+  }
+
+  const handleFcfaChange = (val: string) => {
+    setFcfaAmount(val)
+    const num = parseFloat(val)
+    if (!isNaN(num)) {
+      setEurAmount((num / RATE_EUR_FCFA).toFixed(2))
+    } else {
+      setEurAmount('')
+    }
+  }
+
+  return (
+    <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-border border-border pb-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
+            <Compass className="h-4 w-4" />
+            <span>{t('kicker')}</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-serif font-bold text-foreground mt-1">
+            {t('title')}
+          </h2>
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setActiveTab('convertisseur')}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'convertisseur'
+                ? 'bg-primary text-white shadow-xs'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <DollarSign className="h-3.5 w-3.5" /> {t('tab_currency')}
+          </button>
+          <button
+            onClick={() => setActiveTab('lexique')}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'lexique'
+                ? 'bg-primary text-white shadow-xs'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Languages className="h-3.5 w-3.5" /> {t('tab_lexicon')}
+          </button>
+          <button
+            onClick={() => setActiveTab('transport')}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'transport'
+                ? 'bg-primary text-white shadow-xs'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Bus className="h-3.5 w-3.5" /> {t('tab_transport')}
+          </button>
+          <button
+            onClick={() => setActiveTab('urgence')}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'urgence'
+                ? 'bg-primary text-white shadow-xs'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Phone className="h-3.5 w-3.5" /> {t('tab_emergency')}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Onglet CONVERTISSEUR DEVISES ── */}
+      {activeTab === 'convertisseur' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('eur_label')}</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={eurAmount}
+                  onChange={(e) => handleEurChange(e.target.value)}
+                  className="w-full bg-card rounded-xl border border-border px-3.5 py-2.5 text-lg font-black text-foreground outline-none focus:border-border"
+                  placeholder="0.00"
+                />
+                <span className="font-bold text-sm text-muted-foreground">EUR</span>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-secondary p-4 space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('fcfa_label')}</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={fcfaAmount}
+                  onChange={(e) => handleFcfaChange(e.target.value)}
+                  className="w-full bg-card rounded-xl border border-border px-3.5 py-2.5 text-lg font-black text-primary outline-none focus:border-border"
+                  placeholder="0"
+                />
+                <span className="font-bold text-sm text-muted-foreground">XOF</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-primary border border-border p-3.5 flex items-center justify-between text-xs text-foreground">
+            <span className="flex items-center gap-2"><Info className="h-4 w-4 shrink-0" /><span>{t('rate_info')}</span></span>
+            <span className="font-bold text-primary shrink-0 ml-2">{t('rate_fixed')}</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Onglet PARLER LOCAL (LEXIQUE ÉWÉ / KABYÈ) ── */}
+      {activeTab === 'lexique' && (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            {t('lexicon_intro')}
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {SURVIVAL_VOCABULARY.map((item, i) => (
+              <div key={i} className="rounded-2xl border border-border bg-secondary p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-foreground">{item.fr}</span>
+                  <span className="text-[10px] text-muted-foreground italic">{item.tip}</span>
+                </div>
+                <div className="flex items-center gap-3 pt-1 border-t border-border border-border text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-primary">{t('ewe_label')} : </span>
+                    <strong className="text-foreground">{item.ewe}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-primary">{t('kabye_label')} : </span>
+                    <strong className="text-foreground">{item.kabye}</strong>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Onglet TRANSPORTS ── */}
+      {activeTab === 'transport' && (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {TRANSPORT_TIPS.map((tr, i) => (
+            <div key={i} className="rounded-2xl border border-border bg-secondary p-4 space-y-2 flex flex-col justify-between">
+              <div>
+                <div className="text-2xl mb-1">{tr.icon}</div>
+                <h3 className="font-bold text-sm text-foreground">{tr.mode}</h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{tr.desc}</p>
+              </div>
+              <div className="pt-2 border-t border-border border-border space-y-1">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground">{t('avg_fare')}</span>
+                  <strong className="text-primary">{tr.price}</strong>
+                </div>
+                <p className="text-[10px] text-foreground italic bg-card p-2 rounded-lg border border-border">
+                  <span className="flex gap-1.5"><Info className="mt-0.5 h-3 w-3 shrink-0" />{tr.tip}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Onglet URGENCES ── */}
+      {activeTab === 'urgence' && (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            {t('emergency_intro')}
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {EMERGENCY_CONTACTS.map((c, i) => (
+              <a
+                key={i}
+                href={`tel:${c.number.replace(/\s+/g, '')}`}
+                className="flex items-center justify-between rounded-2xl border border-border bg-secondary p-3.5 hover:border-border hover:bg-card transition-all group"
+              >
+                <div>
+                  <p className="font-bold text-xs text-foreground">{c.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{c.desc}</p>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-black text-white shrink-0 group-hover:scale-105 transition-transform">
+                  <PhoneCall className="h-3.5 w-3.5" />
+                  <span>{c.number}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}

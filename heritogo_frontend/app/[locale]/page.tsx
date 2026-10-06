@@ -2,594 +2,496 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowRight, BadgeCheck, BookOpenText, CalendarDays,
-  Check, Crown, Landmark, Languages, Mail,
-  MapPin, Megaphone, Palette, Scan, Star, Users, Utensils, WifiOff,
-  ChevronLeft, ChevronRight,
+  ArrowRight,
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  Compass,
+  Globe2,
+  Headphones,
+  Landmark,
+  MapPin,
+  Sparkles,
+  TreePine,
+  Users,
+  Utensils,
+  Wifi,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import AuthGuardLink from '@/components/AuthGuardLink'
 
-/* ─── Types ─────────────────────────────────────────────── */
-interface SlideItem {
+type Slide = {
   image: string
   title: string
   subtitle: string
   description: string
-  buttonText: string
-  link: string
+  cta: string
+  href: '/scan' | '/lieux' | '/cuisine' | '/regions'
+  icon: typeof Camera
+  tag: string
+  badgeBg?: string
 }
 
-/* ─── Tokens couleur — palette Stitch officielle ─────────── */
-const C = {
-  forest: '#004D40',
-  rust:   '#BF360C',
-  gold:   '#F57F17',
-  cream:  '#F3F0DC',
-  ink:    '#0A0A0A',
-} as const
-
-/* ════════════════════════════════════════════════════════════
-   PAGE ACCUEIL
-════════════════════════════════════════════════════════════ */
 export default function AccueilPage() {
   const t = useTranslations('Accueil')
-  const [isOnline, setIsOnline]         = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [paused, setPaused] = useState(false)
 
-  /* ── Slides hero ── */
-  const slides = useMemo<SlideItem[]>(() => [
+  const slides = useMemo<Slide[]>(() => [
     {
-      image: '/deuxlions.png',
-      title:       t('slides.0.title'),
-      subtitle:    t('slides.0.subtitle'),
-      description: t('slides.0.description'),
-      buttonText:  t('slides.0.buttonText'),
-      link: '/scan',
-    },
-    {
-      image: '/Hero2.png',
-      title:       t('slides.1.title'),
-      subtitle:    t('slides.1.subtitle'),
+      image: '/Hero2.webp',
+      title: t('slides.1.title'),
+      subtitle: t('slides.1.subtitle'),
       description: t('slides.1.description'),
-      buttonText:  t('slides.1.buttonText'),
-      link: '/lieux',
+      cta: t('slides.1.buttonText'),
+      href: '/lieux',
+      icon: Landmark,
+      tag: t('slide_tags.1'),
     },
     {
-      image: '/fufuhero.png',
-      title:       t('slides.2.title'),
-      subtitle:    t('slides.2.subtitle'),
+      image: '/deuxlions.webp',
+      title: t('slides.0.title'),
+      subtitle: t('slides.0.subtitle'),
+      description: t('slides.0.description'),
+      cta: t('slides.0.buttonText'),
+      href: '/scan',
+      icon: Camera,
+      tag: t('slide_tags.0'),
+    },
+    {
+      image: '/fufuhero.webp',
+      title: t('slides.2.title'),
+      subtitle: t('slides.2.subtitle'),
       description: t('slides.2.description'),
-      buttonText:  t('slides.2.buttonText'),
-      link: '/cuisine',
+      cta: t('slides.2.buttonText'),
+      href: '/cuisine',
+      icon: Utensils,
+      tag: t('slide_tags.2'),
     },
   ], [t])
 
-  /* ── Données statiques ── */
-  const categories = [
-    { icon: Landmark,     label: t('categories.places.label'),    sub: t('categories.places.sub'),    href: '/lieux' },
-    { icon: Palette,      label: t('categories.cultures.label'),  sub: t('categories.cultures.sub'),  href: '/histoire' },
-    { icon: BookOpenText, label: t('categories.stories.label'),   sub: t('categories.stories.sub'),   href: '/histoire' },
-    { icon: CalendarDays, label: t('categories.events.label'),    sub: t('categories.events.sub'),    href: '/lieux' },
-    { icon: Users,        label: t('categories.community.label'), sub: t('categories.community.sub'), href: '/guides' },
-  ]
-
-  const featureCards = [
-    {
-      href: '/scan', icon: Scan, isPremium: true,
-      title:       t('features.scan_title'),
-      description: t('features.scan_desc'),
-      tag:         t('features.scan_tag'),
-      badge:       t('features.scan_badge'),
-      cta:         t('features.scan_cta'),
-    },
-    {
-      href: '/lieux', icon: MapPin, isPremium: false,
-      title:       t('features.geo_title'),
-      description: t('features.geo_desc'),
-      tag:         t('features.geo_tag'),
-      cta:         t('features.geo_cta'),
-    },
-    {
-      href: '/cuisine', icon: Utensils, isPremium: false,
-      title:       t('features.cuisine_title'),
-      description: t('features.cuisine_desc'),
-      tag:         t('features.cuisine_tag'),
-      cta:         t('features.cuisine_cta'),
-    },
-  ]
-
-  const guides = [
-    { initials: 'KA', name: t('guides.0.name'), rating: '4.8', languages: t('guides.0.languages'), bg: C.forest },
-    { initials: 'EA', name: t('guides.1.name'), rating: '4.9', languages: t('guides.1.languages'), bg: C.rust   },
-    { initials: 'MA', name: t('guides.2.name'), rating: '5.0', languages: t('guides.2.languages'), bg: C.gold   },
-  ]
-
-  const subFeatures = [
-    t('subscription.features.scans'),
-    t('subscription.features.audio'),
-    t('subscription.features.history'),
-    t('subscription.features.offline'),
-  ]
-
-  const stats = [
-    { value: '120+', label: t('stats_short.sites') },
-    { value: '7',    label: t('stats_short.regions') },
-    { value: '4',    label: t('stats_short.languages') },
-    { value: '500+', label: t('stats_short.explorers') },
-  ]
-
-  /* ── Effets ── */
   useEffect(() => {
-    const id = window.setInterval(
-      () => setCurrentSlide(s => (s + 1) % slides.length),
-      5200,
-    )
-    return () => window.clearInterval(id)
-  }, [slides.length])
+    if (paused) return
+    const timer = window.setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 6000)
+    return () => window.clearInterval(timer)
+  }, [paused, slides.length])
 
-  useEffect(() => {
-    const sync = () => setIsOnline(navigator.onLine)
-    sync()
-    window.addEventListener('online',  sync)
-    window.addEventListener('offline', sync)
-    return () => {
-      window.removeEventListener('online',  sync)
-      window.removeEventListener('offline', sync)
-    }
-  }, [])
-
+  const previous = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+  const next = () => setCurrentSlide((prev) => (prev + 1) % slides.length)
   const slide = slides[currentSlide]
+  const SlideIcon = slide.icon
 
-  /* ════════════════════════════════════════════════════════
-     JSX
-  ════════════════════════════════════════════════════════ */
+  const categories = [
+    { href: '/lieux' as const, label: t('categories.monuments'), icon: Landmark, count: t('counts.sites') },
+    { href: '/scan' as const, label: t('categories.scan'), icon: Camera, count: t('counts.scan'), highlight: true },
+    { href: '/cuisine' as const, label: t('categories.cuisine'), icon: Utensils, count: t('counts.dishes') },
+    { href: '/loisirs' as const, label: t('categories.parks'), icon: TreePine, count: t('counts.parks') },
+    { href: '/guides' as const, label: t('categories.guides'), icon: Users, count: t('counts.guides') },
+  ]
+
+  const featuredDestinations = [
+    {
+      title: 'Koutammakou',
+      region: 'Kara',
+      tag: 'UNESCO',
+      image: '/Sites/koutamakou.jpg',
+      desc: t('featured.koutammakou_desc'),
+      href: '/lieux' as const,
+    },
+    {
+      title: 'Palais de Lomé',
+      region: 'Maritime',
+      tag: t('regions.maritime.badge'),
+      image: '/Sites/palais_de_lome.webp',
+      desc: t('featured.palais_desc'),
+      href: '/lieux' as const,
+    },
+    {
+      title: 'Cascade de Kpimé',
+      region: 'Plateaux',
+      tag: t('regions.plateaux.badge'),
+      image: '/Sites/kpime.jpg',
+      desc: t('featured.kpime_desc'),
+      href: '/lieux' as const,
+    },
+  ]
+
   return (
-    <main className="min-h-screen bg-background pb-28 pt-16 text-foreground">
-
-      {/* ── Bandeau hors ligne ── */}
-      {!isOnline && (
-        <div className="fixed inset-x-4 top-20 z-[60] mx-auto flex max-w-sm items-center
-                        gap-2 rounded-xl bg-destructive px-4 py-3 text-sm font-bold
-                        text-destructive-foreground shadow-xl">
-          <WifiOff className="h-4 w-4 shrink-0" />
-          {t('offline_banner')}
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════
-          HERO — Carousel
-      ══════════════════════════════════════════════════ */}
-      <section
-        className="relative h-[520px] w-full overflow-hidden md:h-[580px]"
-        style={{ background: C.forest }}
-      >
-        {/* Image de fond animée */}
-        <AnimatePresence initial={false} mode="popLayout">
-          <motion.div
-            key={slide.image}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1,  scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+    <main className="min-h-screen bg-background pb-28 pt-20 text-foreground">
+      <div className="mx-auto w-full max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
+        
+        {/* ══════════════════════════════════════════════════
+            HERO SECTION — ART DIRECTION TERRACOTTA & OR
+        ══════════════════════════════════════════════════ */}
+        <section className="relative">
+          <div
+            className="group relative isolate min-h-[480px] sm:min-h-[560px] lg:min-h-[600px] overflow-hidden rounded-3xl border border-border bg-[#171009] shadow-xl"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
           >
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#004D40]/92 via-[#004D40]/55 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
-
-        {/* Contenu */}
-        <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col
-                        justify-center px-5 sm:px-8">
-
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-white/70">
-            {t('hero_kicker')}
-          </p>
-
-          {/* Titre animé — élément signature */}
-          <AnimatePresence mode="wait">
-            <motion.h1
-              key={slide.title}
-              className="mt-3 max-w-2xl font-serif text-[2.8rem] font-bold italic
-                         leading-[0.95] text-white sm:text-6xl lg:text-7xl"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1,  y: 0 }}
-              exit={{ opacity: 0,    y: -8 }}
-              transition={{ duration: 0.4 }}
-            >
-              {slide.title}
-            </motion.h1>
-          </AnimatePresence>
-
-          <p className="mt-4 text-lg font-black sm:text-xl" style={{ color: C.gold }}>
-            {t('hero_motto')}
-          </p>
-
-          <p className="mt-3 max-w-lg text-base font-medium leading-7 text-white/80">
-            {slide.description}
-          </p>
-
-          {/* Boutons CTA */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <AuthGuardLink
-              href="/scan"
-              className="inline-flex min-h-[52px] items-center justify-center gap-2
-                         rounded-lg px-7 py-3 text-sm font-black uppercase tracking-wider
-                         text-white shadow-lg transition-all
-                         hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
-              style={{ background: C.rust }}
-            >
-              <Scan className="h-5 w-5" />
-              {t('cta_scan')}
-            </AuthGuardLink>
-            <AuthGuardLink
-              href="/lieux"
-              className="inline-flex min-h-[52px] items-center justify-center gap-2
-                         rounded-lg border border-white/80 px-7 py-3 text-sm font-black
-                         uppercase tracking-wider text-white transition-all
-                         hover:bg-white/10 active:scale-[0.98]"
-            >
-              <MapPin className="h-5 w-5" />
-              {t('cta_discover')}
-            </AuthGuardLink>
-          </div>
-        </div>
-
-        {/* Flèches */}
-        <button
-          onClick={() => setCurrentSlide(s => (s - 1 + slides.length) % slides.length)}
-          aria-label="Slide précédent"
-          className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full
-                     bg-black/25 p-2 text-white backdrop-blur-sm transition
-                     hover:bg-black/45 sm:left-5"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => setCurrentSlide(s => (s + 1) % slides.length)}
-          aria-label="Slide suivant"
-          className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full
-                     bg-black/25 p-2 text-white backdrop-blur-sm transition
-                     hover:bg-black/45 sm:right-5"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-
-        {/* Dots */}
-        <div className="absolute bottom-5 left-0 right-0 z-10 flex justify-center gap-2">
-          {slides.map((s, i) => (
-            <button
-              key={s.image}
-              onClick={() => setCurrentSlide(i)}
-              aria-label={t('go_to_slide', { index: i + 1 })}
-              className={
-                i === currentSlide
-                  ? 'h-2 w-8 rounded-full bg-white transition-all'
-                  : 'h-2 w-2 rounded-full bg-white/40 transition-all hover:bg-white/65'
-              }
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          CATÉGORIES
-      ══════════════════════════════════════════════════ */}
-      <nav className="border-b border-border bg-card">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.map(cat => {
-            const Icon = cat.icon
-            return (
-              <AuthGuardLink
-                key={cat.label}
-                href={cat.href}
-                className="group flex min-h-[88px] items-center gap-3 border-b-2
-                           border-transparent px-3 py-4 transition-all
-                           hover:border-primary sm:px-4"
+            {/* Background Images with smooth Fade / Parallax */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.image}
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               >
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-                  style={{ background: C.cream, color: C.forest }}
-                >
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  priority
+                  sizes="(max-width: 1200px) 100vw, 1200px"
+                  className="object-cover object-center brightness-[0.88] contrast-[1.05]"
+                />
+                {/* Warm earthy gradient scrim for contrast and atmosphere */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#171009] via-[#171009]/55 to-[#171009]/20" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#171009]/80 via-transparent to-transparent sm:max-w-3xl" />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Top Bar inside Hero with Status Badge */}
+            <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3.5 py-1.5 backdrop-blur-md">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[11px] font-semibold text-white/90">{t('live_badge')}</span>
+              </div>
+              <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-950/60 px-3.5 py-1.5 backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <span className="text-[11px] font-bold text-amber-200">{t('unesco_badge')}</span>
+              </div>
+            </div>
+
+            {/* Slide Content */}
+            <div className="relative z-10 flex min-h-[480px] sm:min-h-[560px] lg:min-h-[600px] flex-col justify-end p-6 sm:p-10 lg:p-14 text-white">
+              <div className="max-w-2xl space-y-4">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={slide.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.45 }}
+                    className="space-y-3"
+                  >
+                    {/* Tag / Category Badge */}
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-sm">
+                        <SlideIcon className="h-3.5 w-3.5" />
+                        {slide.subtitle}
+                      </span>
+                      <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
+                        {slide.tag}
+                      </span>
+                    </div>
+
+                    {/* Headline */}
+                    <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl text-[#FBF6EF] drop-shadow-sm">
+                      {slide.title}
+                    </h1>
+
+                    {/* Description */}
+                    <p className="max-w-lg text-sm sm:text-base leading-relaxed text-[#FBF6EF]/85 font-sans">
+                      {slide.description}
+                    </p>
+
+                    {/* Primary CTA & Secondary Action */}
+                    <div className="pt-2 flex flex-wrap items-center gap-3">
+                      <AuthGuardLink
+                        href={slide.href}
+                        className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-primary-dark hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        <span>{slide.cta}</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </AuthGuardLink>
+
+                      <AuthGuardLink
+                        href="/scan"
+                        className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/20 px-5 py-3.5 text-sm font-bold text-amber-200 backdrop-blur-md transition-all hover:bg-accent/30 hover:border-accent"
+                      >
+                        <Camera className="h-4 w-4 text-accent" />
+                        <span>{t('cta_scan_ia')}</span>
+                      </AuthGuardLink>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Slider Navigation & Indicators */}
+              <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-4">
+                {/* Dots / Bars */}
+                <div className="flex items-center gap-2">
+                  {slides.map((item, index) => (
+                    <button
+                      key={item.image}
+                      type="button"
+                      onClick={() => setCurrentSlide(index)}
+                      aria-label={t('go_to_slide', { index: index + 1 })}
+                      aria-current={index === currentSlide}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        index === currentSlide
+                          ? 'w-10 bg-primary shadow-sm'
+                          : 'w-2 bg-white/40 hover:bg-white/70'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Arrows for Desktop */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={previous}
+                    aria-label={t('previous_slide')}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 active:scale-95 cursor-pointer"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={next}
+                    aria-label={t('next_slide')}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 active:scale-95 cursor-pointer"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
+            STATS & ENGAGEMENT TICKER
+        ══════════════════════════════════════════════════ */}
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {[
+            { value: '29', label: t('stats_landing.sites'), sub: t('stats_landing.sites_sub'), icon: Landmark },
+            { value: '5', label: t('stats_landing.regions'), sub: t('stats_landing.regions_sub'), icon: Globe2 },
+            { value: '31', label: t('stats_landing.dishes'), sub: t('stats_landing.dishes_sub'), icon: Utensils },
+            { value: '100%', label: t('stats_landing.pwa'), sub: t('stats_landing.pwa_sub'), icon: Wifi },
+          ].map(({ value, label, sub, icon: Icon }) => (
+            <div
+              key={label}
+              className="app-card flex flex-col justify-between p-4 sm:p-5"
+            >
+              <div className="flex items-center justify-between">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </span>
-                <span>
-                  <span className="block text-sm font-black text-foreground">
-                    {cat.label}
-                  </span>
-                  <span className="mt-0.5 block text-[11px] font-medium text-muted-foreground">
-                    {cat.sub}
-                  </span>
-                </span>
-              </AuthGuardLink>
-            )
-          })}
-        </div>
-      </nav>
-
-      {/* ══════════════════════════════════════════════════
-          TICKER
-      ══════════════════════════════════════════════════ */}
-      <div className="overflow-hidden py-3" style={{ background: C.cream }}>
-        <div className="flex items-center gap-4">
-          <Megaphone className="ml-5 h-4 w-4 shrink-0" style={{ color: C.rust }} />
-          <motion.p
-            className="flex gap-16 whitespace-nowrap text-xs font-black uppercase tracking-wider"
-            style={{ color: C.forest }}
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-          >
-            {[0, 1, 2, 3].map(n => <span key={n}>{t('ticker')}</span>)}
-          </motion.p>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════
-          STATS BAR
-      ══════════════════════════════════════════════════ */}
-      <section className="px-4 py-8" style={{ background: C.forest }}>
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 sm:grid-cols-4">
-          {stats.map(stat => (
-            <div key={stat.label} className="text-center">
-              <p
-                className="font-serif text-5xl font-bold italic leading-none sm:text-6xl"
-                style={{ color: C.gold }}
-              >
-                {stat.value}
-              </p>
-              <p className="mt-2 text-xs font-black uppercase tracking-wide text-white/75">
-                {stat.label}
-              </p>
+                <span className="font-serif text-2xl font-bold text-primary sm:text-3xl">{value}</span>
+              </div>
+              <div className="mt-3">
+                <p className="font-bold text-xs sm:text-sm text-foreground">{label}</p>
+                <p className="text-[11px] text-muted-foreground">{sub}</p>
+              </div>
             </div>
           ))}
-        </div>
-      </section>
+        </section>
 
-      {/* ══════════════════════════════════════════════════
-          CONTENU PRINCIPAL
-      ══════════════════════════════════════════════════ */}
-      <div className="mx-auto max-w-5xl space-y-20 px-4 py-16 sm:px-8">
-
-        {/* ── FONCTIONNALITÉS ── */}
-        <section>
-          <div className="mb-8">
-            <p
-              className="text-xs font-black uppercase tracking-widest"
-              style={{ color: C.rust }}
+        {/* ══════════════════════════════════════════════════
+            EXPLORATION PAR CATÉGORIES (PHOTO-FIRST)
+        ══════════════════════════════════════════════════ */}
+        <section className="space-y-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                {t('explore_kicker')}
+              </p>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                {t('explore_title')}
+              </h2>
+            </div>
+            <AuthGuardLink
+              href="/lieux"
+              className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-primary hover:text-primary-dark transition-colors"
             >
-              {t('features_header.tag')}
-            </p>
-            <h2 className="mt-2 font-serif text-4xl font-bold italic text-foreground sm:text-5xl">
-              {t('features_title')}
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">
-              {t('features_header.description')}
-            </p>
+              <span>{t('incontournables_see_all')}</span>
+              <ArrowRight className="h-4 w-4" />
+            </AuthGuardLink>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {featureCards.map(card => {
-              const Icon = card.icon
-              return (
-                <AuthGuardLink
-                  key={card.href}
-                  href={card.href}
-                  className="group flex min-h-[340px] flex-col rounded-xl border border-border
-                             bg-card p-6 shadow-sm transition-all
-                             hover:-translate-y-1 hover:border-primary hover:shadow-md"
-                >
-                  <div className="mb-5 flex items-start justify-between gap-3">
-                    <div
-                      className="flex h-12 w-12 items-center justify-center rounded-lg text-white"
-                      style={{ background: C.forest }}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span
-                      className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wide"
-                      style={{ background: C.cream, color: C.forest }}
-                    >
-                      {card.tag}
-                    </span>
-                  </div>
-
-                  <h3 className="font-serif text-2xl font-bold italic text-foreground">
-                    {card.title}
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    {card.description}
-                  </p>
-
-                  {card.isPremium && card.badge && (
-                    <span
-                      className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full
-                                 px-3 py-1.5 text-xs font-black text-white"
-                      style={{ background: C.rust }}
-                    >
-                      <Crown className="h-3.5 w-3.5" />
-                      {card.badge}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {categories.map(({ href, label, icon: Icon, count, highlight }) => {
+              const className = `app-card group relative flex flex-col justify-between p-4 transition-all duration-300 hover:-translate-y-1 ${
+                  highlight
+                    ? 'border-accent/50 bg-amber-50/40 dark:bg-amber-950/20'
+                    : ''
+                }`
+              const inner = (
+                <>
+                <div className="flex items-center justify-between mb-4">
+                  <span
+                    className={`grid h-11 w-11 place-items-center rounded-2xl transition-colors ${
+                      highlight
+                        ? 'bg-accent text-[#241A08]'
+                        : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  {highlight && (
+                    <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
+                      {t('signature_ia')}
                     </span>
                   )}
-
-                  <span
-                    className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm
-                               font-black transition-all group-hover:gap-3"
-                    style={{ color: C.rust }}
-                  >
-                    {card.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
+                    {label}
+                  </h3>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground font-medium">{count}</p>
+                </div>
+                </>
+              )
+              return (
+                <AuthGuardLink key={href} href={href} className={className}>
+                  {inner}
                 </AuthGuardLink>
               )
             })}
           </div>
         </section>
 
-        {/* ── GUIDES CERTIFIÉS ── */}
-        <section>
-          <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        {/* ══════════════════════════════════════════════════
+            DESTINATIONS EMBLÉMATIQUES (KOUTAMMAKOU UNESCO ETC)
+        ══════════════════════════════════════════════════ */}
+        <section className="space-y-5">
+          <div className="flex items-end justify-between">
             <div>
-              <p
-                className="text-xs font-black uppercase tracking-widest"
-                style={{ color: C.rust }}
-              >
-                {t('guides.tag')}
-              </p>
-              <h2 className="mt-2 font-serif text-4xl font-bold italic text-foreground sm:text-5xl">
-                {t('guides_title')}
-              </h2>
-            </div>
-            <AuthGuardLink
-              href="/guides"
-              className="inline-flex items-center gap-2 text-sm font-black
-                         transition-all hover:gap-3"
-              style={{ color: C.rust }}
-            >
-              {t('guides.view_all')}
-              <ArrowRight className="h-4 w-4" />
-            </AuthGuardLink>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-3">
-            {guides.map(guide => (
-              <article
-                key={guide.name}
-                className="rounded-xl border border-border bg-card p-6 shadow-sm
-                           transition-all hover:border-primary hover:shadow-md"
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex h-14 w-14 shrink-0 items-center justify-center
-                               rounded-full text-lg font-black text-white"
-                    style={{ background: guide.bg }}
-                  >
-                    {guide.initials}
-                  </div>
-                  <div>
-                    <h3 className="font-black text-foreground">{guide.name}</h3>
-                    <span
-                      className="mt-1.5 inline-flex items-center gap-1 rounded-full
-                                 px-2.5 py-1 text-[11px] font-black text-white"
-                      style={{ background: C.forest }}
-                    >
-                      <BadgeCheck className="h-3.5 w-3.5" />
-                      {t('guides.certified')}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-5 flex items-center gap-1.5 text-sm font-black text-foreground">
-                  <Star className="h-4 w-4" style={{ fill: C.gold, color: C.gold }} />
-                  {guide.rating}
-                </div>
-
-                <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Languages className="h-4 w-4 shrink-0" style={{ color: C.rust }} />
-                  {guide.languages}
-                </p>
-
-                <p className="mt-5 text-xl font-black text-foreground">
-                  {t('guides.price')}
-                </p>
-
-                <AuthGuardLink
-                  href="/guides"
-                  className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center
-                             rounded-lg text-sm font-black text-white transition-all
-                             hover:brightness-110 active:scale-[0.98]"
-                  style={{ background: C.forest }}
-                >
-                  {t('guides.reserve')}
-                </AuthGuardLink>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* ── ABONNEMENT PREMIUM ── */}
-        <section
-          className="rounded-2xl p-7 text-white shadow-xl sm:p-10"
-          style={{ background: C.forest }}
-        >
-          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-            <div>
-              <span
-                className="inline-flex items-center gap-2 rounded-full bg-white/10
-                           px-4 py-2 text-xs font-black uppercase tracking-wide"
-              >
-                <Crown className="h-4 w-4" style={{ color: C.gold }} />
-                {t('subscription.tag')}
-              </span>
-              <h2 className="mt-5 font-serif text-4xl font-bold italic sm:text-5xl">
-                {t('subscribe_title')}
-              </h2>
-              <p className="mt-4 text-3xl font-black" style={{ color: C.gold }}>
-                {t('subscribe_price')}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-white/15 bg-white/10 p-6">
-              <ul className="space-y-3">
-                {subFeatures.map(f => (
-                  <li key={f} className="flex items-center gap-3 text-sm font-bold">
-                    <Check className="h-5 w-5 shrink-0" style={{ color: C.gold }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <AuthGuardLink
-                href="/subscription"
-                className="mt-6 inline-flex min-h-[52px] w-full items-center justify-center
-                           rounded-lg text-sm font-black text-white transition-all
-                           hover:brightness-110 active:scale-[0.98]"
-                style={{ background: C.rust }}
-              >
-                {t('subscribe_cta')}
-              </AuthGuardLink>
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA FINAL ── */}
-        <section
-          className="rounded-2xl p-8 text-white shadow-xl sm:p-10"
-          style={{ background: C.ink }}
-        >
-          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-            <div>
-              <p
-                className="text-xs font-black uppercase tracking-widest"
-                style={{ color: C.gold }}
-              >
-                {t('final_cta.tag')}
-              </p>
-              <h2 className="mt-3 max-w-lg font-serif text-3xl font-bold italic sm:text-4xl">
-                {t('final_cta.title')}
+              <div className="inline-flex items-center gap-1.5 mb-1 text-xs font-bold uppercase tracking-wider text-primary">
+                <Compass className="h-3.5 w-3.5" />
+                <span>{t('heritage_kicker')}</span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                {t('treasures_heading')}
               </h2>
             </div>
             <AuthGuardLink
               href="/lieux"
-              className="inline-flex shrink-0 items-center gap-2 rounded-lg px-7 py-4
-                         text-sm font-black transition-all
-                         hover:brightness-110 active:scale-[0.98]"
-              style={{ background: C.gold, color: C.ink }}
+              className="text-xs sm:text-sm font-bold text-primary hover:underline"
             >
-              {t('final_cta.cta')}
-              <ArrowRight className="h-4 w-4" />
+              {t('all_sites')}
             </AuthGuardLink>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredDestinations.map((dest) => (
+              <AuthGuardLink
+                key={dest.title}
+                href={dest.href}
+                className="app-card group relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              >
+                {/* Photo Header */}
+                <div className="relative h-56 w-full overflow-hidden bg-muted">
+                  <Image
+                    src={dest.image}
+                    alt={dest.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  
+                  {/* UNESCO or Category Badge */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                    {dest.tag === 'UNESCO' ? (
+                      <span className="unesco-badge rounded-full px-3 py-1 text-[11px] uppercase tracking-wider">
+                        ✦ {t('unesco_badge')}
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md">
+                        {dest.tag}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-200">
+                      <MapPin className="h-3 w-3" />
+                      {t('region_prefix', { name: dest.region })}
+                    </span>
+                    <h3 className="font-serif text-xl font-bold text-white leading-tight">
+                      {dest.title}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="flex flex-1 flex-col justify-between p-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {dest.desc}
+                  </p>
+                  <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                    <span className="text-xs font-semibold text-primary">{t('explore_sheet')}</span>
+                    <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-primary transition-transform group-hover:translate-x-1">
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </AuthGuardLink>
+            ))}
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
+            SIGNATURE FEATURE — SCANNER IA & AUDIO GUIDE
+        ══════════════════════════════════════════════════ */}
+        <section className="app-card relative overflow-hidden p-6 sm:p-8 lg:p-10 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-accent/5">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center">
+            <div className="space-y-4 lg:col-span-7">
+              <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <span>{t('signature_feature')}</span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+                {t('scan_feature_title')}
+              </h2>
+              <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
+                {t('scan_feature_desc')}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <AuthGuardLink
+                  href="/scan"
+                  className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary-dark"
+                >
+                  <Camera className="h-4 w-4" />
+                  <span>{t('try_scanner')}</span>
+                </AuthGuardLink>
+
+                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                  <Headphones className="h-4 w-4 text-primary" />
+                  <span>{t('audio_included')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="relative h-64 w-full max-w-sm overflow-hidden rounded-2xl border border-border shadow-lg bg-black/10">
+                <Image
+                  src="/deuxlions.png"
+                  alt={t('scan_preview_alt')}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600/90 px-2.5 py-1 text-[11px] font-bold">
+                    <span>{t('confidence')}</span>
+                  </div>
+                  <p className="mt-1 font-serif text-base font-bold">{t('deux_lions')}</p>
+                  <p className="text-xs text-white/80">{t('lome_maritime')}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

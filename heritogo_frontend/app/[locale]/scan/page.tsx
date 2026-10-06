@@ -4,14 +4,17 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Camera, Loader2, MapPin, RefreshCw, Sparkles, Upload, AlertTriangle, ShieldCheck, CreditCard, X } from 'lucide-react'
+import { Camera, Loader2, MapPin, RefreshCw, Upload, AlertTriangle, ShieldCheck, CreditCard, X, Sparkles } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import { COLORS } from '@/lib/constants/colors'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 import { useGeolocation } from '@/hooks/useGeolocation'
-
+import { usePrivacyConsent } from '@/hooks/usePrivacyConsent'
+import GeoConsentBanner from '@/components/GeoConsentBanner'
+import { toast } from 'sonner'
+import Badge from '@/components/ui/Badge'
 
 interface PredictionResult {
   prediction_status: string
@@ -42,30 +45,40 @@ export default function ScanPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Message évolutif d'analyse
+  const [scanStepIndex, setScanStepIndex] = useState(0)
+  const scanStepMessages = [
+    t('steps.0'),
+    t('steps.1'),
+    t('steps.2'),
+    t('steps.3'),
+  ]
+
   // Paywall & Limit States
   const [scanCount, setScanCount] = useState<number>(() => {
     if (typeof window === 'undefined') return 0
     const date = new Date()
     const currentMonth = `${date.getFullYear()}-${date.getMonth() + 1}`
-    const savedMonth = localStorage.getItem('heritogo_scan_month')
+    const savedMonth = safeLocalStorageGet('heritogo_scan_month')
 
     let count = 0
     if (savedMonth !== currentMonth) {
-      localStorage.setItem('heritogo_scan_month', currentMonth)
-      localStorage.setItem('heritogo_scan_count', '0')
+      safeLocalStorageSet('heritogo_scan_month', currentMonth)
+      safeLocalStorageSet('heritogo_scan_count', '0')
       count = 0
     } else {
-      count = parseInt(localStorage.getItem('heritogo_scan_count') || '0', 10)
+      count = parseInt(safeLocalStorageGet('heritogo_scan_count') || '0', 10)
     }
     return count
   })
   const [isPremium, setIsPremium] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false
-    return localStorage.getItem('heritogo_premium') === 'true'
+    return safeLocalStorageGet('heritogo_premium') === 'true'
   })
   const [showPaywall, setShowPaywall] = useState(false)
 
-  const { position: geoPosition } = useGeolocation()
+  const { consent } = usePrivacyConsent()
+  const { position: geoPosition } = useGeolocation({ enabled: consent.geo === true })
 
   useEffect(() => {
     if (geoPosition) {
@@ -82,51 +95,65 @@ export default function ScanPage() {
   // Hook triggered when a prediction is successful to save count & history
   useEffect(() => {
     if (result && result.data) {
-      // 1. Incrémenter le compteur
-      const currentCount = parseInt(localStorage.getItem('heritogo_scan_count') || '0', 10)
+      const currentCount = parseInt(safeLocalStorageGet('heritogo_scan_count') || '0', 10)
       const newCount = currentCount + 1
-      localStorage.setItem('heritogo_scan_count', newCount.toString())
+      safeLocalStorageSet('heritogo_scan_count', newCount.toString())
       setScanCount(newCount)
 
-      // 2. Enregistrer dans l'historique
-      const historyRaw = localStorage.getItem('heritogo_scans')
-      const history = historyRaw ? JSON.parse(historyRaw) : []
+      const history = safeJsonParse<Record<string, unknown>[]>(
+        safeLocalStorageGet('heritogo_scans'),
+        [],
+      )
       const newScan = {
         monument: result.data.monument,
         histoire: result.data.histoire,
         date: new Date().toISOString(),
-        localite: userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : t('default_location')
+        localite: result.data.monument
       }
-      localStorage.setItem('heritogo_scans', JSON.stringify([newScan, ...history]))
+      safeLocalStorageSet('heritogo_scans', JSON.stringify([newScan, ...history]))
     }
   }, [result])
 
   const [error, submitScanAction, loading] = useActionState<string | null, FormData>(
     async (_previousState, formData) => {
       try {
-        const result = await apiFetch<PredictionResult & { error?: string; detail?: string }>('/api/scan', {
+        const res = await apiFetch<PredictionResult & { error?: string; detail?: string }>('/api/scan', {
           method: 'POST',
           body: formData,
           timeoutMs: 70000,
         })
 
-        if (!result.ok || !result.data) return result.error || t('errors.general')
-        if (result.data.prediction_status === 'unknown') {
+        if (!res.ok || !res.data) return res.error || t('errors.general')
+        if (res.data.prediction_status === 'unknown') {
           setResult(null)
           setTranslatedText({})
-          return result.data.detail || t('errors.unknown')
+          return res.data.detail || t('errors.unknown')
         }
 
-        setResult(result.data)
-        setTranslatedText({ fr: result.data.data.histoire })
+        setResult(res.data)
+        setTranslatedText({ fr: res.data.data.histoire })
+        toast.success(t('toast_identified', { name: res.data.data.monument }))
         return null
       } catch (scanError: unknown) {
         console.error(scanError)
-        return getUserFriendlyError(scanError)
+        const errMsg = getUserFriendlyError(scanError)
+        toast.error(errMsg)
+        return errMsg
       }
     },
     null,
   )
+
+  useEffect(() => {
+    if (!loading) {
+      setScanStepIndex(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setScanStepIndex((prev) => (prev + 1) % scanStepMessages.length)
+    }, 2800)
+    return () => clearInterval(interval)
+  }, [loading, scanStepMessages.length])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -142,7 +169,6 @@ export default function ScanPage() {
   const handleScanClick = () => {
     if (!image) return
 
-    // Vérifier la limite gratuite
     if (!isPremium && scanCount >= 3) {
       setShowPaywall(true)
       return
@@ -161,11 +187,11 @@ export default function ScanPage() {
     if (translatedText[targetLang]) return translatedText[targetLang]
     setIsTranslating(true)
     try {
-      const result = await apiFetch<[GoogleTranslateItem[]]>(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`, {
+      const res = await apiFetch<[GoogleTranslateItem[]]>(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`, {
         timeoutMs: 20000,
       })
-      const translated = result.ok && result.data
-        ? result.data[0].map((item) => item[0]).join('')
+      const translated = res.ok && res.data
+        ? res.data[0].map((item) => item[0]).join('')
         : text
       setTranslatedText((current) => ({ ...current, [targetLang]: translated }))
       return translated
@@ -191,25 +217,6 @@ export default function ScanPage() {
     return selectedLang === 'fr' ? result.data.histoire : translatedText[selectedLang] || result.data.histoire
   }
 
-  const toggleSpeech = () => {
-    if (!result?.data.histoire) return
-    if (isSpeaking) {
-      window.speechSynthesis.cancel()
-      setIsSpeaking(false)
-      return
-    }
-
-    const langMap: Record<LanguageCode, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', zh: 'zh-CN' }
-    const utterance = new SpeechSynthesisUtterance(getCurrentText())
-    utterance.lang = langMap[selectedLang]
-    utterance.rate = 0.95
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(utterance)
-    setIsSpeaking(true)
-  }
-
   const resetScanner = () => {
     if (preview) URL.revokeObjectURL(preview)
     setPreview(null)
@@ -221,209 +228,248 @@ export default function ScanPage() {
   }
 
   const handleActivatePremium = () => {
-    localStorage.setItem('heritogo_premium', 'true')
+    safeLocalStorageSet('heritogo_premium', 'true')
     setIsPremium(true)
     setShowPaywall(false)
+    toast.success(t('toast_premium_activated'))
   }
 
   return (
-    <main className="min-h-screen bg-base-100 px-4 pb-28 pt-20 text-base-content sm:px-6 lg:px-8">
-      <section className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+    <main className="min-h-screen bg-background px-4 pb-28 pt-8 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-8">
         
-        {/* Left Control Card */}
-        <div className="rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-[11px] font-black uppercase tracking-wide text-secondary-content">
-                <Sparkles className="h-4 w-4" />
-                {userLocation ? t('gps_available') : t('select_capture')}
+        {/* ── HEADER BANNER ── */}
+        <section className="app-card relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-card via-card to-accent/10 border-accent/30">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
+                <Sparkles className="h-4 w-4 text-accent" />
+                <span>{t('signature_tech')}</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
+                {t('title')}
+              </h1>
+              <div className="togo-underline" />
+              <p className="text-sm sm:text-base font-medium leading-relaxed text-muted-foreground pt-1 max-w-2xl">
+                {t('subtitle')}
+              </p>
+            </div>
+
+            <div className="shrink-0 self-start sm:self-center">
+              {isPremium ? (
+                <span className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm">
+                  {t('premium_active')}
+                </span>
+              ) : (
+                <span className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-muted-foreground shadow-xs">
+                  {t('quota', { count: scanCount })}
+                </span>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <GeoConsentBanner />
+
+        {/* ── SCANNER WORKSPACE ── */}
+        <section className="grid gap-6 lg:grid-cols-12 lg:items-start">
+          {/* Left Control Card */}
+          <div className="app-card p-6 sm:p-8 lg:col-span-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <Camera className="h-4 w-4 text-primary" />
+                <span>{userLocation ? t('gps_available') : t('select_capture')}</span>
               </div>
               {userLocation && (
-                <div 
-                  className="p-1.5 rounded-full bg-base-100 border border-border flex items-center justify-center animate-pulse" 
-                  title={t('gps_active')}
-                >
-                  <MapPin className="h-3.5 w-3.5" style={{ color: COLORS.forest }} />
+                <div className="flex items-center gap-1 text-xs font-bold text-emerald-600">
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span>{t('gps_active_short')}</span>
                 </div>
               )}
             </div>
 
-            {/* Quota Indicator */}
-            {isPremium ? (
-              <span className="badge bg-amber-500 text-white font-extrabold gap-1 border-none py-3 px-3 rounded-xl text-[10px] uppercase shadow-sm">
-                {t('premium_active')}
-              </span>
-            ) : (
-              <span className="badge bg-base-100 border-border text-base-content/75 font-bold py-3 px-3 rounded-xl text-[10px] uppercase">
-                {t('quota', { count: scanCount })}
-              </span>
-            )}
-          </div>
-          
-          <h1 className="text-4xl font-black leading-tight tracking-normal sm:text-5xl">{t('title')}</h1>
-          <p className="mt-4 text-sm font-medium leading-7 text-base-content/65">{t('subtitle')}</p>
-
-          <div className="mt-8 grid gap-3">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-primary px-6 py-4 text-sm font-black uppercase tracking-wide text-primary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] dark:bg-secondary dark:text-secondary-content"
-              style={{ backgroundColor: COLORS.forest, color: '#fff' }}
-            >
-              <Upload className="h-5 w-5" />
-              {preview ? t('change_image') : t('open_gallery')}
-            </button>
-            {preview && !result && (
+            <div className="space-y-3">
               <button
                 type="button"
-                onClick={handleScanClick}
-                disabled={loading}
-                className="inline-flex min-h-14 items-center justify-center gap-3 rounded-[22px] bg-secondary px-6 py-4 text-sm font-black uppercase tracking-wide text-secondary-content shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:translate-y-0 disabled:opacity-55"
-                style={{ backgroundColor: COLORS.rust, color: '#fff' }}
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full bg-card border-2 border-dashed border-primary/40 px-6 font-bold text-primary shadow-sm hover:border-primary hover:bg-primary/5 transition-all text-sm cursor-pointer"
               >
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
-                {loading ? t('analyzing') : t('identify')}
+                <Upload className="h-5 w-5" />
+                <span>{preview ? t('change_image') : t('open_gallery')}</span>
               </button>
-            )}
+
+              {preview && !result && (
+                <button
+                  type="button"
+                  onClick={handleScanClick}
+                  disabled={loading}
+                  className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
+                  <span>{loading ? t('analyzing') : t('identify')}</span>
+                </button>
+              )}
+            </div>
+
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
           </div>
 
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-        </div>
-
-        {/* Right Preview Card */}
-        <div className="rounded-[32px] border border-dashed border-border bg-base-200 p-3 shadow-sm sm:p-4">
-          <div className="relative flex min-h-[390px] items-center justify-center overflow-hidden rounded-[28px] bg-base-100">
-            {preview ? (
-              <Image src={preview} alt={t('select_capture')} fill className="object-contain p-2" />
-            ) : (
-              <div className="max-w-sm px-6 text-center">
-                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[28px] bg-primary text-primary-content dark:bg-secondary dark:text-secondary-content" style={{ backgroundColor: COLORS.forest, color: '#fff' }}>
-                  <Camera className="h-10 w-10" />
+          {/* Right Preview Card */}
+          <div className="app-card overflow-hidden p-4 lg:col-span-6 space-y-3">
+            <div className="relative flex min-h-[340px] items-center justify-center overflow-hidden rounded-2xl bg-muted/40 border border-border">
+              {preview ? (
+                <Image src={preview} alt={t('select_capture')} fill className="object-contain p-2" />
+              ) : (
+                <div className="max-w-sm px-6 text-center space-y-3">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <Camera className="h-8 w-8" />
+                  </div>
+                  <p className="font-serif text-lg font-bold text-foreground">{t('select_capture')}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{t('compatible_info')}</p>
                 </div>
-                <p className="text-lg font-black">{t('select_capture')}</p>
-                <p className="mt-2 text-sm font-medium leading-6 text-base-content/55">{t('compatible_info')}</p>
+              )}
+            </div>
+            {preview && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={resetScanner}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  <span>{t('change_image')}</span>
+                </button>
               </div>
             )}
           </div>
-          {preview && (
-            <button type="button" onClick={resetScanner} className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-4 py-2 text-xs font-black text-base-content/70 transition-colors hover:border-secondary/50 hover:text-secondary">
-              <RefreshCw className="h-4 w-4" />
-              {t('change_image')}
-            </button>
-          )}
-        </div>
-      </section>
-
-      {error && (
-        <section className="mx-auto mt-5 max-w-6xl rounded-[24px] border border-secondary/30 bg-secondary/10 p-4 text-sm font-bold text-secondary">
-          {error}
         </section>
-      )}
 
-      {result?.data && (
-        <section className="mx-auto mt-5 max-w-6xl rounded-[32px] border border-border bg-base-200 p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-wide text-base-content/50">{t('result_label')}</p>
-              <h2 className="mt-1 text-2xl font-black tracking-normal text-base-content">{result.data.monument}</h2>
-            </div>
-            <TextToSpeech text={getCurrentText()} className="w-fit min-h-12 px-5" />
-          </div>
+        {error && (
+          <section className="app-card border-red-300 bg-red-50/40 dark:bg-red-950/20 p-4 text-xs font-bold text-red-600">
+            {error}
+          </section>
+        )}
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            {languageCodes.map((lang) => (
-              <button
-                key={lang}
-                type="button"
-                onClick={() => handleLangChange(lang)}
-                className={`rounded-2xl border px-4 py-2 text-xs font-black uppercase transition-all active:scale-95 ${
-                  selectedLang === lang
-                    ? 'border-primary bg-primary text-primary-content dark:border-secondary dark:bg-secondary dark:text-secondary-content'
-                    : 'border-border bg-base-100 text-base-content/60 hover:border-secondary/50'
-                }`}
-                style={selectedLang === lang ? { backgroundColor: COLORS.forest, borderColor: 'transparent', color: '#fff' } : undefined}
-              >
-                {lang}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-5 rounded-[28px] border border-border bg-base-100 p-5">
-            {isTranslating ? (
-              <div className="flex min-h-40 items-center justify-center">
-                <Loader2 className="h-7 w-7 animate-spin text-secondary" style={{ color: COLORS.rust }} />
+        {loading && (
+          <section className="app-card p-6 sm:p-8 space-y-4 animate-pulse">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
+              <div className="space-y-2">
+                <div className="h-4 w-28 rounded bg-muted" />
+                <div className="h-7 w-64 rounded bg-muted" />
               </div>
-            ) : (
-              <p className="m-0 whitespace-pre-line text-sm font-medium leading-7 text-base-content/75">{getCurrentText()}</p>
+              <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>{scanStepMessages[scanStepIndex]}</span>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {result?.data && (
+          <section className="app-card p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{t('result_label')}</span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground mt-0.5">{result.data.monument}</h2>
+              </div>
+              <TextToSpeech text={getCurrentText()} className="w-fit min-h-11 rounded-full px-5 text-xs" />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {languageCodes.map((lang) => (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => handleLangChange(lang)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase transition-all cursor-pointer ${
+                    selectedLang === lang
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'border border-border bg-card text-muted-foreground hover:border-primary/50'
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+
+            <div className="rounded-2xl bg-muted/40 p-6 border border-border">
+              {isTranslating ? (
+                <div className="flex min-h-32 items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <p className="whitespace-pre-line text-sm sm:text-base font-medium leading-relaxed sm:leading-8 text-foreground">
+                  {getCurrentText()}
+                </p>
+              )}
+            </div>
+
+            {result.data.latitude && result.data.longitude && (
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
+                <MapPin className="h-4 w-4" />
+                <span>{t('coordinates', { lat: Number(result.data.latitude).toFixed(4), lng: Number(result.data.longitude).toFixed(4) })}</span>
+              </div>
             )}
-          </div>
+          </section>
+        )}
 
-          {result.data.latitude && result.data.longitude && (
-            <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-border bg-base-100 px-4 py-3 text-xs font-bold text-base-content/65">
-              <MapPin className="h-4 w-4 text-secondary" style={{ color: COLORS.rust }} />
-              {Number(result.data.latitude).toFixed(4)}, {Number(result.data.longitude).toFixed(4)}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* Paywall Modal Dialog */}
-      {showPaywall && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[32px] border border-border bg-base-200 p-6 shadow-2xl relative space-y-6 text-center">
-            
-            <button 
-              onClick={() => setShowPaywall(false)}
-              className="absolute top-4 right-4 rounded-xl p-1.5 hover:bg-base-300 transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
-              <AlertTriangle className="h-7 w-7" />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-serif text-2xl font-bold tracking-tight">{t('limit_title')}</h3>
-              <p className="text-xs text-base-content/70 leading-relaxed font-semibold">
-                {t('limit_desc')}
-              </p>
-            </div>
-
-            {/* Premium Benefits List */}
-            <div className="rounded-2xl bg-base-100 p-4 border border-border/70 text-left text-xs font-bold space-y-2">
-              <p className="flex items-center gap-2 text-base-content/85">
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                {t('premium_scan')}
-              </p>
-              <p className="flex items-center gap-2 text-base-content/85">
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                {t('premium_tts')}
-              </p>
-              <p className="flex items-center gap-2 text-base-content/85">
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                {t('premium_history')}
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2.5">
-              <button
-                onClick={handleActivatePremium}
-                className="btn btn-block text-white rounded-2xl border-none font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                style={{ backgroundColor: COLORS.forest }}
-              >
-                <CreditCard className="h-4 w-4" /> {t('premium_cta')}
-              </button>
+        {/* Paywall Modal Dialog */}
+        {showPaywall && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <div className="relative w-full max-w-md space-y-6 rounded-3xl bg-card p-6 text-center shadow-2xl border border-border">
               <button
                 onClick={() => setShowPaywall(false)}
-                className="btn btn-block btn-ghost rounded-2xl text-xs font-bold"
+                className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
               >
-                {t('free_continue')}
+                <X className="h-5 w-5" />
               </button>
+
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20 text-accent">
+                <AlertTriangle className="h-7 w-7" />
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="font-serif text-2xl font-bold text-foreground">{t('limit_title')}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('limit_desc')}
+                </p>
+              </div>
+
+              <div className="space-y-2 rounded-2xl bg-muted/40 p-4 text-left text-xs font-semibold border border-border">
+                <p className="flex items-center gap-2 text-foreground">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <span>{t('premium_scan')}</span>
+                </p>
+                <p className="flex items-center gap-2 text-foreground">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <span>{t('premium_tts')}</span>
+                </p>
+                <p className="flex items-center gap-2 text-foreground">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <span>{t('premium_history')}</span>
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                <button
+                  onClick={handleActivatePremium}
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-bold text-white shadow-md hover:bg-primary-dark transition-all cursor-pointer"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  <span>{t('premium_cta')}</span>
+                </button>
+                <button
+                  onClick={() => setShowPaywall(false)}
+                  className="rounded-full py-2 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  {t('free_continue')}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+      </div>
     </main>
   )
 }

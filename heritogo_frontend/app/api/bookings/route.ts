@@ -1,69 +1,79 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { MissionType } from '@prisma/client'
-import { requireRole } from '@/lib/auth/session'
-import { checkRateLimit } from '@/lib/rate-limit'
-import { clipString, isUuid, parseBoundedNumber } from '@/lib/security/input'
 
-const MISSION_TYPES = new Set<string>(Object.values(MissionType))
+const MAX_GROUP_SIZE = 30
+const MAX_TEXT_LENGTH = 2_000
+
+function isNonEmptyString(value: unknown, maxLength = MAX_TEXT_LENGTH): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && value.trim().length <= maxLength
+}
 
 export async function POST(request: Request) {
   try {
-    const auth = await requireRole(['tourist'])
-    if ('error' in auth) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status })
-    }
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-    if (!checkRateLimit(`booking:${auth.user.id}`, 8, 60000)) {
-      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
+    const touristProfile = await prisma.profile.findUnique({ where: { id: user.id } })
+    if (!touristProfile || touristProfile.role !== 'tourist' || !touristProfile.is_active) {
+      return NextResponse.json({ error: 'Seul un compte touriste actif peut effectuer une réservation.' }, { status: 403 })
     }
 
     const body = await request.json()
-    const guide_id = body.guide_id
-    const mission_type = body.mission_type
-    const start_date = body.start_date
-
-    if (!isUuid(guide_id) || typeof mission_type !== 'string' || !MISSION_TYPES.has(mission_type) || !start_date) {
-      return NextResponse.json({ error: 'Champs obligatoires manquants ou invalides' }, { status: 400 })
+    const { guide_id, mission_type, start_date, start_time, meeting_point, tourist_message, group_size, special_needs } = body
+    if (!isNonEmptyString(guide_id, 64) || !Object.values(MissionType).includes(mission_type as MissionType) || !isNonEmptyString(start_date, 32)) {
+      return NextResponse.json({ error: 'Données de réservation invalides.' }, { status: 400 })
     }
 
-    const parsedStartDate = new Date(start_date)
-    if (Number.isNaN(parsedStartDate.getTime())) {
-      return NextResponse.json({ error: 'Date invalide' }, { status: 400 })
+    const parsedStartDate = new Date(`${start_date}T00:00:00`)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (Number.isNaN(parsedStartDate.getTime()) || parsedStartDate < today) {
+      return NextResponse.json({ error: 'La date de visite doit être aujourd’hui ou ultérieure.' }, { status: 400 })
     }
 
-    const guideProfile = await prisma.guideProfile.findFirst({
-      where: { id: guide_id, status: 'approved' },
-      include: { profile: true },
-    })
-
-    if (!guideProfile) {
-      return NextResponse.json({ error: 'Guide introuvable' }, { status: 404 })
+    const parsedGroupSize = Number(group_size ?? 1)
+    if (!Number.isInteger(parsedGroupSize) || parsedGroupSize < 1 || parsedGroupSize > MAX_GROUP_SIZE) {
+      return NextResponse.json({ error: `Le groupe doit compter entre 1 et ${MAX_GROUP_SIZE} personnes.` }, { status: 400 })
     }
 
     let parsedStartTime: Date | null = null
-    if (typeof body.start_time === 'string' && /^\d{2}:\d{2}$/.test(body.start_time)) {
-      const [hours, minutes] = body.start_time.split(':')
-      parsedStartTime = new Date()
-      parsedStartTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
+    if (start_time !== undefined && start_time !== null && start_time !== '') {
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(start_time)) {
+        return NextResponse.json({ error: 'Heure de début invalide.' }, { status: 400 })
+      }
+      const [hours, minutes] = start_time.split(':').map(Number)
+      parsedStartTime = new Date(1970, 0, 1, hours, minutes)
     }
 
-    const groupSize = parseBoundedNumber(body.group_size ?? 1, 1, 20) ?? 1
+    for (const value of [meeting_point, tourist_message, special_needs]) {
+      if (value !== undefined && value !== null && value !== '' && !isNonEmptyString(value)) {
+        return NextResponse.json({ error: 'Un des messages est trop long ou invalide.' }, { status: 400 })
+      }
+    }
+
+    const guideProfile = await prisma.guideProfile.findFirst({
+      where: { id: guide_id, status: 'approved', profile: { is: { is_active: true } } },
+      include: { profile: true }
+    })
+    if (!guideProfile) return NextResponse.json({ error: 'Guide indisponible.' }, { status: 404 })
 
     const booking = await prisma.booking.create({
       data: {
-        tourist_id: auth.user.id,
+        tourist_id: user.id,
         guide_id,
         status: 'quote_requested',
         mission_type: mission_type as MissionType,
         start_date: parsedStartDate,
         start_time: parsedStartTime,
-        meeting_point: clipString(body.meeting_point, 200),
-        tourist_message: clipString(body.tourist_message, 1000),
-        group_size: groupSize,
-        special_needs: clipString(body.special_needs, 500),
-        payment_status: 'pending',
-      },
+        meeting_point: isNonEmptyString(meeting_point) ? meeting_point.trim() : null,
+        tourist_message: isNonEmptyString(tourist_message) ? tourist_message.trim() : null,
+        group_size: parsedGroupSize,
+        special_needs: isNonEmptyString(special_needs) ? special_needs.trim() : null,
+        payment_status: 'pending'
+      }
     })
 
     await prisma.notification.create({
@@ -71,9 +81,9 @@ export async function POST(request: Request) {
         user_id: guideProfile.user_id,
         type: 'booking',
         title: 'Nouvelle demande de réservation',
-        body: `Vous avez reçu une demande de réservation de la part de ${auth.profile.full_name || 'un touriste'}.`,
-        data: { booking_id: booking.id },
-      },
+        body: `Vous avez reçu une demande de réservation de ${touristProfile.full_name || 'un touriste'}.`,
+        data: { booking_id: booking.id }
+      }
     })
 
     return NextResponse.json({ success: true, booking })

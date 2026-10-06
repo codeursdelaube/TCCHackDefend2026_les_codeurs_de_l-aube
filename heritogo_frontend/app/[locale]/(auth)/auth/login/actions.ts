@@ -5,9 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
-import { checkRateLimit, resetRateLimit, getClientIp } from '@/lib/rate-limit'
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limit'
 import { getSafeAuthErrorMessage } from '@/lib/utils/errors'
-import { isSafeInternalPath } from '@/lib/auth/redirect'
 
 export async function loginAction(prevState: any, formData: FormData) {
   try {
@@ -24,7 +23,9 @@ export async function loginAction(prevState: any, formData: FormData) {
 
     // Rate limiting anti brute-force
     const headersList = await headers()
-    const ip = getClientIp(headersList)
+    const ip = headersList.get('x-forwarded-for') ||
+                headersList.get('x-real-ip') ||
+                'unknown'
     const rateLimitKey = `login:${ip}:${email.trim().toLowerCase()}`
 
     if (!checkRateLimit(rateLimitKey, 5, 60000)) {
@@ -48,19 +49,27 @@ export async function loginAction(prevState: any, formData: FormData) {
     // Connexion réussie — réinitialiser le compteur de tentatives
     resetRateLimit(rateLimitKey)
 
-    // Récupérer le profil pour déterminer le rôle
-    const profile = await prisma.profile.findUnique({
-      where: { id: data.user.id },
-      select: { role: true, is_active: true }
-    })
+    // Récupérer le profil pour déterminer le rôle avec fallback sécurisé
+    let role = 'tourist'
+    try {
+      const profile = await prisma.profile.findUnique({
+        where: { id: data.user.id },
+        select: { role: true, is_active: true }
+      })
 
-    if (profile && !profile.is_active) {
-      return { error: 'Votre compte a été désactivé. Contactez le support.' }
+      if (profile && !profile.is_active) {
+        return { error: 'Votre compte a été désactivé. Contactez le support.' }
+      }
+
+      if (profile?.role) {
+        role = profile.role
+      }
+    } catch (dbErr) {
+      console.warn('[loginAction] DB profile fetch fallback to tourist:', dbErr)
     }
 
-    const role = profile?.role || 'tourist'
-
-    if (isSafeInternalPath(redirectTo)) {
+    // Utiliser le paramètre redirect s'il est fourni et valide
+    if (redirectTo && redirectTo.startsWith('/')) {
       redirect(redirectTo)
     }
 

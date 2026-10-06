@@ -45,7 +45,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
       <div className="relative flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-border bg-background shadow-2xl">
         <div
           className="flex shrink-0 items-center justify-between gap-4 rounded-t-2xl border-b border-border p-5"
-          style={{ background: '#004D40' }}
+          style={{ background: '#3B2519' }}
         >
           <div className="flex min-w-0 items-center gap-3">
             <Shield className="h-5 w-5 shrink-0 text-white" />
@@ -61,7 +61,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-card/20"
             aria-label={policy.closeLabel}
           >
             <X className="h-4 w-4" />
@@ -86,7 +86,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
             type="button"
             onClick={onClose}
             className="rounded-xl px-6 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90"
-            style={{ background: '#004D40' }}
+            style={{ background: '#3B2519' }}
           >
             {policy.understoodLabel}
           </button>

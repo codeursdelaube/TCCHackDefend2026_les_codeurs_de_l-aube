@@ -81,3 +81,123 @@ export async function apiFetch<T = unknown>(input: RequestInfo | URL, options: A
     if (signal) signal.removeEventListener('abort', abortFromCaller)
   }
 }
+type ClientCacheStorage = 'session' | 'local'
+
+interface CachedApiFetchOptions extends ApiFetchOptions {
+  /** Stable key for public GET responses. Never use this for authenticated data. */
+  cacheKey: string
+  /** Cache lifetime in milliseconds. Defaults to 5 minutes. */
+  ttlMs?: number
+  storage?: ClientCacheStorage
+}
+
+interface ClientCacheEntry<T> {
+  createdAt: number
+  data: T
+}
+
+const CLIENT_CACHE_PREFIX = 'heritogo:api-cache:'
+const memoryCache = new Map<string, ClientCacheEntry<unknown>>()
+const inFlightRequests = new Map<string, Promise<ApiFetchResult<unknown>>>()
+
+function getCacheStorage(storage: ClientCacheStorage): Storage | null {
+  if (typeof window === 'undefined') return null
+
+  try {
+    return storage === 'local' ? window.localStorage : window.sessionStorage
+  } catch {
+    return null
+  }
+}
+
+function readCacheEntry<T>(key: string, ttlMs: number, storage: ClientCacheStorage): T | null {
+  const now = Date.now()
+  const inMemory = memoryCache.get(key) as ClientCacheEntry<T> | undefined
+  if (inMemory && now - inMemory.createdAt < ttlMs) return inMemory.data
+  if (inMemory) memoryCache.delete(key)
+
+  const cacheStorage = getCacheStorage(storage)
+  if (!cacheStorage) return null
+
+  try {
+    const raw = cacheStorage.getItem(`${CLIENT_CACHE_PREFIX}${key}`)
+    if (!raw) return null
+
+    const entry = JSON.parse(raw) as ClientCacheEntry<T>
+    if (!entry || typeof entry.createdAt !== 'number' || now - entry.createdAt >= ttlMs) {
+      cacheStorage.removeItem(`${CLIENT_CACHE_PREFIX}${key}`)
+      return null
+    }
+
+    memoryCache.set(key, entry)
+    return entry.data
+  } catch {
+    return null
+  }
+}
+
+function writeCacheEntry<T>(key: string, data: T, storage: ClientCacheStorage) {
+  const entry: ClientCacheEntry<T> = { createdAt: Date.now(), data }
+  memoryCache.set(key, entry)
+
+  try {
+    getCacheStorage(storage)?.setItem(`${CLIENT_CACHE_PREFIX}${key}`, JSON.stringify(entry))
+  } catch {
+    // Storage is optional: the in-memory cache still prevents duplicate requests.
+  }
+}
+
+/**
+ * Cache an explicitly public GET response. Concurrent calls with the same key
+ * are deduplicated; stale or failed responses are never cached.
+ */
+export async function apiFetchCached<T = unknown>(
+  input: RequestInfo | URL,
+  options: CachedApiFetchOptions
+): Promise<ApiFetchResult<T>> {
+  const { cacheKey, ttlMs = 5 * 60 * 1000, storage = 'session', ...requestOptions } = options
+  const method = (requestOptions.method || 'GET').toUpperCase()
+
+  if (method !== 'GET') return apiFetch<T>(input, requestOptions)
+
+  const cached = readCacheEntry<T>(cacheKey, ttlMs, storage)
+  if (cached !== null) {
+    return { ok: true, status: 200, data: cached, error: null }
+  }
+
+  const existingRequest = inFlightRequests.get(cacheKey) as Promise<ApiFetchResult<T>> | undefined
+  if (existingRequest) return existingRequest
+
+  const request = apiFetch<T>(input, requestOptions)
+    .then((result) => {
+      if (result.ok && result.data !== null) writeCacheEntry(cacheKey, result.data, storage)
+      return result
+    })
+    .finally(() => {
+      inFlightRequests.delete(cacheKey)
+    })
+
+  inFlightRequests.set(cacheKey, request as Promise<ApiFetchResult<unknown>>)
+  return request
+}
+
+/** Remove cached public resources after a mutation that can change them. */
+export function clearClientCache(keyPrefix = '') {
+  for (const key of memoryCache.keys()) {
+    if (key.startsWith(keyPrefix)) memoryCache.delete(key)
+  }
+
+  for (const storageType of ['session', 'local'] as const) {
+    const cacheStorage = getCacheStorage(storageType)
+    if (!cacheStorage) continue
+
+    try {
+      for (let index = cacheStorage.length - 1; index >= 0; index -= 1) {
+        const key = cacheStorage.key(index)
+        if (key?.startsWith(`${CLIENT_CACHE_PREFIX}${keyPrefix}`)) cacheStorage.removeItem(key)
+      }
+    } catch {
+      // A blocked storage API simply means there is nothing to invalidate.
+    }
+  }
+}

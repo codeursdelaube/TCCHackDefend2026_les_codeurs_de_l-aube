@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -51,7 +51,7 @@ export default function OnboardingTooltip() {
   return (
     <>
       <div className="pointer-events-none fixed inset-0 z-[100] bg-black/50" />
-      <div ref={tooltipRef} className="fixed z-[101] w-64 rounded-[28px] border border-border bg-base-200 p-4 text-base-content shadow-2xl" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+      <div ref={tooltipRef} className="fixed z-[101] w-64 rounded-xl border border-border bg-base-200 p-4 text-base-content shadow-2xl" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {steps[currentStep].icon}

@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Star, X, Loader2 } from 'lucide-react'
 import { COLORS } from '@/lib/constants/colors'
-import { apiFetch } from '@/lib/utils/http'
+import { apiFetch, clearClientCache } from '@/lib/utils/http'
+import { useTranslations } from 'next-intl'
 
 interface ReviewModalProps {
   bookingId: string
@@ -13,6 +14,7 @@ interface ReviewModalProps {
 }
 
 export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: ReviewModalProps) {
+  const t = useTranslations('Common')
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState('')
   const [loading, setLoading] = useState(false)
@@ -40,6 +42,8 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
         return
       }
 
+      clearClientCache('public-guide')
+      clearClientCache('public-guides')
       onSuccess()
       onClose()
     } catch {
@@ -51,16 +55,16 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl">
         <div className="flex items-center justify-between border-b border-border pb-3">
-          <h3 className="font-serif text-xl font-bold text-base-content">Laisser un avis</h3>
+          <h3 className="font-serif text-xl font-bold text-base-content">{t('review_title')}</h3>
           <button type="button" onClick={onClose} className="rounded-xl p-1 hover:bg-base-300">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="mt-6 flex flex-col items-center">
-          <p className="text-sm font-semibold text-base-content/75 mb-2">Note globale</p>
+          <p className="text-sm font-semibold text-base-content/75 mb-2">{t('review_overall_rating')}</p>
           <div className="flex gap-1.5">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -86,17 +90,17 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
         <div className="mt-6">
           <label className="form-control w-full">
             <div className="label mb-1">
-              <span className="label-text text-sm font-semibold">Commentaire</span>
-              <span className="label-text-alt text-xs text-base-content/50">Admin uniquement</span>
+              <span className="label-text text-sm font-semibold">{t('review_comment')}</span>
+              <span className="label-text-alt text-xs text-base-content/50">{t('review_admin_only')}</span>
             </div>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               className="textarea textarea-bordered h-24 rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
-              placeholder="Écrivez votre commentaire ici (visible uniquement par l'équipe administrative)..."
+              placeholder={t('review_placeholder')}
             />
             <span className="mt-1 text-[10px] text-base-content/55 font-medium leading-4">
-              ℹ️ Pour des raisons de confidentialité, votre commentaire textuel ne sera pas affiché publiquement. Seule la note en étoiles sera visible sur le profil du guide.
+              {t('review_privacy_note')}
             </span>
           </label>
         </div>
@@ -113,7 +117,7 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
             onClick={onClose}
             className="btn btn-outline flex-1 rounded-2xl text-xs font-bold"
           >
-            Annuler
+            {t('review_cancel')}
           </button>
           <button
             type="button"
@@ -122,7 +126,7 @@ export default function ReviewModal({ bookingId, isOpen, onClose, onSuccess }: R
             className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
             style={{ backgroundColor: COLORS.forest }}
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Soumettre'}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('review_submit_btn')}
           </button>
         </div>
       </div>

@@ -1,18 +1,29 @@
 // restaurants.ts
-// Données vérifiées via TripAdvisor, Petit Futé, sites officiels des restaurants,
-// wakabileguide.com, saveurstogo.com, quefairealome.com, waafrica.travel
-// Coordonnées GPS basées sur les adresses réelles des quartiers de Lomé
+// Données re-vérifiées le 22/08/2026 via recherche web :
+// Petit Futé, TripAdvisor, quefairealome.com (top 5 spécialités togolaises),
+// wakabileguide.com (top 10 ayimolou), sites officiels des restaurants.
+//
+// IMPORTANT :
+// - Le champ `verifie` indique si le numéro de téléphone et l'adresse ont pu
+//   être confirmés par au moins une source externe fiable.
+// - Pour les vendeuses/stands informels (ayimolou de rue), aucun numéro de
+//   téléphone public n'existe généralement — le champ `telephone` est alors
+//   `null` plutôt qu'un faux numéro inventé.
+// - Les coordonnées GPS restent des ESTIMATIONS au niveau du quartier sauf
+//   mention contraire ; aucun outil de géocodage n'a été utilisé, seules les
+//   adresses textuelles ont été vérifiées.
 
 export interface Restaurant {
   id: string
   nom: string
   adresse: string
   quartier: string
-  telephone: string
+  telephone: string | null
   horaires: string
   budget_fcfa: string
-  note?: number       // sur 5, source TripAdvisor / Petit Futé
-  source_info: string // d'où vient l'info
+  note?: number         // sur 5, source TripAdvisor / Petit Futé si disponible
+  source_info: string   // d'où vient l'info
+  verifie: boolean       // true si adresse + tel confirmés par une source externe
   lat: number
   lng: number
   plats_ids: string[]
@@ -22,9 +33,12 @@ const restaurants: Restaurant[] = [
 
   // ─────────────────────────────────────────────────────────────────
   // 1. NAMIÉLÉ — Restaurant de l'Hôtel 2 Février
-  //    Source : TripAdvisor (#5/123 à Lomé, 83 avis, 4.6/5)
-  //    Tél officiel Hôtel 2 Février : +228 22 23 86 00
-  //    GPS : Place de l'Indépendance (6.127645, 1.214083) — Wikipedia
+  //    Confirmé : restaurant réel de l'hôtel, buffet petit-déj/déjeuner,
+  //    avis positifs récurrents sur TripAdvisor. ATTENTION : c'est un
+  //    buffet international/multi-cuisine (l'hôtel a aussi un resto
+  //    asiatique gastronomique et l'Akwaba Grill) — pas un spécialiste
+  //    100% togolais. À présenter comme "cuisine togolaise + internationale".
+  //    GPS : Place de l'Indépendance (confirmé Wikipedia + Expedia)
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_namiele",
@@ -34,8 +48,9 @@ const restaurants: Restaurant[] = [
     telephone: "+228 22 23 86 00",
     horaires: "Lun–Sam 6h30–10h30 et 12h–15h | Dim 6h30–11h et 12h30–15h30",
     budget_fcfa: "8000 – 25000",
-    note: 4.6,
-    source_info: "TripAdvisor 2026 #5/123 Lomé | Place De L'Independance Hotel 2 Fevrier",
+    note: 4.5,
+    source_info: "TripAdvisor 2026 (avis confirmés) | Petit Futé | Expedia",
+    verifie: true,
     lat: 6.127645,
     lng: 1.214083,
     plats_ids: [
@@ -45,23 +60,23 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 2. VIVI ROYALE
-  //    Source : Petit Futé, globenin.com, togovoyage.com, quefairealome.com
-  //    Adresse vérifiée : 41, Rue des Moussons, Nyékonakpoé
-  //    Tél vérifiés : +228 22 22 20 27 / +228 91 56 77 04
-  //    GPS : Quartier Nyékonakpoé, près Mairie Centrale
-  //    (6.1360, 1.2200) — estimation basée sur adresse
+  // 2. VIVI ROYAL
+  //    CORRECTION : le vrai numéro confirmé par quefairealome.com est
+  //    99 47 60 53 / 91 56 77 04 (l'ancien 22 22 20 27 n'est confirmé
+  //    par aucune source trouvée — retiré). Adresse confirmée identique.
+  //    Nom officiel : "Vivi Royal" (pas "Vivi Royale").
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_vivi_royale",
-    nom: "Vivi Royale",
-    adresse: "41, Rue des Moussons, 2ème rue en face de la Mairie Centrale, Nyékonakpoé, Lomé",
+    nom: "Vivi Royal",
+    adresse: "Rue des Moussons, 2ème rue en face de la Mairie Centrale (ou 1ère rue après l'ancien Maquina Loca), Nyékonakpoé, Lomé",
     quartier: "Nyékonakpoé",
-    telephone: "+228 22 22 20 27",
+    telephone: "+228 99 47 60 53",
     horaires: "Mer–Lun 12h–15h et 19h–23h (fermé mardi)",
-    budget_fcfa: "4000 – 10000",
+    budget_fcfa: "5000 – 10000",
     note: 3.8,
-    source_info: "Petit Futé | globenin.com ref ETG1426 | quefairealome.com",
+    source_info: "quefairealome.com (Top 5 spécialités togolaises) | Petit Futé",
+    verifie: true,
     lat: 6.1360,
     lng: 1.2200,
     plats_ids: [
@@ -71,11 +86,9 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 3. MAQUIS CHEZ BROVI — « La Grâce de Dieu »
-  //    Source : TripAdvisor (#37/97, 3.9/5), Petit Futé, saveurstogo.com
-  //    Adresse : 29, Ave Nicolas Grunitzky / Qrt. Nyekonakpoe, face Mairie
-  //    GPS : Avenue Nicolas Grunitzky, Nyékonakpoé
-  //    (6.1375, 1.2175) — adresse coin mairie centrale
+  // 3. MAQUIS CHEZ BROVI — non re-confirmé cette session (aucune
+  //    source indépendante trouvée pour le numéro +228 90 03 14 60).
+  //    Conservé mais marqué non vérifié — à re-checker sur place.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_chez_brovi",
@@ -86,7 +99,8 @@ const restaurants: Restaurant[] = [
     horaires: "Lun–Dim 11h–22h",
     budget_fcfa: "2500 – 5500",
     note: 3.9,
-    source_info: "TripAdvisor 2025 | Petit Futé | saveurstogo.com",
+    source_info: "Non re-confirmé cette session — à vérifier sur place",
+    verifie: false,
     lat: 6.1375,
     lng: 1.2175,
     plats_ids: [
@@ -95,11 +109,8 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 4. LA MARMITE DU TERROIR
-  //    Source : quefairealome.com, Facebook (2123 likes), evendo.com
-  //    Adresse : Totsi, en face d'Ecobank, à côté de la pharmacie de la Nation
-  //    Tél : +228 90 17 75 75 (confirmé quefairealome.com)
-  //    GPS : Totsi, Lomé (6.1620, 1.2180)
+  // 4. LA MARMITE DU TERROIR — Confirmé quefairealome.com
+  //    Tél 90 17 75 75 correct. Instagram : @restolamat
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_marmite_terroir",
@@ -110,7 +121,8 @@ const restaurants: Restaurant[] = [
     horaires: "Lun–Dim 11h–23h",
     budget_fcfa: "5000 – 15000",
     note: 4.2,
-    source_info: "quefairealome.com 2022 | Facebook La Marmite du Terroir",
+    source_info: "quefairealome.com (confirmé) | Instagram @restolamat",
+    verifie: true,
     lat: 6.1620,
     lng: 1.2180,
     plats_ids: [
@@ -120,11 +132,8 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 5. LA SUITE DE CIKA
-  //    Source : quefairealome.com
-  //    Adresse : Nukafu, Bvd Jean Paul II, en face station T-Oil
-  //    Tél : +228 70 54 38 94 (confirmé quefairealome.com)
-  //    GPS : Nukafu, Bvd Jean Paul II (6.1670, 1.2160)
+  // 5. LA SUITE DE CIKA — Confirmé quefairealome.com, tél 70 54 38 94
+  //    exact. Instagram : @lasuitedecika. Réservation conseillée le week-end.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_suite_cika",
@@ -133,9 +142,10 @@ const restaurants: Restaurant[] = [
     quartier: "Nukafu",
     telephone: "+228 70 54 38 94",
     horaires: "Mar–Dim 11h30–14h30 et 18h30–00h | Lun 18h30–00h",
-    budget_fcfa: "3000 – 15000",
+    budget_fcfa: "1000 – 100000",
     note: 4.3,
-    source_info: "quefairealome.com 2022 | waafrica.travel",
+    source_info: "quefairealome.com (confirmé) | Instagram @lasuitedecika",
+    verifie: true,
     lat: 6.1670,
     lng: 1.2160,
     plats_ids: [
@@ -145,24 +155,22 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 6. BAR LA FIERTÉ
-  //    Source : restaurant-barlafierte.com (site officiel)
-  //    Adresse officielle : Agoè Anomé, face à l'Hôtel La Maison Blanche
-  //    Tél officiel : +228 96 26 91 91
-  //    Plats confirmés : fufu, ayimolou, koliko, kom (khom), gboma,
-  //                      adème, djenkoumé, vèbè, akoumè
-  //    GPS : Agoè Anomé, Lomé (6.2050, 1.2100)
+  // 6. BAR LA FIERTÉ — Entièrement confirmé (site officiel, Facebook,
+  //    TripAdvisor #39/96 à Lomé). Fondé en 2018, tenu par des femmes.
+  //    Adresse précise confirmée : Agoè Anomé / Agoè 2 Lions, entre les
+  //    carrefours Bodjona et 2 Lions, face Hôtel La Maison Blanche.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_bar_la_fierte",
     nom: "Bar La Fierté",
-    adresse: "Agoè Anomé, face à l'Hôtel La Maison Blanche, Lomé",
+    adresse: "Agoè Anomé (Agoè 2 Lions), face à l'Hôtel La Maison Blanche, entre les carrefours Bodjona et 2 Lions, Lomé",
     quartier: "Agoè",
     telephone: "+228 96 26 91 91",
     horaires: "Lun–Dim 9h–21h",
-    budget_fcfa: "1500 – 6000",
-    note: 4.4,
-    source_info: "restaurant-barlafierte.com (site officiel) | barlafierteagoe@gmail.com",
+    budget_fcfa: "1000 – 6000",
+    note: 5.0,
+    source_info: "Site officiel restaurant-barlafierte.com | TripAdvisor #39/96 Lomé | Facebook (511 likes)",
+    verifie: true,
     lat: 6.2050,
     lng: 1.2100,
     plats_ids: [
@@ -173,23 +181,21 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 7. CHÂTEAU TAMBERMA
-  //    Source : quefairealome.com, waafrica.travel
-  //    Adresse : 2ème von à droite après le Collège Saint Joseph
-  //              (en venant de Bè / Centre Culturel Denyigban)
-  //    Spécialités : koliko, poulet bicyclette, plats togolais tous types
-  //    GPS : Bè, Lomé (6.1270, 1.2350) — estimation quartier Bè
+  // 7. CHÂTEAU TAMBERMA — CORRECTION : vrai numéro confirmé par
+  //    quefairealome.com = 97 09 79 79 (l'ancien 90 00 00 00 était un
+  //    placeholder factice, retiré).
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_chateau_tamberma",
     nom: "Château Tamberma",
     adresse: "2ème ruelle à droite après le Collège Saint Joseph, quartier Bè (vers Centre Culturel Denyigban), Lomé",
     quartier: "Bè",
-    telephone: "+228 90 00 00 00",
+    telephone: "+228 97 09 79 79",
     horaires: "Lun–Dim 11h–23h",
     budget_fcfa: "5000 – 15000",
     note: 4.1,
-    source_info: "quefairealome.com 2022 | waafrica.travel",
+    source_info: "quefairealome.com (confirmé, Top 5 spécialités togolaises)",
+    verifie: true,
     lat: 6.1270,
     lng: 1.2350,
     plats_ids: [
@@ -199,222 +205,296 @@ const restaurants: Restaurant[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 8. CHEZ WIYAO
-  //    Source : wakabileguide.com (top 10 ayimolou 2025)
-  //    Adresse : Hedzranawoé, derrière l'Ambassade du Gabon
-  //    Horaires confirmés : Lun–Dim 10h–22h
-  //    Prix : à partir de 500 FCFA
-  //    GPS : Hedzranawoé (6.1730, 1.2420)
+  // 8. CHEZ WIYAO — Confirmé wakabileguide.com (bar-restaurant +
+  //    traiteur). Aucun numéro public trouvé — l'ancien 90 00 00 01
+  //    était un placeholder factice, retiré.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_chez_wiyao",
     nom: "Chez Wiyao",
     adresse: "Hedzranawoé, derrière l'Ambassade du Gabon, Lomé",
     quartier: "Hedzranawoé",
-    telephone: "+228 90 00 00 01",
+    telephone: null,
     horaires: "Lun–Dim 10h–22h",
     budget_fcfa: "500 – 2500",
     note: 4.0,
-    source_info: "wakabileguide.com Top 10 Ayimolou Lomé 2025",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
     lat: 6.1730,
     lng: 1.2420,
     plats_ids: ["ayimolou_togolais", "koliko_togolais"]
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 9. CONGOTON (Congotô)
-  //    Source : wakabileguide.com (top 10 ayimolou 2025)
-  //    Adresse : Bè-Kpota, en face de la Pharmacie 2000
-  //    Réputé pour la qualité de son riz, très fréquenté
-  //    GPS : Bè-Kpota (6.1305, 1.2340)
+  // 9. CONGOTÔ — Confirmé wakabileguide.com. Vendeuse de rue reconnue
+  //    pour la qualité de son riz, forte affluence. Pas de tél public.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_congoto",
     nom: "Congotô",
     adresse: "Bè-Kpota, en face de la Pharmacie 2000, Lomé",
     quartier: "Bè-Kpota",
-    telephone: "+228 90 00 00 02",
+    telephone: null,
     horaires: "Lun–Dim 7h–14h",
     budget_fcfa: "500 – 2000",
     note: 4.1,
-    source_info: "wakabileguide.com Top 10 Ayimolou Lomé 2025",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
     lat: 6.1305,
     lng: 1.2340,
     plats_ids: ["ayimolou_togolais"]
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 10. MAMA LOCOH DONOU
-  //     Source : wakabileguide.com (top 10 ayimolou 2025)
-  //     Adresse : Nyékonakpoé, en face du laboratoire Locoh Donou
-  //     Horaires : 9h–12h (Lun–Sam), célèbre pour son ébéssé fionfion
-  //     GPS : Nyékonakpoé (6.1445, 1.2250)
+  // 10. MAMA LOCOH DONOU — Confirmé wakabileguide.com. Réputée pour
+  //     son ébéssé fionfion. Pas de tél public.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_mama_locoh_donou",
     nom: "Mama Locoh Donou",
     adresse: "Nyékonakpoé, en face du laboratoire Locoh Donou, Lomé",
     quartier: "Nyékonakpoé",
-    telephone: "+228 90 00 00 03",
+    telephone: null,
     horaires: "Lun–Sam 9h–12h",
     budget_fcfa: "500 – 1500",
     note: 4.2,
-    source_info: "wakabileguide.com Top 10 Ayimolou Lomé 2025",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
     lat: 6.1445,
     lng: 1.2250,
     plats_ids: ["ayimolou_togolais"]
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 11. MAGUINON AYIMOLOU (Maman Maggi)
-  //     Source : lacarte.menu — Rue de l'Ogou face au Lycée Français
-  //     Spécialité : ayimolou le matin, koliko le soir
-  //     Quartier : Avedji / Gblenkome
-  //     GPS : Rue de l'Ogou, face Lycée Français (6.1780, 1.2080)
-  // ─────────────────────────────────────────────────────────────────
-  {
-    id: "r_maguinon_ayimolou",
-    nom: "Maguinon Ayimolou (Maman Maggi)",
-    adresse: "Rue de l'Ogou, face au Lycée Français de Lomé, Avedji",
-    quartier: "Avedji / Gblenkome",
-    telephone: "+228 90 00 00 04",
-    horaires: "6h30–13h (ayimolou) | 18h–22h (koliko)",
-    budget_fcfa: "500 – 2000",
-    note: 4.3,
-    source_info: "lacarte.menu Lome — Maguinon Ayimolou",
-    lat: 6.1780,
-    lng: 1.2080,
-    plats_ids: ["ayimolou_togolais", "koliko_togolais"]
-  },
-
-  // ─────────────────────────────────────────────────────────────────
-  // 12. MAMA RAMCO
-  //     Source : wakabileguide.com (top 10 ayimolou 2025)
-  //     Adresse : sens interdit de Tokoin Ramco, Lomé
-  //     Horaires : 19h–23h (nocturne), fameuse sauce Akpama
-  //     GPS : Tokoin Ramco (6.1590, 1.2195)
+  // 11. MAMA RAMCO — Confirmé wakabileguide.com. Nocturne, sauce
+  //     Akpama réputée. Pas de tél public.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_mama_ramco",
     nom: "Mama Ramco",
     adresse: "Sens interdit de Tokoin Ramco, Lomé",
     quartier: "Tokoin Ramco",
-    telephone: "+228 90 00 00 05",
+    telephone: null,
     horaires: "Lun–Dim 19h–23h",
     budget_fcfa: "500 – 2000",
     note: 4.0,
-    source_info: "wakabileguide.com Top 10 Ayimolou Lomé 2025",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
     lat: 6.1590,
     lng: 1.2195,
     plats_ids: ["ayimolou_togolais", "koliko_togolais"]
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // 13. CHEZ MADJO
-  //     Source : wakabileguide.com (top 10 ayimolou 2025)
-  //     Adresse : Tokoin Hôpital, Lomé
-  //     GPS : Tokoin (6.1560, 1.2240)
+  // 12. CHEZ MADJO — Confirmé wakabileguide.com. Pas de tél public.
   // ─────────────────────────────────────────────────────────────────
   {
     id: "r_chez_madjo",
     nom: "Chez Madjo",
     adresse: "Tokoin Hôpital, Lomé",
     quartier: "Tokoin",
-    telephone: "+228 90 00 00 06",
-    horaires: "Lun–Dim 7h–14h",
+    telephone: null,
+    horaires: "Lun–Dim 10h–22h",
     budget_fcfa: "500 – 2000",
     note: 4.2,
-    source_info: "wakabileguide.com Top 10 Ayimolou Lomé 2025",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
     lat: 6.1560,
     lng: 1.2240,
     plats_ids: ["ayimolou_togolais"]
   },
 
+  // ═════════════════════════════════════════════════════════════════
+  // NOUVEAUX RESTAURANTS AJOUTÉS CETTE SESSION
+  // ═════════════════════════════════════════════════════════════════
+
   // ─────────────────────────────────────────────────────────────────
-  // 14. FUFU BAR MOKPÔKPÔ
-  //     Source : lacarte.menu — confirmé plusieurs avis
-  //     Spécialité : foufou (fufu togolais du Sud / Plateaux)
-  //     avec akoumé, tou, pâte de maïs, sauces variées
-  //     Quartier : Bè, Lomé
-  //     GPS : Bè (6.1280, 1.2310)
+  // 13. LE TALIER À VOLONTÉ — Nouveau. Confirmé quefairealome.com,
+  //     tél double confirmé. Quartier Amoutiévé.
   // ─────────────────────────────────────────────────────────────────
+  {
+    id: "r_talier_a_volonte",
+    nom: "Le Talier à Volonté",
+    adresse: "Rue Mampo, 3ème rue à gauche en quittant Deckon pour Colombe de la Paix, non loin de la station Total, Amoutiévé, Lomé",
+    quartier: "Amoutiévé",
+    telephone: "+228 93 45 90 90",
+    horaires: "Service déjeuner (idéal pause-déjeuner)",
+    budget_fcfa: "5000+",
+    source_info: "quefairealome.com (Top 5 spécialités togolaises, confirmé)",
+    verifie: true,
+    lat: 6.1330,
+    lng: 1.2100,
+    plats_ids: ["fufu_togolais", "gboma_dessi", "ayimolou_togolais", "koliko_togolais"]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // 14. MAAMI AGOÈ — Nouveau. Confirmé wakabileguide.com. Stand
+  //     informel près du marché Assiyéyé, repère : microfinance Famer.
+  //     Pas de tél public — GPS estimé au niveau du quartier Agoè.
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "r_maami_agoe",
+    nom: "Maami Agoè",
+    adresse: "Ruelle près du marché Assiyéyé, à côté de la microfinance Famer, Agoè, Lomé",
+    quartier: "Agoè",
+    telephone: null,
+    horaires: "Non précisé — vendeuse de rue, service matinal typique",
+    budget_fcfa: "500 – 2000",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
+    lat: 6.1950,
+    lng: 1.2050,
+    plats_ids: ["ayimolou_togolais"]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // 15. DA VODOU — Nouveau. Confirmé wakabileguide.com. Stand de riz,
+  //     quartier Bè près du corner de la poste.
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "r_da_vodou",
+    nom: "Da Vodou",
+    adresse: "Quartier Bè, près du corner de la poste, Lomé",
+    quartier: "Bè",
+    telephone: null,
+    horaires: "Lun–Sam 8h–12h (fermé dimanche)",
+    budget_fcfa: "500 – 1500",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
+    lat: 6.1290,
+    lng: 1.2320,
+    plats_ids: ["ayimolou_togolais"]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // 16. CHEZ BÈRÈ — Nouveau. Confirmé wakabileguide.com. Quartier
+  //     Kotokoli Zongo.
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "r_chez_bere",
+    nom: "Chez Bèrè",
+    adresse: "Quartier Kotokoli Zongo, Lomé",
+    quartier: "Kotokoli Zongo",
+    telephone: null,
+    horaires: "Non précisé — adresse locale bien connue des habitants",
+    budget_fcfa: "500 – 2000",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
+    lat: 6.1400,
+    lng: 1.2280,
+    plats_ids: ["ayimolou_togolais"]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // 17. TANTI KPOKPOROKPO — Nouveau. Confirmé wakabileguide.com.
+  //     Tokoin Doumassessé-Adéwi.
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "r_tanti_kpokporokpo",
+    nom: "Tanti Kpokporokpo",
+    adresse: "Tokoin Doumassessé-Adéwi, Lomé",
+    quartier: "Tokoin Doumassessé-Adéwi",
+    telephone: null,
+    horaires: "Non précisé — stand très fréquenté par les habitants du quartier",
+    budget_fcfa: "500 – 2000",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
+    lat: 6.1540,
+    lng: 1.2260,
+    plats_ids: ["ayimolou_togolais"]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // 18. MAMAN ASHAO — Nouveau. Confirmé wakabileguide.com. Tokoin
+  //     Séminaire.
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "r_maman_ashao",
+    nom: "Maman Ashao",
+    adresse: "Tokoin Séminaire, Lomé",
+    quartier: "Tokoin Séminaire",
+    telephone: null,
+    horaires: "Non précisé — grande popularité locale",
+    budget_fcfa: "500 – 2000",
+    source_info: "wakabileguide.com — Top 10 Ayimolou Lomé",
+    verifie: true,
+    lat: 6.1570,
+    lng: 1.2210,
+    plats_ids: ["ayimolou_togolais"]
+  },
+
+  // ═════════════════════════════════════════════════════════════════
+  // ENTRÉES DE L'ANCIEN FICHIER NON RE-CONFIRMÉES CETTE SESSION
+  // (conservées mais marquées `verifie: false` — à vérifier sur place
+  // avant publication si tu veux garder une fiabilité 100%)
+  // ═════════════════════════════════════════════════════════════════
+
+  {
+    id: "r_maguinon_ayimolou",
+    nom: "Maguinon Ayimolou (Maman Maggi)",
+    adresse: "Rue de l'Ogou, face au Lycée Français de Lomé, Avedji",
+    quartier: "Avedji / Gblenkome",
+    telephone: null,
+    horaires: "6h30–13h (ayimolou) | 18h–22h (koliko)",
+    budget_fcfa: "500 – 2000",
+    source_info: "Non re-confirmé cette session (source d'origine : lacarte.menu) — à vérifier",
+    verifie: false,
+    lat: 6.1780,
+    lng: 1.2080,
+    plats_ids: ["ayimolou_togolais", "koliko_togolais"]
+  },
   {
     id: "r_fufu_mokpokpo",
     nom: "Fufu Bar Mokpôkpô",
     adresse: "Quartier Bè, Lomé",
     quartier: "Bè",
-    telephone: "+228 90 00 00 07",
+    telephone: null,
     horaires: "Lun–Dim 7h–22h",
     budget_fcfa: "1500 – 4000",
-    note: 4.1,
-    source_info: "lacarte.menu Fufu Mokpôkpô Lome",
+    source_info: "Non re-confirmé cette session (source d'origine : lacarte.menu) — à vérifier",
+    verifie: false,
     lat: 6.1280,
     lng: 1.2310,
-    plats_ids: [
-      "fufu_togolais", "gboma_dessi", "adzeme_togolais", "vebe_togolais"
-    ]
+    plats_ids: ["fufu_togolais", "gboma_dessi", "adzeme_togolais", "vebe_togolais"]
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // 15. FUFU BAR RESTO MAIN DIVINE
-  //     Source : allianztravelinsurance.com (article 2024 sur Lomé)
-  //     Cité comme l'un des deux fufu bars incontournables de Lomé
-  //     avec son concurrent « Bar Restaurant »
-  //     GPS : Tokoin, Lomé (6.1520, 1.2270)
-  // ─────────────────────────────────────────────────────────────────
   {
     id: "r_fufu_main_divine",
     nom: "Fufu Bar Resto Main Divine",
     adresse: "Tokoin, Lomé",
     quartier: "Tokoin",
-    telephone: "+228 90 00 00 08",
+    telephone: null,
     horaires: "Lun–Dim 7h30–22h",
     budget_fcfa: "1500 – 3500",
-    note: 4.0,
-    source_info: "allianztravelinsurance.com — Incredible Foodie Capitals: Lomé 2024",
+    source_info: "Non re-confirmé cette session (source d'origine : allianztravelinsurance.com) — à vérifier",
+    verifie: false,
     lat: 6.1520,
     lng: 1.2270,
     plats_ids: ["fufu_togolais", "gboma_dessi", "adzeme_togolais"]
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // 16. MAQUIS CHEZ AFOVI (ablo & kom — zone côtière)
-  //     Source : saveurstogo.com + allianztravelinsurance.com
-  //     Ablo et Kom : spécialités côtières, Baguida / Route d'Aného
-  //     GPS : Baguida (6.1050, 1.3100)
-  // ─────────────────────────────────────────────────────────────────
   {
     id: "r_chez_afovi",
     nom: "Maquis Chez Afovi",
     adresse: "Baguida, Route d'Aného, Lomé",
     quartier: "Baguida",
-    telephone: "+228 90 00 00 09",
+    telephone: null,
     horaires: "Lun–Dim 9h–22h",
     budget_fcfa: "1000 – 3500",
-    note: 3.9,
-    source_info: "saveurstogo.com | allianztravelinsurance.com",
+    source_info: "Non re-confirmé cette session — à vérifier",
+    verifie: false,
     lat: 6.1050,
     lng: 1.3100,
     plats_ids: ["ablo_togolais", "kom_togolais", "fufu_togolais"]
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // 17. MAQUIS EWÉ SAVEURS
-  //     Restaurant spécialisé plats Éwé du Sud-Togo
-  //     (djenkoumé, gboma, fufu, vèbè)
-  //     Quartier : Agbalépédogan, Lomé
-  //     GPS : (6.1480, 1.2380)
-  // ─────────────────────────────────────────────────────────────────
   {
     id: "r_ewe_saveurs",
     nom: "Maquis Ewé Saveurs",
     adresse: "Agbalépédogan, Lomé",
     quartier: "Agbalépédogan",
-    telephone: "+228 90 00 00 10",
+    telephone: null,
     horaires: "Lun–Dim 11h–22h",
     budget_fcfa: "2000 – 6000",
-    note: 4.0,
-    source_info: "saveurstogo.com | guides cuisine togolaise",
+    source_info: "Non re-confirmé cette session — à vérifier (existence non retrouvée par recherche web)",
+    verifie: false,
     lat: 6.1480,
     lng: 1.2380,
     plats_ids: [

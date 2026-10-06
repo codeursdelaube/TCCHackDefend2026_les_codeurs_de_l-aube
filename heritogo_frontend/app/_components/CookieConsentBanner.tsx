@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { Cookie, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
+import PrivacyModal from '@/components/PrivacyModal'
 
 const COOKIE_NAME = 'heritogo_cookie_consent'
 const MAX_AGE = 60 * 60 * 24 * 365
@@ -16,11 +18,14 @@ function getCookie(name: string) {
 }
 
 function saveConsent(value: 'accepted' | 'refused') {
-  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${MAX_AGE}; SameSite=Lax`
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${MAX_AGE}; SameSite=Lax${secure}`
 }
 
 export default function CookieConsentBanner() {
+  const t = useTranslations('Cookie')
   const [visible, setVisible] = useState(false)
+  const [policyOpen, setPolicyOpen] = useState(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -48,10 +53,12 @@ export default function CookieConsentBanner() {
             <Cookie className="h-5 w-5" />
           </span>
           <div>
-            <p className="text-sm font-black">Cookies Heritogo</p>
+            <p className="text-sm font-black">{t('title')}</p>
             <p className="mt-1 text-xs leading-5 text-base-content/65">
-              Nous utilisons des cookies pour garder votre session, votre langue et votre theme.
-              Vous pouvez accepter ou refuser les cookies non essentiels.
+              {t('body')}{' '}
+              <button type="button" className="font-bold underline" onClick={() => setPolicyOpen(true)}>
+                {t('policy')}
+              </button>
             </p>
           </div>
         </div>
@@ -62,7 +69,7 @@ export default function CookieConsentBanner() {
             onClick={() => answer('refused')}
             className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border px-4 text-xs font-black hover:bg-base-200"
           >
-            Refuser
+            {t('refuse')}
           </button>
           <button
             type="button"
@@ -70,18 +77,19 @@ export default function CookieConsentBanner() {
             className="inline-flex min-h-10 items-center justify-center rounded-xl px-4 text-xs font-black text-white hover:brightness-110"
             style={{ backgroundColor: COLORS.rust }}
           >
-            Accepter
+            {t('accept')}
           </button>
           <button
             type="button"
             onClick={() => answer('refused')}
             className="flex h-10 w-10 items-center justify-center rounded-xl text-base-content/60 hover:bg-base-200 hover:text-base-content"
-            aria-label="Fermer"
+            aria-label={t('close')}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       </div>
+      <PrivacyModal isOpen={policyOpen} onClose={() => setPolicyOpen(false)} />
     </div>
   )
 }

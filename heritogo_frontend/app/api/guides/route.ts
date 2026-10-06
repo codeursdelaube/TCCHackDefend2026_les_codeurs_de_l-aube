@@ -40,6 +40,8 @@ export async function GET(request: Request) {
           select: {
             full_name: true,
             avatar_url: true,
+            preferred_lang: true,
+            bio: true
           }
         }
       },
@@ -48,7 +50,14 @@ export async function GET(request: Request) {
       }
     })
 
-    return NextResponse.json({ guides })
+    return NextResponse.json(
+      { guides },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600',
+        },
+      }
+    )
   } catch (error: unknown) {
     console.error('[GET /api/guides]', error)
     const message = error instanceof Error && error.message.includes('P1001')

@@ -1,15 +1,16 @@
 // hotels.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// Données vérifiées via :
-//   • Sites officiels des hôtels (sarakawa-hotel.com, 2fevrier.com,
-//     onomohotels.com, napotogo.com, hotelsanctamaria.com, cocobeach-togo.com)
-//   • Booking.com, TripAdvisor, Petit Futé, Globenin, Trivago
-//   • Wikipedia (Hotel 2 Février GPS : 6.127645 / 1.214083)
-//   • Cybevasion.fr (Sancta Maria GPS : 6.12859 / 1.23872)
-//   • Ehotelsreviews.com (Robinson Plage GPS : 6.150814 / 1.299338)
+// Ré-vérification du 22/08/2026 en complément du fichier d'origine.
+// Sources ajoutées cette session : Petit Futé (Le Sphinx), togotourisme.tg
+// (annuaire officiel hôtels), iokahospitality.com (site officiel IOKA),
+// planetofhotels.com / trivago / booking.com / expedia (Résidence Océane).
 //
-// GPS marqué ✅ = coordonnées issues d'une source explicite
-// GPS marqué ~ = estimation au centroïde de rue / quartier vérifiable
+// Nouveau champ `contact_verifie` : true si le téléphone affiché provient
+// d'une source vérifiable (site officiel, annuaire officiel, TripAdvisor
+// listing avec numéro). Les 3 entrées qui avaient des numéros placeholder
+// factices (+228 22 21 00 00, +228 22 22 00 00, +228 22 00 00 00) ont été
+// remplacées par de vrais numéros trouvés, ou par `null` si rien de fiable
+// n'a été trouvé.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface Hotel {
@@ -17,7 +18,7 @@ export interface Hotel {
   nom: string
   adresse: string
   quartier: string
-  telephone: string
+  telephone: string | null
   email?: string
   site_web?: string
   etoiles: number
@@ -27,7 +28,8 @@ export interface Hotel {
   note_tripadvisor?: number
   note_booking?: number
   source_info: string
-  gps_fiable: boolean   // true = source GPS explicite
+  gps_fiable: boolean      // true = source GPS explicite
+  contact_verifie: boolean // true = téléphone confirmé par source externe
   lat: number
   lng: number
 }
@@ -35,11 +37,7 @@ export interface Hotel {
 const hotels: Hotel[] = [
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 1. HÔTEL 2 FÉVRIER
-  //    ✅ GPS Wikipedia : 6°07′40″N 1°12′51″E = 6.127645 / 1.214083
-  //    ✅ Tél site officiel 2fevrier.com : +228 22 23 86 00
-  //    Bâtiment le plus haut du Togo (102 m, 36 étages)
-  //    256 chambres + 64 appartements. Hôtel "6 étoiles" selon Wikipedia
+  // 1. HÔTEL 2 FÉVRIER — inchangé, déjà entièrement vérifié
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_2fevrier",
@@ -61,16 +59,13 @@ const hotels: Hotel[] = [
     note_booking: 8.7,
     source_info: "2fevrier.com (officiel) | Wikipedia GPS | Booking.com",
     gps_fiable: true,
+    contact_verifie: true,
     lat: 6.127645,
     lng: 1.214083,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 2. HÔTEL SARAKAWA (Mercure)
-  //    ✅ Tél site officiel sarakawa-hotel.com : +228 22 27 65 90
-  //    ✅ Adresse : Boulevard du Mono, BP 2232, Lomé
-  //    GPS ~ Boulevard du Mono, bord de mer (6.1268 / 1.2195)
-  //    Parc de 20 ha, piscine olympique, 196 chambres, chef étoilé Michelin
+  // 2. HÔTEL SARAKAWA — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_sarakawa",
@@ -93,16 +88,13 @@ const hotels: Hotel[] = [
     note_booking: 7.5,
     source_info: "sarakawa-hotel.com (officiel) | Facebook @HotelSarakawa | Booking.com",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.1268,
     lng: 1.2195,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 3. ONOMO HOTEL LOMÉ
-  //    ✅ Tél site officiel onomohotels.com : +228 22 53 63 00
-  //    ✅ Adresse : Boulevard du Mono – Bê Souzanétimé, BP 2135, Lomé
-  //    GPS ~ Bvd du Mono, à l'est de Sarakawa (6.1261 / 1.2340)
-  //    Hôtel 4★ moderne, piscine à débordement, restaurant O'Kope
+  // 3. ONOMO HOTEL LOMÉ — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_onomo",
@@ -124,17 +116,13 @@ const hotels: Hotel[] = [
     note_booking: 8.1,
     source_info: "onomohotels.com (officiel) | aeroportdelome.com | Booking.com",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.1261,
     lng: 1.2340,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 4. HÔTEL SANCTA MARIA
-  //    ✅ GPS cybevasion.fr : 6.12859 / 1.23872
-  //    ✅ Adresse : Boulevard du Mono 08, Lomé
-  //    ✅ Site officiel : hotelsanctamaria.com
-  //    4★, 63 chambres, vue mer, restaurant gastronomique Imani
-  //    Fondé en 2011 par Mme Mensah
+  // 4. HÔTEL SANCTA MARIA — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_sancta_maria",
@@ -156,17 +144,13 @@ const hotels: Hotel[] = [
     note_booking: 9.0,
     source_info: "hotelsanctamaria.com (officiel) | cybevasion.fr GPS explicite | Booking.com",
     gps_fiable: true,
+    contact_verifie: true,
     lat: 6.12859,
     lng: 1.23872,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 5. HÔTEL ROBINSON PLAGE
-  //    ✅ GPS ehotelsreviews.com : 6.150814 / 1.299338
-  //    ✅ Tél globenin.com : +228 22 41 98 22 / +228 90 78 14 90
-  //    ✅ Adresse : Zone portuaire, bord de mer, Lomé
-  //    TripAdvisor #2/46 Lomé, 4/5 (126 avis)
-  //    14 chambres, plage privée, restaurant fruits de mer
+  // 5. HÔTEL ROBINSON PLAGE — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_robinson_plage",
@@ -187,17 +171,13 @@ const hotels: Hotel[] = [
     note_booking: 8.5,
     source_info: "globenin.com tél | TripAdvisor #2 Lomé | ehotelsreviews.com GPS 6.150814/1.299338",
     gps_fiable: true,
+    contact_verifie: true,
     lat: 6.150814,
     lng: 1.299338,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 6. HÔTEL NAPOLÉON LAGUNE
-  //    ✅ Tél togo-tourisme.com : +228 22 43 18 75 / +228 92 08 99 99
-  //    ✅ Adresse : 01 Rue 20, Quartier Bê, Lomé
-  //    ✅ Site officiel : napotogo.com
-  //    GPS ~ Quartier Bê, bords de la lagune (6.1295 / 1.2410)
-  //    21 chambres, restaurant au bord de la lagune, crocodile au menu
+  // 6. HÔTEL NAPOLÉON LAGUNE — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_napoleon_lagune",
@@ -220,17 +200,13 @@ const hotels: Hotel[] = [
     note_booking: 7.2,
     source_info: "napotogo.com (officiel) | togo-tourisme.com tél | Petit Futé",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.1295,
     lng: 1.2410,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 7. HÔTEL DU GOLFE
-  //    ✅ Adresse Trivago : 10, Avenue Sylvanus Olympio, Lomé
-  //    ✅ Tél HotelsCombined : +228 99 13 88 88
-  //    ✅ Site officiel : hoteldugolfelome.com
-  //    GPS ~ Ave Sylvanus Olympio, centre-ville (6.1318 / 1.2185)
-  //    4★, piscine, restaurant afro-européen, navette aéroport gratuite
+  // 7. HÔTEL DU GOLFE — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_du_golfe",
@@ -251,44 +227,47 @@ const hotels: Hotel[] = [
     note_booking: 8.3,
     source_info: "Trivago adresse | HotelsCombined tél | hoteldugolfelome.com | Booking.com",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.1318,
     lng: 1.2185,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 8. HÔTEL LE SPHINX
-  //    ✅ Adresse Petit Futé : Boulevard Félix Houphouët-Boigny, Lomé
-  //    TripAdvisor : Standard 45 000 FCFA, Privilege 65 000 FCFA
-  //    Particularité : rooftop terrasse pour observation du ciel
-  //    GPS ~ Bvd Félix Houphouët-Boigny, centre (6.1350 / 1.2230)
+  //    CORRECTION : vrai numéro trouvé — annuaire officiel Togo Tourisme
+  //    ET Petit Futé concordent : +228 22 21 59 89 (fax 22 21 59 34).
+  //    Email confirmé : sphinxhotel@gmail.com. Ancien site web www.sphinx.tg.
+  //    Adresse confirmée : Boulevard Félix Houphouët-Boigny (inchangée).
+  //    Attention : plusieurs avis TripAdvisor mentionnent un établissement
+  //    "difficile à trouver en ligne" et des retours mitigés sur la gestion —
+  //    à vérifier sur place avant de le mettre en avant.
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_le_sphinx",
     nom: "Hôtel Le Sphinx",
     adresse: "Boulevard Félix Houphouët-Boigny, Lomé",
     quartier: "Centre-ville",
-    telephone: "+228 22 21 00 00",
+    telephone: "+228 22 21 59 89",
+    email: "sphinxhotel@gmail.com",
+    site_web: "http://www.sphinx.tg",
     etoiles: 3,
     nuit_fcfa_min: 36000,
     nuit_fcfa_max: 80000,
     services: [
-      "Restaurant (5ème étage)", "Rooftop terrasse",
+      "Restaurant (5ème étage)", "Rooftop terrasse (observation du ciel)",
       "Cyber snack bar", "Salle de conférence",
-      "WiFi", "Parking", "Sécurité & CCTV 24h"
+      "WiFi", "Parking", "Sécurité & CCTV 24h", "Nightclub"
     ],
     note_tripadvisor: 3.9,
-    source_info: "Petit Futé (adresse, tarifs) | TripAdvisor (avis détaillés avec prix)",
+    source_info: "togotourisme.tg (annuaire officiel) | Petit Futé (confirmé) | TripAdvisor (avis + tarifs)",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.1350,
     lng: 1.2230,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 9. COCO BEACH HOTEL (Zone portuaire)
-  //    ✅ Tél dontstopliving.net (article 2024) : +228 70 28 69 11 / +228 90 11 57 90
-  //    ✅ Adresse hotelsone.com : 9 Rue Zone Portuaire 12502, Lomé
-  //    GPS ~ Zone portuaire, 8,2 km du centre (6.1298 / 1.2978)
-  //    3★, 30 chambres, plage privée, piscine, bord de mer Est
+  // 9. COCO BEACH HOTEL (Zone portuaire) — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_coco_beach_port",
@@ -307,17 +286,13 @@ const hotels: Hotel[] = [
     note_booking: 7.6,
     source_info: "dontstopliving.net (tél confirmé 2024) | hotelsone.com (adresse) | Booking.com",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.1298,
     lng: 1.2978,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 10. COCO BEACH CHEZ ANTOINE (Baguida)
-  //     ✅ Tél site officiel cocobeach-togo.com : +228 90 32 53 73 / +228 70 45 80 38
-  //     ✅ Adresse : 12 BP 399, Baguida, Lomé
-  //     ✅ Email : cocobeach.avepozo@gmail.com
-  //     GPS ~ Baguida, bord de mer (6.0930 / 1.3520)
-  //     Eco-lodge sur plage sécurisée, à 15 min de Lomé
+  // 10. COCO BEACH CHEZ ANTOINE (Baguida) — inchangé
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_coco_beach_baguida",
@@ -339,63 +314,82 @@ const hotels: Hotel[] = [
     note_booking: 8.8,
     source_info: "cocobeach-togo.com (officiel) | zenhotels.com",
     gps_fiable: false,
+    contact_verifie: true,
     lat: 6.0930,
     lng: 1.3520,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 11. RÉSIDENCE HÔTELIÈRE OCÉANE
-  //     Source : TripAdvisor (citée parmi les plus populaires près du Musée National
-  //     et du Monument de l'Indépendance)
-  //     Petit Futé — hôtel budget bien noté, centre-ville
-  //     GPS ~ Quartier Nyékonakpoé / Centre (6.1380 / 1.2210)
+  //     CORRECTIONS :
+  //     - Adresse précise trouvée : 42 rue de la Gare, Quartier Assivito
+  //       (PAS Nyékonakpoé comme indiqué à l'origine — proche gare/marché,
+  //       à 2,7 km de la plage de Lomé).
+  //     - Restaurant réel identifié : "Restaurant les Trois Lys" / "Ambiances"
+  //       (cuisine française et africaine), tenu par un patron français.
+  //     - Pas de piscine confirmée (source trivago FAQ) — ne pas en promettre.
+  //     - Aucun numéro de téléphone public fiable trouvé cette session
+  //       (uniquement réservable via OTA type Booking/Expedia) — le
+  //       +228 22 22 00 00 d'origine était un placeholder, retiré.
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_oceane",
     nom: "Résidence Hôtelière Océane",
-    adresse: "Quartier Nyékonakpoé, Lomé",
-    quartier: "Nyékonakpoé",
-    telephone: "+228 22 22 00 00",
+    adresse: "42, Rue de la Gare, Quartier Assivito, Lomé",
+    quartier: "Assivito (près de la gare et du Grand Marché)",
+    telephone: null,
     etoiles: 3,
     nuit_fcfa_min: 20000,
     nuit_fcfa_max: 55000,
     services: [
-      "Restaurant", "Bar", "WiFi gratuit",
-      "Parking", "Réception 24h", "Navette aéroport"
+      "Restaurant (Les Trois Lys — cuisine française & africaine)", "Bar",
+      "WiFi gratuit", "Parking", "Réception 24h", "Navette aéroport gratuite",
+      "Massage sur demande", "Service blanchisserie inclus"
     ],
     note_tripadvisor: 4.0,
-    source_info: "TripAdvisor Lomé top hotels list | Petit Futé",
+    note_booking: 8.0,
+    source_info: "planetofhotels.com | Expedia | Trivago (adresse confirmée) | Booking.com (avis) — pas de tél public trouvé",
     gps_fiable: false,
-    lat: 6.1380,
-    lng: 1.2210,
+    contact_verifie: false,
+    lat: 6.1330,
+    lng: 1.2185,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 12. HOTEL IOKA & SUITES
-  //     Source : TripAdvisor (#1 Lomé selon classement récent), Booking.com
-  //     Nouvel établissement très bien noté (spa, business)
-  //     GPS ~ Quartier résidentiel Lomé nord (6.1680 / 1.2250)
+  // 12. IOKA HOTEL & SUITES
+  //     CORRECTIONS :
+  //     - Adresse exacte confirmée : 134 Boulevard du 13 Janvier, BP 12317,
+  //       Nyékonakpoè (PAS "Tokoin / résidentiel nord" comme à l'origine).
+  //     - Vrai téléphone (site officiel iokahospitality.com) :
+  //       +228 22 53 01 53. Email : info@iokahospitality.com.
+  //     - Établissement 4★, 11 étages, seul golf simulator d'Afrique
+  //       francophone, coworking space, rooftop avec vue mer/lagune,
+  //       à 1 km de la Place de l'Indépendance et du Palais des Congrès.
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "h_ioka",
     nom: "IOKA Hotel & Suites",
-    adresse: "Lomé (quartier résidentiel)",
-    quartier: "Tokoin / Résidentiel nord",
-    telephone: "+228 22 00 00 00",
+    adresse: "134, Boulevard du 13 Janvier, BP 12317, Nyékonakpoè, Lomé",
+    quartier: "Nyékonakpoè (quartier administratif, près Place de l'Indépendance)",
+    telephone: "+228 22 53 01 53",
+    email: "info@iokahospitality.com",
+    site_web: "https://www.iokahospitality.com/ioka-hotel-and-suites-lome",
     etoiles: 4,
     nuit_fcfa_min: 55000,
     nuit_fcfa_max: 200000,
     services: [
-      "Spa", "Piscine", "Restaurant",
-      "Bar", "WiFi gratuit", "Parking gratuit",
-      "Salle de conférence", "Business center", "Réception 24h"
+      "Rooftop terrasse (vue mer & lagune)", "Golf simulator (unique en Afrique francophone)",
+      "Coworking space", "Piscine", "Restaurant", "Sky bar",
+      "WiFi gratuit", "Parking gratuit", "Salle de conférence",
+      "Business center", "Réception 24h"
     ],
     note_tripadvisor: 4.6,
     note_booking: 9.1,
-    source_info: "TripAdvisor #1 Lomé 2026 | Booking.com (établissement récent très noté)",
+    source_info: "iokahospitality.com (officiel, tél confirmé) | travelagewest.com | evendo.com",
     gps_fiable: false,
-    lat: 6.1680,
-    lng: 1.2250,
+    contact_verifie: true,
+    lat: 6.1310,
+    lng: 1.2195,
   },
 
 ]

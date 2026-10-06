@@ -15,6 +15,7 @@ import {
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import PrivacySettings from '@/components/PrivacySettings'
 
 interface BookingRow {
   id: string
@@ -283,21 +284,16 @@ export default function GuideDashboard() {
   const handleUploadDocument = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    if (!selectedFile) {
-      setError(t('guide.error_pdf_required'))
-      return
-    }
     setActionLoading(true)
 
     try {
-      // Lire le fichier en base64
-      const reader = new FileReader()
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = (err) => reject(err)
+      const kyc = await apiFetch<{ sessionId?: string; hostedUrl?: string | null }>('/api/kyc/session', {
+        method: 'POST',
       })
-      reader.readAsDataURL(selectedFile)
-      const base64Data = await base64Promise
+      if (!kyc.ok || !kyc.data?.sessionId) {
+        setError(kyc.error || t('guide.error_doc_submit'))
+        return
+      }
 
       const result = await apiFetch<{ guide?: GuideProfileData }>('/api/guide/profile', {
         method: 'POST',
@@ -306,9 +302,8 @@ export default function GuideDashboard() {
           document: {
             type: docType,
             label: docLabel || t('guide.default_doc_label'),
-            file_url: base64Data,
-            file_name: selectedFile.name,
-            file_size: selectedFile.size
+            kyc_session_id: kyc.data.sessionId,
+            file_name: selectedFile?.name || 'kyc-session',
           }
         })
       })
@@ -320,6 +315,10 @@ export default function GuideDashboard() {
       if (result.data.guide) setGuide(result.data.guide)
       setDocLabel('')
       setSelectedFile(null)
+      if (kyc.data.hostedUrl) {
+        window.location.href = kyc.data.hostedUrl
+        return
+      }
       alert(t('guide.success_doc_submit'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
@@ -458,7 +457,7 @@ export default function GuideDashboard() {
 
       {/* Guide Info Banner */}
       {guide && (
-        <div className="rounded-[36px] bg-base-200 border border-border p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs mb-8">
+        <div className="rounded-xl bg-base-200 border border-border p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs mb-8">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             <div 
               className="h-20 w-20 shrink-0 rounded-2xl relative shadow-sm overflow-visible"
@@ -560,7 +559,7 @@ export default function GuideDashboard() {
               </h3>
               
               {bookings.filter(b => b.status === 'quote_requested').length === 0 ? (
-                <div className="rounded-[24px] border border-dashed border-border bg-base-200 p-8 text-center">
+                <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                   <p className="text-sm font-semibold text-base-content/50">{t('guide.no_quotes')}</p>
                 </div>
               ) : (
@@ -622,7 +621,7 @@ export default function GuideDashboard() {
               </h3>
 
               {bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status)).length === 0 ? (
-                <div className="rounded-[24px] border border-dashed border-border bg-base-200 p-8 text-center">
+                <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                   <p className="text-sm font-semibold text-base-content/50">{t('guide.no_active_missions')}</p>
                 </div>
               ) : (
@@ -684,7 +683,7 @@ export default function GuideDashboard() {
             {/* History */}
             <div className="border-t border-border/55 pt-6">
               <h3 className="font-serif text-lg font-bold mb-4">{t('guide.missions_history')}</h3>
-              <div className="overflow-x-auto rounded-[24px] border border-border bg-base-200">
+              <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
                 <table className="table w-full text-xs font-semibold">
                   <thead>
                     <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
@@ -740,7 +739,8 @@ export default function GuideDashboard() {
 
         {/* Tab 2: Edit Profile */}
         {activeTab === 'profile' && (
-          <form onSubmit={handleUpdateProfile} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <>
+          <form onSubmit={handleUpdateProfile} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
             <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.tab_profile')}</h3>
 
             {/* Avatar Upload */}
@@ -993,6 +993,8 @@ export default function GuideDashboard() {
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save_changes')}
             </button>
           </form>
+          <div className="mt-6"><PrivacySettings /></div>
+          </>
         )}
 
         {/* Tab 3: Documents */}
@@ -1000,7 +1002,7 @@ export default function GuideDashboard() {
           <div className="grid gap-6 md:grid-cols-2">
             
             {/* Upload form */}
-            <form onSubmit={handleUploadDocument} className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-5">
+            <form onSubmit={handleUploadDocument} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-5">
               <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.submit_doc_title')}</h3>
               
               <label className="form-control w-full">
@@ -1054,7 +1056,6 @@ export default function GuideDashboard() {
                     }
                   }}
                   className="file-input file-input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
-                  required
                 />
               </label>
 
@@ -1075,7 +1076,7 @@ export default function GuideDashboard() {
             </form>
 
             {/* List of submitted docs */}
-            <div className="rounded-[32px] border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-4 h-fit">
+            <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-4 h-fit">
               <h3 className="font-serif text-lg font-bold">{t('guide.docs_submitted_title')}</h3>
               
               {(guide as any)?.documents?.length === 0 ? (
@@ -1091,9 +1092,9 @@ export default function GuideDashboard() {
                         <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">
                           {t('common.status')} : {doc.type}
                         </p>
-                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="inline-block text-[10px] font-bold text-primary underline">
-                          {t('guide.open_doc')}
-                        </a>
+                        <p className="text-[10px] font-bold text-primary">
+                          Vérification chez le prestataire KYC
+                        </p>
                       </div>
 
                       <span className={`badge badge-sm font-extrabold uppercase text-[8px] py-2.5 px-2 rounded-lg ${
@@ -1115,7 +1116,7 @@ export default function GuideDashboard() {
       {/* Quote Dialog Modal */}
       {selectedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-base-200 p-6 shadow-2xl space-y-5">
+          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-5">
             
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="font-serif text-xl font-bold text-base-content">{t('guide.propose_quote_title')}</h3>

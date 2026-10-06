@@ -1,6 +1,7 @@
 'use client'
 
 import { Link, usePathname } from '@/i18n/navigation'
+import AuthGuardLink from '@/components/AuthGuardLink'
 import { useLocale, useTranslations } from 'next-intl'
 import { useParams, useRouter } from 'next/navigation'
 import {
@@ -56,9 +57,10 @@ export default function Navbar() {
   const params = useParams<{ locale: string }>()
   const router = useRouter()
   const t = useTranslations('Navbar')
-  const { toggle, isDark, mounted } = useTheme()
+  const { setTheme, isDark, mounted } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [bottomNavOpen, setBottomNavOpen] = useState(false)
   const [profile, setProfile] = useState<ProfileRow | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
@@ -121,17 +123,24 @@ export default function Navbar() {
     return () => subscription.unsubscribe()
   }, [router])
 
+  useEffect(() => {
+    setBottomNavOpen(false)
+    setDrawerOpen(false)
+    setSettingsOpen(false)
+  }, [pathname])
+
   const publicLinks: NavLinkItem[] = [
     { href: '/lieux', label: t('lieux'), icon: Map },
-    { href: '/scan', label: t('scan'), icon: ScanLine },
-    { href: '/guides', label: t('guides'), icon: Compass },
+    { href: '/regions', label: t('regions'), icon: Compass },
     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
+    { href: '/guides', label: t('guides'), icon: User },
+    { href: '/scan', label: t('scan'), icon: ScanLine },
   ]
 
   const bottomLinks: NavLinkItem[] = [
     { href: '/accueil', label: t('accueil'), icon: Home },
     { href: '/lieux', label: t('lieux'), icon: Map },
-    { href: '/histoire', label: t('histoire'), icon: BookOpenText },
+    { href: '/regions', label: t('regions'), icon: Compass },
     { href: '/scan', label: t('scan'), icon: ScanLine },
     { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
   ]
@@ -147,44 +156,51 @@ export default function Navbar() {
     if (!profile) return []
     if (profile.role === 'admin') {
       return [
-        { href: '/dashboard/admin', label: '📊 Dashboard', icon: User },
-        { href: '/dashboard/admin?tab=guides', label: '👥 Gérer guides', icon: User },
-        { href: '/dashboard/admin?tab=reports', label: '🚨 Signalements', icon: User },
-        { href: '/dashboard/admin?tab=reviews', label: '💬 Avis', icon: User },
-        { href: '/dashboard/admin?tab=bans', label: '🔨 Bannissements', icon: User },
+        { href: '/dashboard/admin', label: t('dashboard_admin'), icon: User },
+        { href: '/dashboard/admin?tab=places', label: t('admin_places'), icon: User },
+        { href: '/dashboard/admin?tab=dishes', label: t('admin_dishes'), icon: User },
+        { href: '/dashboard/admin?tab=guides', label: t('admin_guides'), icon: User },
+        { href: '/dashboard/admin?tab=reports', label: t('admin_reports'), icon: User },
+        { href: '/dashboard/admin?tab=reviews', label: t('admin_reviews'), icon: User },
+        { href: '/dashboard/admin?tab=bans', label: t('admin_bans'), icon: User },
       ]
     }
     if (profile.role === 'guide') {
       return [
-        { href: '/dashboard/guide', label: '👤 Mon profil public', icon: User },
-        { href: '/dashboard/guide?tab=quotes', label: '📋 Demandes reçues', icon: Calendar },
-        { href: '/dashboard/guide?tab=missions', label: '✅ Mes missions', icon: Compass },
-        { href: '/dashboard/guide?tab=subscription', label: '💳 Mon abonnement', icon: Settings },
+        { href: '/dashboard/guide', label: t('guide_profile'), icon: User },
+        { href: '/dashboard/guide?tab=quotes', label: t('guide_quotes'), icon: Calendar },
+        { href: '/dashboard/guide?tab=missions', label: t('guide_missions'), icon: Compass },
+        { href: '/dashboard/guide?tab=subscription', label: t('guide_subscription'), icon: Settings },
       ]
     }
     return [
-      { href: '/dashboard/tourist', label: '👤 Mon profil', icon: User },
-      { href: '/dashboard/tourist?tab=bookings', label: '📅 Mes réservations', icon: Calendar },
-      { href: '/dashboard/tourist?tab=favorites', label: '❤️ Mes favoris', icon: Heart },
-      { href: '/dashboard/tourist?tab=scans', label: '🔍 Historique scans', icon: History },
+      { href: '/dashboard/tourist', label: t('tourist_profile'), icon: User },
+      { href: '/dashboard/tourist?tab=bookings', label: t('tourist_bookings'), icon: Calendar },
+      { href: '/dashboard/tourist?tab=favorites', label: t('tourist_favorites'), icon: Heart },
+      { href: '/dashboard/tourist?tab=scans', label: t('tourist_scans'), icon: History },
     ]
   }
 
   if (isAuthPage) return null
 
-  const isActive = (path: string): boolean => pathname === path
+  const isActive = (path: string): boolean => {
+    if (path === '/accueil') {
+      return pathname === '/' || pathname === '/accueil'
+    }
+    return pathname === path || pathname.startsWith(path + '/')
+  }
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-border/80 bg-base-100/92 shadow-sm backdrop-blur-xl">
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-border border-border bg-card/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
+          <Link href="/accueil" aria-label="HeriTogo" className="group flex items-center gap-3 transition-opacity hover:opacity-90">
             <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-border bg-base-200 shadow-sm">
               <Image src="/icons/icon-192x192.png" alt="HeriTogo" width={32} height={32} className="h-8 w-8 object-contain" />
             </div>
-            <div className="leading-none">
+            <div className="hidden leading-none lg:block">
               <span className="block text-lg font-black text-base-content">HeriTogo</span>
-              <span className="mt-1 hidden text-[10px] font-bold uppercase tracking-wider text-base-content/50 sm:block">
+              <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-base-content/50">
                 {t('tagline')}
               </span>
             </div>
@@ -192,19 +208,29 @@ export default function Navbar() {
 
           {(!pathname.startsWith('/auth') && (profile || pathname !== '/')) && (
             <nav className="hidden items-center gap-1 lg:flex">
-              {publicLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`rounded-2xl px-4 py-2 text-sm font-bold transition-all ${
+              {publicLinks.map((link) => {
+                const className = `rounded-2xl px-4 py-2 text-sm font-bold transition-all ${
                     isActive(link.href)
                       ? 'bg-primary text-primary-content'
                       : 'text-base-content/70 hover:bg-base-200'
-                  }`}
+                  }`
+                if (link.href === '/guides') {
+                  return (
+                    <AuthGuardLink key={link.href} href={link.href} className={className}>
+                      {link.label}
+                    </AuthGuardLink>
+                  )
+                }
+                return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={className}
                 >
                   {link.label}
                 </Link>
-              ))}
+                )
+              })}
             </nav>
           )}
 
@@ -268,7 +294,7 @@ export default function Navbar() {
         </div>
 
         {settingsOpen && (
-          <div className="absolute right-4 top-full mt-3 w-[min(21rem,calc(100vw-2rem))] rounded-[28px] border border-border bg-base-200 p-4 shadow-2xl">
+          <div className="absolute right-4 top-full mt-3 w-[min(21rem,calc(100vw-2rem))] rounded-xl border border-border bg-base-200 p-4 shadow-2xl">
             <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
               <span className="text-xs font-black uppercase tracking-wider">{t('settings')}</span>
               <button type="button" onClick={() => setSettingsOpen(false)} className="rounded-xl p-1 hover:bg-base-300">
@@ -291,14 +317,10 @@ export default function Navbar() {
               ))}
             </div>
             {mounted && (
-              <button
-                type="button"
-                onClick={toggle}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-base-100 py-3 text-sm font-bold"
-              >
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                {isDark ? t('light') : t('dark')}
-              </button>
+              <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-base-100 p-1.5">
+                <button type="button" onClick={() => setTheme('light')} className={`flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold ${!isDark ? 'bg-primary text-primary-content' : 'text-base-content/60'}`}><Sun className="h-4 w-4" />{t('light')}</button>
+                <button type="button" onClick={() => setTheme('dark')} className={`flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold ${isDark ? 'bg-primary text-primary-content' : 'text-base-content/60'}`}><Moon className="h-4 w-4" />{t('dark')}</button>
+              </div>
             )}
           </div>
         )}
@@ -339,27 +361,31 @@ export default function Navbar() {
               </div>
               <nav className="flex-1 overflow-y-auto p-4">
                 <ul className="space-y-1">
-                  {drawerLinks().map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setDrawerOpen(false)}
-                        className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-base-content hover:bg-base-200"
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {drawerLinks().map((item) => {
+                    const ItemIcon = item.icon
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setDrawerOpen(false)}
+                          className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-base-content hover:bg-base-200"
+                        >
+                          <ItemIcon className="h-4 w-4 text-secondary" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </nav>
               <div className="border-t border-border p-4">
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm font-bold text-error"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm font-bold text-error cursor-pointer hover:bg-error/20 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  🚪 Déconnexion
+                  {t('logout')}
                 </button>
               </div>
             </motion.aside>
@@ -367,36 +393,116 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {isAuthenticated && profile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl">
-          <div className="mx-auto max-w-md px-3 pb-2 pt-2">
-            <div className="grid grid-cols-5 gap-1 rounded-[28px] bg-base-200 p-1.5">
-              {bottomLinks.map((link) => {
-                const Icon = link.icon
-                const active = isActive(link.href)
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[22px] px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
-                      active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
-                    }`}
-                  >
-                    {active && (
-                      <motion.span
-                        layoutId="activeBottomNav"
-                        className="absolute inset-0 rounded-[22px] bg-primary dark:bg-secondary"
-                      />
-                    )}
-                    <Icon className="relative h-5 w-5" />
-                    <span className="relative truncate">{link.label}</span>
-                  </Link>
-                )
-              })}
-            </div>
+      {/* ── Bottom Bar (Mobile always visible, Desktop via floating button) ── */}
+
+      {/* Mobile bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/80 bg-base-100/92 backdrop-blur-xl md:hidden">
+        <div className="mx-auto max-w-md px-3 pb-2 pt-2">
+          <div className="grid grid-cols-5 gap-1 rounded-xl bg-base-200 p-1.5">
+            {(isAuthenticated && profile ? bottomLinks : [
+              { href: '/accueil', label: t('accueil'), icon: Home },
+              { href: '/lieux', label: t('lieux'), icon: Map },
+              { href: '/regions', label: t('regions'), icon: Compass },
+              { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
+              { href: '/scan', label: t('scan'), icon: ScanLine },
+            ]).map((link) => {
+              const Icon = link.icon
+              const active = isActive(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[9px] font-bold sm:text-[10px] ${
+                    active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/55'
+                  }`}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="activeBottomNav"
+                      className="absolute inset-0 rounded-xl bg-primary dark:bg-secondary"
+                    />
+                  )}
+                  <Icon className="relative h-5 w-5" />
+                  <span className="relative truncate">{link.label}</span>
+                </Link>
+              )
+            })}
           </div>
-        </nav>
-      )}
+        </div>
+      </nav>
+
+      {/* Desktop: floating "Découvrir" button */}
+      <div className="hidden" aria-hidden="true">
+        <AnimatePresence>
+          {bottomNavOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[60]"
+                onClick={() => setBottomNavOpen(false)}
+              />
+              {/* Bottom nav panel sliding up */}
+              <motion.div
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '100%', opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 340, damping: 34 }}
+                className="fixed bottom-0 left-1/2 z-[61] w-full max-w-xl -translate-x-1/2 rounded-t-[32px] border border-border/60 bg-base-100/95 px-4 pb-6 pt-4 shadow-2xl backdrop-blur-xl"
+              >
+                {/* Drag handle */}
+                <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-base-content/20" />
+                <div className="grid grid-cols-5 gap-2 rounded-xl bg-base-200 p-2">
+                  {(isAuthenticated && profile ? bottomLinks : [
+                    { href: '/accueil', label: t('accueil'), icon: Home },
+                    { href: '/lieux', label: t('lieux'), icon: Map },
+                    { href: '/regions', label: t('regions'), icon: Compass },
+                    { href: '/cuisine', label: t('cuisine'), icon: UtensilsCrossed },
+                    { href: '/scan', label: t('scan'), icon: ScanLine },
+                  ]).map((link) => {
+                    const Icon = link.icon
+                    const active = isActive(link.href)
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setBottomNavOpen(false)}
+                        className={`relative flex flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-[10px] font-bold transition-colors ${
+                          active ? 'text-primary-content dark:text-secondary-content' : 'text-base-content/60 hover:text-base-content'
+                        }`}
+                      >
+                        {active && (
+                          <motion.span
+                            layoutId="activeBottomNavDesktop"
+                            className="absolute inset-0 rounded-xl bg-primary dark:bg-secondary"
+                          />
+                        )}
+                        <Icon className="relative h-5 w-5" />
+                        <span className="relative truncate">{link.label}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Floating trigger button */}
+        <motion.button
+          type="button"
+          onClick={() => setBottomNavOpen((v) => !v)}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.95 }}
+          className="fixed bottom-6 right-6 z-[65] flex items-center gap-2 rounded-full px-5 py-3 text-sm font-black text-white shadow-lg shadow-black/20 transition-shadow hover:shadow-xl cursor-pointer"
+          style={{ backgroundColor: COLORS.forest }}
+        >
+          <Compass className="h-5 w-5" />
+          {t('discover')}
+        </motion.button>
+      </div>
     </>
   )
 }

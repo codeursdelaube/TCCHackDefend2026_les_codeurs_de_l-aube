@@ -8,12 +8,6 @@ export async function GET(
   try {
     const { id } = await params
 
-    const UUID_RE =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    if (!UUID_RE.test(id)) {
-      return NextResponse.json({ error: 'Guide introuvable' }, { status: 404 })
-    }
-
     const guide = await prisma.guideProfile.findFirst({
       where: { id, status: 'approved' },
       include: {

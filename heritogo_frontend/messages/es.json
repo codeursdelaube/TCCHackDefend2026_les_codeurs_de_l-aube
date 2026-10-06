@@ -17,19 +17,48 @@
     "histoire": "Historia",
     "guides": "Guías",
     "login": "Iniciar sesión",
-    "register": "Registrarse"
+    "register": "Registrarse",
+    "discover": "Descubrir",
+    "logout": "Cerrar sesión",
+    "regions": "Regiones",
+    "dashboard_admin": "Panel de Control",
+    "admin_places": "Sitios turísticos",
+    "admin_dishes": "Platos culinarios",
+    "admin_guides": "Gestionar guías",
+    "admin_reports": "Reportes",
+    "admin_reviews": "Reseñas",
+    "admin_bans": "Bloqueos",
+    "guide_profile": "Mi perfil público",
+    "guide_quotes": "Solicitudes recibidas",
+    "guide_missions": "Mis misiones",
+    "guide_subscription": "Mi suscripción",
+    "tourist_profile": "Mi perfil",
+    "tourist_bookings": "Mis reservas",
+    "tourist_favorites": "Mis favoritos",
+    "tourist_scans": "Historial de escaneos"
   },
   "Accueil": {
+    "categories": {
+      "monuments": "Monumentos",
+      "tamberma": "Castillos Tamberma",
+      "nature": "Cascadas y Montañas",
+      "cuisine": "Gastronomía y Sabores",
+      "guides": "Guías Locales Certificados",
+      "scan": "Escáner IA",
+      "plages": "Playas y Lago Togo",
+      "histoire": "Historia y Museos",
+      "parks": "Parques y ocio"
+    },
     "offline_banner": "Modo sin conexión — datos guardados disponibles",
     "explorers": "{count}+ exploradores",
     "discover": "Descubrir",
     "scroll": "Desplazarse",
-    "hackathon_badge": "#TCCHackDefend2026",
+    "unesco_badge": "Patrimonio UNESCO",
     "slides": {
       "0": {
         "title": "Heritogo",
         "subtitle": "Guía Turística Inteligente",
-        "description": "Identifique monumentos togoleses al instante con Gemini IA. Apunte su cámara, descubra la historia.",
+        "description": "Identifique monumentos togoleses al instante con IA. Apunte su cámara, descubra la historia.",
         "buttonText": "Escanear un monumento"
       },
       "1": {
@@ -57,9 +86,9 @@
       "description": "Heritogo combina IA y geolocalización para una inmersión completa en el corazón de la cultura y la gastronomía de Togo."
     },
     "features": {
-      "scan_title": "Escáner Gemini IA",
-      "scan_desc": "Tome una foto de un monumento. Gemini 2.5 Flash lo identifica, cuenta su historia y la lee en voz alta mediante síntesis de voz.",
-      "scan_tag": "Gemini IA",
+      "scan_title": "Escáner IA",
+      "scan_desc": "Tome una foto de un monumento. Intelligence Artificielle lo identifica, cuenta su historia y la lee en voz alta mediante síntesis de voz.",
+      "scan_tag": "IA",
       "geo_title": "Geolocalización y Mapa",
       "geo_desc": "Su posición GPS calcula las distancias mediante Haversine. Los sitios, restaurantes y hoteles más cercanos se muestran al instante.",
       "geo_tag": "Tiempo Real",
@@ -115,21 +144,25 @@
     "guides": {
       "0": {
         "name": "Kossi Adom",
-        "languages": "Francés, Ewé, Inglés"
+        "languages": "Francés, Ewé, Inglés",
+        "zone": "Lomé y Marítima"
       },
       "1": {
         "name": "Elom Afi",
-        "languages": "Francés, Mina, Español"
+        "languages": "Francés, Mina, Español",
+        "zone": "Kpalimé y Altiplanos"
       },
       "2": {
         "name": "Mawuli Agbo",
-        "languages": "Francés, Kabyè, Inglés"
+        "languages": "Francés, Kabyè, Inglés",
+        "zone": "Kara y Koutammakou"
       },
       "tag": "Guías certificados",
       "certified": "Certificado",
       "price": "20 000 FCFA/día",
       "reserve": "Reservar",
-      "view_all": "Ver todos los guías"
+      "view_all": "Ver todos los guías",
+      "sample_disclaimer": "Ejemplos ilustrativos — los perfiles certificados reales están en /guides"
     },
     "subscription": {
       "tag": "Suscripción Premium",
@@ -153,33 +186,200 @@
     "cta_discover": "Descubrir lugares",
     "go_to_slide": "Ir a la diapositiva {index}",
     "ticker": "✦ Nuestro patrimonio es el vínculo entre nuestro pasado, nuestro presente y nuestro futuro. Explora Togo de otra manera con Heritogo ✦",
-    "categories": {
-      "places": {
-        "label": "Lugares",
-        "sub": "Sitios culturales"
-      },
-      "cultures": {
-        "label": "Culturas",
-        "sub": "Tradiciones vivas"
-      },
-      "stories": {
-        "label": "Historias",
-        "sub": "Memoria de Togo"
-      },
-      "events": {
-        "label": "Eventos",
-        "sub": "Momentos locales"
-      },
-      "community": {
-        "label": "Comunidad",
-        "sub": "Guías y viajeros"
-      }
-    },
     "stats_short": {
       "sites": "Sitios",
       "regions": "Regiones",
       "languages": "Idiomas",
       "explorers": "Exploradores"
+    },
+    "stats_subs": {
+      "sites": "Monumentos listados",
+      "regions": "Regiones cubiertas",
+      "languages": "Idiomas soportados",
+      "pwa": "PWA independiente"
+    },
+    "pillars_section": {
+      "badge": "Experiencia Completa",
+      "title": "Tu Compañero de Descubrimiento Cultural",
+      "desc": "HeriTogo digitaliza y promueve el patrimonio togolés para dar a viajeros y apasionados acceso inmediato a la memoria viva del país."
+    },
+    "pillars": {
+      "scan": {
+        "badge": "Escaneo IA",
+        "title": "Escáner Inteligente de Monumentos",
+        "desc": "Toma una foto o carga una imagen para identificar al instante los monumentos y tesoros históricos de Togo.",
+        "action": "Escanear un monumento"
+      },
+      "geo": {
+        "badge": "Geolocalización",
+        "title": "Sitios & Patrimonio Nacional",
+        "desc": "Explora más de 120 sitios a través de las 5 regiones de Togo con itinerarios GPS y hoteles recomendados cercanos.",
+        "action": "Explorar el mapa"
+      },
+      "food": {
+        "badge": "Gastronomía",
+        "title": "Viaje Culinario Togolés",
+        "desc": "Descubre platos icónicos (Ayimolou, Fufu, Djenkoumé) y localiza los mejores restaurantes para disfrutarlos.",
+        "action": "Descubrir los sabores"
+      },
+      "guides": {
+        "badge": "Acompañamiento",
+        "title": "Guías Locales Certificados",
+        "desc": "Reserva guías profesionales verificados para visitas inmersivas, seguras y personalizadas.",
+        "action": "Encontrar un guía"
+      }
+    },
+    "scanner_section": {
+      "badge": "Tecnología Inteligente",
+      "title": "¿Cómo funciona el Escáner HeriTogo?",
+      "desc": "Tecnología de visión por computadora diseñada para reconocer el patrimonio togolés en un instante.",
+      "cta": "Probar el escáner ahora"
+    },
+    "steps": {
+      "0": {
+        "title": "Encuadra el monumento",
+        "desc": "Apunta tu dispositivo hacia un monumento histórico de Togo o importa una foto desde tu galería."
+      },
+      "1": {
+        "title": "Reconocimiento por IA",
+        "desc": "Nuestro modelo de inteligencia artificial analiza la imagen y extrae la historia, el origen y las anécdotas del sitio."
+      },
+      "2": {
+        "title": "Escucha & Profundiza",
+        "desc": "Disfruta de la síntesis de voz multilingüe para escuchar el relato o reserva un guía certificado para ir más lejos."
+      }
+    },
+    "monuments_section": {
+      "badge": "Patrimonio Imprescindible",
+      "title": "Explora los Sitios Emblemáticos",
+      "view_all": "Ver todos los monumentos ({count})"
+    },
+    "guide_daily_rate": "Tarifa diaria",
+    "subscribe_ideal": "Ideal para turistas, estudiantes y exploradores culturales.",
+    "final_cta_sub": "Explora Togo con total libertad desde hoy.",
+    "pwa_label": "Sin conexión",
+    "pwa_sub": "PWA independiente",
+    "tagline": "Tu compañero de viaje",
+    "app_name": "HeriTogo",
+    "header_kicker": "Guía de Patrimonio y Turismo de Togo",
+    "header_title": "Descubra los destinos y el patrimonio de Togo a su alrededor.",
+    "destinations_title": "Nuestros destinos",
+    "destinations_subtitle": "Selección destacada en Togo",
+    "destinations_see_all": "Ver más",
+    "pill_discover": "Descubrir",
+    "pill_discover_region": "Descubrir región",
+    "downloaded_title": "Mis destinos sin conexión",
+    "downloaded_subtitle": "Accesibles incluso sin conexión a Internet",
+    "downloaded_badge": "Sin conexión",
+    "downloaded_cached": "PWA Cache",
+    "treasures_title": "29 sitios y tesoros por descubrir en Togo",
+    "treasures_subtitle": "Explore nuestro patrimonio por categoría al alcance de su mano.",
+    "category_counts": {
+      "monuments": "12 sitios clave",
+      "tamberma": "UNESCO Koutammakou",
+      "nature": "Plateaux & Kloto",
+      "cuisine": "9 delicias tradicionales",
+      "guides": "Acompañantes certificados",
+      "scan": "Reconocimiento instantáneo",
+      "plages": "Costa y Lago Togo",
+      "histoire": "Memoria viva"
+    },
+    "incontournables_title": "Los imprescindibles",
+    "incontournables_see_all": "Ver todo",
+    "regions_section_title": "Las 5 regiones de Togo a su alcance",
+    "regions_section_desc": "Desde la costa atlántica hasta los acantilados del norte, descubra la diversidad geográfica y cultural de Togo.",
+    "regions": {
+      "maritime": {
+        "name": "Maritime y Gran Lomé",
+        "tag": "Capital y Costa Atlántica",
+        "desc": "Palacio de Lomé, Casa de los Esclavos de Agbodrafo, Lago Togo y playas doradas.",
+        "badge": "Litoral"
+      },
+      "plateaux": {
+        "name": "Plateaux & Kloto",
+        "tag": "Café, Bosques y Cascadas",
+        "desc": "Kpalimé, Monte Agou, Cascadas de Yikpa, Castillo Viale y plantaciones fértiles.",
+        "badge": "Ecoturismo"
+      },
+      "centrale": {
+        "name": "Centrale & Sokodé",
+        "tag": "Artesanía y Tradiciones",
+        "desc": "Sokodé, Parque Fazao-Malfakassa, tejidos artesanales y festividades culturales.",
+        "badge": "Tradición"
+      },
+      "kara": {
+        "name": "Kara & Koutammakou",
+        "tag": "Castillos Tata Tamberma UNESCO",
+        "desc": "Hábitat tradicional fortificado Batammariba, montañas Défalé y forjas ancestrales.",
+        "badge": "UNESCO"
+      },
+      "savanes": {
+        "name": "Savanes & Dapaong",
+        "tag": "Cuevas y Acantilados",
+        "desc": "Cuevas rupestres de Nano y Bogou, fosa de leones y paisajes salvajes.",
+        "badge": "Aventura"
+      }
+    },
+    "audioguides_section_title": "Múltiples audioguías para facilitar su visita",
+    "audioguides_section_desc": "Escuche relatos cautivadores de monumentos históricos leídos en voz alta en su idioma preferido.",
+    "audioguide_sample_title": "Monumento de la Independencia",
+    "audioguide_sample_location": "Lomé • Región Maritime",
+    "audioguide_sample_desc": "Erigido el 27 de abril de 1960 para celebrar la independencia de Togo. La silueta monumental esculpida por Georges Coustère simboliza la liberación del pueblo togolés rompiendo las cadenas coloniales.",
+    "audioguide_play": "Escuchar historia",
+    "audioguide_pause": "Pausar",
+    "audioguide_choose_lang": "Idioma de narración",
+    "audioguide_btn_open": "Abrir ficha completa",
+    "audioguide_tts_badge": "Narración por IA",
+    "interactive_map_title": "Vea los sitios turísticos en un mapa interactivo",
+    "interactive_map_desc": "Localice al instante monumentos, cascadas y tesoros según sus gustos y su posición GPS en tiempo real.",
+    "interactive_map_all_regions": "Todas las regiones",
+    "interactive_map_btn_gps": "Monumentos cercanos",
+    "interactive_map_open_view": "Abrir mapa interactivo",
+    "live_badge": "Patrimonio togolés en directo",
+    "cta_scan_ia": "Escáner IA",
+    "explore_kicker": "Explore Togo",
+    "explore_title": "¿Qué desea descubrir?",
+    "signature_ia": "Firma IA",
+    "counts": {
+      "sites": "29 sitios",
+      "scan": "Reconocimiento IA",
+      "dishes": "31 platos",
+      "parks": "16 espacios",
+      "guides": "Guías certificados"
+    },
+    "heritage_kicker": "Patrimonio vivo",
+    "treasures_heading": "Tesoros imprescindibles",
+    "all_sites": "Los 29 sitios →",
+    "region_prefix": "Región {name}",
+    "explore_sheet": "Ver la ficha",
+    "signature_feature": "Función estrella",
+    "scan_feature_title": "Fotografie un monumento y la IA cuenta su historia.",
+    "scan_feature_desc": "Apunte su cámara a un monumento histórico togolés o importe una foto. Nuestro modelo de visión identifica el edificio y lanza la síntesis de voz inmersiva en directo.",
+    "try_scanner": "Probar el escáner IA",
+    "audio_included": "Audioguía multilingüe incluida",
+    "scan_preview_alt": "Escáner IA HeriTogo",
+    "confidence": "99,4% de confianza",
+    "deux_lions": "Monumento de los Dos Leones",
+    "lome_maritime": "Lomé, Región Marítima",
+    "slide_tags": {
+      "0": "Innovación IA",
+      "1": "UNESCO y monumentos",
+      "2": "Gastronomía y terroir"
+    },
+    "stats_landing": {
+      "sites": "Sitios patrimoniales",
+      "sites_sub": "Monumentos registrados",
+      "regions": "Regiones turísticas",
+      "regions_sub": "Del litoral a las Savanes",
+      "dishes": "Especialidades culinarias",
+      "dishes_sub": "Recetas y terroirs",
+      "pwa": "PWA sin conexión",
+      "pwa_sub": "Acceso sin red"
+    },
+    "featured": {
+      "koutammakou_desc": "Paisaje cultural y arquitectura fortificada de los Tata Somba.",
+      "palais_desc": "Antiguo palacio de gobernadores convertido en gran centro cultural.",
+      "kpime_desc": "La cascada más alta de Togo, en plena vegetación exuberante."
     }
   },
   "Scan": {
@@ -197,7 +397,7 @@
     "errors": {
       "unknown": "Este monumento u objeto no está registrado en la base de datos oficial de HeriTogo.",
       "general": "Ocurrió un error durante el análisis.",
-      "server": "No se pudo contactar con el servidor o el servicio Gemini."
+      "server": "No se pudo contactar con el servidor o el servicio IA."
     },
     "result_label": "Monumento identificado",
     "gps_active": "GPS activo",
@@ -210,7 +410,18 @@
     "premium_tts": "Audioguía TTS multilingüe de alta calidad",
     "premium_history": "Historial de visitas persistente",
     "premium_cta": "Pasar a Premium (Simulado)",
-    "free_continue": "Continuar con la versión gratuita"
+    "free_continue": "Continuar con la versión gratuita",
+    "steps": {
+      "0": "Digitalización de motivos arquitectónicos…",
+      "1": "Búsqueda en la memoria patrimonial de Togo…",
+      "2": "Análisis de visión IA y cruce geocultural…",
+      "3": "Generación de anécdotas y secretos históricos…"
+    },
+    "gps_active_short": "GPS Activo",
+    "signature_tech": "Tecnología Firma HeriTogo",
+    "coordinates": "Coordenadas: {lat}, {lng}",
+    "toast_identified": "Monumento identificado: {name}",
+    "toast_premium_activated": "¡Acceso Premium activado! Escaneos ilimitados desbloqueados."
   },
   "Lieux": {
     "all": "Todos",
@@ -233,7 +444,7 @@
     "gps_action": "Cómo llegar",
     "history_title": "Historia y Leyendas",
     "desc_title": "Descripción",
-    "rating": "Calificación ★",
+    "rating": "Calificación",
     "visits_per_year": "Visitas/año",
     "distance": "Distancia",
     "period_tag": "1905 — Época Colonial Alemana",
@@ -245,7 +456,47 @@
     "share": "Compartir",
     "copied": "¡Copiado!",
     "hero_badge": "Explorar cerca",
-    "filter_region": "Filtrar por región"
+    "filter_region": "Filtrar por región",
+    "tab_apercu": "Resumen",
+    "tab_activites": "¿Qué hacer aquí?",
+    "tab_guide_pratique": "Guía práctica",
+    "tab_carte": "Mapa y GPS",
+    "tab_similaires": "En los alrededores",
+    "unesco_badge_full": "✦ Patrimonio de la Humanidad UNESCO",
+    "gps_button": "Ruta Google Maps (GPS)",
+    "history_extended": "Contexto histórico detallado",
+    "read_more": "Leer la historia completa…",
+    "read_less": "Reducir",
+    "recommended_experiences": "Experiencias recomendadas",
+    "see_all_activities": "Ver todo ({count}) →",
+    "eat_nearby": "Para degustar cerca",
+    "gastro_guide": "Guía gastronómica →",
+    "explorer_reviews": "Opiniones de viajeros",
+    "things_to_do": "Actividades y cosas que hacer",
+    "things_to_do_sub": "Sugerencias para aprovechar al máximo su visita",
+    "certified_guide_badge": "Guía local certificado",
+    "guided_tour_title": "¿Desea una visita guiada personalizada?",
+    "guided_tour_desc": "Reserve un guía togolés certificado para una experiencia inmersiva.",
+    "find_guide_btn": "Buscar un guía",
+    "practical_tips": "Consejos prácticos para el viajero",
+    "practical_tips_sub": "Toda la información útil para planificar su visita tranquilamente",
+    "best_time_title": "Mejor momento",
+    "duration_title": "Duración recomendada",
+    "outfit_title": "Ropa y equipo",
+    "access_title": "Acceso y transporte",
+    "fee_title": "Tarifas y entrada",
+    "start_nav": "Iniciar navegación GPS →",
+    "other_treasures": "Otros tesoros en la región",
+    "continue_explore": "Continúe su viaje cerca de {city}",
+    "grid_view": "Cuadrícula",
+    "map_view": "Mapa",
+    "regions_label": "Regiones:",
+    "sites_found": "{count} sitio(s) encontrado(s)",
+    "empty_title": "No se encontraron sitios turísticos",
+    "empty_desc": "Intente otra ortografía o cambie los filtros.",
+    "reset_filters": "Restablecer filtros",
+    "map_loading": "Cargando el mapa interactivo de Togo...",
+    "card_discover": "Descubrir"
   },
   "Cuisine": {
     "title": "Sabores de Togo",
@@ -253,6 +504,8 @@
     "search_placeholder": "Buscar fufu, ablo, una salsa...",
     "results_for": "Resultados para:",
     "no_plats": "No se encontraron platos tradicionales",
+    "empty_search": "Ningún plato coincide con su búsqueda",
+    "reset_filters": "Restablecer filtros",
     "try_other": "Intente otra ortografía (ej: come, djenkoume) o categoría.",
     "categories": {
       "accompagnement": "Acompañamiento",
@@ -287,7 +540,9 @@
     "page_subtitle": "Descubra los sabores auténticos de Togo",
     "all": "Todos",
     "restaurants_available": "{count} restaurante{count, plural, =1 {} other {s}} disponible{count, plural, =1 {} other {s}}",
-    "directions": "Direcciones",
+    "top_restaurants": "Restaurantes recomendados",
+    "selection": "Selección",
+    "directions": "Cómo llegar",
     "hero_badge": "Sabores locales",
     "lome_area": "Lomé",
     "default_hours": "07h-22h",
@@ -297,9 +552,25 @@
       "fufu": "Fufu",
       "djenkoume": "Djenkoumé",
       "gboma": "Gboma",
-      "akoume": "Akoumé"
+      "akoume": "Akoumé",
+      "wagasi": "Wagasi (queso)",
+      "gombo": "Gombo (fétri)",
+      "boissons": "Bebidas locales"
     },
-    "filter_category": "Filtrar por plato"
+    "filter_category": "Filtrar por plato",
+    "togo_authentic": "Auténtica gastronomía togolesa",
+    "flavors_texture": "Sabores y textura",
+    "specialties_count": "{count} especialidad{s} togolesa{s}",
+    "filter_label": "Especialidades:",
+    "section_kicker": "Sabores Locales",
+    "section_title": "Especialidades Emblemáticas de Togo",
+    "section_subtitle": "Explore recetas tradicionales, salsas ricas y comida callejera legendaria.",
+    "restaurants_kicker": "Buenas Mesas",
+    "restaurants_title": "¿Dónde degustar la gastronomía togolesa?",
+    "restaurants_sub": "Maquis auténticos y restaurantes reconocidos",
+    "specialties_label": "Especialidades:",
+    "card_recipe": "Receta & Maquis",
+    "card_see": "Ver"
   },
   "Loisirs": {
     "tag": "Entretenimiento y Biodiversidad",
@@ -316,7 +587,11 @@
       "maritime": "Región Marítima"
     },
     "gps_available": "GPS Disponible",
-    "rejoin": "Cómo llegar"
+    "rejoin": "Cómo llegar",
+    "reset_search": "Restablecer búsqueda",
+    "section_kicker": "Naturaleza & Safari",
+    "section_title": "Espacios Verdes, Reservas y Ocio en Togo",
+    "parcs_found": "{count} parque(s) registrado(s)"
   },
   "Onboarding": {
     "scan_tooltip": "Escanea un monumento para descubrir su historia",
@@ -382,6 +657,60 @@
       "description": "Una salsa cremosa y aterciopelada hecha de pasta de cacahuete tostado, sazonada con especias locales.",
       "histoire": "La salsa de cacahuete atraviesa todas las regiones de Togo, del Sur al Norte (donde el cacahuete se cultiva ampliamente). Demuestra la capacidad del patrimonio culinario togolesa para vincular sabores dulces y grasos con pimientos fuertes para crear un equilibrio perfecto.",
       "accompagnementsIdaux": "Arroz blanco, fufu de ñame, o masa de maíz."
+    },
+    "wagasi_togolais": {
+      "nom": "Wagasi (Fromage Peulh)",
+      "description": "Fromage artisanal doré à pâte ferme et croûte rouge naturelle, spécialité des pasteurs Peulhs.",
+      "histoire": "Fabriqué à partir de lait de vache frais caillé à l'aide d'un extrait végétal de Calotropis procera, le Wagasi est frit dans l'huile et consommé croustillant, souvent nappé d'une sauce tomate relevée ou ajouté aux plats de riz et de haricots.",
+      "accompagnementsIdaux": "Idéal avec de l'Ayimolou, des bananes plantains frites (Aloko) ou une sauce pimentée."
+    },
+    "fetri_dessi": {
+      "nom": "Fétri Dessi (Sauce Gombo)",
+      "description": "Onctueuse sauce gombo mijotée à l'huile de palme rouge avec crabe, poissons fumés et crevettes.",
+      "histoire": "Le Fétri Dessi est l'un des joyaux du patrimoine culinaire togolais. La texture filante du gombo frais mariée aux fruits de mer de l'océan et à la rondeur de l'huile de palme en fait un plat d'honneur servi lors des grands déjeuners de famille.",
+      "accompagnementsIdaux": "Akoumé (pâte de maïs), Ewassa, ou Pâte de manioc."
+    },
+    "to_sorgho_togolais": {
+      "nom": "Tô de Sorgho (Pâte du Nord)",
+      "description": "La pâte nourrissante de céréales nobles du Grand Nord togolais, à la texture dense et au goût toasté.",
+      "histoire": "Aliment de base des régions de la Kara et des Savanes, le Tô est confectionné à base de farine de sorgho ou de mil blanc battu dans une eau frémissante. Riche en minéraux, il a nourri des générations de cultivateurs et de guerriers de la savane.",
+      "accompagnementsIdaux": "Sauce gombo, sauce feuilles de baobab, ou sauce d'arachide relevée."
+    },
+    "riz_gras_togolais": {
+      "nom": "Riz Gras au Poisson & Viande",
+      "description": "Riz délicatement parfumé mijoté dans un bouillon riche de tomates fraîches, légumes locaux et épices.",
+      "histoire": "Variante togolaise du grand riz ouest-africain, le Riz Gras togolais se distingue par l'utilisation de légumes locaux (choux, carottes, aubergines africaines) et son assaisonnement d'ail, de laurier et de piment vert écrasé.",
+      "accompagnementsIdaux": "Poulet frit, poisson braisé, piment noir et rondelles d'oignons."
+    },
+    "soupe_poisson_togolaise": {
+      "nom": "Soupe de Poisson de Mer",
+      "description": "Bouillon marin épicé et parfumé aux poissons frais du littoral de Lomé et d'Aného.",
+      "histoire": "Préparée quotidiennement par les femmes des pêcheurs sur la côte, cette soupe pimentée utilise les poissons les plus frais (mérou, capitaine, daurade) mijotés avec du gingembre, de l'ail et du basilic africain (Tchayo).",
+      "accompagnementsIdaux": "Akoumé blanc, Ablo chaud ou pain croustillant."
+    },
+    "hanvidokpome_aneho": {
+      "nom": "Hanvidokpomè (Porc au Four d'Aného)",
+      "description": "Rôti de porc mariné aux épices traditionnelles et cuit à l'étouffée, grande spécialité festive d'Aného.",
+      "histoire": "Originaire de la ville historique d'Aného, le Hanvidokpomè est le plat festif suprême lors des cérémonies de mariage et de la fête traditionnelle Epé-Ekpé. La viande est longuement marinée puis dorée au four jusqu'à ce qu'elle devienne tendre et parfumée.",
+      "accompagnementsIdaux": "Ablo, Kohm ou galettes de maïs avec sauce tomate épicée."
+    },
+    "agbeli_togolais": {
+      "nom": "Agbeli (Manioc Pilé)",
+      "description": "Pâte élastique et soyeuse de manioc doux cuit à la vapeur puis pilé avec art.",
+      "histoire": "Très apprécié dans les régions du Sud et des Plateaux, l'Agbeli est une alternative légère au fufu d'igname. Sa texture gélatineuse et délicate capture parfaitement les sauces pimentées.",
+      "accompagnementsIdaux": "Sauce claire de poisson, sauce graine ou Adémè."
+    },
+    "tchoukoutou_togolais": {
+      "nom": "Tchoukoutou (Bière de Sorgho)",
+      "description": "La bière artisanale traditionnelle à base de sorgho fermenté, servie fraîche dans une calebasse.",
+      "histoire": "Boisson emblématique du Nord Togo (particulièrement en pays Kabyè et Tamberma), le Tchoukoutou est préparé par un savoir-faire féminin séculaire de maltage et de fermentation. C'est la boisson du partage, de l'amitié et des rites initiatiques.",
+      "accompagnementsIdaux": "Se déguste lors des rassemblements entre amis ou après les travaux champêtres."
+    },
+    "sodabi_togolais": {
+      "nom": "Sodabi Artisanal",
+      "description": "La célèbre eau-de-vie traditionnelle togolaise distillée à partir de sève pure de palmier.",
+      "histoire": "Surnommé la boisson des dieux, le Sodabi est obtenu par distillation du vin de palme fermenté. Présent dans toutes les libations et bénédictions traditionnelles, il est aussi préparé infusé d'écorces et de racines bienfaisantes.",
+      "accompagnementsIdaux": "À déguster en digestif ou lors des toasts traditionnels."
     }
   },
   "Monuments": {
@@ -444,6 +773,91 @@
       "nom": "Cascada de Yikpa",
       "description": "Una de las cascadas más espectaculares y altas de Togo, anidada en naturaleza salvaje.",
       "histoire": "También llamada Cascadas Douala, es una de las cascadas más impresionantes y altas de Togo. Ubicada en el extremo norte de la meseta Danyi, fluye a lo largo de un acantilado empinado en vegetación densa, marcando espectacularmente la frontera natural con Ghana."
+    },
+    "marche_fetiches_akodessewa": {
+      "nom": "Marché des Fétiches d'Akodésséwa",
+      "description": "Le plus grand marché vaudou et de médecine traditionnelle au monde, situé au cœur de Lomé.",
+      "histoire": "Véritable institution spirituelle et culturelle, le marché d'Akodésséwa rassemble les guérisseurs traditionnels et prêtres vaudou de toute l'Afrique de l'Ouest. On y trouve des talismans sacrés, des poudres végétales ancestrales et des objets rituels protecteurs façonnés selon les traditions séculaires."
+    },
+    "togoville_sanctuaire": {
+      "nom": "Togoville & Lac Togo",
+      "description": "Cité historique sacrée berceau du nom 'Togo', sanctuaire marial et couvents vaudou ancestraux.",
+      "histoire": "Située sur la rive nord du lac Togo, Togoville a donné son nom à tout le pays après la signature du traité de 1884 entre le roi Mlapa III et Gustav Nachtigal. Lieu de rencontre fascinant entre la tradition animiste et le catholicisme, le village abrite à la fois de célèbres couvents vaudou et la cathédrale Notre-Dame du Lac."
+    },
+    "aneho_cite_coloniale": {
+      "nom": "Aného (Ancienne Capitale)",
+      "description": "Ancienne capitale coloniale du Togo bordée par l'océan Atlantique et la lagune des lacs.",
+      "histoire": "Capitale du Togo sous l'administration allemande puis française de 1886 à 1897, Aného est un centre historique du peuple Guin-Mina. Ses majestueuses bâtisses de style colonial, son embouchure magique où la lagune rejoint l'océan et son célèbre sanctuaire de Glidji pour la fête d'Epé-Ekpé en font une halte culturelle majeure."
+    },
+    "plage_de_lome": {
+      "nom": "Plage & Corniche de Lomé",
+      "description": "Le magnifique littoral de sable fin bordé de cocotiers qui s'étend sur toute la longueur de la capitale.",
+      "histoire": "La plage de Lomé est l'une des rares plages de mer au monde située directement au cœur d'une capitale. Point de rencontre populaire le week-end, les pêcheurs traditionnels y tirent leurs immenses filets en chantant en rythme au coucher du soleil."
+    },
+    "cascade_kpime": {
+      "nom": "Cascade de Kpimé",
+      "description": "Superbe chute d'eau tropicale nichée dans les collines verdoyantes de Kpalimé.",
+      "histoire": "Située à une dizaine de kilomètres de Kpalimé sur la route d'Atakpamé, la cascade de Kpimé dévale des parois rocheuses au cœur d'une végétation dense de fougères et de cacaoyers, offrant une fraîcheur revitalisante très appréciée des randonneurs."
+    },
+    "cascade_aklowa": {
+      "nom": "Cascade d'Aklowa (Badou)",
+      "description": "La spectaculaire cascade d'eaux sulfureuses de près de 100 mètres de hauteur dissimulée dans la forêt de Badou.",
+      "histoire": "Considérée comme l'une des plus impressionnantes cascades du pays, Aklowa jaillit d'une falaise abrupte. Selon la tradition locale, ses eaux pures et légèrement sulfureuses possèdent des propriétés médicinales et purificatrices."
+    },
+    "notse_agbogbo": {
+      "nom": "Muraille d'Agbogbo à Notsè",
+      "description": "Les vestiges légendaires de la cité royale fortifiée, berceau historique du peuple Éwé.",
+      "histoire": "Au XVe siècle, Notsè était la capitale du puissant royaume Éwé sous le règne du roi Agokoli. Les ruines monumentales du mur d'enceinte en terre battue (Agbogbodi) témoignent encore aujourd'hui de l'épopée fondatrice de la grande migration des Éwés vers la côte."
+    },
+    "parc_fazao_malfakassa": {
+      "nom": "Parc National de Fazao-Malfakassa",
+      "description": "Le plus grand parc national du Togo (192 000 ha), réserve de biodiversité sauvage et de reliefs rocheux.",
+      "histoire": "À cheval sur la chaîne de l'Atakora dans la Région Centrale, ce parc naturel spectaculaire protège des forêts denses de savane, des éléphants d'Afrique, des buffles, des antilopes et des centaines d'espèces d'oiseaux migrateurs au cœur d'un paysage de collines escarpées."
+    },
+    "lac_de_nangbeto": {
+      "nom": "Lac de Nangbéto & Barrage",
+      "description": "Vaste étendue d'eau artificielle sur le fleuve Mono, sanctuaire d'oiseaux aquatiques et d'hippopotames.",
+      "histoire": "Créé par la retenue du barrage hydroélectrique sur le fleuve Mono, le lac de Nangbéto est devenu un écosystème remarquable propice aux promenades en pirogue, à la pêche artisanale et à l'observation d'hippopotames en liberté."
+    },
+    "sokode_centre": {
+      "nom": "Sokodé & Tradition Kotokoli",
+      "description": "Deuxième métropole du Togo, capitale de la culture Tem et de la célèbre fête des couteaux Gadao-Adossa.",
+      "histoire": "Carrefour commercial et carrefour des pistes caravanières reliant le Sahel au golfe de Guinée, Sokodé est célèbre pour ses bâtisses islamiques historiques, ses tisserands traditionnels et la fête spectaculaire de Gadao-Adossa où les initiés défient le feu et les lames."
+    },
+    "faille_aledjo": {
+      "nom": "La Faille d'Alédjo",
+      "description": "Impressionnante trouée routière taillée directement dans la montagne rocheuse de l'Atakora.",
+      "histoire": "Ouvrage spectaculaire creusé dans le roc pendant la période coloniale pour relier le Sud au Nord du Togo, la Faille d'Alédjo offre un panorama grandiose sur les crêtes de l'Atakora et symbolise la porte d'entrée héroïque vers la région de la Kara."
+    },
+    "reserve_sarakawa": {
+      "nom": "Parc & Réserve de Sarakawa",
+      "description": "Réserve animalière réputée abritant girafes, zèbres, autruches et antilopes au pied des monts Kara.",
+      "histoire": "Situé à proximité de Kara, ce parc faunique réaménagé permet aux visiteurs d'approcher de grands mammifères de la savane africaine dans un paysage préservé de collines arborées."
+    },
+    "forgerons_tchare": {
+      "nom": "Forgerons traditionnels de Tcharè",
+      "description": "Ateliers millénaires de forge sur pierre des artisans Kabyè au cœur du massif de la Kara.",
+      "histoire": "Sur les hauteurs des monts Kabyè, les forgerons de Tcharè perpétuent une technique de métallurgie précoloniale unique : ils battent le fer rouge à l'aide de lourdes pierres rondes de granit en guise de marteau et d'enclume, créant outils agricoles et parures rituelles."
+    },
+    "reserve_oti_mandouri": {
+      "nom": "Réserve de Faune Oti-Mandouri",
+      "description": "Vaste réserve protégée de savane sahélienne bordée par la rivière Oti à l'extrême nord du Togo.",
+      "histoire": "Partie intégrante du grand complexe écologique transfrontalier WAPO, la réserve d'Oti-Mandouri protège une plaine inondable où se rassemblent troupeaux d'éléphants, buffles et hippopotames sous le ciel infini des savanes septentrionales."
+    },
+    "peintures_namoundjoga": {
+      "nom": "Peintures Rupestres de Namoundjoga",
+      "description": "Sites d'art rupestre préhistorique gravés et peints sur les falaises de grès du grand Nord.",
+      "histoire": "Témoignage inestimable du peuplement préhistorique de l'Afrique de l'Ouest, les abris sous roche de Namoundjoga présentent des peintures ocres et des gravures rupestres représentant scènes de chasse, animaux sauvages et symboles cosmogoniques anciens."
+    },
+    "grottes_de_nok": {
+      "nom": "Grottes et Greniers de Nok (Nano)",
+      "description": "Refuges troglodytiques fortifiés et greniers d'argile bâtis à flanc de falaise vertigineuse.",
+      "histoire": "Au XVIIIe et XIXe siècle, les populations Moba et Gourma ont aménagé des grottes inaccessibles dans la falaise de Nano pour se protéger des razzias. On y observe encore intacts des dizaines de greniers coniques en terre cuite suspendus au-dessus du vide."
+    },
+    "dapaong_marche": {
+      "nom": "Dapaong & Pays Moba",
+      "description": "Capitale septentrionale du Togo, carrefour des cultures sahéliennes et de l'artisanat du cuir et du fer.",
+      "histoire": "Entourée de paysages de savane et de baobabs géants, Dapaong est le centre économique de la Région des Savanes. Son grand marché coloré est réputé pour les poteries traditionnelles, le beurre de karité pur et les épices du grand nord."
     }
   },
   "Parcs": {
@@ -530,7 +944,45 @@
   },
   "Common": {
     "listen": "Escuchar",
-    "stop": "Detener"
+    "stop": "Detener",
+    "pwa_installed": "Aplicación instalada",
+    "pwa_install_btn": "Instalar aplicación",
+    "pwa_modal_title": "Instalar HeriTogo en su pantalla",
+    "pwa_modal_desc": "Acceda a todas sus guías y monumentos al instante desde su pantalla de inicio, incluso sin conexión.",
+    "pwa_step_1_prefix": "Toque el botón",
+    "pwa_share_btn": "Compartir",
+    "pwa_step_1_suffix": "en la parte inferior de Safari.",
+    "pwa_step_2_prefix": "Desplácese y elija",
+    "pwa_add_home": "Añadir a pantalla de inicio",
+    "pwa_step_3_prefix": "Toque",
+    "pwa_add_btn": "Añadir",
+    "pwa_step_3_suffix": "en la esquina superior derecha.",
+    "pwa_got_it": "Entendido",
+    "report_title": "Reportar un perfil o reserva",
+    "report_reason_inappropriate": "Comportamiento inapropiado",
+    "report_reason_fake": "Perfil falso",
+    "report_reason_noshow": "Ausencia injustificada",
+    "report_reason_fraud": "Fraude",
+    "report_reason_other": "Otro",
+    "report_desc_placeholder": "Describa los hechos con precisión...",
+    "report_cancel": "Cancelar",
+    "report_submit": "Enviar reporte",
+    "review_title": "Dejar una opinión",
+    "review_cancel": "Cancelar",
+    "review_submit": "Publicar opinión",
+    "report_notice": "Por favor reporte cualquier comportamiento sospechoso, fraude, ausencia o perfil falso. Sus reportes son tratados de manera confidencial por nuestro equipo en 24h.",
+    "report_reason_label": "Motivo del reporte",
+    "report_desc_label": "Descripción detallada",
+    "report_send": "Enviar",
+    "review_rating_label": "Su calificación",
+    "review_comment_label": "Su comentario",
+    "review_comment_placeholder": "Comparta su experiencia con este guía...",
+    "review_overall_rating": "Calificación general",
+    "review_comment": "Comentario",
+    "review_admin_only": "Solo admin",
+    "review_placeholder": "Escriba su comentario aquí (visible solo para el equipo administrativo)...",
+    "review_privacy_note": "ℹ️ Por razones de privacidad, su comentario de texto no se mostrará públicamente. Solo la calificación en estrellas será visible en el perfil del guía.",
+    "review_submit_btn": "Enviar"
   },
   "ChatBot": {
     "title": "TGO AI",
@@ -605,7 +1057,19 @@
     "error_password_short": "La contraseña debe tener al menos 6 caracteres.",
     "success_register": "¡Cuenta creada! Redirigiendo...",
     "success_forgot": "Email enviado. Revisa tu bandeja de entrada.",
-    "check_email": "Revisa tu email para confirmar tu cuenta."
+    "check_email": "Revisa tu email para confirmar tu cuenta.",
+    "or_continue_with": "O continuar con",
+    "google_continue": "Continuar con Google",
+    "google_privacy_hint": "Acepta la política de privacidad para registrarte con Google.",
+    "error_oauth": "La conexión con Google falló o el enlace ya no es válido. Inténtalo de nuevo.",
+    "confirm_loading_title": "Confirmación en curso...",
+    "confirm_loading_sub": "Espere unos segundos.",
+    "confirm_success_title": "¡Cuenta confirmada!",
+    "confirm_success_message": "¡Correo confirmado! Redirigiendo a su espacio...",
+    "confirm_error_title": "Enlace caducado",
+    "confirm_error_invalid": "Enlace inválido o caducado. Vuelva a iniciar sesión.",
+    "confirm_error_generic": "No se pudo confirmar su correo.",
+    "confirm_redirect": "Redirección automática..."
   },
   "Dashboard": {
     "common": {
@@ -634,7 +1098,7 @@
       "default_country": "Togo"
     },
     "tourist": {
-      "greeting": "Hola, {name} 👋",
+      "greeting": "Hola, {name}",
       "subtitle": "Espacio de Viajero Heritogo",
       "new_scan": "Nuevo escaneo",
       "find_guide": "Buscar un guía",
@@ -661,8 +1125,9 @@
       "status_in_progress": "En curso",
       "status_completed": "Completado",
       "status_cancelled": "Cancelado",
-      "booking_type": "🎒 Tipo: {type}",
+      "booking_type": "Tipo: {type}",
       "offer_label": "Oferta: {amount} FCFA",
+      "accept_quote": "Aceptar presupuesto",
       "view_guide": "Ver guía",
       "leave_review": "Dejar una opinión",
       "review_left": "Opinión dejada ({rating}/5)",
@@ -739,7 +1204,7 @@
       "doc_title_label": "Etiqueta / Título",
       "doc_title_placeholder": "Ej: Licencia Ministerio de Turismo 2026",
       "doc_file_label": "Archivo adjunto (solo PDF)",
-      "doc_upload_hint": "📁 Suba un archivo oficial en formato PDF (máx. 5 MB). El documento será accesible y descargable para su validación por parte del equipo de administración.",
+      "doc_upload_hint": "Suba un archivo oficial en formato PDF (máx. 5 MB). El documento será accesible y descargable para su validación por parte del equipo de administración.",
       "submit_for_verification": "Enviar para verificación",
       "docs_submitted_title": "Documentos enviados",
       "no_docs": "Ningún documento enviado todavía.",
@@ -856,10 +1321,22 @@
     "error_generic": "Ocurrió un error durante la reserva.",
     "mission_type_label": "Tipo de visita / misión",
     "types": {
-      "full_day": { "label": "Día completo", "desc": "Completo" },
-      "half_day": { "label": "Medio día", "desc": "Mañana/Tarde" },
-      "hourly": { "label": "Por hora", "desc": "Por hora" },
-      "virtual": { "label": "Virtual", "desc": "Por videoconferencia" }
+      "full_day": {
+        "label": "Día completo",
+        "desc": "Completo"
+      },
+      "half_day": {
+        "label": "Medio día",
+        "desc": "Mañana/Tarde"
+      },
+      "hourly": {
+        "label": "Por hora",
+        "desc": "Por hora"
+      },
+      "virtual": {
+        "label": "Virtual",
+        "desc": "Por videoconferencia"
+      }
     },
     "date_label": "Fecha prevista",
     "start_time_label": "Hora de inicio",
@@ -878,6 +1355,265 @@
     "half_day": "Medio día:",
     "hourly": "Por hora:",
     "virtual": "Visita virtual:",
-    "warning_text": "⚠️ Tras validar este formulario, el guía analizará su solicitud y le enviará un presupuesto personalizado. Solo pagará después de aceptar el presupuesto."
+    "warning_text": "Tras validar este formulario, el guía analizará su solicitud y le enviará un presupuesto personalizado. Solo pagará después de aceptar el presupuesto."
+  },
+  "Update": {
+    "later": "Más tarde",
+    "title": "Actualización disponible",
+    "install": "Instalar",
+    "desc": "Una nueva versión de Heritogo está lista. Instálala para disfrutar de las últimas correcciones."
+  },
+  "GuidesPage": {
+    "tag": "Guías certificados",
+    "title": "Encuentra tu guía",
+    "subtitle": "Explora Togo acompañado de un guía local certificado. Cada guía es verificado y calificado por nuestra comunidad.",
+    "filters": "Filtros",
+    "reset": "Restablecer",
+    "search_placeholder": "Buscar un guía…",
+    "zone_label": "Zona",
+    "all_zones": "Todas las zonas",
+    "lang_label": "Idioma",
+    "all_langs": "Todos los idiomas",
+    "price_label": "Precio máx. / día",
+    "certified": "Certificado",
+    "reviews": "reseñas",
+    "languages": "Idiomas",
+    "zones": "Zonas",
+    "rate_label": "Tarifa diaria",
+    "per_day": "XOF / día",
+    "view_profile": "Ver perfil",
+    "book": "Reservar",
+    "no_guides": "Ningún guía encontrado",
+    "no_guides_sub": "Intenta modificar tus filtros para encontrar un guía disponible en tu zona.",
+    "default_bio": "Este guía aún no ha completado su biografía.",
+    "error_loading": "No se pueden cargar los guías. Inténtalo de nuevo.",
+    "loading": "Cargando guías...",
+    "loading_profile": "Cargando perfil del guía...",
+    "guide_unavailable": "Guía temporalmente no disponible",
+    "error_loading_sub": "Error de carga. Verifique su conexión y vuelva a intentarlo.",
+    "back_to_guides": "Volver a los guías",
+    "share_guide": "Compartir",
+    "hourly_rate": "Tarifa por hora",
+    "half_day": "Medio día",
+    "full_day": "Día completo",
+    "virtual_tour": "Visita virtual",
+    "book_guide": "Reservar este guía",
+    "about_guide": "Acerca del guía",
+    "experience_years": "{years} años de experiencia",
+    "spoken_languages": "Idiomas",
+    "coverage_zones": "Zonas de cobertura",
+    "specialties": "Especialidades",
+    "pricing_title": "Tarifas y reserva",
+    "retry": "Reintentar",
+    "empty_title": "No se encontraron guías",
+    "empty_desc": "Ajuste sus filtros o amplíe su búsqueda para encontrar guías locales.",
+    "experience_short": "{years} años exp.",
+    "back_to_directory": "← Volver al directorio",
+    "add_to_favorites": "Añadir a favoritos",
+    "in_favorites": "Favorito",
+    "skills_and_zones": "Habilidades y Zonas",
+    "not_specified": "No especificado",
+    "tourist_specialties": "Especialidades turísticas",
+    "default_specialty": "Turismo Cultural y Naturaleza",
+    "planned_availabilities": "Disponibilidades programadas",
+    "availability_sub": "Fechas confirmadas por el guía. También puede enviar una solicitud abierta.",
+    "available": "Disponible",
+    "on_request": "Reserva disponible bajo petición.",
+    "indicative_pricing": "Tarifas indicativas",
+    "secure_payment_note": "Pago seguro validado al final del recorrido.",
+    "quote_request": "Solicitar un presupuesto",
+    "trust_charter": "Carta de confianza HeriTogo",
+    "trust_1": "Guía certificado con identidad verificada.",
+    "trust_2": "Pago seguro (Flooz / T-Money).",
+    "trust_3": "Fondos bloqueados hasta el final de la visita.",
+    "trust_4": "Asistencia de soporte HeriTogo 24/7.",
+    "report_profile": "Reportar este perfil",
+    "report_sub": "¿Un problema con este perfil o comportamiento inapropiado? Infórmalo al equipo.",
+    "report_success": "Reporte enviado. ¡Gracias!",
+    "report_guide": "Reportar este guía",
+    "exchange_language": "Idioma de intercambio:"
+  },
+  "TravelTools": {
+    "drawer": {
+      "button": "Herramientas",
+      "open": "Abrir herramientas de viaje",
+      "title": "Herramientas del viajero",
+      "close": "Cerrar",
+      "privacy": "Tus listas se guardan en este dispositivo"
+    },
+    "checklist": {
+      "kicker": "Prepara tu llegada",
+      "title": "Lo esencial antes de salir",
+      "description": "Una lista breve y clara guardada en tu dispositivo.",
+      "progress": "{done}/{total}",
+      "items": {
+        "documents": {
+          "title": "Documentos a mano",
+          "detail": "Pasaporte, datos del alojamiento y copias digitales seguras."
+        },
+        "entry": {
+          "title": "Requisitos de entrada verificados",
+          "detail": "Consulta fuentes oficiales antes de salir: los requisitos pueden cambiar."
+        },
+        "offline": {
+          "title": "Mapa y contactos guardados",
+          "detail": "Descarga la zona útil sin conexión y conserva un contacto local."
+        },
+        "money": {
+          "title": "Presupuesto inicial preparado",
+          "detail": "Prepara lo necesario para la llegada y acuerda siempre el precio antes del trayecto."
+        }
+      }
+    },
+    "planner": {
+      "kicker": "Tu estancia, simplemente",
+      "title": "Un itinerario listo para vivir",
+      "description": "Elige lo que te apetece y sigue un recorrido claro durante el viaje.",
+      "styleLabel": "Tu interés",
+      "duration": "Duración",
+      "oneDay": "1 día",
+      "twoDays": "2 días",
+      "threeDays": "3 días",
+      "save": "Guardar mi itinerario",
+      "saved": "Itinerario guardado en este dispositivo",
+      "map": "Ver lugares en el mapa",
+      "itineraries": {
+        "essentiel": {
+          "label": "Imprescindibles",
+          "description": "Lo mejor de Togo para una primera visita.",
+          "days": {
+            "1": "Lomé: Gran Mercado, catedral y paseo marítimo",
+            "2": "Kpalimé: artesanía, café-cacao y cascada de Womé",
+            "3": "Koutammakou: pueblos Batammariba y paisajes del norte"
+          }
+        },
+        "nature": {
+          "label": "Naturaleza",
+          "description": "Cascadas, montañas y grandes espacios a tu ritmo.",
+          "days": {
+            "1": "Lomé: laguna y lago Togo",
+            "2": "Kpalimé: monte Agou y cascada de Womé",
+            "3": "Fazao-Malfakassa: senderismo y fauna"
+          }
+        },
+        "culture": {
+          "label": "Cultura",
+          "description": "Encuentros, saber hacer y patrimonio vivo.",
+          "days": {
+            "1": "Lomé: museos, mercado de fetiches y cocina local",
+            "2": "Kpalimé: talleres artesanales y productos locales",
+            "3": "Koutammakou: arquitectura tradicional y comunidades locales"
+          }
+        }
+      }
+    },
+    "toolkit": {
+      "kicker": "Herramientas del viajero",
+      "title": "Facilite su estancia en Togo",
+      "tab_currency": "Moneda FCFA",
+      "tab_lexicon": "Hablar local",
+      "tab_transport": "Transporte",
+      "tab_emergency": "Urgencias",
+      "eur_label": "Monto en Euros (€)",
+      "fcfa_label": "Equivalente en Francos CFA (FCFA)",
+      "rate_info": "Referencia rápida: 1 000 FCFA ≈ 1,52 € · 5 000 FCFA ≈ 7,62 € · 10 000 FCFA ≈ 15,24 €",
+      "rate_fixed": "Tasa fija BCEAO",
+      "lexicon_intro": "A los togoleses les encanta que los visitantes saluden en las lenguas locales. Estas son las frases clave:",
+      "ewe_label": "Ewé (Sur)",
+      "kabye_label": "Kabyè (Norte)",
+      "avg_fare": "Tarifa promedio:",
+      "emergency_intro": "Números oficiales de asistencia y emergencia en Togo, gratuitos las 24 horas:"
+    }
+  },
+  "Splash": {
+    "tagline": "Patrimonio y viajes en Togo"
+  },
+  "Cookie": {
+    "title": "Cookies de HeriTogo",
+    "body": "Cookies esenciales: sesión (HttpOnly) e idioma. Las cookies no esenciales (tema) son opcionales. La geolocalización y las notificaciones requieren un consentimiento aparte.",
+    "policy": "Política de privacidad",
+    "refuse": "Rechazar",
+    "accept": "Aceptar",
+    "close": "Cerrar"
+  },
+  "Privacy": {
+    "gdpr_kicker": "RGPD",
+    "geo_title": "¿Afinar el escaneo con su posición?",
+    "geo_body": "La posición permanece en memoria durante el escaneo, no se guarda en nuestra base, y puede rechazarla: el escáner funciona igual.",
+    "allow": "Permitir",
+    "deny": "Rechazar",
+    "settings_title": "Privacidad y consentimientos",
+    "settings_intro": "Puede retirar un consentimiento en cualquier momento. Eso no impide usar el escáner, el mapa o las reservas.",
+    "geo_label": "Geolocalización",
+    "geo_hint": "Se usa solo al vuelo para afinar un escaneo. Nunca se historializa en base.",
+    "notif_label": "Notificaciones",
+    "notif_hint": "Alertas sobre sus reservas, solo si las activa.",
+    "read_policy": "Leer la política de privacidad",
+    "erasure_title": "Derecho al olvido",
+    "erasure_body": "La eliminación borra su perfil, reservas y documentos de estado. Los documentos de identidad nunca se almacenaron con nosotros.",
+    "delete_account": "Eliminar definitivamente mi cuenta",
+    "deleting": "Eliminando…",
+    "delete_confirm": "Esta acción es definitiva. Su cuenta y datos de HeriTogo se eliminarán. ¿Continuar?",
+    "delete_error": "No se pudo eliminar."
+  },
+  "Subscription": {
+    "kicker": "Planes y tarifas",
+    "title": "Desbloquee la experiencia completa de HeriTogo",
+    "subtitle": "Disfrute de escaneos ilimitados por visión artificial, audioguías inmersivas multilingües y contacto directo con nuestros mejores guías locales.",
+    "free_title": "Plan Descubrimiento",
+    "free_sub": "Ideal para explorar los monumentos esenciales.",
+    "per_month": "/ mes",
+    "free_f1": "3 escaneos IA de monumentos gratis / mes",
+    "free_f2": "Consulta de 29 sitios patrimoniales y 31 platos",
+    "free_f3": "Solicitud de reserva de guías locales certificados",
+    "free_f4": "Escaneos ilimitados no incluidos",
+    "current_plan": "Plan actual",
+    "recommended": "✦ Recomendado",
+    "premium_title": "HeriTogo Premium",
+    "premium_sub": "Para amantes de la cultura y viajeros en Togo.",
+    "premium_f1": "Escaneos IA de monumentos ilimitados",
+    "premium_f2": "Audioguías multilingües completas (TTS de alta calidad)",
+    "premium_f3": "Reserva prioritaria de guías verificados",
+    "premium_f4": "Historial de escaneos y navegación sin conexión",
+    "instant": "Activación instantánea en modo demo",
+    "cta": "Activar el acceso Premium",
+    "success": "¡Suscripción Premium activada con éxito!"
+  },
+  "Regions": {
+    "hero_badge": "5 regiones, 5 universos",
+    "capital": "Capital: {name}",
+    "spirit": "El espíritu de {name}",
+    "selection": "Selección",
+    "highlights": "Imprescindibles de la región",
+    "sites": "Sitios emblemáticos",
+    "dishes": "Especialidades culinarias",
+    "activities": "Qué hacer allí",
+    "type_site": "Sitio",
+    "type_dish": "Sabor",
+    "type_activity": "Actividad",
+    "cta_title": "Prepare su estancia en {name}",
+    "cta_sub": "Encuentre un guía local certificado para una inmersión auténtica.",
+    "cta_button": "Reservar un guía local →",
+    "stats": {
+      "monuments": "Monumentos mayores",
+      "inhabitants": "Habitantes",
+      "coast": "Costa atlántica",
+      "nature": "Sitios naturales",
+      "summit": "Punto culminante",
+      "waterfalls": "Cascadas y ríos",
+      "park": "Parque protegido",
+      "species": "Especies animales",
+      "cities": "Ciudades históricas",
+      "unesco": "Patrimonio mundial",
+      "listed": "Zona clasificada",
+      "signatures": "Monumentos emblemáticos",
+      "reserve": "Reserva natural",
+      "granaries": "Graneros de Nok",
+      "archaeology": "Sitios arqueológicos"
+    },
+    "monuments_kicker": "Monumentos y Tesoros",
+    "monuments_title": "Monumentos de {name}",
+    "monuments_subtitle": "Explore las fichas detalladas de los {count} sitios registrados en esta región.",
+    "see_all_sites": "Ver los {count} lugares"
   }
 }

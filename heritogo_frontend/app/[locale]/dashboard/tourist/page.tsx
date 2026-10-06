@@ -10,13 +10,15 @@ import { getFirstName, getInitials } from '@/lib/auth/redirect'
 import { COLORS } from '@/lib/constants/colors'
 import { useTranslations } from 'next-intl'
 import { 
-  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2 
+  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2, Languages, MapPin
 } from 'lucide-react'
 import ReviewModal from '@/components/ReviewModal'
 import ShareItinerary from '@/components/ShareItinerary'
+import PrivacySettings from '@/components/PrivacySettings'
 import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
+import { safeJsonParse, safeLocalStorageGet } from '@/lib/utils/storage'
 
 interface BookingRow {
   id: string
@@ -100,8 +102,7 @@ export default function TouristDashboardPage() {
         setBookings(bookingsResult.data.bookings)
       }
 
-      const favIdsRaw = localStorage.getItem('heritogo_favorites')
-      const favIds = favIdsRaw ? JSON.parse(favIdsRaw) as string[] : []
+      const favIds = safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), [])
       if (favIds.length > 0) {
         const guidesResult = await apiFetch<{ guides?: any[] }>('/api/guides')
         if (guidesResult.ok && guidesResult.data?.guides) {
@@ -112,8 +113,7 @@ export default function TouristDashboardPage() {
         setFavorites([])
       }
 
-      const scansRaw = localStorage.getItem('heritogo_scans')
-      const scans = scansRaw ? JSON.parse(scansRaw) : []
+      const scans = safeJsonParse<any[]>(safeLocalStorageGet('heritogo_scans'), [])
       setScanHistory(scans)
     } catch (e: unknown) {
       console.error(e)
@@ -231,7 +231,7 @@ export default function TouristDashboardPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-24 text-base-content">
       {/* Header Profile Section */}
-      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between rounded-[32px] border border-border bg-base-200 p-6 shadow-sm">
+      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-border bg-base-200 p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <div 
             className="flex h-16 w-16 items-center justify-center rounded-3xl text-xl font-black text-white"
@@ -304,7 +304,7 @@ export default function TouristDashboardPage() {
         {/* 1. PROFILE TAB */}
         {activeTab === 'profile' && (
           <div className="grid gap-6 md:grid-cols-[1fr_1.8fr]">
-            <div className="rounded-[28px] border border-border bg-base-200 p-6">
+            <div className="rounded-xl border border-border bg-base-200 p-6">
               <h3 className="font-serif text-lg font-bold mb-4">{t('tourist.info_title')}</h3>
               <div className="space-y-4 text-sm">
                 <div>
@@ -326,7 +326,7 @@ export default function TouristDashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-[28px] border border-border bg-base-200 p-6">
+            <div className="rounded-xl border border-border bg-base-200 p-6">
               <h3 className="font-serif text-lg font-bold mb-4">{t('tourist.edit_profile')}</h3>
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <label className="form-control w-full">
@@ -390,6 +390,7 @@ export default function TouristDashboardPage() {
                 </button>
               </form>
             </div>
+            <PrivacySettings />
           </div>
         )}
 
@@ -397,7 +398,7 @@ export default function TouristDashboardPage() {
         {activeTab === 'bookings' && (
           <div className="space-y-4">
             {bookings.length === 0 ? (
-              <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
+              <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                 <Calendar className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
                 <h4 className="font-serif text-lg font-bold">{t('tourist.no_bookings')}</h4>
                 <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
@@ -415,7 +416,7 @@ export default function TouristDashboardPage() {
               bookings.map((booking) => (
                 <div 
                   key={booking.id}
-                  className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:border-primary/20"
+                  className="rounded-xl border border-border bg-base-200 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:border-primary/20"
                 >
                   <div className="flex gap-4">
                     <div 
@@ -430,7 +431,7 @@ export default function TouristDashboardPage() {
                         {getStatusBadge(booking.status)}
                       </div>
                       <p className="text-xs text-base-content/60 mt-1.5 flex items-center gap-3">
-                        <span>🗓️ {new Date(booking.start_date).toLocaleDateString()}</span>
+                        <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5 text-secondary" /> {new Date(booking.start_date).toLocaleDateString()}</span>
                         <span>{t('tourist.booking_type', { type: booking.mission_type.replace('_', ' ') })}</span>
                       </p>
                       
@@ -503,7 +504,7 @@ export default function TouristDashboardPage() {
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {favorites.length === 0 ? (
-                <div className="col-span-full rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
+                <div className="col-span-full rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                   <Heart className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
                   <h4 className="font-serif text-lg font-bold">{t('tourist.no_favorites')}</h4>
                   <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
@@ -521,7 +522,7 @@ export default function TouristDashboardPage() {
                 favorites.map((guide) => (
                   <div 
                     key={guide.id}
-                    className="rounded-[28px] border border-border bg-base-200 p-5 shadow-sm flex flex-col justify-between"
+                    className="rounded-xl border border-border bg-base-200 p-5 shadow-sm flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center gap-3">
@@ -542,8 +543,8 @@ export default function TouristDashboardPage() {
                       </div>
 
                       <div className="mt-4 space-y-1.5 text-xs text-base-content/70">
-                        <p>🗣️ <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
-                        <p>📍 <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
+                        <p className="flex items-center gap-1.5"><Languages className="h-3.5 w-3.5 text-secondary shrink-0" /> <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
+                        <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-secondary shrink-0" /> <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
                         <p className="font-bold text-base-content mt-3">
                           {t('tourist.rate_label')} {Number(guide.full_day_rate).toLocaleString()} XOF/jour
                         </p>
@@ -584,7 +585,7 @@ export default function TouristDashboardPage() {
         {activeTab === 'scans' && (
           <div className="space-y-4">
             {scanHistory.length === 0 ? (
-              <div className="rounded-[28px] border border-dashed border-border bg-base-200 p-8 text-center">
+              <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
                 <History className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
                 <h4 className="font-serif text-lg font-bold">{t('tourist.no_scans')}</h4>
                 <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
@@ -603,7 +604,7 @@ export default function TouristDashboardPage() {
                 {scanHistory.map((scan, i) => (
                   <div 
                     key={i}
-                    className="rounded-[28px] border border-border bg-base-200 overflow-hidden shadow-sm flex flex-col justify-between"
+                    className="rounded-xl border border-border bg-base-200 overflow-hidden shadow-sm flex flex-col justify-between"
                   >
                     <div className="p-5">
                       <span className="text-[10px] text-base-content/50 font-bold">
@@ -616,8 +617,8 @@ export default function TouristDashboardPage() {
                     </div>
 
                     <div className="border-t border-border/60 p-4 bg-base-300/30 flex justify-between items-center">
-                      <span className="text-xs font-semibold text-base-content/60">
-                        📍 {scan.localite || t('common.default_country')}
+                      <span className="text-xs font-semibold text-base-content/60 flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-secondary" /> {scan.localite || t('common.default_country')}
                       </span>
                       <Link 
                         href="/scan"

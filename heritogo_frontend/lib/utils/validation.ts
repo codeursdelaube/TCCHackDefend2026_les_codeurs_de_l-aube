@@ -1,4 +1,4 @@
-﻿/**
+/**
  * lib/utils/validation.ts
  * Fonctions de validation réutilisables dans toute l'application Heritogo.
  */

@@ -1,42 +1,79 @@
 "use client";
 
+import { useMemo } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { COLORS } from "@/lib/constants/colors";
 import { useTranslations } from "next-intl";
-
-// 🚨 INDISPENSABLE : Importer les styles CSS de Leaflet pour éviter que la carte soit invisible ou éclatée
+import { Link } from "@/i18n/navigation";
 import "leaflet/dist/leaflet.css";
-import { Monument } from "../LieuxT/site";
+import { Monument } from "@/lib/catalog/types";
 
-// 🚨 INDISPENSABLE : Recréer l'icône de l'épingle car Next.js perd les chemins des images Leaflet au build
-const iconeMonument = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+// Création d'épingles personnalisées élégantes aux couleurs de la palette Café (Expresso, Caramel, Crema)
+function createCoffeePin(pinColor: string, dotColor: string) {
+  return L.divIcon({
+    className: "coffee-map-pin",
+    html: `
+      <div style="
+        position: relative;
+        width: 32px;
+        height: 32px;
+        background-color: ${pinColor};
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid #FFFFFF;
+        box-shadow: 0 4px 12px rgba(42, 28, 20, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        <div style="
+          width: 10px;
+          height: 10px;
+          background-color: ${dotColor};
+          border-radius: 50%;
+          transform: rotate(45deg);
+        "></div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+}
+
+const pinSavane   = createCoffeePin(COLORS.gold, COLORS.white);
+const pinLaterite = createCoffeePin(COLORS.gold, COLORS.white);
+const pinOr       = createCoffeePin(COLORS.gold, COLORS.ink);
 
 interface CarteProps {
-  monumentsList: Monument[]; // ✅ Correction : C'est un tableau de monuments (Monument[])
+  monumentsList: Monument[];
 }
 
 export default function Carte({ monumentsList }: CarteProps) {
   const tMonuments = useTranslations('Monuments');
   
-  // ✅ Demande : Centrer systématiquement et précisément la position de départ sur Lomé
-  const positionCentre: [number, number] = [8.6195,  1.1518];
+  const isSingle = monumentsList?.length === 1;
+  const positionCentre: [number, number] = useMemo(() => {
+    if (isSingle && monumentsList[0]) {
+      return [monumentsList[0].lat, monumentsList[0].lng];
+    }
+    return [8.6195, 1.1518]; // Centre Togo
+  }, [isSingle, monumentsList]);
+
+  const zoomLevel = isSingle ? 13 : 7;
+
+  const getPinByRegion = (region: string) => {
+    if (region === 'Maritime' || region === 'Plateaux') return pinSavane;
+    if (region === 'Centrale') return pinLaterite;
+    return pinOr;
+  };
 
   return (
-    /* 🚨 CONTRAINTE TAILWIND CRITIQUE : 
-       La div parente DOIT obligatoirement avoir une hauteur fixe (ici h-[350px]).
-       Sans cela, Leaflet prend une hauteur de 0px et la carte reste invisible ! */
-    <div className="w-full h-125 relative z-0 rounded-2xl overflow-hidden border border-base-content/10 shadow-inner bg-base-300">
+    <div className={`w-full ${isSingle ? 'h-64 sm:h-72' : 'h-125'} relative z-0 rounded-2xl overflow-hidden border border-border shadow-sm bg-secondary`}>
       <MapContainer
         center={positionCentre}
-        zoom={monumentsList?.length === 1 ? 7 : 12} // Zoom plus immersif (15) s'il s'agit d'un seul monument ciblé
+        zoom={zoomLevel}
         scrollWheelZoom={false}
         className="w-full h-full"
       >
@@ -47,19 +84,34 @@ export default function Carte({ monumentsList }: CarteProps) {
 
         {monumentsList &&
           monumentsList.map((site) => {
-            const siteNom = tMonuments(`${site.id}.nom`);
+            const siteNom = site.nom || tMonuments(`${site.id}.nom`);
+            const siteDesc = site.description || tMonuments(`${site.id}.description`);
+            const pinIcon = getPinByRegion(site.région);
+
             return (
               <Marker
                 key={site.id}
                 position={[site.lat, site.lng]}
-                icon={iconeMonument}
+                icon={pinIcon}
               >
-                <Popup>
-                  <div className="p-1 text-slate-800">
-                    <p className="font-bold text-sm mb-0.5">{siteNom}</p>
-                    <p className="text-xs text-amber-600 font-semibold italic">
-                      {site.localite} — Région {site.région}
+                <Popup className="custom-togo-popup">
+                  <div className="p-2 max-w-[210px] text-foreground font-sans">
+                    <span className="inline-block rounded-md bg-primary px-2 py-0.5 text-[9px] font-bold uppercase text-white mb-1">
+                      {site.région}
+                    </span>
+                    <p className="font-bold text-xs leading-tight text-foreground mb-1">{siteNom}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium mb-1.5">
+                      {site.localite}
                     </p>
+                    <p className="line-clamp-2 text-[10px] text-muted-foreground mb-2 leading-relaxed">
+                      {siteDesc}
+                    </p>
+                    <Link
+                      href={`/lieux/${site.id}`}
+                      className="inline-block w-full text-center rounded-lg bg-primary py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90"
+                    >
+                      Découvrir →
+                    </Link>
                   </div>
                 </Popup>
               </Marker>
