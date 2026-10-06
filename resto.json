@@ -200,8 +200,8 @@
     "quartier": "Kotokoli Zongo",
     "adresse": "Kotokoli Zongo, Lomé",
     "telephone": "+228 91 99 00 11",
-    "lat": 6.1420,
-    "lng": 1.2300,
+    "latitude": 6.1420,
+    "longitude": 1.2300,
     "horaires": "7h – 13h (Lun–Sam)",
     "budget_fcfa": "500 – 1500",
     "plats_ids": ["ayimolou_togolais"]

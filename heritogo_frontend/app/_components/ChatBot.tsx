@@ -88,7 +88,7 @@ export default function ChatBot() {
         timeoutMs: 45000,
         // CORRECTION : Structure du JSON nettoyée pour coller au BaseModel de FastAPI
         body: JSON.stringify({
-          message: content,
+          message: content.slice(0, 500),
           extracted_location: "Lomé", // Optionnel (prendra Lomé par défaut si tu l'enlèves)
           extracted_budget: 0.0       // Optionnel (prendra 0.0 par défaut si tu l'enlèves)
         }),
@@ -265,7 +265,8 @@ export default function ChatBot() {
               <input
                 type="text"
                 value={inputValue}
-                onChange={e => setInputValue(e.target.value)}
+                maxLength={500}
+                onChange={e => setInputValue(e.target.value.slice(0, 500))}
                 placeholder={t('placeholder')}
                 disabled={isTyping}
                 className="min-w-0 grow rounded-2xl border border-border bg-base-100

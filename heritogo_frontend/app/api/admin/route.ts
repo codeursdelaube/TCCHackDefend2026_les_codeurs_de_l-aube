@@ -1,30 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
-import { GuideStatus, ReportStatus } from '@prisma/client'
+import { ReportStatus } from '@prisma/client'
+import { requireRole } from '@/lib/auth/session'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { clipString, isUuid } from '@/lib/security/input'
 
-// Middleware helper to check admin role
 async function checkAdmin() {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return { error: 'Non autorisé', status: 401 }
-  }
-
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id }
-  })
-
-  if (!profile || profile.role !== 'admin') {
-    return { error: 'Accès interdit', status: 403 }
-  }
-
-  if (!('is_active' in profile) || (profile as { is_active?: boolean }).is_active === false) {
-    return { error: 'Compte inactif', status: 403 }
-  }
-
-  return { user, profile }
+  return requireRole(['admin'])
 }
 
 // GET: Fetch admin dashboard statistics & details
@@ -149,9 +132,20 @@ export async function POST(request: Request) {
     const adminUser = auth.user
     const body = await request.json()
     const { action, targetId, details } = body
+    const allowedActions = new Set([
+      'approve_guide',
+      'reject_guide',
+      'suspend_guide',
+      'resolve_report',
+      'toggle_review_hidden',
+    ])
 
-    if (!action || !targetId) {
+    if (!allowedActions.has(action) || !isUuid(targetId)) {
       return NextResponse.json({ error: 'action et targetId requis' }, { status: 400 })
+    }
+
+    if (!checkRateLimit(`admin:${adminUser.id}`, 40, 60000)) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
     }
 
     if (action === 'approve_guide') {
@@ -222,7 +216,7 @@ export async function POST(request: Request) {
         }
       }
     } else if (action === 'reject_guide') {
-      const reason = details?.reason || 'Non conforme aux critères'
+      const reason = clipString(details?.reason, 500) || 'Non conforme aux critères'
       await prisma.$transaction([
         prisma.guideProfile.update({
           where: { id: targetId },
@@ -282,8 +276,8 @@ export async function POST(request: Request) {
         })
       }
     } else if (action === 'resolve_report') {
-      const resolution = details?.resolution || 'resolved' // resolved or dismissed
-      const note = details?.note || 'Résolu par l\'admin'
+      const resolution = details?.resolution === 'dismissed' ? 'dismissed' : 'resolved'
+      const note = clipString(details?.note, 500) || "Résolu par l'admin"
       await prisma.$transaction([
         prisma.report.update({
           where: { id: targetId },
@@ -311,7 +305,7 @@ export async function POST(request: Request) {
       }
       
       const newHidden = !review.is_hidden
-      const reason = details?.reason || 'Décision modérateur'
+      const reason = clipString(details?.reason, 500) || 'Décision modérateur'
 
       await prisma.$transaction([
         prisma.review.update({

@@ -45,7 +45,6 @@ export async function POST() {
     return NextResponse.json({ success: true, guideProfile })
   } catch (error: unknown) {
     console.error('Erreur dans /api/auth/register-guide:', error)
-    const message = error instanceof Error ? error.message : 'Erreur serveur'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Veuillez réessayer.' }, { status: 500 })
   }
 }

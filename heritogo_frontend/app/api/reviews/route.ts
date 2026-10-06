@@ -1,20 +1,27 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { requireUser } from '@/lib/auth/session'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { clipString, isUuid, parseBoundedNumber } from '@/lib/security/input'
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const auth = await requireUser()
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    const { booking_id, rating_overall, comment } = await request.json()
+    if (!checkRateLimit(`review:${auth.user.id}`, 10, 60000)) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
+    }
 
-    if (!booking_id || !rating_overall) {
-      return NextResponse.json({ error: 'Données manquantes' }, { status: 400 })
+    const body = await request.json()
+    const booking_id = body.booking_id
+    const rating_overall = parseBoundedNumber(body.rating_overall, 1, 5)
+    const comment = clipString(body.comment, 1000) || ''
+
+    if (!isUuid(booking_id) || rating_overall === null) {
+      return NextResponse.json({ error: 'Données manquantes ou invalides' }, { status: 400 })
     }
 
     // Trouver le booking et vérifier son statut
@@ -26,7 +33,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Réservation introuvable' }, { status: 404 })
     }
 
-    if (booking.tourist_id !== user.id) {
+    if (booking.tourist_id !== auth.user.id) {
       return NextResponse.json({ error: 'Action non autorisée' }, { status: 403 })
     }
 
@@ -38,9 +45,9 @@ export async function POST(request: Request) {
     const review = await prisma.review.create({
       data: {
         booking_id,
-        reviewer_id: user.id,
+        reviewer_id: auth.user.id,
         guide_id: booking.guide_id,
-        rating_overall: Number(rating_overall),
+        rating_overall,
         comment: comment || '',
         is_visible_public: false // Caché au public par défaut
       }
