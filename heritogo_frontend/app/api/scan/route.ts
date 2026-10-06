@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 
-// Retry automatique optimisé pour le Hackathon (Évite de dépasser les 10s de timeout Vercel)
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+
+function parseCoord(value: string | null, min: number, max: number): string | null {
+  if (!value) return null
+  const num = Number(value)
+  if (!Number.isFinite(num) || num < min || num > max) return null
+  return String(num)
+}
+
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
@@ -30,6 +39,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!checkRateLimit(`scan:${user.id}`, 8, 60000)) {
+      return NextResponse.json(
+        { error: 'Trop de scans. Réessayez dans une minute.' },
+        { status: 429 }
+      )
+    }
+
     // 1. Récupération des données envoyées par le composant ScanPage
     const incomingFormData = await request.formData()
 
@@ -44,6 +60,14 @@ export async function POST(request: NextRequest) {
     if (!imageFile || typeof imageFile === 'string') {
       return NextResponse.json(
         { error: "Aucune image n'a été reçue par le serveur." },
+        { status: 400 }
+      )
+    }
+
+    const mime = (imageFile.type || '').toLowerCase()
+    if (mime && !ALLOWED_IMAGE_TYPES.has(mime)) {
+      return NextResponse.json(
+        { error: 'Format de photo non autorisé. JPEG, PNG ou WEBP uniquement.' },
         { status: 400 }
       )
     }
@@ -86,8 +110,10 @@ export async function POST(request: NextRequest) {
 
     // Ajout des paramètres GPS optionnels
     const queryParams = new URLSearchParams()
-    if (lat) queryParams.append('lat', lat)
-    if (long) queryParams.append('long', long)
+    const safeLat = parseCoord(lat, -90, 90)
+    const safeLong = parseCoord(long, -180, 180)
+    if (safeLat) queryParams.append('lat', safeLat)
+    if (safeLong) queryParams.append('long', safeLong)
     if (queryParams.toString()) {
       targetUrl += `?${queryParams.toString()}`
     }
@@ -118,29 +144,16 @@ export async function POST(request: NextRequest) {
 
       let userFriendlyMessage = "Le scanner rencontre des difficultés à analyser cette image. Veuillez réessayer."
 
-      try {
-        const parsedError = JSON.parse(errorText)
-        if (parsedError.detail) {
-          // Gestion propre des erreurs Pydantic (Tableaux ou Objets) pour éviter le crash React
-          if (Array.isArray(parsedError.detail)) {
-            userFriendlyMessage = parsedError.detail[0].msg || JSON.stringify(parsedError.detail)
-          } else if (typeof parsedError.detail === 'object') {
-            userFriendlyMessage = parsedError.detail.msg || JSON.stringify(parsedError.detail)
-          } else {
-            userFriendlyMessage = parsedError.detail
-          }
-        }
-      } catch {
-        // Fallback sur les codes HTTP standards si le backend ne renvoie pas du JSON
-        if (backendResponse.status === 400 || errorText.includes('multipart')) {
-          userFriendlyMessage = 'Le format de la photo est illisible. Essayez de reprendre la photo.'
-        } else if (backendResponse.status === 401 || backendResponse.status === 403) {
-          userFriendlyMessage = "L'accès au service de reconnaissance a été refusé. Erreur de clé de sécurité."
-        } else if (backendResponse.status === 429) {
-          userFriendlyMessage = 'Trop de requêtes simultanées. Veuillez patienter quelques instants avant de réessayer.'
-        } else if (backendResponse.status >= 500) {
-          userFriendlyMessage = "Le moteur d'analyse IA d'HériTogo est temporairement indisponible ou surchargé."
-        }
+      if (backendResponse.status === 400) {
+        userFriendlyMessage = 'Le format de la photo est illisible. Essayez de reprendre la photo.'
+      } else if (backendResponse.status === 401 || backendResponse.status === 403) {
+        userFriendlyMessage = "Accès au scanner refusé. Réessayez plus tard."
+      } else if (backendResponse.status === 413) {
+        userFriendlyMessage = 'La photo est trop lourde. Réduisez sa taille et réessayez.'
+      } else if (backendResponse.status === 429) {
+        userFriendlyMessage = 'Trop de requêtes simultanées. Veuillez patienter quelques instants avant de réessayer.'
+      } else if (backendResponse.status >= 500) {
+        userFriendlyMessage = "Le moteur d'analyse IA d'HériTogo est temporairement indisponible ou surchargé."
       }
 
       return NextResponse.json(

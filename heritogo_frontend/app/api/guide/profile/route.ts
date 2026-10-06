@@ -1,19 +1,24 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { DocumentType } from '@prisma/client'
+import { requireRole } from '@/lib/auth/session'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { asStringArray, clipString, isSafeHttpsUrl, parseBoundedNumber } from '@/lib/security/input'
+import { sanitizePhoneInput, validatePhone } from '@/lib/utils/validation'
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const auth = await requireRole(['guide'])
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!checkRateLimit(`guide-profile:${auth.user.id}`, 20, 60000)) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
     }
 
     const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id }
+      where: { user_id: auth.user.id }
     })
 
     if (!guideProfile) {
@@ -32,47 +37,58 @@ export async function POST(request: Request) {
       half_day_rate,
       full_day_rate,
       virtual_rate,
-      document // Object: { type, file_url, file_name, file_size }
+      document
     } = body
 
-    // 1. Mettre à jour la table Profile (bio, phone)
     if (bio !== undefined || phone !== undefined) {
       const profileData: Record<string, unknown> = {}
-      if (bio !== undefined) profileData.bio = bio
-      if (phone !== undefined) profileData.phone = phone
+      if (bio !== undefined) profileData.bio = typeof bio === 'string' ? bio.trim().slice(0, 500) : null
+      if (phone !== undefined && phone !== null && phone !== '') {
+        const phoneRaw = sanitizePhoneInput(String(phone))
+        const phoneError = validatePhone(phoneRaw)
+        if (phoneError) {
+          return NextResponse.json({ error: phoneError }, { status: 400 })
+        }
+        profileData.phone = phoneRaw
+      }
 
       await prisma.profile.update({
-        where: { id: user.id },
+        where: { id: auth.user.id },
         data: profileData
       })
     }
 
-    // 2. Mettre à jour la table GuideProfile
     const guideData: Record<string, unknown> = {}
-    if (languages !== undefined) guideData.languages = languages
-    if (coverage_zones !== undefined) guideData.coverage_zones = coverage_zones
-    if (specialties !== undefined) guideData.specialties = specialties
-    if (experience_years !== undefined) guideData.experience_years = parseInt(experience_years, 10) || 0
-    if (hourly_rate !== undefined) guideData.hourly_rate = hourly_rate ? parseFloat(hourly_rate) : null
-    if (half_day_rate !== undefined) guideData.half_day_rate = half_day_rate ? parseFloat(half_day_rate) : null
-    if (full_day_rate !== undefined) guideData.full_day_rate = full_day_rate ? parseFloat(full_day_rate) : null
-    if (virtual_rate !== undefined) guideData.virtual_rate = virtual_rate ? parseFloat(virtual_rate) : null
+    if (languages !== undefined) guideData.languages = asStringArray(languages) ?? []
+    if (coverage_zones !== undefined) guideData.coverage_zones = asStringArray(coverage_zones) ?? []
+    if (specialties !== undefined) guideData.specialties = asStringArray(specialties) ?? []
+    if (experience_years !== undefined) {
+      guideData.experience_years = parseBoundedNumber(experience_years, 0, 50) ?? 0
+    }
+    if (hourly_rate !== undefined) guideData.hourly_rate = parseBoundedNumber(hourly_rate, 0, 10_000_000)
+    if (half_day_rate !== undefined) guideData.half_day_rate = parseBoundedNumber(half_day_rate, 0, 10_000_000)
+    if (full_day_rate !== undefined) guideData.full_day_rate = parseBoundedNumber(full_day_rate, 0, 10_000_000)
+    if (virtual_rate !== undefined) guideData.virtual_rate = parseBoundedNumber(virtual_rate, 0, 10_000_000)
 
-    // 3. Ajouter un document de vérification
     let shouldSendDocEmail = false
     if (document && document.file_url && document.type) {
+      if (!isSafeHttpsUrl(document.file_url) || !Object.values(DocumentType).includes(document.type)) {
+        return NextResponse.json({ error: 'Document invalide' }, { status: 400 })
+      }
+      const fileName = clipString(document.file_name, 120) || 'document'
+      const fileSize = parseBoundedNumber(document.file_size, 1, 15 * 1024 * 1024)
+
       await prisma.guideDocument.create({
         data: {
           guide_id: guideProfile.id,
           type: document.type as DocumentType,
-          label: document.label || null,
+          label: clipString(document.label, 80),
           file_url: document.file_url,
-          file_name: document.file_name || 'document',
-          file_size: document.file_size ? parseInt(document.file_size, 10) : null
+          file_name: fileName,
+          file_size: fileSize
         }
       })
 
-      // Passer le statut du guide à "under_review" s'il était pending
       if (guideProfile.status === 'pending' || guideProfile.status === 'rejected') {
         guideData.status = 'under_review'
         guideData.submitted_at = new Date()
@@ -90,14 +106,15 @@ export async function POST(request: Request) {
     })
 
     // Envoi de l'email si le statut passe en examen/traitement
-    if (shouldSendDocEmail && user.email) {
+    if (shouldSendDocEmail && auth.user.email) {
       const { sendEmail } = await import('@/lib/utils/email')
+      const safeName = updatedGuide.profile.full_name.replace(/[<>]/g, '')
       await sendEmail({
-        to: user.email,
+        to: auth.user.email,
         subject: 'HériTogo — Documents de vérification bien reçus',
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 12px;">
-            <h2 style="color: #004D40; font-family: serif;">Bonjour ${updatedGuide.profile.full_name},</h2>
+            <h2 style="color: #004D40; font-family: serif;">Bonjour ${safeName},</h2>
             <p>Nous vous informons que vos documents justificatifs ont bien été soumis sur votre espace Guide HériTogo.</p>
             <p><strong>Statut actuel :</strong> En cours de traitement par notre équipe de modération.</p>
             <p>Nous vérifions vos pièces d'identité et accréditations professionnelles afin de garantir la sécurité de notre communauté. Cette validation prend généralement moins de 48 heures.</p>

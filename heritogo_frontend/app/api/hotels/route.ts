@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const DEFAULT_FASTAPI_URL = 'http://127.0.0.1:8000'
 
@@ -12,9 +13,17 @@ function parseCoordinate(value: string | null, name: string) {
 
 export async function GET(request: NextRequest) {
   try {
+    const ip = getClientIp(request.headers)
+    if (!checkRateLimit(`hotels:${ip}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes. Réessayez plus tard.' }, { status: 429 })
+    }
+
     const { searchParams } = new URL(request.url)
     const lat = parseCoordinate(searchParams.get('lat'), 'lat')
     const lng = parseCoordinate(searchParams.get('lng'), 'lng')
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return NextResponse.json({ error: 'Coordonnées GPS invalides.' }, { status: 400 })
+    }
 
     const rawBaseUrl = process.env.FASTAPI_URL
     if (!rawBaseUrl && process.env.NODE_ENV === 'production') {

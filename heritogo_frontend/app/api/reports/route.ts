@@ -1,46 +1,53 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { ReportReason } from '@prisma/client'
+import { requireUser } from '@/lib/auth/session'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { clipString, isUuid } from '@/lib/security/input'
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const auth = await requireUser()
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    const { reported_id, reason, description, booking_id } = await request.json()
-
-    if (!reported_id || !reason || !description) {
-      return NextResponse.json({ error: 'Données manquantes' }, { status: 400 })
+    if (!checkRateLimit(`report:${auth.user.id}`, 5, 60000)) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
     }
 
-    // Valider la raison
-    if (!Object.values(ReportReason).includes(reason as ReportReason)) {
-      return NextResponse.json({ error: 'Raison invalide' }, { status: 400 })
+    const body = await request.json()
+    const reported_id = body.reported_id
+    const reason = body.reason
+    const description = clipString(body.description, 2000)
+    const booking_id = body.booking_id ? body.booking_id : null
+
+    if (!isUuid(reported_id) || !description || !Object.values(ReportReason).includes(reason as ReportReason)) {
+      return NextResponse.json({ error: 'Données manquantes ou invalides' }, { status: 400 })
     }
 
-    // Créer le report
+    if (booking_id && !isUuid(booking_id)) {
+      return NextResponse.json({ error: 'Réservation invalide' }, { status: 400 })
+    }
+
+    if (reported_id === auth.user.id) {
+      return NextResponse.json({ error: 'Action non autorisée' }, { status: 400 })
+    }
+
     const report = await prisma.report.create({
       data: {
-        reporter_id: user.id,
+        reporter_id: auth.user.id,
         reported_id,
         reason: reason as ReportReason,
         description,
-        booking_id: booking_id || null,
-        status: 'open'
-      }
+        booking_id,
+        status: 'open',
+      },
     })
 
-    return NextResponse.json({ success: true, report })
+    return NextResponse.json({ success: true, report: { id: report.id } })
   } catch (error: unknown) {
     console.error('[POST /api/reports]', error)
-    const message = error instanceof Error && error.message.includes('P1001')
-      ? 'Erreur de chargement. Vérifiez votre connexion.'
-      : 'Une erreur est survenue. Veuillez réessayer.'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Veuillez réessayer.' }, { status: 500 })
   }
 }

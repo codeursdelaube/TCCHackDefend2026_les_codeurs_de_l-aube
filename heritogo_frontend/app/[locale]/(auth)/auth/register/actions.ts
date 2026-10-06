@@ -4,6 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { getSafeAuthErrorMessage } from '@/lib/utils/errors'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { headers } from 'next/headers'
+import { isSafeInternalPath } from '@/lib/auth/redirect'
+import { parseLocale } from '@/lib/security/input'
+import { validateEmail, validateFullName, validatePassword } from '@/lib/utils/validation'
 
 
 
@@ -17,8 +22,9 @@ export async function registerAction(
     const fullName = formData.get('full_name') as string
     const email    = formData.get('email') as string
     const password = formData.get('password') as string
-    const role     = (formData.get('role') as string) || 'tourist'
-    const locale   = (formData.get('locale') as string) || 'fr'
+    const requestedRole = (formData.get('role') as string) || 'tourist'
+    const role = requestedRole === 'guide' ? 'guide' : 'tourist'
+    const locale   = parseLocale(formData.get('locale'), 'fr')
     const redirectTo = (formData.get('redirect') as string) || ''
     const privacyAccepted = formData.get('privacy_accepted') as string
 
@@ -26,12 +32,23 @@ export async function registerAction(
       return { error: 'Tous les champs sont requis.' }
     }
 
-    if (password.length < 8) {
-      return { error: 'Le mot de passe doit contenir au moins 8 caractères.' }
-    }
+    const nameError = validateFullName(fullName)
+    if (nameError) return { error: nameError }
+
+    const emailError = validateEmail(email.trim())
+    if (emailError) return { error: emailError }
+
+    const passwordError = validatePassword(password)
+    if (passwordError) return { error: passwordError }
 
     if (privacyAccepted !== 'true') {
       return { error: 'Vous devez accepter la politique de confidentialité.' }
+    }
+
+    const headersList = await headers()
+    const rateLimitKey = `register:${getClientIp(headersList)}:${email.trim().toLowerCase()}`
+    if (!checkRateLimit(rateLimitKey, 5, 15 * 60 * 1000)) {
+      return { error: 'Trop de tentatives. Réessayez plus tard.' }
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -73,7 +90,7 @@ export async function registerAction(
           data: {
             id:             data.user.id,
             full_name:      fullName.trim(),
-            role:           role as 'tourist' | 'guide' | 'admin',
+            role,
             preferred_lang: locale,
             is_active:      true,
           },
@@ -121,7 +138,7 @@ export async function registerAction(
     }
 
     // Session active → redirection
-    const safeRedirect = redirectTo.startsWith(`/${locale}/`) ? redirectTo : `/${locale}/dashboard`
+    const safeRedirect = isSafeInternalPath(redirectTo) ? redirectTo : `/${locale}/dashboard`
     redirect(safeRedirect)
 
   } catch (err: unknown) {
@@ -135,8 +152,7 @@ export async function registerAction(
       throw err
     }
 
-    const msg = err instanceof Error ? err.message : 'Erreur serveur inattendue.'
     console.error('[registerAction] Unexpected error:', err)
-    return { error: msg }
+    return { error: 'Une erreur est survenue. Réessayez.' }
   }
 }

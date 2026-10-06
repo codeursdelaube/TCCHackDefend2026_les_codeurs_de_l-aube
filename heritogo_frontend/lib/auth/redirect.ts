@@ -1,5 +1,15 @@
 export type UserRole = 'tourist' | 'guide' | 'admin'
 
+/** Chemin interne uniquement — bloque //evil.com, /\\evil.com, URLs absolues. */
+export function isSafeInternalPath(path: string | null | undefined): path is string {
+  if (!path) return false
+  if (!path.startsWith('/')) return false
+  if (path.startsWith('//') || path.startsWith('/\\')) return false
+  if (path.includes('\\') || path.includes('://')) return false
+  if (/[\u0000-\u001f\u007f]/.test(path)) return false
+  return true
+}
+
 export function dashboardPath(locale: string, role: UserRole): string {
   switch (role) {
     case 'admin':

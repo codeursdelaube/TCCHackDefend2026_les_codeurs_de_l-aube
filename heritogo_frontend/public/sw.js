@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'heritogo-v3';
+﻿const CACHE_NAME = 'heritogo-v4';
 const LOCALES = ['fr', 'en', 'es', 'zh'];
 
 const STATIC_ASSETS = LOCALES.flatMap((l) => [
@@ -10,7 +10,7 @@ const STATIC_ASSETS = LOCALES.flatMap((l) => [
 ]).concat(['/manifest.json', '/offline.html']);
 
 // Endpoints qui ne doivent JAMAIS être mis en cache (action en temps réel)
-const NEVER_CACHE = ['/api/scan', '/api/chatbot', '/api/booking', '/api/guides/reserve', '/api/auth'];
+const NEVER_CACHE = ['/api/'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

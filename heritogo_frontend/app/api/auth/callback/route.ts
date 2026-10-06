@@ -1,17 +1,17 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { isSafeInternalPath } from '@/lib/auth/redirect'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  // origin = http://localhost:3000 en dev
-  // origin = https://heritogo.com en prod
-  // automatique — pas besoin de le hardcoder
 
   const code       = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type       = searchParams.get('type')
-  const next       = searchParams.get('next') ?? '/fr/dashboard'
+  const next       = isSafeInternalPath(searchParams.get('next'))
+    ? searchParams.get('next')!
+    : '/fr/dashboard'
 
   const cookieStore = await cookies()
 

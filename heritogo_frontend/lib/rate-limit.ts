@@ -45,3 +45,9 @@ export function checkRateLimit(
 export function resetRateLimit(key: string): void {
   attempts.delete(key)
 }
+
+export function getClientIp(headersList: Headers): string {
+  const forwarded = headersList.get('x-forwarded-for')
+  if (forwarded) return forwarded.split(',')[0].trim().slice(0, 64)
+  return headersList.get('x-real-ip')?.trim().slice(0, 64) || 'unknown'
+}

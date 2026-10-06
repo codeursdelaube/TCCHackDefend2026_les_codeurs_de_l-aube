@@ -1,13 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { isSafeInternalPath } from '@/lib/auth/redirect'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
 
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as 'email' | 'recovery' | 'invite' | null
-  const next = searchParams.get('next') ?? '/'
+  const next = isSafeInternalPath(searchParams.get('next')) ? searchParams.get('next')! : '/'
 
   if (token_hash && type) {
     const cookieStore = await cookies()

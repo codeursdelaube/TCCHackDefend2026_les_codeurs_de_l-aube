@@ -5,8 +5,9 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
-import { checkRateLimit, resetRateLimit } from '@/lib/rate-limit'
+import { checkRateLimit, resetRateLimit, getClientIp } from '@/lib/rate-limit'
 import { getSafeAuthErrorMessage } from '@/lib/utils/errors'
+import { isSafeInternalPath } from '@/lib/auth/redirect'
 
 export async function loginAction(prevState: any, formData: FormData) {
   try {
@@ -23,9 +24,7 @@ export async function loginAction(prevState: any, formData: FormData) {
 
     // Rate limiting anti brute-force
     const headersList = await headers()
-    const ip = headersList.get('x-forwarded-for') ||
-                headersList.get('x-real-ip') ||
-                'unknown'
+    const ip = getClientIp(headersList)
     const rateLimitKey = `login:${ip}:${email.trim().toLowerCase()}`
 
     if (!checkRateLimit(rateLimitKey, 5, 60000)) {
@@ -61,8 +60,7 @@ export async function loginAction(prevState: any, formData: FormData) {
 
     const role = profile?.role || 'tourist'
 
-    // Utiliser le paramètre redirect s'il est fourni et valide
-    if (redirectTo && redirectTo.startsWith('/')) {
+    if (isSafeInternalPath(redirectTo)) {
       redirect(redirectTo)
     }
 

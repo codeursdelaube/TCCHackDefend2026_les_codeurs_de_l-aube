@@ -1,100 +1,84 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { MissionType } from '@prisma/client'
+import { requireRole } from '@/lib/auth/session'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { clipString, isUuid, parseBoundedNumber } from '@/lib/security/input'
+
+const MISSION_TYPES = new Set<string>(Object.values(MissionType))
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const auth = await requireRole(['tourist'])
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    // Récupérer le profil du touriste
-    const touristProfile = await prisma.profile.findUnique({
-      where: { id: user.id }
-    })
-
-    if (!touristProfile) {
-      return NextResponse.json({ error: 'Profil touriste introuvable' }, { status: 404 })
+    if (!checkRateLimit(`booking:${auth.user.id}`, 8, 60000)) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
     }
 
     const body = await request.json()
-    const {
-      guide_id,
-      mission_type,
-      start_date,
-      start_time,
-      meeting_point,
-      tourist_message,
-      group_size,
-      special_needs
-    } = body
+    const guide_id = body.guide_id
+    const mission_type = body.mission_type
+    const start_date = body.start_date
 
-    if (!guide_id || !mission_type || !start_date) {
-      return NextResponse.json({ error: 'Champs obligatoires manquants' }, { status: 400 })
+    if (!isUuid(guide_id) || typeof mission_type !== 'string' || !MISSION_TYPES.has(mission_type) || !start_date) {
+      return NextResponse.json({ error: 'Champs obligatoires manquants ou invalides' }, { status: 400 })
     }
 
-    // Vérifier que le guide existe
-    const guideProfile = await prisma.guideProfile.findUnique({
-      where: { id: guide_id },
-      include: { profile: true }
+    const parsedStartDate = new Date(start_date)
+    if (Number.isNaN(parsedStartDate.getTime())) {
+      return NextResponse.json({ error: 'Date invalide' }, { status: 400 })
+    }
+
+    const guideProfile = await prisma.guideProfile.findFirst({
+      where: { id: guide_id, status: 'approved' },
+      include: { profile: true },
     })
 
     if (!guideProfile) {
       return NextResponse.json({ error: 'Guide introuvable' }, { status: 404 })
     }
 
-    // Convertir start_date en objet Date
-    const parsedStartDate = new Date(start_date)
-    
-    // Si start_time est fourni, on le parse ou on le gère comme une date/heure
     let parsedStartTime: Date | null = null
-    if (start_time) {
-      // Ex: start_time = "14:30"
-      const [hours, minutes] = start_time.split(':')
+    if (typeof body.start_time === 'string' && /^\d{2}:\d{2}$/.test(body.start_time)) {
+      const [hours, minutes] = body.start_time.split(':')
       parsedStartTime = new Date()
       parsedStartTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
     }
 
-    // Créer la réservation
+    const groupSize = parseBoundedNumber(body.group_size ?? 1, 1, 20) ?? 1
+
     const booking = await prisma.booking.create({
       data: {
-        tourist_id: user.id,
-        guide_id: guide_id,
+        tourist_id: auth.user.id,
+        guide_id,
         status: 'quote_requested',
         mission_type: mission_type as MissionType,
         start_date: parsedStartDate,
         start_time: parsedStartTime,
-        meeting_point: meeting_point || null,
-        tourist_message: tourist_message || null,
-        group_size: parseInt(group_size, 10) || 1,
-        special_needs: special_needs || null,
-        payment_status: 'pending'
-      }
+        meeting_point: clipString(body.meeting_point, 200),
+        tourist_message: clipString(body.tourist_message, 1000),
+        group_size: groupSize,
+        special_needs: clipString(body.special_needs, 500),
+        payment_status: 'pending',
+      },
     })
 
-    // Créer une notification pour le guide
     await prisma.notification.create({
       data: {
-        user_id: guideProfile.user_id, // L'ID utilisateur du guide
+        user_id: guideProfile.user_id,
         type: 'booking',
         title: 'Nouvelle demande de réservation',
-        body: `Vous avez reçu une demande de réservation de la part de ${touristProfile.full_name || 'un touriste'}.`,
-        data: {
-          booking_id: booking.id
-        }
-      }
+        body: `Vous avez reçu une demande de réservation de la part de ${auth.profile.full_name || 'un touriste'}.`,
+        data: { booking_id: booking.id },
+      },
     })
 
     return NextResponse.json({ success: true, booking })
   } catch (error: unknown) {
     console.error('[POST /api/bookings]', error)
-    const message = error instanceof Error && error.message.includes('P1001')
-      ? 'Erreur de chargement. Vérifiez votre connexion.'
-      : 'Une erreur est survenue. Veuillez réessayer.'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Veuillez réessayer.' }, { status: 500 })
   }
 }

@@ -1,25 +1,19 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { BookingStatus } from '@prisma/client'
+import { requireRole } from '@/lib/auth/session'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { isUuid } from '@/lib/security/input'
 
-async function getAuthenticatedUser() {
-  const supabase = await createClient()
-  return supabase.auth.getUser()
-}
-
-// GET: Fetch bookings for the logged-in guide
 export async function GET() {
   try {
-    const { data: { user }, error: authError } = await getAuthenticatedUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const auth = await requireRole(['guide'])
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    // ✅ FIX : include profile + documents
     const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id },
+      where: { user_id: auth.user.id },
       include: {
         profile: {
           select: {
@@ -70,15 +64,17 @@ export async function GET() {
 // POST: Actions on bookings
 export async function POST(request: Request) {
   try {
-    const { data: { user }, error: authError } = await getAuthenticatedUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    const auth = await requireRole(['guide'])
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
     }
 
-    // Pas besoin de profile ici — juste l'id du guide
+    if (!checkRateLimit(`guide-booking:${auth.user.id}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez plus tard.' }, { status: 429 })
+    }
+
     const guideProfile = await prisma.guideProfile.findUnique({
-      where: { user_id: user.id },
+      where: { user_id: auth.user.id },
       select: { id: true },
     })
 
@@ -89,7 +85,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { bookingId, action, quoteAmount, quoteMessage, cancellationReason } = body
 
-    if (!bookingId || !action) {
+    if (!isUuid(bookingId) || !action) {
       return NextResponse.json({ error: 'bookingId et action sont requis' }, { status: 400 })
     }
 
@@ -107,26 +103,36 @@ export async function POST(request: Request) {
     let notifBody = ''
 
     if (action === 'send_quote') {
-      if (!quoteAmount) {
-        return NextResponse.json({ error: 'Le montant du devis est requis' }, { status: 400 })
+      if (booking.status !== 'quote_requested') {
+        return NextResponse.json({ error: 'Action non autorisée pour ce statut' }, { status: 400 })
+      }
+      const amount = parseFloat(quoteAmount)
+      if (!quoteAmount || !Number.isFinite(amount) || amount <= 0 || amount > 10_000_000) {
+        return NextResponse.json({ error: 'Le montant du devis est invalide' }, { status: 400 })
       }
       updatedStatus = 'quote_sent'
       updateData = {
         status: updatedStatus,
-        quote_amount: parseFloat(quoteAmount),
-        quote_message: quoteMessage || null,
+        quote_amount: amount,
+        quote_message: typeof quoteMessage === 'string' ? quoteMessage.trim().slice(0, 1000) : null,
         quote_sent_at: new Date(),
       }
       notifTitle = 'Nouveau devis reçu'
-      notifBody = `Le guide vous a envoyé un devis de ${quoteAmount} XOF.`
+      notifBody = `Le guide vous a envoyé un devis de ${amount} XOF.`
 
     } else if (action === 'start_mission') {
+      if (booking.status !== 'quote_sent' && booking.status !== 'confirmed') {
+        return NextResponse.json({ error: 'Action non autorisée pour ce statut' }, { status: 400 })
+      }
       updatedStatus = 'in_progress'
       updateData = { status: updatedStatus, started_at: new Date() }
       notifTitle = 'Mission commencée'
       notifBody = 'Votre visite guidée a commencé.'
 
     } else if (action === 'complete_mission') {
+      if (booking.status !== 'in_progress') {
+        return NextResponse.json({ error: 'Action non autorisée pour ce statut' }, { status: 400 })
+      }
       updatedStatus = 'completed'
       updateData = { status: updatedStatus, completed_at: new Date() }
       await prisma.guideProfile.update({
@@ -137,15 +143,21 @@ export async function POST(request: Request) {
       notifBody = "La visite guidée est terminée. N'hésitez pas à laisser un avis."
 
     } else if (action === 'cancel') {
+      if (booking.status === 'completed' || booking.status === 'cancelled') {
+        return NextResponse.json({ error: 'Action non autorisée pour ce statut' }, { status: 400 })
+      }
+      const reason = typeof cancellationReason === 'string'
+        ? cancellationReason.trim().slice(0, 500)
+        : 'Annule par le guide'
       updatedStatus = 'cancelled'
       updateData = {
         status: updatedStatus,
         cancelled_at: new Date(),
-        cancelled_by: user.id,
-        cancellation_reason: cancellationReason || 'Annule par le guide',
+        cancelled_by: auth.user.id,
+        cancellation_reason: reason || 'Annule par le guide',
       }
       notifTitle = 'Réservation annulée'
-      notifBody = `Le guide a annulé votre demande : "${cancellationReason || 'Aucun motif fourni'}"`
+      notifBody = `Le guide a annulé votre demande : "${reason || 'Aucun motif fourni'}"`
 
     } else {
       return NextResponse.json({ error: 'Action invalide' }, { status: 400 })

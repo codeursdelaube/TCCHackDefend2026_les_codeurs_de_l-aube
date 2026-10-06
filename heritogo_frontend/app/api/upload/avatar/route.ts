@@ -9,6 +9,17 @@ const ALLOWED_TYPES = {
   'image/webp': 'webp',
 } as const
 
+function detectImageExt(bytes: Uint8Array): 'jpg' | 'png' | 'webp' | null {
+  if (bytes.length < 12) return null
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'jpg'
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'png'
+  if (
+    bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+    bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+  ) return 'webp'
+  return null
+}
+
 function getStorageErrorMessage(errorMessage: string) {
   const msg = errorMessage.toLowerCase()
 
@@ -59,8 +70,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Aucun fichier fourni' }, { status: 400 })
     }
 
-    const ext = ALLOWED_TYPES[file.type as keyof typeof ALLOWED_TYPES]
-    if (!ext) {
+    const extFromMime = ALLOWED_TYPES[file.type as keyof typeof ALLOWED_TYPES]
+    if (!extFromMime) {
       return NextResponse.json(
         { error: 'Format invalide. JPG, PNG ou WEBP uniquement.' },
         { status: 400 }
@@ -81,12 +92,20 @@ export async function POST(request: Request) {
       )
     }
 
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    const ext = detectImageExt(bytes)
+    if (!ext) {
+      return NextResponse.json(
+        { error: 'Format invalide. JPG, PNG ou WEBP uniquement.' },
+        { status: 400 }
+      )
+    }
+
     const fileName = `${user.id}/avatar.${ext}`
-    const bytes = await file.arrayBuffer()
     const { error: uploadError } = await supabase.storage
       .from(AVATAR_BUCKET)
       .upload(fileName, bytes, {
-        contentType: file.type,
+        contentType: ext === 'jpg' ? 'image/jpeg' : ext === 'png' ? 'image/png' : 'image/webp',
         upsert: true,
       })
 
