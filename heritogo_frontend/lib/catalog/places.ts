@@ -13,10 +13,10 @@ type PlaceCopy = {
 }
 
 const MESSAGES_BY_LOCALE: Record<string, Record<string, PlaceCopy>> = {
-  fr: (frMessages as { Lieux?: Record<string, PlaceCopy> }).Lieux ?? {},
-  en: (enMessages as { Lieux?: Record<string, PlaceCopy> }).Lieux ?? {},
-  es: (esMessages as { Lieux?: Record<string, PlaceCopy> }).Lieux ?? {},
-  zh: (zhMessages as { Lieux?: Record<string, PlaceCopy> }).Lieux ?? {},
+  fr: (frMessages as { Monuments?: Record<string, PlaceCopy> }).Monuments ?? {},
+  en: (enMessages as { Monuments?: Record<string, PlaceCopy> }).Monuments ?? {},
+  es: (esMessages as { Monuments?: Record<string, PlaceCopy> }).Monuments ?? {},
+  zh: (zhMessages as { Monuments?: Record<string, PlaceCopy> }).Monuments ?? {},
 }
 
 function normalize(value: string): string {
@@ -40,7 +40,7 @@ export function getLocalPlaces(locale: string = 'fr'): CatalogPlace[] {
     return {
       id: m.id,
       slug: m.id,
-      nom: copy.nom || m.id,
+      nom: copy.nom || m.id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
       description: copy.description || '',
       histoire: copy.histoire || '',
       région: m.région,

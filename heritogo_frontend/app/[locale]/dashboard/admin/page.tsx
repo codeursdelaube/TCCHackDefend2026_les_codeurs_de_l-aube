@@ -565,7 +565,7 @@ export default function AdminDashboardPage() {
 
                       <div className="rounded-2xl bg-base-100 border border-border/60 p-3.5 text-xs text-base-content/85">
                         <span className="block font-black text-[9px] uppercase tracking-wider text-base-content/40 mb-1">{t('admin.description_label')}</span>
-                        "{r.description}"
+                        {`"${r.description}"`}
                       </div>
                     </div>
 
@@ -623,7 +623,7 @@ export default function AdminDashboardPage() {
                       </p>
 
                       <div className="rounded-2xl bg-base-100 border border-border/60 p-3 text-xs text-base-content italic">
-                        "{r.comment || t('admin.no_comment')}"
+                        {`"${r.comment || t('admin.no_comment')}"`}
                       </div>
 
                       {r.is_hidden && r.hidden_reason && (

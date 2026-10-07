@@ -17,7 +17,7 @@ export function usePlaces() {
   useEffect(() => {
     let cancelled = false
     apiFetchCached<{ places?: CatalogPlace[] }>(`/api/places?locale=${locale}`, {
-      cacheKey: `public-places-${locale}`,
+      cacheKey: `public-places-v2-${locale}`,
       ttlMs: CATALOG_CACHE_TTL_MS,
       storage: 'session',
     }).then((result) => {
@@ -45,7 +45,7 @@ export function useDishes() {
   useEffect(() => {
     let cancelled = false
     apiFetchCached<{ dishes?: CatalogDish[] }>(`/api/dishes?locale=${locale}`, {
-      cacheKey: `public-dishes-${locale}`,
+      cacheKey: `public-dishes-v2-${locale}`,
       ttlMs: CATALOG_CACHE_TTL_MS,
       storage: 'session',
     }).then((result) => {
