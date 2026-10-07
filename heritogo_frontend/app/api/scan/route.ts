@@ -85,10 +85,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Envoi de la requête au backend FastAPI
-    const apiSecretKey = process.env.API_SECRET_KEY || process.env.api_secret_key
-    const headers: Record<string, string> = {}
-    if (apiSecretKey) {
-      headers['herit'] = apiSecretKey
+    const apiSecretKey = process.env.API_SECRET_KEY || process.env.api_secret_key || 'ReallySadLifeInMyCountry'
+    const headers: Record<string, string> = {
+      herit: apiSecretKey,
     }
 
     // Envoi avec le système de retry intelligent
