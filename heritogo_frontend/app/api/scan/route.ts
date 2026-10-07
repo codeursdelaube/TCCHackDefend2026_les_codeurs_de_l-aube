@@ -70,18 +70,10 @@ export async function POST(request: NextRequest) {
     fastapiFormData.append('file', blob, imageFile.name || 'photo.jpg')
 
     // 3. Construction de l'URL cible
-    const rawBaseUrl = process.env.FASTAPI_URL
-
-    if (!rawBaseUrl && process.env.NODE_ENV === 'production') {
-      console.error('[HériTogo] FASTAPI_URL est manquante dans les variables Vercel !')
-      return NextResponse.json(
-        { error: 'Configuration serveur incomplète (FASTAPI_URL manquante). Contactez l\'équipe HériTogo.' },
-        { status: 503 }
-      )
-    }
-
-    // Fallback localhost uniquement en développement local
-    const baseUrl = (rawBaseUrl || 'http://127.0.0.1:8000').replace(/\/$/, '')
+    const rawBaseUrl = process.env.FASTAPI_URL || 'https://heritogo-backend.fastapicloud.dev'
+    const trimmedUrl = rawBaseUrl.trim()
+    const normalizedBaseUrl = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`
+    const baseUrl = normalizedBaseUrl.replace(/\/$/, '')
     let targetUrl = `${baseUrl}/predict`
 
     // Ajout des paramètres GPS optionnels
@@ -93,22 +85,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Envoi de la requête au backend FastAPI
-    //  CORRECTION CASSE : Utilisation stricte des MAJUSCULES pour la variable d'environnement
-    const apiSecretKey = process.env.API_SECRET_KEY
-
-    if (!apiSecretKey) {
-      console.error('[HériTogo] API_SECRET_KEY est manquante dans l\'environnement.')
-      return NextResponse.json(
-        { error: 'Configuration serveur incomplète (Clé API manquante). Contactez l\'équipe HériTogo.' },
-        { status: 503 }
-      )
+    const apiSecretKey = process.env.API_SECRET_KEY || process.env.api_secret_key
+    const headers: Record<string, string> = {}
+    if (apiSecretKey) {
+      headers['herit'] = apiSecretKey
     }
 
     // Envoi avec le système de retry intelligent
     const backendResponse = await fetchWithRetry(targetUrl, {
       method: 'POST',
       body: fastapiFormData,
-      headers: { herit: apiSecretKey },
+      headers,
     })
 
     // 5. Gestion des erreurs retournées par FastAPI

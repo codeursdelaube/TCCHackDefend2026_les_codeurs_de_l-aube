@@ -994,14 +994,14 @@
     "review_submit_btn": "提交"
   },
   "ChatBot": {
-    "title": "TGO AI",
+    "title": "Heritogo Chat",
     "subtitle": "文化助手",
-    "welcome": "Woezon！我是 TGO AI，你的文化导游，帮助你了解多哥的纪念地、地区和美食。",
+    "welcome": "Woezon！我是 Heritogo Chat，你的文化导游，帮助你了解多哥的纪念地、地区和美食。",
     "fallback_response": "感谢你的提问。我可以帮助你找到旅途中实用的景点、美食和文化体验。",
-    "typing": "TGO AI 正在准备回复...",
+    "typing": "Heritogo Chat 正在准备回复...",
     "placeholder": "询问关于多哥的问题...",
     "send": "发送",
-    "open": "打开 TGO AI 聊天",
+    "open": "打开 Heritogo Chat",
     "close": "关闭聊天"
   },
   "Histoire": {

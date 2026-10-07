@@ -993,14 +993,14 @@
     "review_submit_btn": "Soumettre"
   },
   "ChatBot": {
-    "title": "TGO AI",
+    "title": "Heritogo Chat",
     "subtitle": "Assistant culturel",
-    "welcome": "Woezon ! Je suis TGO AI, votre guide culturel pour découvrir les monuments, régions et saveurs du Togo.",
+    "welcome": "Woezon ! Je suis Heritogo Chat, votre guide culturel pour découvrir les monuments, régions et saveurs du Togo.",
     "fallback_response": "Merci pour votre question. Je suis prêt à vous orienter vers les lieux, plats et expériences culturelles les plus utiles pendant votre séjour.",
-    "typing": "TGO AI prépare une réponse...",
+    "typing": "Heritogo Chat prépare une réponse...",
     "placeholder": "Posez une question sur le Togo...",
     "send": "Envoyer",
-    "open": "Ouvrir le chat TGO AI",
+    "open": "Ouvrir Heritogo Chat",
     "close": "Fermer le chat"
   },
   "Histoire": {

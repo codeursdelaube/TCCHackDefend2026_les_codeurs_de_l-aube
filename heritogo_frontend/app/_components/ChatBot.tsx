@@ -16,11 +16,19 @@ interface Message {
   timestamp: Date
 }
 
-// CORRECTION : Suppression du slash '/' à la fin pour éviter la 404 de FastAPI
-const CHAT_API = 'https://heritogo-production.up.railway.app/chatbot/api/v1/chat'
+const CHAT_API =
+  process.env.NEXT_PUBLIC_CHATBOT_API_URL ||
+  'https://heritogo-backend.fastapicloud.dev/chatbot/api/v1/chat'
 
 // Pages sur lesquelles le ChatBot ne doit pas apparaître
 const AUTH_PATH_SEGMENTS = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/confirm']
+
+// Villes togolaises reconnues
+const TOGO_LOCATIONS = [
+  'lomé', 'lome', 'kpalimé', 'kpalime', 'kara', 'sokodé', 'sokode',
+  'atakpamé', 'atakpame', 'aného', 'aneho', 'dapaong', 'tsévié', 'tsevie',
+  'bassar', 'mango', 'kloto', 'badou', 'kévé', 'keve'
+]
 
 export default function ChatBot() {
   const t = useTranslations('ChatBot')
@@ -74,11 +82,28 @@ export default function ChatBot() {
     ]
 
     try {
+      // Détection de localisation et de budget togolais
+      const textLower = content.toLowerCase()
+      const matchedLoc = TOGO_LOCATIONS.find(l => textLower.includes(l))
+      const location = matchedLoc
+        ? matchedLoc.charAt(0).toUpperCase() + matchedLoc.slice(1)
+        : 'Lomé'
+
+      const budgetMatch = textLower.match(/(\d+[\d\s]*)\s*(?:fcfa|cfa|f\b|francs?)/i) || textLower.match(/budget.*?(\d+[\d\s]*)/i)
+      let budget = 500000.0
+      if (budgetMatch) {
+        const parsed = parseFloat(budgetMatch[1].replace(/\s/g, ''))
+        if (!isNaN(parsed) && parsed >= 0) budget = parsed
+      } else if (textLower.includes('gratuit')) {
+        budget = 0.0
+      }
+
       const result = await apiFetch<{
         response?: string
         reply?: string
         message?: string
         answer?: string
+        sources_used?: string[]
       }>(CHAT_API, {
         method: 'POST',
         headers: {
@@ -86,11 +111,10 @@ export default function ChatBot() {
           'Accept': 'application/json'
         },
         timeoutMs: 45000,
-        // CORRECTION : Structure du JSON nettoyée pour coller au BaseModel de FastAPI
         body: JSON.stringify({
           message: content.slice(0, 500),
-          extracted_location: "Lomé", // Optionnel (prendra Lomé par défaut si tu l'enlèves)
-          extracted_budget: 0.0       // Optionnel (prendra 0.0 par défaut si tu l'enlèves)
+          extracted_location: location,
+          extracted_budget: budget
         }),
       })
 
