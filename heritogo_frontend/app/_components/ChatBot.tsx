@@ -16,9 +16,7 @@ interface Message {
   timestamp: Date
 }
 
-const CHAT_API =
-  process.env.NEXT_PUBLIC_CHATBOT_API_URL ||
-  'https://heritogo-backend.fastapicloud.dev/chatbot/api/v1/chat'
+const CHAT_API = '/api/chatbot'
 
 // Pages sur lesquelles le ChatBot ne doit pas apparaître
 const AUTH_PATH_SEGMENTS = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/confirm']
