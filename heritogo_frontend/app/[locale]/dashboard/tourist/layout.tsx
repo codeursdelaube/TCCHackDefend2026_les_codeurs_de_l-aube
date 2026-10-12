@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { requireUser } from '@/lib/auth/session'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   children: React.ReactNode
   params: Promise<{ locale: string }>

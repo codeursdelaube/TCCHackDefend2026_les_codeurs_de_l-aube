@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 
+// Cette route dépend de la session : elle ne doit jamais être pré-rendue.
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ locale: string }>
 }

@@ -21,8 +21,7 @@ import CookieConsentBanner from '@/app/_components/CookieConsentBanner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
@@ -138,6 +137,12 @@ interface LayoutProps {
   params: Promise<{ locale: string }>;
 }
 
+// Les langues sont connues à la compilation. Next peut ainsi mettre en cache
+// le shell des pages publiques au lieu de le recalculer à chaque navigation.
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }))
+}
+
 export default async function LocaleLayout({ children, params }: LayoutProps) {
   const { locale } = await params;
 
@@ -145,13 +150,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
     notFound();
   }
 
+  // Évite de lire les headers de la requête pendant le rendu statique.
+  setRequestLocale(locale)
   const messages = await getMessages();
 
-  // Lire le cookie thème côté serveur
-  const cookieStore = await cookies();
-  const themeCookie = cookieStore.get('heritogo_theme')?.value ?? cookieStore.get('theme')?.value;
-  const isDark = themeCookie === 'dark';
-
+  // Le thème est appliqué avant le premier rendu par le script ci-dessous.
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://heritogo.codorah.com';
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -196,7 +199,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
       lang={locale}
       data-scroll-behavior="smooth"
       style={{ fontFamily: 'var(--font-body)' }}
-      className={`${isDark ? 'dark' : ''} ${fraunces.variable} ${manrope.variable}`}
+      className={`${fraunces.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
       <head>
