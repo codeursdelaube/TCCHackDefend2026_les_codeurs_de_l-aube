@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BookOpenText, ChevronDown, Clock3, Globe2, Landmark, ScrollText, Sparkles } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from '@/i18n/navigation'
 import TextToSpeech from '@/components/TextToSpeech'
 import Badge from '@/components/ui/Badge'
 
@@ -25,10 +25,8 @@ export default function HistoirePage() {
   const historyText = useMemo(() => paragraphs.join('\n\n'), [paragraphs])
 
   const changerLangue = (newLocale: string) => {
-    const segments = pathname.split('/')
-    segments[1] = newLocale
-    const newPath = segments.join('/')
-    router.push(newPath)
+    // useRouter de @/i18n/navigation gère le changement de locale proprement
+    router.replace(pathname, { locale: newLocale })
   }
 
   return (

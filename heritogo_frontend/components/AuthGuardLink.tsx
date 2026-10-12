@@ -1,7 +1,8 @@
 'use client'
 
 import { type ReactNode, type CSSProperties } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
+import { useRouter, Link } from '@/i18n/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
 
 interface AuthGuardLinkProps {
@@ -29,22 +30,20 @@ export default function AuthGuardLink({
   const locale = params?.locale || 'fr'
   const { isAuthenticated, loading } = useAuth()
 
-  const targetPath = href.startsWith('/') ? `/${locale}${href}` : href
-
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!requireAuth) return
-
     if (isAuthenticated && !loading) return
-
     e.preventDefault()
     if (loading) return
-    router.push(`/${locale}/auth/login?redirect=${encodeURIComponent(targetPath)}`)
+    // Utilise router i18n — le préfixe locale est géré automatiquement
+    router.push(`/auth/login?redirect=${encodeURIComponent(`/${locale}${href}`)}`)
   }
 
   return (
-    <a href={targetPath} onClick={handleClick} className={className} style={style}>
+    // Link de @/i18n/navigation préfixe automatiquement la locale
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <Link href={href as any} onClick={handleClick} className={className} style={style}>
       {children}
-    </a>
+    </Link>
   )
 }
-

@@ -1,38 +1,10 @@
 @import "tailwindcss";
+/* Next writes PostCSS worker scripts under .next during development. Excluding
+   that generated directory prevents Tailwind from watching its own output. */
+@source not "../.next";
 @plugin "daisyui";
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *, .dark, .dark *));
-
-@theme {
-  /* Marque — terre cuite profonde */
-  --color-primary: #B5502E;
-  --color-primary-dark: #8A3A20;
-  --color-primary-light: #D97A52;
-
-  /* Accent — doré chaud */
-  --color-accent: #D9A441;
-
-  /* Touche rare — vert forêt */
-  --color-forest: #3E5C45;
-
-  /* Mode clair */
-  --color-background: #FBF6EF;
-  --color-surface: #FFFFFF;
-  --color-ink: #2A1E16;
-  --color-ink-muted: #7A6A5C;
-
-  /* Mode sombre */
-  --color-background-dark: #171009;
-  --color-surface-dark: #241A11;
-  --color-ink-on-dark: #F2E9DC;
-  --color-ink-muted-dark: #B5A390;
-
-  /* Typographie */
-  --font-serif: var(--font-fraunces), 'Fraunces', Georgia, serif;
-  --font-display: var(--font-fraunces), 'Fraunces', Georgia, serif;
-  --font-sans: var(--font-manrope), 'Manrope', system-ui, sans-serif;
-  --font-body: var(--font-manrope), 'Manrope', system-ui, sans-serif;
-}
 
 :root {
   --background: #FBF6EF;
@@ -43,24 +15,24 @@
   --surface-foreground: #2A1E16;
   --popover: #FFFFFF;
   --popover-foreground: #2A1E16;
-  
+
   --primary: #B5502E;
   --primary-dark: #8A3A20;
   --primary-light: #D97A52;
   --primary-foreground: #FFFFFF;
-  
+
   --secondary: #F4EAD4;
   --secondary-foreground: #6B5324;
-  
+
   --accent: #D9A441;
   --accent-foreground: #2A1E16;
 
   --forest: #3E5C45;
   --forest-foreground: #FFFFFF;
-  
+
   --muted: #F0E6D8;
   --muted-foreground: #7A6A5C;
-  
+
   --ink: #2A1E16;
   --ink-muted: #7A6A5C;
 
@@ -103,7 +75,8 @@
   --accent-content: #2A1E16;
 }
 
-[data-theme='dark'], .dark {
+[data-theme='dark'],
+.dark {
   --background: #171009;
   --foreground: #F2E9DC;
   --card: #241A11;
@@ -220,91 +193,115 @@
 }
 
 @layer base {
-  * { box-sizing: border-box; border-color: var(--border); }
-  html, body { 
-    background: var(--background); 
-    color: var(--foreground); 
-    font-family: var(--font-body); 
-    -webkit-font-smoothing: antialiased; 
+  * {
+    box-sizing: border-box;
+    border-color: var(--border);
   }
-  h1, h2 { 
-    font-family: var(--font-serif); 
-    color: var(--foreground); 
-    letter-spacing: -0.02em; 
+
+  html,
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
   }
-  h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-serif);
     color: var(--foreground);
+    letter-spacing: -0.02em;
   }
-  p, span, button, label, li, a, input, textarea, select { 
-    font-family: var(--font-body); 
+
+  p,
+  span,
+  button,
+  label,
+  li,
+  a,
+  input,
+  textarea,
+  select {
+    font-family: var(--font-body);
   }
-  p { line-height: 1.6; }
-  a { color: inherit; text-decoration: none; }
-  input, textarea, select { 
-    background: var(--card); 
-    color: var(--foreground); 
-    border-color: var(--input); 
+
+  p {
+    line-height: 1.6;
   }
-  input::placeholder, textarea::placeholder { color: var(--muted-foreground); }
-  button:focus-visible, a:focus-visible, input:focus-visible { 
-    outline: 2px solid var(--ring); 
-    outline-offset: 3px; 
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+
+  input,
+  textarea,
+  select {
+    background: var(--card);
+    color: var(--foreground);
+    border-color: var(--input);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
 }
 
-@utility app-card { 
-  background: var(--card); 
-  border: 1px solid var(--border); 
-  border-radius: var(--radius); 
-  box-shadow: 0 4px 20px -2px rgba(42, 30, 22, 0.06); 
+@utility app-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px -2px rgba(42, 30, 22, 0.06);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@utility app-button { 
-  border-radius: 999px; 
+@utility app-button {
+  border-radius: 999px;
 }
 
-@utility scrollbar-none { 
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
-  &::-webkit-scrollbar { display: none; } 
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-@utility rating-star { 
-  color: var(--accent); 
-  fill: var(--accent); 
+@utility rating-star {
+  color: var(--accent);
+  fill: var(--accent);
 }
 
-.custom-togo-popup .leaflet-popup-content-wrapper { 
-  background: var(--card); 
-  border-radius: var(--radius); 
-  border: 0; 
-  box-shadow: 0 8px 24px rgba(42, 30, 22, 0.12); 
-}
-.custom-togo-popup .leaflet-popup-tip { 
-  background: var(--card); 
+/* Leaflet map styles fixed and closed properly */
+.custom-togo-popup .leaflet-popup-content-wrapper {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 0;
+  box-shadow: 0 8px 24px rgba(42, 30, 22, 0.12);
 }
 
-@utility togo-underline { 
-  display: block; 
-  width: 2.75rem; 
-  height: 0.25rem; 
-  margin-top: 0.5rem; 
-  border-radius: 999px; 
-  background: var(--primary); 
-}
-
-@utility unesco-badge {
-  background: linear-gradient(135deg, #E6B85C 0%, #D9A441 100%);
-  color: #241A08;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(217, 164, 65, 0.35);
-}
-
-[data-theme='dark'] .app-card, .dark .app-card {
-  border-color: var(--border);
-  box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.35);
+.custom-togo-popup .leaflet-popup-tip {
+  background: var(--card);
 }
