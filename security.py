@@ -13,6 +13,7 @@ from starlette.responses import JSONResponse, Response
 class AuthSettings(BaseSettings):
     api_secret_key: str
     cors_origins: str = (
+        "https://heritogo.codorah.com,"
         "https://heritogo.vercel.app,"
         "http://localhost:3000,"
         "http://127.0.0.1:3000"

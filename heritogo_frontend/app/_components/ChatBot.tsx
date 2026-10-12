@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bot, Send, X, AlertCircle } from 'lucide-react'
+import { Bot, Send, X, AlertCircle, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { COLORS } from '@/lib/constants/colors'
 import { getUserFriendlyError } from '@/lib/utils/errors'
@@ -13,6 +13,7 @@ interface Message {
   id: string
   sender: 'user' | 'ai'
   text: string
+  sources_used?: string[]
   timestamp: Date
 }
 
@@ -57,10 +58,10 @@ export default function ChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
 
-  const addMessage = useCallback((sender: 'user' | 'ai', text: string) => {
+  const addMessage = useCallback((sender: 'user' | 'ai', text: string, sources_used?: string[]) => {
     setMessages(prev => [
       ...prev,
-      { id: crypto.randomUUID(), sender, text, timestamp: new Date() },
+      { id: crypto.randomUUID(), sender, text, sources_used, timestamp: new Date() },
     ])
   }, [])
 
@@ -88,7 +89,7 @@ export default function ChatBot() {
         : 'Lomé'
 
       const budgetMatch = textLower.match(/(\d+[\d\s]*)\s*(?:fcfa|cfa|f\b|francs?)/i) || textLower.match(/budget.*?(\d+[\d\s]*)/i)
-      let budget = 500000.0
+      let budget = 0.0
       if (budgetMatch) {
         const parsed = parseFloat(budgetMatch[1].replace(/\s/g, ''))
         if (!isNaN(parsed) && parsed >= 0) budget = parsed
@@ -129,12 +130,16 @@ export default function ChatBot() {
         data.answer ??
         t('fallback_response')
 
+      const sourcesUsed = Array.isArray(data.sources_used) && data.sources_used.length > 0
+        ? data.sources_used
+        : undefined
+
       historyRef.current = [
         ...currentHistory,
         { role: 'assistant' as const, content: aiText },
       ]
 
-      addMessage('ai', aiText)
+      addMessage('ai', aiText, sourcesUsed)
 
     } catch (err: unknown) {
       console.error('[ChatBot] API error:', err)
@@ -244,6 +249,25 @@ export default function ChatBot() {
                       style={!isAi ? { backgroundColor: COLORS.forest } : undefined}
                     >
                       <p className="m-0 whitespace-pre-wrap">{msg.text}</p>
+
+                      {/* Chips des sources documentaires utilisées */}
+                      {msg.sources_used && msg.sources_used.length > 0 && (
+                        <div className="mt-2.5 pt-2 border-t border-border/40 flex flex-wrap gap-1.5 items-center">
+                          <span className="text-[10px] font-bold opacity-60 uppercase tracking-wider">
+                            Sources :
+                          </span>
+                          {msg.sources_used.map((source, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className="inline-flex items-center gap-1 rounded-full bg-base-300/80 px-2 py-0.5 text-[10px] font-semibold text-base-content"
+                            >
+                              <Sparkles className="h-2.5 w-2.5 text-accent" />
+                              <span>{source}</span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
                       <span className="mt-1 block text-right text-[9px] opacity-55">
                         {msg.timestamp.toLocaleTimeString([], {
                           hour: '2-digit',

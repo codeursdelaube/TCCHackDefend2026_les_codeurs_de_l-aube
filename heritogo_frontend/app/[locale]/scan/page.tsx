@@ -4,8 +4,22 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Camera, Loader2, MapPin, RefreshCw, Upload, AlertTriangle, ShieldCheck, CreditCard, X, Sparkles } from 'lucide-react'
+import {
+  Camera,
+  Loader2,
+  MapPin,
+  RefreshCw,
+  Upload,
+  AlertTriangle,
+  ShieldCheck,
+  CreditCard,
+  X,
+  Sparkles,
+  SearchX,
+  LogIn,
+} from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import TextToSpeech from '@/components/TextToSpeech'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
@@ -17,14 +31,76 @@ import { toast } from 'sonner'
 import Badge from '@/components/ui/Badge'
 
 interface PredictionResult {
-  prediction_status: string
-  data: {
+  prediction_status: 'success' | 'unknown'
+  detail?: string
+  data?: {
     monument: string
     histoire: string
     latitude: number
     longitude: number
     source: string
   }
+}
+
+// Compression d'image côté client (garantit < 4,5 Mo pour éviter l'erreur 413)
+async function compressImageIfNeeded(file: File): Promise<File> {
+  if (typeof window === 'undefined') return file
+  if (file.size <= 3.2 * 1024 * 1024 && file.type === 'image/jpeg') {
+    return file
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = (event) => {
+      const img = new window.Image()
+      img.src = event.target?.result as string
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+          const maxDim = 1600
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width)
+              width = maxDim
+            } else {
+              width = Math.round((width * maxDim) / height)
+              height = maxDim
+            }
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            resolve(file)
+            return
+          }
+
+          ctx.drawImage(img, 0, 0, width, height)
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                resolve(file)
+                return
+              }
+              const cleanName = (file.name || 'photo.jpg').replace(/\.[^/.]+$/, '') + '.jpg'
+              resolve(new File([blob], cleanName, { type: 'image/jpeg' }))
+            },
+            'image/jpeg',
+            0.82
+          )
+        } catch {
+          resolve(file)
+        }
+      }
+      img.onerror = () => resolve(file)
+    }
+    reader.onerror = () => resolve(file)
+  })
 }
 
 type GoogleTranslateItem = [string]
@@ -124,16 +200,35 @@ export default function ScanPage() {
           timeoutMs: 70000,
         })
 
-        if (!res.ok || !res.data) return res.error || t('errors.general')
-        if (res.data.prediction_status === 'unknown') {
-          setResult(null)
-          setTranslatedText({})
-          return res.data.detail || t('errors.unknown')
+        if (!res.ok) {
+          if (res.status === 401) {
+            return 'AUTH_REQUIRED'
+          }
+          if (res.status === 413) {
+            return 'PAYLOAD_TOO_LARGE'
+          }
+          if (res.status === 429) {
+            return 'RATE_LIMIT'
+          }
+          return res.error || t('errors.general')
         }
 
-        setResult(res.data)
-        setTranslatedText({ fr: res.data.data.histoire })
-        toast.success(t('toast_identified', { name: res.data.data.monument }))
+        if (!res.data) return t('errors.general')
+
+        if (res.data.prediction_status === 'unknown') {
+          setResult({
+            prediction_status: 'unknown',
+            detail: res.data.detail || t('errors.unknown'),
+          })
+          setTranslatedText({})
+          return null
+        }
+
+        if (res.data.data) {
+          setResult(res.data)
+          setTranslatedText({ fr: res.data.data.histoire })
+          toast.success(t('toast_identified', { name: res.data.data.monument }))
+        }
         return null
       } catch (scanError: unknown) {
         console.error(scanError)
@@ -167,7 +262,7 @@ export default function ScanPage() {
     setIsSpeaking(false)
   }
 
-  const handleScanClick = () => {
+  const handleScanClick = async () => {
     if (!image) return
 
     if (!isPremium && scanCount >= 3) {
@@ -175,13 +270,26 @@ export default function ScanPage() {
       return
     }
 
-    const formData = new FormData()
-    formData.append('image', image)
-    if (userLocation) {
-      formData.append('lat', userLocation.lat.toString())
-      formData.append('long', userLocation.lng.toString())
+    try {
+      const processedImage = await compressImageIfNeeded(image)
+      const formData = new FormData()
+      formData.append('file', processedImage)
+      formData.append('image', processedImage)
+      if (userLocation) {
+        formData.append('lat', userLocation.lat.toString())
+        formData.append('long', userLocation.lng.toString())
+      }
+      startTransition(() => submitScanAction(formData))
+    } catch {
+      const formData = new FormData()
+      formData.append('file', image)
+      formData.append('image', image)
+      if (userLocation) {
+        formData.append('lat', userLocation.lat.toString())
+        formData.append('long', userLocation.lng.toString())
+      }
+      startTransition(() => submitScanAction(formData))
     }
-    startTransition(() => submitScanAction(formData))
   }
 
   const translateText = async (text: string, targetLang: LanguageCode) => {
@@ -206,7 +314,7 @@ export default function ScanPage() {
 
   const handleLangChange = async (lang: LanguageCode) => {
     setSelectedLang(lang)
-    if (result?.data.histoire && lang !== 'fr') await translateText(result.data.histoire, lang)
+    if (result?.data?.histoire && lang !== 'fr') await translateText(result.data.histoire, lang)
     if (isSpeaking) {
       window.speechSynthesis.cancel()
       setIsSpeaking(false)
@@ -214,7 +322,7 @@ export default function ScanPage() {
   }
 
   const getCurrentText = () => {
-    if (!result?.data.histoire) return ''
+    if (!result?.data?.histoire) return ''
     return selectedLang === 'fr' ? result.data.histoire : translatedText[selectedLang] || result.data.histoire
   }
 
@@ -365,8 +473,80 @@ export default function ScanPage() {
         </section>
 
         {error && (
-          <section className="app-card border-red-300 bg-red-50/40 dark:bg-red-950/20 p-4 text-xs font-bold text-red-600">
-            {error}
+          <section className="app-card border-red-300 bg-red-50/40 dark:bg-red-950/20 p-5 text-xs font-bold text-red-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
+              <span>
+                {error === 'AUTH_REQUIRED'
+                  ? 'Vous devez être connecté pour utiliser le scanner de monuments.'
+                  : error === 'PAYLOAD_TOO_LARGE'
+                  ? 'La photo est trop lourde (> 4,5 Mo). La compression automatique va réduire sa taille, veuillez réessayer.'
+                  : error === 'RATE_LIMIT'
+                  ? 'Trop de requêtes simultanées. Veuillez patienter quelques instants avant de scanner à nouveau.'
+                  : error}
+              </span>
+            </div>
+            {error === 'AUTH_REQUIRED' && (
+              <Link
+                href="/auth/login?redirect=/scan"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all self-start sm:self-auto cursor-pointer"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                <span>Se connecter</span>
+              </Link>
+            )}
+          </section>
+        )}
+
+        {/* ── BRANCHE UNKNOWN : Monument non identifié ── */}
+        {result?.prediction_status === 'unknown' && (
+          <section className="app-card border-accent/40 bg-accent/5 p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/20 text-accent">
+                  <SearchX className="h-6 w-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground/70">
+                    Analyse terminée • Non répertorié
+                  </span>
+                  <h2 className="font-serif text-2xl font-bold text-foreground mt-0.5">
+                    Monument non identifié
+                  </h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-card p-5 border border-border space-y-3">
+              <p className="text-sm font-medium leading-relaxed text-foreground">
+                {result.detail || "Ce monument n'a pas pu être identifié avec certitude parmi le patrimoine officiel du Togo."}
+              </p>
+              <div className="text-xs text-muted-foreground space-y-1.5 pt-1">
+                <p className="font-semibold text-foreground">Conseils pour réussir votre identification :</p>
+                <ul className="list-disc list-inside space-y-1 pl-1">
+                  <li>Assurez-vous d'être devant un monument ou site patrimonial togolais répertorié.</li>
+                  <li>Rapprochez-vous et cadrez la façade principale ou la structure caractéristique.</li>
+                  <li>Évitez le contre-jour trop prononcé, le flou de bougé ou les photos trop sombres.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={resetScanner}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
+              >
+                <Camera className="h-4 w-4" />
+                <span>Prendre une autre photo</span>
+              </button>
+              <Link
+                href="/lieux"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-xs font-bold text-foreground hover:border-primary/50 transition-all cursor-pointer"
+              >
+                <span>Explorer les 29 sites répertoriés</span>
+              </Link>
+            </div>
           </section>
         )}
 

@@ -10,7 +10,7 @@ async function fetchWithRetry(
 ): Promise<Response> {
   const res = await fetch(url, options)
   // Si Rate Limit (429) ou Erreur Serveur temporaire (502/503/504)
-  if ((res.status === 429 || res.status >= 502) && retries > 0) {
+  if ((res.status === 429 || res.status === 502 || res.status === 503 || res.status === 504) && retries > 0) {
     console.warn(`[HériTogo] Statut ${res.status} reçu, retry dans ${delayMs}ms... (${retries} restant)`)
     await new Promise(r => setTimeout(r, delayMs))
     return fetchWithRetry(url, options, retries - 1, delayMs + 1000)
@@ -33,13 +33,13 @@ export async function POST(request: NextRequest) {
     // 1. Récupération des données envoyées par le composant ScanPage
     const incomingFormData = await request.formData()
 
-    // Robustesse du champ image
+    // Robustesse du champ image / file
     const imageFile =
-      (incomingFormData.get('image') as File | null) ??
-      (incomingFormData.get('file') as File | null)
+      (incomingFormData.get('file') as File | null) ??
+      (incomingFormData.get('image') as File | null)
 
     const lat = incomingFormData.get('lat') as string | null
-    const long = incomingFormData.get('long') as string | null
+    const rawLong = (incomingFormData.get('long') ?? incomingFormData.get('lng')) as string | null
 
     if (!imageFile || typeof imageFile === 'string') {
       return NextResponse.json(
@@ -48,43 +48,51 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // CORRECTION DANGER TAILLE : Vérification de la taille limite de Vercel (4.5 Mo max)
-    // Évite que Vercel ne coupe la fonction avec une erreur de payload trop volumineux.
+    // Vérification de la taille limite Vercel / BFF (4.5 Mo max)
     const MAX_SIZE_BYTES = 4.5 * 1024 * 1024 // 4.5 Mo
     if (imageFile.size > MAX_SIZE_BYTES) {
       console.error(`[HériTogo] L'image est trop lourde (${(imageFile.size / (1024 * 1024)).toFixed(2)} Mo).`)
       return NextResponse.json(
         { 
-          error: "La photo est trop lourde pour être analysée en direct. Veuillez réduire sa résolution ou utiliser une image de moins de 4 Mo." 
+          error: "La photo est trop lourde pour être analysée en direct. Veuillez réduire sa résolution ou utiliser une image de moins de 4,5 Mo." 
         },
         { status: 413 } // Payload Too Large
       )
     }
 
-    // 2. Préparation du FormData pour FastAPI
+    // 2. Préparation du FormData pour FastAPI (doit impérativement s'appeler 'file')
     const fastapiFormData = new FormData()
     const buffer = await imageFile.arrayBuffer()
     const blob = new Blob([buffer], { type: imageFile.type || 'image/jpeg' })
 
-    // FastAPI attend le champ nommé exactement 'file'
     fastapiFormData.append('file', blob, imageFile.name || 'photo.jpg')
 
     // 3. Construction de l'URL cible
-    const rawBaseUrl = process.env.FASTAPI_URL || 'https://heritogo-backend.fastapicloud.dev'
+    const rawBaseUrl = process.env.FASTAPI_URL || 'https://heritogo-production.up.railway.app'
     const trimmedUrl = rawBaseUrl.trim()
     const normalizedBaseUrl = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`
     const baseUrl = normalizedBaseUrl.replace(/\/$/, '')
     let targetUrl = `${baseUrl}/predict`
 
-    // Ajout des paramètres GPS optionnels
+    // Ajout des paramètres GPS validés
     const queryParams = new URLSearchParams()
-    if (lat) queryParams.append('lat', lat)
-    if (long) queryParams.append('long', long)
+    if (lat && !isNaN(Number(lat))) {
+      const numLat = Number(lat)
+      if (numLat >= -90 && numLat <= 90) {
+        queryParams.append('lat', numLat.toString())
+      }
+    }
+    if (rawLong && !isNaN(Number(rawLong))) {
+      const numLong = Number(rawLong)
+      if (numLong >= -180 && numLong <= 180) {
+        queryParams.append('long', numLong.toString())
+      }
+    }
     if (queryParams.toString()) {
       targetUrl += `?${queryParams.toString()}`
     }
 
-    // 4. Envoi de la requête au backend FastAPI
+    // 4. Envoi de la requête au backend FastAPI avec header d'authentification 'herit'
     const apiSecretKey = process.env.API_SECRET_KEY || process.env.api_secret_key || 'ReallySadLifeInMyCountry'
     const headers: Record<string, string> = {
       herit: apiSecretKey,
@@ -107,7 +115,6 @@ export async function POST(request: NextRequest) {
       try {
         const parsedError = JSON.parse(errorText)
         if (parsedError.detail) {
-          // Gestion propre des erreurs Pydantic (Tableaux ou Objets) pour éviter le crash React
           if (Array.isArray(parsedError.detail)) {
             userFriendlyMessage = parsedError.detail[0].msg || JSON.stringify(parsedError.detail)
           } else if (typeof parsedError.detail === 'object') {
@@ -117,11 +124,10 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch {
-        // Fallback sur les codes HTTP standards si le backend ne renvoie pas du JSON
         if (backendResponse.status === 400 || errorText.includes('multipart')) {
           userFriendlyMessage = 'Le format de la photo est illisible. Essayez de reprendre la photo.'
         } else if (backendResponse.status === 401 || backendResponse.status === 403) {
-          userFriendlyMessage = "L'accès au service de reconnaissance a été refusé. Erreur de clé de sécurité."
+          userFriendlyMessage = "L'accès au service de reconnaissance a été refusé. Erreur d'authentification API."
         } else if (backendResponse.status === 429) {
           userFriendlyMessage = 'Trop de requêtes simultanées. Veuillez patienter quelques instants avant de réessayer.'
         } else if (backendResponse.status >= 500) {
@@ -135,8 +141,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 6. Succès — transmission directe au client
+    // 6. Succès ou Réponse valide inconnue
     const data = await backendResponse.json()
+    if (data.prediction_status === 'unknown' && !data.detail) {
+      data.detail = "Monument non répertorié ou non identifiable au Togo."
+    }
     return NextResponse.json(data)
 
   } catch (error) {
