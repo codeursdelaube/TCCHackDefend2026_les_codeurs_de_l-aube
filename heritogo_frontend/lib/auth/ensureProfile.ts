@@ -1,10 +1,10 @@
 import type { User } from '@supabase/supabase-js'
 import { prisma } from '@/lib/prisma'
 
-type AppRole = 'tourist' | 'guide'
+type AppRole = 'tourist' | 'guide' | 'admin'
 
 function asAppRole(value: unknown): AppRole | null {
-  if (value === 'guide' || value === 'tourist') return value
+  if (value === 'guide' || value === 'tourist' || value === 'admin') return value
   return null
 }
 

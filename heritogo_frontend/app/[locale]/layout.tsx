@@ -130,6 +130,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     verification: {
       google: '7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A',
     },
+    other: {
+      'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-3944525312929685',
+    },
   }
 }
 
@@ -157,10 +160,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
 
   // Le thème est appliqué avant le premier rendu par le script ci-dessous.
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://heritogo.codorah.com';
+  const adsClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-3944525312929685';
   const adsEnabled =
-    process.env.NEXT_PUBLIC_ADS_ENABLED === 'true' &&
-    Boolean(process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID);
-  const adsClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+    process.env.NEXT_PUBLIC_ADS_ENABLED !== 'false' &&
+    Boolean(adsClientId);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -262,6 +265,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
         </Script>
         <meta name="theme-color" content="#1C2D52" />
         <meta name="google-site-verification" content="7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A" />
+        <meta name="google-adsense-account" content={adsClientId} />
         <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
