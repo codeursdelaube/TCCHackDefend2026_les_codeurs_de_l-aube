@@ -27,6 +27,7 @@ import { notFound } from 'next/navigation';
 import { Toaster } from 'sonner';
 import ChatBot from "../_components/ChatBot";
 import SplashScreen from "@/components/SplashScreen";
+import Footer from "@/components/Footer";
 
 
 const SEO_DATA: Record<string, { title: string; description: string; keywords: string[] }> = {
@@ -156,6 +157,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
 
   // Le thème est appliqué avant le premier rendu par le script ci-dessous.
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://heritogo.codorah.com';
+  const adsEnabled =
+    process.env.NEXT_PUBLIC_ADS_ENABLED === 'true' &&
+    Boolean(process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID);
+  const adsClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -264,6 +269,15 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {adsEnabled && adsClientId && (
+          <Script
+            id="google-adsense"
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsClientId}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
       </head>
 
       <body
@@ -278,6 +292,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               <OnboardingTooltip />
               <CookieConsentBanner />
               {children}
+              <Footer />
               <ChatBot />
 
               <Toaster

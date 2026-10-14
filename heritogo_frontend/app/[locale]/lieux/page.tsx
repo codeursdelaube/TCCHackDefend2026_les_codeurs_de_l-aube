@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { Fragment, useState, useTransition } from 'react'
+import AdSlot from '@/components/AdSlot'
 import dynamic from 'next/dynamic'
 import {
   Compass,
@@ -195,17 +196,23 @@ export default function ToutPage() {
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredSites.map((site, index) => (
-                  <SiteCard
-                    key={site.id}
-                    id={site.id}
-                    nom={site.nom}
-                    region={site.région}
-                    localite={site.localite}
-                    description={site.description}
-                    image={site.image}
-                    isUnesco={site.isUnesco}
-                    priority={index < 3}
-                  />
+                  <Fragment key={site.id}>
+                    <SiteCard
+                      id={site.id}
+                      nom={site.nom}
+                      region={site.région}
+                      localite={site.localite}
+                      description={site.description}
+                      image={site.image}
+                      isUnesco={site.isUnesco}
+                      priority={index < 3}
+                    />
+                    {index === 7 && (
+                      <div className="col-span-1 sm:col-span-2 lg:col-span-3 py-2">
+                        <AdSlot slot="places-list-slot" format="auto" />
+                      </div>
+                    )}
+                  </Fragment>
                 ))}
               </div>
             )}

@@ -1626,5 +1626,10 @@
     "monuments_title": "Monuments in {name}",
     "monuments_subtitle": "Explore the detailed cards of the {count} heritage sites in this region.",
     "see_all_sites": "See all {count} places"
+  },
+  "Ads": {
+    "label": "Advertisement",
+    "manage_preferences": "Manage ad preferences",
+    "privacy_policy": "Privacy Policy"
   }
 }

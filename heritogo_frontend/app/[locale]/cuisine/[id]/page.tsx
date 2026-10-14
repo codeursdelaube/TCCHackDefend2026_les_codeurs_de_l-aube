@@ -8,6 +8,7 @@ import TTSButton from '@/app/_components/TTSButton'
 import Badge from '@/components/ui/Badge'
 import StarRating from '@/components/ui/StarRating'
 import { dishLookupIds, dishMatches, findPublishedDish, getLocalDishes } from '@/lib/catalog/dishes'
+import AdSlot from '@/components/AdSlot'
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>
@@ -198,6 +199,9 @@ export default async function PlatDetailPage({ params }: PageProps) {
                 </div>
               )}
             </article>
+
+            {/* Emplacement Publicitaire AdSense autorisé (1 seul par page) */}
+            <AdSlot slot="dishes-detail-slot" format="auto" className="my-8" />
 
             {/* Suggestions d'autres plats */}
             {suggestions.length > 0 && (

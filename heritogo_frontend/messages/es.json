@@ -1626,5 +1626,10 @@
     "monuments_title": "Monumentos de {name}",
     "monuments_subtitle": "Explore las fichas detalladas de los {count} sitios registrados en esta región.",
     "see_all_sites": "Ver los {count} lugares"
+  },
+  "Ads": {
+    "label": "Publicidad",
+    "manage_preferences": "Gestionar preferencias de publicidad",
+    "privacy_policy": "Política de privacidad"
   }
 }

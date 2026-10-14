@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { Fragment, useMemo, useState, useTransition } from 'react'
+import AdSlot from '@/components/AdSlot'
 import Image from 'next/image'
 import { ChefHat, Filter, MapPin, Search, Utensils, Sparkles, Navigation, ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -150,17 +151,23 @@ export default function CuisinePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredPlats.map((plat) => (
-                <DishCard
-                  key={plat.id}
-                  id={plat.id}
-                  nom={plat.nom}
-                  categorie={plat.catégorie}
-                  description={plat.description}
-                  image={plat.image}
-                  region={plat.region || undefined}
-                />
-              ))}
+                {filteredPlats.map((plat, index) => (
+                  <Fragment key={plat.id}>
+                    <DishCard
+                      id={plat.id}
+                      nom={plat.nom}
+                      categorie={plat.catégorie}
+                      description={plat.description}
+                      image={plat.image}
+                      region={plat.region || undefined}
+                    />
+                    {index === 7 && (
+                      <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 py-2">
+                        <AdSlot slot="dishes-list-slot" format="auto" />
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
             </div>
           )}
         </section>

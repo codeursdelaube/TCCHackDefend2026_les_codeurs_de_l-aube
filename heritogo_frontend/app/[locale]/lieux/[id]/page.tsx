@@ -20,6 +20,7 @@ import StarRating from '@/components/ui/StarRating'
 import Badge from '@/components/ui/Badge'
 import { useDishes, usePlaces } from '@/hooks/useCatalog'
 import { findLocalPlace } from '@/lib/catalog/places'
+import AdSlot from '@/components/AdSlot'
 
 const DynamicCarte = dynamic(() => import('@/app/_components/Carte'), {
   ssr: false,
@@ -441,6 +442,9 @@ export default function SiteDetailPage({ params }: PageProps) {
                 </div>
               </div>
             )}
+
+            {/* Emplacement Publicitaire AdSense autorisé (1 seul par page) */}
+            <AdSlot slot="places-detail-slot" format="auto" className="my-8" />
 
             {/* Hôtels & Hébergements proches */}
             {nearbyHotels.length > 0 && (

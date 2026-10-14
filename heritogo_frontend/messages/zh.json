@@ -1678,5 +1678,10 @@
     "monuments_title": "{name} 的特色遗迹",
     "monuments_subtitle": "探索本区域内收录的全部 {count} 个重点文旅景点。",
     "see_all_sites": "查看全部 {count} 处胜景"
+  },
+  "Ads": {
+    "label": "广告",
+    "manage_preferences": "管理广告偏好设置",
+    "privacy_policy": "隐私政策"
   }
 }

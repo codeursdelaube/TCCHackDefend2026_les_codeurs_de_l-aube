@@ -1,0 +1,3 @@
+# Google AdSense ads.txt - HeriTogo
+# Remplacez pub-3944525312929685 par votre propre ID éditeur AdSense si nécessaire.
+google.com, pub-3944525312929685, DIRECT, f08c47fec0942fa0
