@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { ShieldCheck, SlidersHorizontal } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function Footer() {
   const t = useTranslations('Ads')
@@ -12,11 +13,10 @@ export default function Footer() {
     if (typeof window !== 'undefined' && window.googlefc?.showRevocationMessage) {
       window.googlefc.showRevocationMessage()
     } else {
-      // Si la CMP Google n'est pas encore initialisée ou hors zone UE
-      alert(
+      toast.info(
         locale === 'fr'
-          ? "Le panneau de consentement publicitaire Google s'affiche pour les utilisateurs soumis aux réglementations RGPD / ePrivacy."
-          : 'Google consent preferences are automatically presented to visitors covered by GDPR / ePrivacy regulations.'
+          ? "Le panneau de préférences publicitaires Google s'active automatiquement pour les visiteurs sous réglementation RGPD (Europe). Vous pouvez également gérer vos choix sur Google Ad Settings."
+          : 'Google consent preferences are automatically managed for visitors under GDPR regulations.'
       )
     }
   }
