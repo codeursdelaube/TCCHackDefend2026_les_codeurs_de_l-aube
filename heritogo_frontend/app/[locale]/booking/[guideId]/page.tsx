@@ -362,6 +362,7 @@ export default function BookingPage() {
                     alt={guide.profile.full_name}
                     width={48}
                     height={48}
+                    unoptimized
                     className="h-12 w-12 rounded-2xl object-cover border border-border"
                   />
                 ) : (

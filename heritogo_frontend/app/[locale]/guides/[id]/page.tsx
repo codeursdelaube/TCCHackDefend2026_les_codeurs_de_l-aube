@@ -182,6 +182,7 @@ export default function GuideDetailPage() {
                     alt={guide.profile.full_name}
                     width={112}
                     height={112}
+                    unoptimized
                     className="h-28 w-28 object-cover rounded-3xl border border-border shadow-md"
                   />
                 ) : (

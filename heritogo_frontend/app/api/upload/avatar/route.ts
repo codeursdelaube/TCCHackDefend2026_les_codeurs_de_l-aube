@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
+import { prisma } from '@/lib/prisma'
 
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024
 const AVATAR_BUCKET = 'avatars'
@@ -37,23 +39,24 @@ function getStorageErrorMessage(errorMessage: string) {
 }
 
 async function updateProfileAvatar(userId: string, avatarUrl: string) {
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from('profiles')
-    .update({ avatar_url: avatarUrl })
-    .eq('id', userId)
-    .select('avatar_url')
-    .single()
+  try {
+    await prisma.profile.update({
+      where: { id: userId },
+      data: { avatar_url: avatarUrl },
+    })
+  } catch (err) {
+    console.error('[POST /api/upload/avatar] Prisma profile update error:', err)
+  }
 
-  if (!error) return
-
-  console.error('[POST /api/upload/avatar] Supabase profile update error:', error)
-
-  const { prisma } = await import('@/lib/prisma')
-  await prisma.profile.update({
-    where: { id: userId },
-    data: { avatar_url: avatarUrl },
-  })
+  try {
+    const supabase = await createClient()
+    await supabase
+      .from('profiles')
+      .update({ avatar_url: avatarUrl })
+      .eq('id', userId)
+  } catch (err) {
+    console.warn('[POST /api/upload/avatar] Supabase profile sync notice:', err)
+  }
 }
 
 export async function POST(request: Request) {
@@ -102,7 +105,22 @@ export async function POST(request: Request) {
     }
 
     const fileName = `${user.id}/avatar.${ext}`
-    const { error: uploadError } = await supabase.storage
+    const serviceClient = createServiceClient()
+    const storageClient = serviceClient ?? supabase
+
+    // Ensure bucket exists if service client is available
+    if (serviceClient) {
+      try {
+        const { data: buckets } = await serviceClient.storage.listBuckets()
+        if (buckets && !buckets.some((b) => b.name === AVATAR_BUCKET)) {
+          await serviceClient.storage.createBucket(AVATAR_BUCKET, { public: true })
+        }
+      } catch (err) {
+        console.warn('[POST /api/upload/avatar] Bucket existence check notice:', err)
+      }
+    }
+
+    const { error: uploadError } = await storageClient.storage
       .from(AVATAR_BUCKET)
       .upload(fileName, bytes, {
         contentType: ext === 'jpg' ? 'image/jpeg' : ext === 'png' ? 'image/png' : 'image/webp',
@@ -117,11 +135,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = storageClient.storage
       .from(AVATAR_BUCKET)
       .getPublicUrl(fileName)
 
-    const publicUrl = urlData.publicUrl
+    const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
     await updateProfileAvatar(user.id, publicUrl)
 
     return NextResponse.json({ success: true, avatar_url: publicUrl })

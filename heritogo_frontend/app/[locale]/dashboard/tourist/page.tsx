@@ -19,6 +19,7 @@ import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
 import { safeJsonParse, safeLocalStorageGet } from '@/lib/utils/storage'
+import { toast } from 'sonner'
 
 interface BookingRow {
   id: string
@@ -74,6 +75,7 @@ export default function TouristDashboardPage() {
   // Booking details & review modal state
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [isReviewOpen, setIsReviewOpen] = useState(false)
+  const [bookingActionLoading, setBookingActionLoading] = useState<string | null>(null)
   
   // Alert for success messages (e.g., booking created)
   const [alertMessage, setAlertMessage] = useState<string>('')
@@ -191,6 +193,72 @@ export default function TouristDashboardPage() {
   const handleOpenReview = (bookingId: string) => {
     setSelectedBookingId(bookingId)
     setIsReviewOpen(true)
+  }
+
+  const handleAcceptQuote = async (bookingId: string) => {
+    setBookingActionLoading(bookingId)
+    try {
+      const result = await apiFetch('/api/tourist/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId, action: 'accept_quote' }),
+      })
+      if (!result.ok) {
+        toast.error(result.error || 'Erreur lors de l’acceptation du devis')
+        return
+      }
+      toast.success(t('tourist.quote_accepted_success'))
+      setAlertMessage(t('tourist.quote_accepted_success'))
+      await fetchData()
+    } catch (err: unknown) {
+      toast.error(getUserFriendlyError(err))
+    } finally {
+      setBookingActionLoading(null)
+    }
+  }
+
+  const handleDeclineQuote = async (bookingId: string) => {
+    if (!confirm(t('tourist.decline_quote') + ' ?')) return
+    setBookingActionLoading(bookingId)
+    try {
+      const result = await apiFetch('/api/tourist/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId, action: 'decline_quote' }),
+      })
+      if (!result.ok) {
+        toast.error(result.error || 'Erreur lors du refus du devis')
+        return
+      }
+      toast.info(t('tourist.quote_declined_success'))
+      await fetchData()
+    } catch (err: unknown) {
+      toast.error(getUserFriendlyError(err))
+    } finally {
+      setBookingActionLoading(null)
+    }
+  }
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm(t('tourist.cancel_request') + ' ?')) return
+    setBookingActionLoading(bookingId)
+    try {
+      const result = await apiFetch('/api/tourist/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId, action: 'cancel_request' }),
+      })
+      if (!result.ok) {
+        toast.error(result.error || 'Erreur lors de l’annulation')
+        return
+      }
+      toast.info(t('tourist.request_cancelled_success'))
+      await fetchData()
+    } catch (err: unknown) {
+      toast.error(getUserFriendlyError(err))
+    } finally {
+      setBookingActionLoading(null)
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -419,15 +487,23 @@ export default function TouristDashboardPage() {
                   className="rounded-xl border border-border bg-base-200 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:border-primary/20"
                 >
                   <div className="flex gap-4">
-                    <div 
-                      className="flex h-12 w-12 items-center justify-center rounded-2xl text-xs font-black text-white shrink-0"
-                      style={{ backgroundColor: COLORS.gold }}
-                    >
-                      {getInitials(booking.guide.profile.full_name)}
-                    </div>
+                    {booking.guide?.profile?.avatar_url ? (
+                      <img
+                        src={booking.guide.profile.avatar_url}
+                        alt={booking.guide.profile.full_name}
+                        className="h-12 w-12 rounded-2xl object-cover border border-border shrink-0 shadow-xs"
+                      />
+                    ) : (
+                      <div 
+                        className="flex h-12 w-12 items-center justify-center rounded-2xl text-xs font-black text-white shrink-0"
+                        style={{ backgroundColor: COLORS.gold }}
+                      >
+                        {getInitials(booking.guide?.profile?.full_name || 'Guide')}
+                      </div>
+                    )}
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-bold text-base-content">{booking.guide.profile.full_name}</span>
+                        <span className="font-bold text-base-content">{booking.guide?.profile?.full_name || 'Guide'}</span>
                         {getStatusBadge(booking.status)}
                       </div>
                       <p className="text-xs text-base-content/60 mt-1.5 flex items-center gap-3">
@@ -443,19 +519,56 @@ export default function TouristDashboardPage() {
 
                       {booking.quote_message && (
                         <div className="mt-2 text-xs italic bg-base-100 p-2.5 rounded-xl border border-border max-w-md">
-                          " {booking.quote_message} "
+                          "{booking.quote_message}"
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex gap-2 self-end md:self-center shrink-0 flex-wrap">
+                  <div className="flex gap-2 self-end md:self-center shrink-0 flex-wrap items-center">
                     <Link
                       href={`/guides/${booking.guide.id}`}
                       className="btn btn-sm btn-ghost rounded-xl text-xs font-bold"
                     >
                       {t('tourist.view_guide')}
                     </Link>
+
+                    {booking.status === 'quote_sent' && (
+                      <>
+                        <button
+                          type="button"
+                          disabled={bookingActionLoading === booking.id}
+                          onClick={() => handleAcceptQuote(booking.id)}
+                          className="btn btn-sm text-white rounded-xl text-xs font-bold gap-1 border-none bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+                        >
+                          {bookingActionLoading === booking.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <CheckCircle className="h-3.5 w-3.5" />
+                          )}
+                          <span>{t('tourist.accept_quote')}</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={bookingActionLoading === booking.id}
+                          onClick={() => handleDeclineQuote(booking.id)}
+                          className="btn btn-sm btn-outline btn-error rounded-xl text-xs font-bold"
+                        >
+                          {t('tourist.decline_quote')}
+                        </button>
+                      </>
+                    )}
+
+                    {booking.status === 'quote_requested' && (
+                      <button
+                        type="button"
+                        disabled={bookingActionLoading === booking.id}
+                        onClick={() => handleCancelBooking(booking.id)}
+                        className="btn btn-sm btn-ghost text-error rounded-xl text-xs font-bold hover:bg-error/10"
+                      >
+                        {t('tourist.cancel_request')}
+                      </button>
+                    )}
 
                     {['confirmed', 'in_progress'].includes(booking.status) && (
                       <button

@@ -3,20 +3,23 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { BookingStatus } from '@prisma/client'
 
-async function getGuide() {
+async function getGuide(requireApproved = false) {
   const supabase = await createClient()
   const { data: { user }, error } = await supabase.auth.getUser()
   if (error || !user) return { error: 'Non autorisé', status: 401 } as const
 
   const guide = await prisma.guideProfile.findUnique({ where: { user_id: user.id } })
   if (!guide) return { error: 'Profil guide introuvable', status: 404 } as const
-  if (guide.status !== 'approved') return { error: 'Profil guide non approuvé', status: 403 } as const
+  if (guide.status === 'suspended') return { error: 'Compte guide suspendu', status: 403 } as const
+  if (requireApproved && guide.status !== 'approved') {
+    return { error: 'Profil guide non approuvé. Votre compte est en cours d’examen.', status: 403 } as const
+  }
   return { user, guide } as const
 }
 
 export async function GET() {
   try {
-    const auth = await getGuide()
+    const auth = await getGuide(false)
     if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status })
 
     const [guideProfile, bookings] = await Promise.all([
@@ -55,12 +58,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const auth = await getGuide()
+    const auth = await getGuide(false)
     if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status })
 
     const { bookingId, action, quoteAmount, quoteMessage, cancellationReason } = await request.json()
     if (typeof bookingId !== 'string' || typeof action !== 'string') {
       return NextResponse.json({ error: 'Données de réservation invalides.' }, { status: 400 })
+    }
+
+    if ((action === 'send_quote' || action === 'start_mission') && auth.guide.status !== 'approved') {
+      return NextResponse.json({ error: 'Votre profil doit être validé par un administrateur pour effectuer cette action.' }, { status: 403 })
     }
 
     const booking = await prisma.booking.findFirst({ where: { id: bookingId, guide_id: auth.guide.id } })

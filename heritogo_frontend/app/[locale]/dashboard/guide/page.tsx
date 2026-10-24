@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
-import { apiFetch } from '@/lib/utils/http'
+import { apiFetch, clearClientCache } from '@/lib/utils/http'
 import PrivacySettings from '@/components/PrivacySettings'
 
 interface BookingRow {
@@ -273,6 +273,8 @@ export default function GuideDashboard() {
         ? { ...current, profile: { ...current.profile, avatar_url: data.avatar_url } }
         : current
       )
+      clearClientCache('public-guide')
+      clearClientCache('public-guides')
     } catch (err: unknown) {
       setAvatarError(getUserFriendlyError(err))
     } finally {
