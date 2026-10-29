@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation'
-import { requireUser } from '@/lib/auth/session'
+import { guardDashboard } from '@/lib/auth/dashboardGuard'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,9 +9,6 @@ interface Props {
 
 export default async function TouristDashboardLayout({ children, params }: Props) {
   const { locale } = await params
-  const auth = await requireUser()
-  if ('error' in auth) {
-    redirect(`/${locale}/auth/login`)
-  }
+  await guardDashboard(locale)
   return children
 }

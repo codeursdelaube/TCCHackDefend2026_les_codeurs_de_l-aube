@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation'
-import { requireRole } from '@/lib/auth/session'
+import { guardDashboard } from '@/lib/auth/dashboardGuard'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,10 +9,6 @@ interface Props {
 
 export default async function GuideDashboardLayout({ children, params }: Props) {
   const { locale } = await params
-  const auth = await requireRole(['guide'])
-  if ('error' in auth) {
-    if (auth.status === 401) redirect(`/${locale}/auth/login`)
-    redirect(`/${locale}/dashboard`)
-  }
+  await guardDashboard(locale, ['guide'])
   return children
 }
