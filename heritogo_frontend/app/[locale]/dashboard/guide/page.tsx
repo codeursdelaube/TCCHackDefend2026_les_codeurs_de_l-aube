@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
-import { Briefcase, Loader2, Star, ShieldCheck, FileText, UploadCloud, Edit3, X, ExternalLink } from 'lucide-react'
+import { Briefcase, Loader2, Star, ShieldCheck, FileText, UploadCloud, Edit3, X, ExternalLink, Camera } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
@@ -375,7 +375,7 @@ export default function GuideDashboard() {
       {guide && (
         <header className="mb-8 flex flex-col gap-6 rounded-xl border border-border bg-card p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
-            <div className="relative h-16 w-16 shrink-0">
+            <label htmlFor="avatar-upload" title={tg('avatar_change')} className="group relative h-20 w-20 shrink-0 cursor-pointer">
               {avatarUrl ? (
                 <img src={avatarUrl} alt={guide.profile.full_name} className="h-full w-full rounded-xl border border-border object-cover" />
               ) : (
@@ -383,12 +383,24 @@ export default function GuideDashboard() {
                   {getInitials(guide.profile.full_name)}
                 </div>
               )}
+              <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                {avatarUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
+              </span>
               {guide.status === 'approved' && (
                 <span className="absolute -bottom-1.5 -right-1.5 rounded-md border-2 border-card bg-forest p-0.5 text-white">
                   <ShieldCheck className="h-3.5 w-3.5" />
                 </span>
               )}
-            </div>
+            </label>
+            {/* Champ fichier unique, partagé par l'en-tête et l'onglet profil */}
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={handleAvatarChange}
+              disabled={avatarUploading}
+            />
             <div>
               <h1 className="font-serif text-2xl font-bold">{t('guide.greeting', { name: guide.profile.full_name })}</h1>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
@@ -409,6 +421,11 @@ export default function GuideDashboard() {
                   <span>{tg('no_reviews_yet')}</span>
                 )}
               </div>
+              <label htmlFor="avatar-upload" className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+                {avatarUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
+                {avatarUploading ? tg('avatar_uploading') : avatarUrl ? tg('avatar_change') : tg('avatar_add')}
+              </label>
+              {avatarError && <p className="mt-1 text-xs font-semibold text-red-700">{avatarError}</p>}
             </div>
           </div>
           {guide.status === 'approved' && (
@@ -483,28 +500,14 @@ export default function GuideDashboard() {
                     {getInitials(guide?.profile?.full_name ?? '')}
                   </div>
                 )}
-                {/* Badge upload */}
-                <label
-                  htmlFor="avatar-upload"
-                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-lg flex items-center justify-center cursor-pointer bg-primary text-primary-foreground border-2 border-card"
-                >
-                  {avatarUploading
-                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    : <UploadCloud className="h-3.5 w-3.5" />
-                  }
-                </label>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                  disabled={avatarUploading}
-                />
               </div>
+              <label htmlFor="avatar-upload" className="btn-outline-brand min-h-9 cursor-pointer px-3 text-xs">
+                {avatarUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}
+                {avatarUploading ? tg('avatar_uploading') : avatarUrl ? tg('avatar_change') : tg('avatar_add')}
+              </label>
               <span className="text-xs text-muted-foreground">{tg('avatar_hint')}</span>
               {avatarError && (
-                <span className="text-xs text-error font-semibold">{avatarError}</span>
+                <span className="text-xs font-semibold text-red-700">{avatarError}</span>
               )}
             </div>
 

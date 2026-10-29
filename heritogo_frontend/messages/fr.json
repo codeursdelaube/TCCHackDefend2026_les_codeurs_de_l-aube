@@ -2064,6 +2064,9 @@
     "avatar_error": "L'envoi de la photo a échoué. Réessayez.",
     "avatar_incomplete": "Photo envoyée, mais la réponse du serveur est incomplète. Actualisez la page.",
     "remove": "Retirer",
-    "doc_kyc_pending": "Vérification en cours par le prestataire d'identité"
+    "doc_kyc_pending": "Vérification en cours par le prestataire d'identité",
+    "avatar_add": "Ajouter une photo",
+    "avatar_change": "Changer la photo",
+    "avatar_uploading": "Envoi en cours…"
   }
 }

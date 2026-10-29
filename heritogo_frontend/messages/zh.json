@@ -2117,6 +2117,9 @@
     "avatar_error": "照片上传失败，请重试。",
     "avatar_incomplete": "照片已上传，但服务器响应不完整。请刷新页面。",
     "remove": "移除",
-    "doc_kyc_pending": "身份验证服务商审核中"
+    "doc_kyc_pending": "身份验证服务商审核中",
+    "avatar_add": "添加照片",
+    "avatar_change": "更换照片",
+    "avatar_uploading": "上传中……"
   }
 }

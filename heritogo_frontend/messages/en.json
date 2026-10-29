@@ -2065,6 +2065,9 @@
     "avatar_error": "Photo upload failed. Please try again.",
     "avatar_incomplete": "Photo uploaded, but the server response was incomplete. Refresh the page.",
     "remove": "Remove",
-    "doc_kyc_pending": "Being verified by the identity provider"
+    "doc_kyc_pending": "Being verified by the identity provider",
+    "avatar_add": "Add a photo",
+    "avatar_change": "Change photo",
+    "avatar_uploading": "Uploading…"
   }
 }

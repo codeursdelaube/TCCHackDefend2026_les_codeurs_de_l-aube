@@ -2065,6 +2065,9 @@
     "avatar_error": "No se pudo enviar la foto. Inténtelo de nuevo.",
     "avatar_incomplete": "Foto enviada, pero la respuesta del servidor está incompleta. Actualice la página.",
     "remove": "Quitar",
-    "doc_kyc_pending": "En verificación por el proveedor de identidad"
+    "doc_kyc_pending": "En verificación por el proveedor de identidad",
+    "avatar_add": "Añadir una foto",
+    "avatar_change": "Cambiar la foto",
+    "avatar_uploading": "Enviando…"
   }
 }
