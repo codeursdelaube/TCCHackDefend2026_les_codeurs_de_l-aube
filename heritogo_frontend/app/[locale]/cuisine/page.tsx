@@ -1,239 +1,169 @@
 'use client'
 
 import { Fragment, useMemo, useState, useTransition } from 'react'
-import AdSlot from '@/components/AdSlot'
-import Image from 'next/image'
-import { ChefHat, Filter, MapPin, Search, Utensils, Sparkles, Navigation, ArrowRight, Loader2 } from 'lucide-react'
+import AdSlot from '@/components/ads/AdSlot'
+import { ChefHat, MapPin, Search, Utensils, Navigation, Loader2, Phone } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
-import restaurants from '@/app/Resto/restaurants'
+import restaurants from '@/lib/data/restaurants'
 import DishCard from '@/components/ui/DishCard'
-import SectionHeader from '@/components/ui/SectionHeader'
+import PageHeader from '@/components/ui/PageHeader'
+import EmptyState from '@/components/ui/EmptyState'
 import { useDishes } from '@/hooks/useCatalog'
-
-const categoryFilters = ['all', 'Ayimolou', 'Fufu', 'Djenkoumé', 'Gboma', 'Akoumé', 'Wagasi', 'Gombo', 'Boissons'] as const
-type CategoryFilter = (typeof categoryFilters)[number]
 
 export default function CuisinePage() {
   const t = useTranslations('Cuisine')
   const { dishes, loading } = useDishes()
   const [searchInput, setSearchInput] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [, startTransition] = useTransition()
 
-  const getFilterLabel = (category: CategoryFilter): string => {
-    switch (category) {
-      case 'all': return t('all')
-      case 'Ayimolou': return t('filters.ayimolou')
-      case 'Fufu': return t('filters.fufu')
-      case 'Djenkoumé': return t('filters.djenkoume')
-      case 'Gboma': return t('filters.gboma')
-      case 'Akoumé': return t('filters.akoume')
-      case 'Wagasi': return t('filters.wagasi')
-      case 'Gombo': return t('filters.gombo')
-      case 'Boissons': return t('filters.boissons')
-      default: return category
-    }
-  }
+  // Catégories issues des données réelles (déjà localisées par l'API).
+  const categories = useMemo(
+    () => ['all', ...Array.from(new Set(dishes.map((d) => d.catégorie).filter(Boolean)))],
+    [dishes],
+  )
 
   const filteredPlats = dishes.filter((plat) => {
-    const platName = plat.nom.toLowerCase()
-    const platDescription = plat.description.toLowerCase()
-    const search = searchInput.toLowerCase()
+    const search = searchInput.trim().toLowerCase()
     const matchesSearch =
-      platName.includes(search) ||
-      platDescription.includes(search) ||
+      !search ||
+      plat.nom.toLowerCase().includes(search) ||
+      plat.description.toLowerCase().includes(search) ||
       plat.catégorie.toLowerCase().includes(search)
-    const matchesCategory =
-      selectedCategory === 'all' || platName.includes(selectedCategory.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || plat.catégorie === selectedCategory
     return matchesSearch && matchesCategory
   })
 
-  const featuredRestaurants = useMemo(() => {
-    return restaurants.slice(0, 4)
-  }, [])
+  const featuredRestaurants = restaurants.slice(0, 4)
+
+  const resetFilters = () => {
+    setSearchInput('')
+    setSelectedCategory('all')
+  }
 
   return (
-    <main className="min-h-screen bg-background pb-28 pt-8 text-foreground">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        
-        {/* ── HEADER & SEARCH BANNER ── */}
-        <section className="app-card relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-card via-card to-primary/5">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-primary">
-                <ChefHat className="h-4 w-4" />
-                <span>{t('hero_badge')}</span>
-              </div>
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
-                {t('page_title')}
-              </h1>
-              <div className="togo-underline" />
-              <p className="text-sm sm:text-base font-medium leading-relaxed text-muted-foreground pt-1">
-                {t('page_subtitle')}
-              </p>
-            </div>
+    <main className="min-h-screen bg-background pb-32 pt-24 text-foreground">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+        <PageHeader
+          kicker={t('hero_badge')}
+          kickerIcon={ChefHat}
+          title={t('page_title')}
+          subtitle={t('page_subtitle')}
+          image="/fufuhero.webp"
+        />
 
-            {/* Search Input */}
-            <div className="w-full lg:w-96 space-y-2">
-              <div className="relative flex items-center rounded-2xl border border-border bg-card px-3.5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <input
-                  type="search"
-                  value={searchInput}
-                  onChange={(e) => startTransition(() => setSearchInput(e.target.value))}
-                  placeholder={t('search_placeholder')}
-                  className="min-h-12 w-full bg-transparent px-3 text-sm font-medium outline-none placeholder:text-muted-foreground"
-                />
-              </div>
-              <p className="text-xs font-semibold text-muted-foreground text-right">
-                {filteredPlats.length} {t('specialties_label')}
-              </p>
-            </div>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-            <span className="text-xs font-bold text-muted-foreground mr-1 flex items-center gap-1">
-              <Filter className="h-3 w-3" />
-              <span>{t('specialties_label')}</span>
-            </span>
-            {categoryFilters.map((category) => {
+        <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 lg:flex-row lg:items-center lg:justify-between">
+          <label className="relative flex items-center lg:w-96">
+            <span className="sr-only">{t('search_placeholder')}</span>
+            <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground" />
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(e) => startTransition(() => setSearchInput(e.target.value))}
+              placeholder={t('search_placeholder')}
+              className="field pl-9"
+            />
+          </label>
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t('specialties_label')}>
+            {categories.map((category) => {
               const active = selectedCategory === category
               return (
                 <button
                   key={category}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => startTransition(() => setSelectedCategory(category))}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
-                    active
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'border border-border bg-card text-foreground hover:border-primary/50'
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    active ? 'bg-primary text-primary-foreground' : 'border border-border text-foreground/80 hover:border-primary/50'
                   }`}
                 >
-                  {getFilterLabel(category)}
+                  {category === 'all' ? t('all') : category}
                 </button>
               )
             })}
           </div>
+          <span className="text-xs font-semibold text-muted-foreground lg:text-right">
+            {t('results_count', { count: filteredPlats.length })}
+          </span>
         </section>
 
-        {/* ── GRILLE DES PLATS ── */}
-        <section className="space-y-6">
-          <SectionHeader
-            kicker={t('section_kicker')}
-            title={t('section_title')}
-            subtitle={t('section_subtitle')}
-            icon={Sparkles}
-          />
-
-          {loading ? (
-            <div className="flex justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : filteredPlats.length === 0 ? (
-            <div className="app-card flex flex-col items-center justify-center p-12 text-center space-y-3">
-              <ChefHat className="h-10 w-10 text-primary opacity-60" />
-              <h3 className="font-serif text-xl font-bold">{t('empty_search')}</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground max-w-md">
-                {t('try_other')}
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchInput('')
-                  setSelectedCategory('all')
-                }}
-                className="mt-2 inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark"
-              >
-                {t('reset_filters')}
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredPlats.map((plat, index) => (
-                  <Fragment key={plat.id}>
-                    <DishCard
-                      id={plat.id}
-                      nom={plat.nom}
-                      categorie={plat.catégorie}
-                      description={plat.description}
-                      image={plat.image}
-                      region={plat.region || undefined}
-                    />
-                    {index === 7 && (
-                      <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 py-2">
-                        <AdSlot slot="dishes-list-slot" format="auto" />
-                      </div>
-                    )}
-                  </Fragment>
-                ))}
-            </div>
-          )}
-        </section>
-
-        {/* ── RESTAURANTS & MAQUIS EN VEDETTE ── */}
-        <section className="app-card p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
-                <Utensils className="h-3.5 w-3.5" />
-                <span>{t('restaurants_kicker')}</span>
-              </div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">
-                {t('restaurants_title')}
-              </h2>
-            </div>
-            <span className="text-xs font-semibold text-muted-foreground">
-              {t('restaurants_sub')}
-            </span>
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featuredRestaurants.map((resto) => (
-              <div
-                key={resto.id}
-                className="app-card flex flex-col justify-between p-4 bg-muted/40 border-border"
-              >
-                <div className="space-y-2">
-                  <h3 className="font-serif text-base font-bold text-foreground line-clamp-1">
-                    {resto.nom}
-                  </h3>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
-                    <span className="truncate">{resto.adresse}</span>
+        ) : filteredPlats.length === 0 ? (
+          <EmptyState icon={ChefHat} title={t('empty_search')} description={t('try_other')} action={{ label: t('reset_filters'), onClick: resetFilters }} />
+        ) : (
+          <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredPlats.map((plat, index) => (
+              <Fragment key={plat.id}>
+                <DishCard
+                  id={plat.id}
+                  nom={plat.nom}
+                  categorie={plat.catégorie}
+                  description={plat.description}
+                  image={plat.image}
+                  region={plat.region || undefined}
+                />
+                {index === 7 && (
+                  <div className="col-span-full">
+                    <AdSlot slot="dishes-list-slot" format="auto" />
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    {resto.quartier && (
-                      <span className="rounded-full bg-card border border-border px-2.5 py-0.5 text-[10px] font-semibold text-foreground">
-                        {resto.quartier}
-                      </span>
-                    )}
-                    {resto.budget_fcfa && (
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
-                        {resto.budget_fcfa} FCFA
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
-                  <span className="font-bold text-primary">{resto.telephone || 'Lomé, Togo'}</span>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resto.nom + ' ' + resto.adresse)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>GPS</span>
-                    <Navigation className="h-3 w-3 text-primary" />
-                  </a>
-                </div>
-              </div>
+                )}
+              </Fragment>
             ))}
-          </div>
-        </section>
+          </section>
+        )}
 
+        {featuredRestaurants.length > 0 && (
+          <section className="rounded-xl border border-border bg-card p-6 sm:p-8">
+            <div className="flex flex-col justify-between gap-2 border-b border-border pb-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                  <Utensils className="h-3.5 w-3.5" />
+                  {t('restaurants_kicker')}
+                </p>
+                <h2 className="mt-1 font-serif text-2xl font-bold sm:text-3xl">{t('restaurants_title')}</h2>
+              </div>
+              <p className="text-xs text-muted-foreground">{t('restaurants_sub')}</p>
+            </div>
+
+            <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredRestaurants.map((resto) => (
+                <li key={resto.id} className="flex flex-col justify-between rounded-lg border border-border p-4">
+                  <div>
+                    <h3 className="line-clamp-1 font-serif text-base font-bold">{resto.nom}</h3>
+                    <p className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                      <span className="line-clamp-2">{resto.adresse}</span>
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                      {resto.quartier && <span className="rounded-md bg-muted px-2 py-0.5 font-medium">{resto.quartier}</span>}
+                      {resto.budget_fcfa && <span className="rounded-md bg-primary/10 px-2 py-0.5 font-bold text-primary">{resto.budget_fcfa} FCFA</span>}
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
+                    {resto.telephone ? (
+                      <a href={`tel:${resto.telephone}`} className="inline-flex items-center gap-1 font-semibold hover:text-primary">
+                        <Phone className="h-3 w-3 text-primary" />
+                        {resto.telephone}
+                      </a>
+                    ) : <span />}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${resto.nom} ${resto.adresse}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-semibold hover:text-primary"
+                    >
+                      {t('directions')}
+                      <Navigation className="h-3 w-3 text-primary" />
+                    </a>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </main>
   )

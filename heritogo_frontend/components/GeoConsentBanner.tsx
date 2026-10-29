@@ -22,14 +22,14 @@ export default function GeoConsentBanner() {
             <button
               type="button"
               onClick={() => setGeoConsent(true)}
-              className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white"
+              className="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white"
             >
               {t('allow')}
             </button>
             <button
               type="button"
               onClick={() => setGeoConsent(false)}
-              className="rounded-full border border-border px-4 py-2 text-xs font-bold"
+              className="rounded-lg border border-border px-4 py-2 text-xs font-bold"
             >
               {t('deny')}
             </button>

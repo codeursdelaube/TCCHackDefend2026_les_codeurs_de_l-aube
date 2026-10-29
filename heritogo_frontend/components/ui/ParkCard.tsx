@@ -39,7 +39,7 @@ export default function ParkCard({
             <TreePine className="h-12 w-12 opacity-60" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/15 to-transparent" />
 
         <div className="absolute top-3 left-3">
           <Badge variant="forest">{region}</Badge>
@@ -69,7 +69,7 @@ export default function ParkCard({
             <div className="flex items-center justify-between pt-1">
               <a
                 href={`tel:${telephone}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-foreground hover:border-primary hover:text-primary transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1 text-xs font-bold text-foreground hover:border-primary hover:text-primary transition-colors"
               >
                 <Phone className="h-3 w-3 text-primary" />
                 <span>{telephone}</span>

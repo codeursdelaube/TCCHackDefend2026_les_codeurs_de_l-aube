@@ -2,40 +2,19 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
 
-import { useEffect, useState, startTransition, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { COLORS } from '@/lib/constants/colors'
 import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
-import { 
-  Briefcase, Calendar, Clock, MapPin, 
-  AlertTriangle, Loader2, Star, ShieldCheck, BadgeCent, 
-  FileText, UploadCloud, Edit3, User, Bell, Phone 
-} from 'lucide-react'
+import { Briefcase, Loader2, Star, ShieldCheck, FileText, UploadCloud, Edit3, X, ExternalLink } from 'lucide-react'
+import { toast } from 'sonner'
+import { Link } from '@/i18n/navigation'
 import { sanitizePhoneInput, validatePhone, validatePositiveNumber } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch, clearClientCache } from '@/lib/utils/http'
 import PrivacySettings from '@/components/PrivacySettings'
-
-interface BookingRow {
-  id: string
-  status: string
-  mission_type: string
-  start_date: string
-  start_time?: string
-  meeting_point?: string
-  tourist_message?: string
-  group_size: number
-  special_needs?: string
-  quote_amount?: string
-  quote_message?: string
-  created_at: string
-  tourist: {
-    full_name: string
-    phone?: string
-    preferred_lang?: string
-  }
-}
+import GuideBookingsPanel, { type GuideBookingsView } from '@/components/bookings/GuideBookingsPanel'
+import type { GuideBooking } from '@/lib/bookings/types'
 
 interface GuideProfileData {
   id: string
@@ -66,11 +45,12 @@ export default function GuideDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('Dashboard')
+  const tg = useTranslations('DashboardGuide')
   
   // Tabs: 'bookings' | 'profile' | 'documents'
   const activeTab = useMemo<'bookings' | 'profile' | 'documents'>(() => {
     const tab = searchParams.get('tab')
-    if (tab === 'quotes' || tab === 'missions' || tab === 'subscription' || tab === 'bookings') {
+    if (tab === 'quotes' || tab === 'missions' || tab === 'history' || tab === 'subscription' || tab === 'bookings') {
       return 'bookings'
     } else if (tab === 'profile') {
       return 'profile'
@@ -80,11 +60,18 @@ export default function GuideDashboard() {
     return 'bookings'
   }, [searchParams])
 
+  const bookingsView = useMemo<GuideBookingsView>(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'missions') return 'missions'
+    if (tab === 'history') return 'history'
+    return 'requests'
+  }, [searchParams])
+
   const handleTabChange = (tabName: 'bookings' | 'profile' | 'documents') => {
     const newTabParam = tabName === 'bookings' ? 'quotes' : tabName
     router.push(`?tab=${newTabParam}`, { scroll: false })
   }
-  const [bookings, setBookings] = useState<BookingRow[]>([])
+  const [bookings, setBookings] = useState<GuideBooking[]>([])
   const [guide, setGuide] = useState<GuideProfileData | null>(null)
   
   const [loading, setLoading] = useState(true)
@@ -116,10 +103,6 @@ export default function GuideDashboard() {
   const [docUrl, setDocUrl] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  // Quote Modal State
-  const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null)
-  const [quoteAmount, setQuoteAmount] = useState('')
-  const [quoteMessage, setQuoteMessage] = useState('')
   
   // Action Loading
   const [actionLoading, setActionLoading] = useState(false)
@@ -128,7 +111,7 @@ export default function GuideDashboard() {
     setLoading(true)
     setError(null)
     try {
-      const result = await apiFetch<{ bookings?: BookingRow[]; guideProfile?: GuideProfileData }>('/api/guide/bookings')
+      const result = await apiFetch<{ bookings?: GuideBooking[]; guideProfile?: GuideProfileData }>('/api/guide/bookings')
       if (!result.ok || !result.data) {
         setError(result.error || t('guide.error_load_data'))
         return
@@ -218,7 +201,7 @@ export default function GuideDashboard() {
         return
       }
       if (result.data.guide) setGuide(result.data.guide)
-      alert(t('common.success_update'))
+      toast.success(t('common.success_update'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
     } finally {
@@ -233,17 +216,17 @@ export default function GuideDashboard() {
     if (!file) return
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setAvatarError('Format invalide. JPG, PNG ou WEBP uniquement.')
+      setAvatarError(tg('avatar_format'))
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setAvatarError('Image trop lourde. Maximum 5MB.')
+      setAvatarError(tg('avatar_size'))
       return
     }
 
     if (file.size === 0) {
-      setAvatarError('Le fichier est vide.')
+      setAvatarError(tg('avatar_empty'))
       return
     }
 
@@ -261,11 +244,11 @@ export default function GuideDashboard() {
       })
       const data = result.data
       if (!result.ok) {
-        setAvatarError(result.error || "Erreur lors de l'envoi de la photo. Réessayez.")
+        setAvatarError(result.error || tg('avatar_error'))
         return
       }
       if (!data?.avatar_url) {
-        setAvatarError('Photo envoyée, mais la réponse du serveur est incomplète.')
+        setAvatarError(tg('avatar_incomplete'))
         return
       }
       setAvatarUrl(data.avatar_url)
@@ -321,76 +304,9 @@ export default function GuideDashboard() {
         window.location.href = kyc.data.hostedUrl
         return
       }
-      alert(t('guide.success_doc_submit'))
+      toast.success(t('guide.success_doc_submit'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
-    } finally {
-      setActionLoading(false)
-    }
-  }
-
-  // Booking action handlers (quotes, mission state)
-  const handleSendQuote = async () => {
-    if (!selectedBooking || !quoteAmount) return
-    setError(null)
-
-    const quoteErr = validatePositiveNumber(quoteAmount, t('guide.proposed_amount'))
-    if (quoteErr) {
-      setError(quoteErr)
-      return
-    }
-
-    setActionLoading(true)
-    try {
-      const result = await apiFetch('/api/guide/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookingId: selectedBooking.id,
-          action: 'send_quote',
-          quoteAmount,
-          quoteMessage
-        })
-      })
-
-      if (!result.ok) {
-        setError(result.error || t('guide.error_quote_send'))
-        return
-      }
-
-      setSelectedBooking(null)
-      setQuoteAmount('')
-      setQuoteMessage('')
-      await loadData()
-      alert(t('guide.success_quote_send'))
-    } catch (err: unknown) {
-      setError(getUserFriendlyError(err))
-    } finally {
-      setActionLoading(false)
-    }
-  }
-
-  const handleUpdateBookingStatus = async (bookingId: string, action: 'start_mission' | 'complete_mission' | 'cancel', reason?: string) => {
-    if (!confirm(t('guide.confirm_action'))) return
-    setActionLoading(true)
-    try {
-      const result = await apiFetch('/api/guide/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookingId,
-          action,
-          cancellationReason: reason
-        })
-      })
-
-      if (!result.ok) {
-        alert(result.error || t('guide.error_status_change'))
-        return
-      }
-      await loadData()
-    } catch {
-      alert(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -423,12 +339,12 @@ export default function GuideDashboard() {
     setSpecialties(specialties.filter(s => s !== spec))
   }
 
-  if (loading) {
+  if (loading && !guide) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-base-100">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" style={{ color: COLORS.forest }} />
-          <p className="text-sm font-semibold text-base-content/60 font-sans">{t('common.loading_guide')}</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-sm text-muted-foreground">{t('common.loading_guide')}</p>
         </div>
       </div>
     )
@@ -448,301 +364,107 @@ export default function GuideDashboard() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-base-content sm:px-6 lg:px-8 bg-base-100">
-      
-      {/* Error Alert */}
+    <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-foreground sm:px-6 lg:px-8">
       {error && (
-        <div className="alert alert-error rounded-2xl mb-4">
+        <div role="alert" className="mb-4 flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
           <span>{error}</span>
+          <button type="button" onClick={() => setError(null)} aria-label={tg('dismiss')}><X className="h-4 w-4" /></button>
         </div>
       )}
 
-      {/* Guide Info Banner */}
       {guide && (
-        <div className="rounded-xl bg-base-200 border border-border p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs mb-8">
-          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-            <div 
-              className="h-20 w-20 shrink-0 rounded-2xl relative shadow-sm overflow-visible"
-            >
+        <header className="mb-8 flex flex-col gap-6 rounded-xl border border-border bg-card p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-5">
+            <div className="relative h-16 w-16 shrink-0">
               {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={guide.profile.full_name}
-                  className="h-full w-full object-cover rounded-2xl border border-border"
-                />
+                <img src={avatarUrl} alt={guide.profile.full_name} className="h-full w-full rounded-xl border border-border object-cover" />
               ) : (
-                <div
-                  className="flex h-full w-full items-center justify-center rounded-2xl text-xl font-black text-white"
-                  style={{ backgroundColor: COLORS.forest }}
-                >
+                <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary font-serif text-xl font-bold text-primary-foreground">
                   {getInitials(guide.profile.full_name)}
                 </div>
               )}
               {guide.status === 'approved' && (
-                <div className="absolute -bottom-1 -right-1 bg-success text-white p-0.5 rounded-lg border-2 border-base-200 z-10">
-                  <ShieldCheck className="h-4 w-4" />
-                </div>
+                <span className="absolute -bottom-1.5 -right-1.5 rounded-md border-2 border-card bg-forest p-0.5 text-white">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                </span>
               )}
             </div>
-            
-            <div className="space-y-1">
-              <h2 className="font-serif text-2xl font-bold tracking-tight">{t('guide.greeting', { name: guide.profile.full_name })}</h2>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 text-xs text-base-content/65 font-bold">
-                <span className="flex items-center gap-1">
-                  <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
-                  {Number(guide.avg_rating).toFixed(1)} ({guide.total_reviews} {t('guide.review_count_label')})
+            <div>
+              <h1 className="font-serif text-2xl font-bold">{t('guide.greeting', { name: guide.profile.full_name })}</h1>
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${
+                  guide.status === 'approved' ? 'bg-forest/10 text-forest dark:text-emerald-300' :
+                  guide.status === 'rejected' || guide.status === 'suspended' ? 'bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-300' :
+                  'bg-accent/15 text-foreground'
+                }`}>
+                  {getGuideStatusText(guide.status)}
                 </span>
-                <span>•</span>
-                <span>{t('common.status')} : 
-                  <span className={`ml-1 font-extrabold uppercase text-[10px] px-2 py-0.5 rounded-lg ${
-                    guide.status === 'approved' ? 'bg-success/20 text-success' :
-                    guide.status === 'under_review' ? 'bg-amber-500/20 text-amber-600' :
-                    guide.status === 'rejected' ? 'bg-error/20 text-error' :
-                    'bg-neutral/20 text-neutral-content'
-                  }`}>
-                    {getGuideStatusText(guide.status)}
+                {guide.total_reviews > 0 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+                    <strong className="text-foreground">{Number(guide.avg_rating).toFixed(1)}</strong>
+                    ({guide.total_reviews} {t('guide.review_count_label')})
                   </span>
-                </span>
+                ) : (
+                  <span>{tg('no_reviews_yet')}</span>
+                )}
               </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4 w-full md:w-auto text-center font-semibold">
-            <div className="bg-base-100 rounded-2xl p-3 border border-border/60">
-              <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('guide.missions_stat')}</p>
-              <p className="text-xl font-black text-base-content mt-0.5">{guide.total_missions}</p>
-            </div>
-            <div className="bg-base-100 rounded-2xl p-3 border border-border/60">
-              <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">{t('guide.rating_stat')}</p>
-              <p className="text-xl font-black text-base-content mt-0.5">{Number(guide.avg_rating).toFixed(1)}</p>
-            </div>
-          </div>
-        </div>
+          {guide.status === 'approved' && (
+            <Link href={`/guides/${guide.id}`} className="btn-outline-brand self-start md:self-center">
+              <ExternalLink className="h-4 w-4" />
+              {tg('view_public_profile')}
+            </Link>
+          )}
+        </header>
       )}
 
-      {/* Tabs Switcher */}
-      <div className="flex border-b border-border mb-8 overflow-x-auto gap-4">
-        {[
-          { id: 'bookings', label: t('guide.tab_bookings'), icon: Briefcase },
-          { id: 'profile', label: t('guide.tab_profile'), icon: Edit3 },
-          { id: 'documents', label: t('guide.tab_documents'), icon: FileText }
-        ].map((tabItem) => {
+      <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-border" role="tablist">
+        {([
+          { id: 'bookings', label: tg('tab_bookings'), icon: Briefcase },
+          { id: 'profile', label: tg('tab_profile'), icon: Edit3 },
+          { id: 'documents', label: tg('tab_documents'), icon: FileText },
+        ] as const).map((tabItem) => {
           const Icon = tabItem.icon
+          const active = activeTab === tabItem.id
           return (
             <button
               key={tabItem.id}
-              onClick={() => handleTabChange(tabItem.id as any)}
-              className={`flex items-center gap-2 pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors ${
-                activeTab === tabItem.id 
-                  ? 'border-primary text-primary font-black' 
-                  : 'border-transparent text-base-content/60 hover:text-base-content'
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => handleTabChange(tabItem.id)}
+              className={`-mb-px inline-flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                active ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
-              style={{ borderBottomColor: activeTab === tabItem.id ? COLORS.forest : undefined, color: activeTab === tabItem.id ? COLORS.forest : undefined }}
             >
-              <Icon className="h-4.5 w-4.5" />
+              <Icon className="h-4 w-4" />
               {tabItem.label}
             </button>
           )
         })}
-      </div>
+      </nav>
 
       {/* Tab Content */}
       <div className="space-y-6">
         
         {/* Tab 1: Bookings */}
-        {activeTab === 'bookings' && (
-          <div className="space-y-6">
-            
-            {/* Pending Requests / Quote requested */}
-            <div>
-              <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
-                <Bell className="h-5 w-5 text-amber-500" />
-                {t('guide.new_quotes_title')}
-              </h3>
-              
-              {bookings.filter(b => b.status === 'quote_requested').length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
-                  <p className="text-sm font-semibold text-base-content/50">{t('guide.no_quotes')}</p>
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {bookings.filter(b => b.status === 'quote_requested').map(b => (
-                    <div key={b.id} className="rounded-3xl border border-border bg-base-200 p-5 shadow-xs flex flex-col justify-between">
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className="badge badge-warning badge-sm font-bold text-white uppercase text-[8px] rounded-lg">{t('guide.status_quote_required')}</span>
-                            <h4 className="font-bold text-base-content text-base mt-1">{b.tourist.full_name}</h4>
-                          </div>
-                          <span className="text-[10px] text-base-content/40 font-bold">{new Date(b.created_at).toLocaleDateString()}</span>
-                        </div>
-
-                        <div className="space-y-1.5 text-xs text-base-content/75 font-semibold">
-                          <p className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-base-content/40" /> {new Date(b.start_date).toLocaleDateString()}</p>
-                          {b.start_time && <p className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-base-content/40" /> {t('guide.start_at', { time: new Date(b.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}</p>}
-                          {b.meeting_point && <p className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-base-content/40" /> {t('guide.meeting_point', { point: b.meeting_point })}</p>}
-                          <p className="flex items-center gap-1.5"><User className="h-4 w-4 text-base-content/40" /> {t('guide.group_size', { size: b.group_size })}</p>
-                        </div>
-
-                        {b.tourist_message && (
-                          <div className="rounded-xl bg-base-100 p-3 text-xs italic text-base-content/85 border border-border/60">
-                            {b.tourist_message}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-5 flex gap-2 border-t border-border/60 pt-4">
-                        <button
-                          onClick={() => handleUpdateBookingStatus(b.id, 'cancel', t('guide.cancel_reason_refused'))}
-                          className="btn btn-outline btn-error btn-sm rounded-xl flex-1 text-xs font-bold"
-                        >
-                          {t('guide.refuse')}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedBooking(b)
-                            setQuoteAmount(guide?.full_day_rate || '')
-                          }}
-                          className="btn btn-sm text-white rounded-xl border-none font-bold flex-1"
-                          style={{ backgroundColor: COLORS.forest }}
-                        >
-                          {t('guide.send_quote_btn')}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* In Progress / Active Missions */}
-            <div className="border-t border-border/55 pt-6">
-              <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-emerald-600" />
-                {t('guide.confirmed_missions_title')}
-              </h3>
-
-              {bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status)).length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
-                  <p className="text-sm font-semibold text-base-content/50">{t('guide.no_active_missions')}</p>
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status)).map(b => (
-                    <div key={b.id} className="rounded-3xl border border-border bg-base-200 p-5 shadow-xs flex flex-col justify-between">
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className={`badge badge-sm font-bold text-white uppercase text-[8px] rounded-lg ${b.status === 'in_progress' ? 'bg-primary' : 'bg-success'}`}>
-                              {b.status === 'in_progress' ? t('guide.status_in_progress') : t('guide.status_confirmed')}
-                            </span>
-                            <h4 className="font-bold text-base-content text-base mt-1">{b.tourist.full_name}</h4>
-                          </div>
-                          <span className="text-[10px] text-base-content/40 font-bold">{new Date(b.created_at).toLocaleDateString()}</span>
-                        </div>
-
-                        <div className="space-y-1.5 text-xs text-base-content/75 font-semibold">
-                          <p className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-base-content/40" /> {t('common.date')} : {new Date(b.start_date).toLocaleDateString()}</p>
-                          {b.quote_amount && (
-                            <p className="flex items-center gap-1.5 text-base-content font-bold">
-                              <BadgeCent className="h-4 w-4 text-emerald-600" />
-                              {t('guide.budget_label', { amount: Number(b.quote_amount).toLocaleString() })}
-                            </p>
-                          )}
-                          {b.tourist.phone && (
-                            <p className="flex items-center gap-1.5 text-base-content">
-                              <Phone className="h-4 w-4 text-base-content/40" />
-                              {t('guide.contact_label')}<span className="font-bold underline">{b.tourist.phone}</span>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="mt-5 flex gap-2 border-t border-border/60 pt-4">
-                        {b.status === 'confirmed' ? (
-                          <button
-                            onClick={() => handleUpdateBookingStatus(b.id, 'start_mission')}
-                            className="btn btn-sm text-white rounded-xl border-none font-bold w-full"
-                            style={{ backgroundColor: COLORS.rust }}
-                          >
-                            {t('guide.start_mission')}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleUpdateBookingStatus(b.id, 'complete_mission')}
-                            className="btn btn-sm text-white rounded-xl border-none font-bold w-full bg-success hover:bg-success-content"
-                          >
-                            {t('guide.complete_mission')}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* History */}
-            <div className="border-t border-border/55 pt-6">
-              <h3 className="font-serif text-lg font-bold mb-4">{t('guide.missions_history')}</h3>
-              <div className="overflow-x-auto rounded-xl border border-border bg-base-200">
-                <table className="table w-full text-xs font-semibold">
-                  <thead>
-                    <tr className="bg-base-300 text-left text-[10px] font-black uppercase text-base-content/60">
-                      <th className="p-4 rounded-tl-[24px]">{t('guide.table_tourist')}</th>
-                      <th className="p-4">{t('common.date')}</th>
-                      <th className="p-4">{t('common.amount')}</th>
-                      <th className="p-4">{t('guide.table_status')}</th>
-                      <th className="p-4 rounded-tr-[24px]">{t('guide.table_action')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bookings.filter(b => ['completed', 'cancelled', 'quote_sent'].includes(b.status)).map(b => (
-                      <tr key={b.id} className="border-b border-border/60 hover:bg-base-100/40">
-                        <td className="p-4 font-bold">{b.tourist.full_name}</td>
-                        <td className="p-4">{new Date(b.start_date).toLocaleDateString()}</td>
-                        <td className="p-4">{b.quote_amount ? `${Number(b.quote_amount).toLocaleString()} XOF` : 'N/A'}</td>
-                        <td className="p-4">
-                          <span className={`px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase ${
-                            b.status === 'completed' ? 'bg-success/20 text-success' :
-                            b.status === 'cancelled' ? 'bg-error/20 text-error' :
-                            'bg-neutral/20 text-neutral-content'
-                          }`}>
-                            {b.status === 'completed' ? t('guide.history_completed') :
-                             b.status === 'cancelled' ? t('guide.history_cancelled') : t('guide.history_quote_sent')}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          {b.status === 'quote_sent' && (
-                            <button 
-                              onClick={() => handleUpdateBookingStatus(b.id, 'cancel', t('guide.cancel_reason_guide'))}
-                              className="text-xs text-error hover:underline"
-                            >
-                              {t('guide.cancel_quote')}
-                            </button>
-                          )}
-                          {b.status === 'completed' && b.quote_amount && t('guide.mission_paid')}
-                          {b.status === 'cancelled' && t('guide.history_cancelled')}
-                        </td>
-                      </tr>
-                    ))}
-                    {bookings.filter(b => ['completed', 'cancelled', 'quote_sent'].includes(b.status)).length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="p-6 text-center text-base-content/50">{t('guide.no_history')}</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
+        {activeTab === 'bookings' && guide && (
+          <GuideBookingsPanel
+            bookings={bookings}
+            rates={guide}
+            approved={guide.status === 'approved'}
+            view={bookingsView}
+            onViewChange={(view) => router.push(`?tab=${view === 'requests' ? 'quotes' : view}`, { scroll: false })}
+            onChanged={loadData}
+          />
         )}
 
         {/* Tab 2: Edit Profile */}
         {activeTab === 'profile' && (
           <>
-          <form onSubmit={handleUpdateProfile} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <form onSubmit={handleUpdateProfile} className="rounded-xl border border-border bg-card p-6 sm:p-8 space-y-6">
             <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.tab_profile')}</h3>
 
             {/* Avatar Upload */}
@@ -751,13 +473,12 @@ export default function GuideDashboard() {
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
-                    alt="Photo de profil"
-                    className="h-24 w-24 rounded-2xl object-cover border-2 border-border shadow"
+                    alt={tg('avatar_alt')}
+                    className="h-24 w-24 rounded-xl object-cover border border-border"
                   />
                 ) : (
                   <div
-                    className="h-24 w-24 rounded-2xl flex items-center justify-center text-2xl font-black text-white border-2 border-border"
-                    style={{ backgroundColor: COLORS.forest }}
+                    className="h-24 w-24 rounded-xl flex items-center justify-center bg-primary font-serif text-2xl font-bold text-primary-foreground"
                   >
                     {getInitials(guide?.profile?.full_name ?? '')}
                   </div>
@@ -765,8 +486,7 @@ export default function GuideDashboard() {
                 {/* Badge upload */}
                 <label
                   htmlFor="avatar-upload"
-                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full flex items-center justify-center cursor-pointer text-white shadow-lg border-2 border-white"
-                  style={{ backgroundColor: COLORS.rust }}
+                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-lg flex items-center justify-center cursor-pointer bg-primary text-primary-foreground border-2 border-card"
                 >
                   {avatarUploading
                     ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -782,29 +502,29 @@ export default function GuideDashboard() {
                   disabled={avatarUploading}
                 />
               </div>
-              <span className="text-xs text-muted-foreground opacity-60">JPG, PNG ou WEBP — max 5MB</span>
+              <span className="text-xs text-muted-foreground">{tg('avatar_hint')}</span>
               {avatarError && (
                 <span className="text-xs text-error font-semibold">{avatarError}</span>
               )}
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.phone_label')}</span>
+              <label className="block">
+                <span className="field-label">{t('guide.phone_label')}</span>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
                   placeholder="+228 90 00 00 00"
-                  className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+                  className="field"
                 />
                 {phone && validatePhone(phone) && (
                   <span className="text-xs text-error mt-1">{validatePhone(phone)}</span>
                 )}
               </label>
 
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.exp_label')}</span>
+              <label className="block">
+                <span className="field-label">{t('guide.exp_label')}</span>
                 <input
                   type="number"
                   min="0"
@@ -821,32 +541,32 @@ export default function GuideDashboard() {
                       }
                     }
                   }}
-                  className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+                  className="field"
                 />
               </label>
             </div>
 
             {/* Bio */}
-            <label className="form-control w-full">
-              <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.bio_label')}</span>
+            <label className="block">
+              <span className="field-label">{t('guide.bio_label')}</span>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder={t('guide.bio_placeholder')}
-                className="textarea textarea-bordered h-28 rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
+                className="field min-h-28 resize-y"
               />
             </label>
 
             {/* Rates Grid */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.rates_title')}</span>
+              <span className="field-label">{t('guide.rates_title')}</span>
               <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">{t('guide.rate_full')}</span>
+                <label className="block">
+                  <span className="field-label">{t('guide.rate_full')}</span>
                   <input
                     type="number"
                     min="0"
-                    step="0.5"
+                    step="500"
                     value={fullDayRate}
                     onChange={(e) => {
                       const v = e.target.value
@@ -854,15 +574,15 @@ export default function GuideDashboard() {
                         setFullDayRate(v)
                       }
                     }}
-                    className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
+                    className="field"
                   />
                 </label>
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">{t('guide.rate_half')}</span>
+                <label className="block">
+                  <span className="field-label">{t('guide.rate_half')}</span>
                   <input
                     type="number"
                     min="0"
-                    step="0.5"
+                    step="500"
                     value={halfDayRate}
                     onChange={(e) => {
                       const v = e.target.value
@@ -870,15 +590,15 @@ export default function GuideDashboard() {
                         setHalfDayRate(v)
                       }
                     }}
-                    className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
+                    className="field"
                   />
                 </label>
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/60">{t('guide.rate_hour')}</span>
+                <label className="block">
+                  <span className="field-label">{t('guide.rate_hour')}</span>
                   <input
                     type="number"
                     min="0"
-                    step="0.5"
+                    step="500"
                     value={hourlyRate}
                     onChange={(e) => {
                       const v = e.target.value
@@ -886,15 +606,15 @@ export default function GuideDashboard() {
                         setHourlyRate(v)
                       }
                     }}
-                    className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
+                    className="field"
                   />
                 </label>
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-[10px] font-bold text-base-content/65">{t('guide.rate_virtual')}</span>
+                <label className="block">
+                  <span className="field-label">{t('guide.rate_virtual')}</span>
                   <input
                     type="number"
                     min="0"
-                    step="0.5"
+                    step="500"
                     value={virtualRate}
                     onChange={(e) => {
                       const v = e.target.value
@@ -902,7 +622,7 @@ export default function GuideDashboard() {
                         setVirtualRate(v)
                       }
                     }}
-                    className="input input-bordered rounded-2xl bg-base-100 text-xs focus:border-primary focus:outline-none"
+                    className="field"
                   />
                 </label>
               </div>
@@ -910,7 +630,7 @@ export default function GuideDashboard() {
 
             {/* Languages Selector */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.langs_title')}</span>
+              <span className="field-label">{t('guide.langs_title')}</span>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_LANGUAGES.map((l) => {
                   const active = selectedLangs.includes(l)
@@ -919,10 +639,10 @@ export default function GuideDashboard() {
                       key={l}
                       type="button"
                       onClick={() => toggleLanguage(l)}
-                      className={`badge py-3 px-3 rounded-lg text-xs font-bold transition-all border ${
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors border ${
                         active 
-                          ? 'bg-primary text-white border-transparent' 
-                          : 'bg-base-100 text-base-content border-border hover:border-base-content/30'
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-card text-foreground border-border hover:border-primary/50'
                       }`}
                     >
                       {l}
@@ -934,7 +654,7 @@ export default function GuideDashboard() {
 
             {/* Zones Selector */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.zones_title')}</span>
+              <span className="field-label">{t('guide.zones_title')}</span>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_ZONES.map((z) => {
                   const active = selectedZones.includes(z)
@@ -943,10 +663,10 @@ export default function GuideDashboard() {
                       key={z}
                       type="button"
                       onClick={() => toggleZone(z)}
-                      className={`badge py-3 px-3 rounded-lg text-xs font-bold transition-all border ${
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors border ${
                         active 
-                          ? 'bg-primary text-white border-transparent' 
-                          : 'bg-base-100 text-base-content border-border hover:border-base-content/30'
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-card text-foreground border-border hover:border-primary/50'
                       }`}
                     >
                       {z}
@@ -958,29 +678,28 @@ export default function GuideDashboard() {
 
             {/* Specialties Manager */}
             <div className="space-y-3">
-              <span className="block text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.specs_title')}</span>
+              <span className="field-label">{t('guide.specs_title')}</span>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={newSpecialty}
                   onChange={(e) => setNewSpecialty(e.target.value)}
                   placeholder={t('guide.spec_placeholder')}
-                  className="input input-bordered rounded-2xl bg-base-100 text-sm flex-1 focus:border-primary focus:outline-none"
+                  className="field flex-1"
                 />
                 <button
                   type="button"
                   onClick={addSpecialty}
-                  className="btn text-white rounded-2xl border-none font-bold"
-                  style={{ backgroundColor: COLORS.forest }}
+                  className="btn-outline-brand"
                 >
                   {t('guide.add_spec')}
                 </button>
               </div>
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {specialties.map((s) => (
-                  <span key={s} className="badge bg-neutral text-neutral-content font-bold px-3.5 py-3 rounded-xl text-xs gap-1.5">
+                  <span key={s} className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                     {s}
-                    <button type="button" onClick={() => removeSpecialty(s)} className="text-neutral-content/60 hover:text-white font-extrabold text-[10px] ml-1">×</button>
+                    <button type="button" onClick={() => removeSpecialty(s)} aria-label={tg('remove')} className="hover:text-primary-dark"><X className="h-3 w-3" /></button>
                   </span>
                 ))}
               </div>
@@ -989,8 +708,7 @@ export default function GuideDashboard() {
             <button
               type="submit"
               disabled={actionLoading}
-              className="btn btn-block text-white rounded-2xl border-none font-bold mt-4"
-              style={{ backgroundColor: COLORS.forest }}
+              className="btn-brand w-full mt-4"
             >
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save_changes')}
             </button>
@@ -1004,15 +722,15 @@ export default function GuideDashboard() {
           <div className="grid gap-6 md:grid-cols-2">
             
             {/* Upload form */}
-            <form onSubmit={handleUploadDocument} className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-5">
+            <form onSubmit={handleUploadDocument} className="rounded-xl border border-border bg-card p-6 sm:p-8 space-y-5">
               <h3 className="font-serif text-xl font-bold border-b border-border pb-3">{t('guide.submit_doc_title')}</h3>
               
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.doc_type')}</span>
+              <label className="block">
+                <span className="field-label">{t('guide.doc_type')}</span>
                 <select
                   value={docType}
                   onChange={(e) => setDocType(e.target.value)}
-                  className="select select-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+                  className="field"
                 >
                   <option value="guide_license">{t('guide.doc_license')}</option>
                   <option value="national_id">{t('guide.doc_id')}</option>
@@ -1021,20 +739,20 @@ export default function GuideDashboard() {
                 </select>
               </label>
 
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60">{t('guide.doc_title_label')}</span>
+              <label className="block">
+                <span className="field-label">{t('guide.doc_title_label')}</span>
                 <input
                   type="text"
                   value={docLabel}
                   onChange={(e) => setDocLabel(e.target.value)}
                   placeholder={t('guide.doc_title_placeholder')}
-                  className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+                  className="field"
                   required
                 />
               </label>
 
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/60 flex items-center gap-1">
+              <label className="block">
+                <span className="field-label flex items-center gap-1">
                   <UploadCloud className="h-3.5 w-3.5" /> {t('guide.doc_file_label')}
                 </span>
                 <input
@@ -1057,12 +775,12 @@ export default function GuideDashboard() {
                       setSelectedFile(file)
                     }
                   }}
-                  className="file-input file-input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+                  className="field file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-xs file:font-semibold"
                 />
               </label>
 
-              <div className="rounded-2xl bg-base-100 p-4 border border-border/60">
-                <p className="text-xs text-base-content/60 leading-5">
+              <div className="rounded-lg bg-muted/60 p-4">
+                <p className="text-xs text-muted-foreground leading-5">
                   {t('guide.doc_upload_hint')}
                 </p>
               </div>
@@ -1070,37 +788,36 @@ export default function GuideDashboard() {
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="btn btn-block text-white rounded-2xl border-none font-bold"
-                style={{ backgroundColor: COLORS.forest }}
+                className="btn-brand w-full"
               >
                 {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('guide.submit_for_verification')}
               </button>
             </form>
 
             {/* List of submitted docs */}
-            <div className="rounded-xl border border-border bg-base-200 p-6 sm:p-8 shadow-sm space-y-4 h-fit">
+            <div className="rounded-xl border border-border bg-card p-6 sm:p-8 space-y-4 h-fit">
               <h3 className="font-serif text-lg font-bold">{t('guide.docs_submitted_title')}</h3>
               
               {(guide as any)?.documents?.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border bg-base-100 p-6 text-center text-base-content/50">
+                <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                   {t('guide.no_docs')}
                 </div>
               ) : (
                 <div className="space-y-3">
                   {(guide as any)?.documents?.map((doc: any) => (
-                    <div key={doc.id} className="rounded-2xl bg-base-100 p-4 border border-border/70 flex justify-between items-center gap-3">
+                    <div key={doc.id} className="rounded-lg p-4 border border-border flex justify-between items-center gap-3">
                       <div className="space-y-1">
-                        <p className="text-xs font-extrabold text-base-content">{doc.label}</p>
-                        <p className="text-[10px] font-black uppercase text-base-content/40 tracking-wider">
+                        <p className="text-sm font-semibold">{doc.label}</p>
+                        <p className="text-[11px] text-muted-foreground">
                           {t('common.status')} : {doc.type}
                         </p>
                         <p className="text-[10px] font-bold text-primary">
-                          Vérification chez le prestataire KYC
+                          {tg('doc_kyc_pending')}
                         </p>
                       </div>
 
-                      <span className={`badge badge-sm font-extrabold uppercase text-[8px] py-2.5 px-2 rounded-lg ${
-                        doc.is_verified ? 'bg-success/20 text-success' : 'bg-amber-500/20 text-amber-600'
+                      <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold ${
+                        doc.is_verified ? 'bg-forest/10 text-forest dark:text-emerald-300' : 'bg-accent/15 text-foreground'
                       }`}>
                         {doc.is_verified ? t('guide.doc_verified') : t('guide.doc_pending')}
                       </span>
@@ -1114,67 +831,6 @@ export default function GuideDashboard() {
         )}
 
       </div>
-
-      {/* Quote Dialog Modal */}
-      {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-xl border border-border bg-base-200 p-6 shadow-2xl space-y-5">
-            
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-serif text-xl font-bold text-base-content">{t('guide.propose_quote_title')}</h3>
-              <button onClick={() => setSelectedBooking(null)} className="btn btn-ghost btn-circle btn-xs font-extrabold">×</button>
-            </div>
-
-            <div className="space-y-4">
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">{t('guide.proposed_amount')}</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  value={quoteAmount}
-                  onChange={(e) => {
-                    const v = e.target.value
-                    if (v === '' || parseFloat(v) >= 0) {
-                      setQuoteAmount(v)
-                    }
-                  }}
-                  className="input input-bordered w-full rounded-2xl bg-base-100 text-sm focus:border-primary focus:outline-none"
-                  required
-                />
-              </label>
-
-              <label className="form-control w-full">
-                <span className="label-text mb-1 text-xs font-black uppercase tracking-wider text-base-content/65">{t('guide.message_explan')}</span>
-                <textarea
-                  value={quoteMessage}
-                  onChange={(e) => setQuoteMessage(e.target.value)}
-                  placeholder={t('guide.message_placeholder')}
-                  className="textarea textarea-bordered h-24 rounded-2xl bg-base-100 p-3 text-sm focus:border-primary focus:outline-none"
-                />
-              </label>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setSelectedBooking(null)}
-                className="btn btn-outline flex-1 rounded-2xl text-xs font-bold"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleSendQuote}
-                disabled={actionLoading || !quoteAmount}
-                className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
-                style={{ backgroundColor: COLORS.forest }}
-              >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('guide.send_quote')}
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </main>
   )

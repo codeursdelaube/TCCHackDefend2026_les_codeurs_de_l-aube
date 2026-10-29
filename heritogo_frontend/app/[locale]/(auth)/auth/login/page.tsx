@@ -17,7 +17,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
+      className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
     >
       {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : t('login_button')}
     </button>
@@ -39,9 +39,9 @@ function LoginForm() {
       : null
 
   return (
-    <div className="app-card p-6 sm:p-8 space-y-6 shadow-xl">
+    <div className="rounded-xl border border-border bg-card p-6 sm:p-8 space-y-6">
       <div className="text-center space-y-2">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-white">
           <LogIn className="h-7 w-7" />
         </div>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">{t('login_title')}</h1>
@@ -53,20 +53,20 @@ function LoginForm() {
         <input type="hidden" name="redirect" value={redirectParam} />
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="field-label">
             {t('email')}
           </label>
           <input
             type="email"
             name="email"
             required
-            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field"
             autoComplete="email"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="field-label">
             {t('password')}
           </label>
           <input
@@ -74,7 +74,7 @@ function LoginForm() {
             name="password"
             required
             minLength={6}
-            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field"
             autoComplete="current-password"
           />
         </div>

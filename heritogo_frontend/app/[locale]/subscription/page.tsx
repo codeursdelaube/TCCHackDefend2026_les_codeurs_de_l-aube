@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Check, Shield, Zap, ArrowRight, Star, Sparkles } from 'lucide-react'
+import { Check, Minus, ArrowRight, Sparkles, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { safeLocalStorageSet } from '@/lib/utils/storage'
@@ -13,6 +12,7 @@ export default function SubscriptionPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  // Activation locale (mode démonstration) : aucun paiement n'est encaissé.
   const handleSubscribe = () => {
     setIsLoading(true)
     setTimeout(() => {
@@ -23,146 +23,78 @@ export default function SubscriptionPage() {
     }, 1200)
   }
 
+  const freeFeatures = [
+    { label: t('free_f1'), included: true },
+    { label: t('free_f2'), included: true },
+    { label: t('free_f3'), included: true },
+    { label: t('free_f4'), included: false },
+  ]
+  const premiumFeatures = [t('premium_f1'), t('premium_f2'), t('premium_f3'), t('premium_f4')]
+
   return (
-    <main className="min-h-screen bg-background px-4 pb-28 pt-8 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl space-y-12">
-        
-        {/* Title Header */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <span>{t('kicker')}</span>
-          </div>
-
-          <h1 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-foreground">
-            {t('title')}
-          </h1>
-
-          <div className="togo-underline mx-auto" />
-
-          <p className="mx-auto max-w-2xl text-sm sm:text-base font-medium text-muted-foreground pt-1">
-            {t('subtitle')}
+    <main className="min-h-screen bg-background pb-32 pt-24 text-foreground">
+      <div className="mx-auto max-w-5xl space-y-10 px-4 sm:px-6 lg:px-8">
+        <header className="mx-auto max-w-3xl text-center">
+          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+            <Sparkles className="h-4 w-4" />
+            {t('kicker')}
           </p>
-        </div>
+          <h1 className="mt-2 font-serif text-3xl font-bold tracking-tight sm:text-4xl">{t('title')}</h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{t('subtitle')}</p>
+        </header>
 
-        {/* Pricing Cards Grid */}
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
-          {/* Plan Gratuit */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="app-card flex flex-col justify-between p-8 space-y-6"
-          >
-            <div className="space-y-4">
-              <div>
-                <h2 className="font-serif text-2xl font-bold text-foreground">{t('free_title')}</h2>
-                <p className="text-xs text-muted-foreground mt-1">{t('free_sub')}</p>
-              </div>
-
-              <div className="pt-2">
-                <span className="font-serif text-4xl sm:text-5xl font-bold text-foreground">0 FCFA</span>
-                <span className="text-xs font-semibold text-muted-foreground"> {t('per_month')}</span>
-              </div>
-
-              <ul className="space-y-3.5 pt-4 border-t border-border text-xs sm:text-sm font-medium text-muted-foreground">
-                <li className="flex items-center gap-3 text-foreground font-semibold">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>{t('free_f1')}</span>
-                </li>
-                <li className="flex items-center gap-3 text-foreground font-semibold">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>{t('free_f2')}</span>
-                </li>
-                <li className="flex items-center gap-3 text-foreground font-semibold">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>{t('free_f3')}</span>
-                </li>
-                <li className="flex items-center gap-3 opacity-40">
-                  <Check className="h-4 w-4 shrink-0" />
-                  <span>{t('free_f4')}</span>
-                </li>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className="flex flex-col justify-between rounded-xl border border-border bg-card p-8">
+            <div>
+              <h2 className="font-serif text-2xl font-bold">{t('free_title')}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t('free_sub')}</p>
+              <p className="mt-6">
+                <span className="font-serif text-4xl font-bold">0 FCFA</span>
+                <span className="text-sm text-muted-foreground"> {t('per_month')}</span>
+              </p>
+              <ul className="mt-6 space-y-3 border-t border-border pt-6 text-sm">
+                {freeFeatures.map(({ label, included }) => (
+                  <li key={label} className={`flex items-start gap-3 ${included ? '' : 'text-muted-foreground'}`}>
+                    {included ? <Check className="mt-0.5 h-4 w-4 shrink-0 text-forest" /> : <Minus className="mt-0.5 h-4 w-4 shrink-0" />}
+                    {label}
+                  </li>
+                ))}
               </ul>
             </div>
-
-            <button
-              disabled
-              className="rounded-full border border-border bg-muted/40 py-3 text-xs font-bold text-muted-foreground w-full cursor-not-allowed"
-            >
+            <button type="button" disabled className="btn-outline-brand mt-8 w-full">
               {t('current_plan')}
             </button>
-          </motion.div>
+          </section>
 
-          {/* Plan Premium */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="app-card relative flex flex-col justify-between p-8 space-y-6 border-primary bg-gradient-to-br from-card via-card to-primary/10 shadow-xl"
-          >
-            <div className="absolute -top-3.5 right-6">
-              <span className="unesco-badge rounded-full px-4 py-1 text-xs uppercase tracking-wider">
-                {t('recommended')}
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h2 className="font-serif text-2xl font-bold text-foreground flex items-center gap-2">
-                  <Star className="h-5 w-5 text-accent fill-accent" />
-                  <span>{t('premium_title')}</span>
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">{t('premium_sub')}</p>
-              </div>
-
-              <div className="pt-2">
-                <span className="font-serif text-4xl sm:text-5xl font-bold text-primary">2 000 FCFA</span>
-                <span className="text-xs font-semibold text-muted-foreground"> {t('per_month')}</span>
-              </div>
-
-              <ul className="space-y-3.5 pt-4 border-t border-border text-xs sm:text-sm font-medium text-foreground">
-                <li className="flex items-center gap-3 font-semibold">
-                  <Shield className="h-4 w-4 text-primary shrink-0" />
-                  <span>{t('premium_f1')}</span>
-                </li>
-                <li className="flex items-center gap-3 font-semibold">
-                  <Zap className="h-4 w-4 text-accent shrink-0" />
-                  <span>{t('premium_f2')}</span>
-                </li>
-                <li className="flex items-center gap-3 font-semibold">
-                  <Star className="h-4 w-4 text-accent fill-accent" />
-                  <span>{t('premium_f3')}</span>
-                </li>
-                <li className="flex items-center gap-3 font-semibold">
-                  <Shield className="h-4 w-4 text-primary shrink-0" />
-                  <span>{t('premium_f4')}</span>
-                </li>
+          <section className="relative flex flex-col justify-between rounded-xl border-2 border-primary bg-card p-8">
+            <span className="unesco-badge absolute -top-3 right-6 rounded-md px-3 py-1 text-[11px] uppercase tracking-wider">
+              {t('recommended')}
+            </span>
+            <div>
+              <h2 className="font-serif text-2xl font-bold">{t('premium_title')}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t('premium_sub')}</p>
+              <p className="mt-6">
+                <span className="font-serif text-4xl font-bold text-primary">2 000 FCFA</span>
+                <span className="text-sm text-muted-foreground"> {t('per_month')}</span>
+              </p>
+              <ul className="mt-6 space-y-3 border-t border-border pt-6 text-sm">
+                {premiumFeatures.map((label) => (
+                  <li key={label} className="flex items-start gap-3">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    {label}
+                  </li>
+                ))}
               </ul>
             </div>
-
-            <div className="space-y-3 pt-2">
-              <div className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent/15 py-1.5 px-3 text-[11px] font-bold text-[#8A3A20] dark:text-amber-200">
-                <Zap className="h-3.5 w-3.5 text-accent" />
-                <span>{t('instant')}</span>
-              </div>
-
-              <button
-                onClick={handleSubscribe}
-                disabled={isLoading}
-                className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-bold text-white shadow-lg hover:bg-primary-dark transition-all cursor-pointer"
-              >
-                {isLoading ? (
-                  <span className="loading loading-spinner"></span>
-                ) : (
-                  <>
-                    <span>{t('cta')}</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
+            <div className="mt-8 space-y-2">
+              <button type="button" onClick={handleSubscribe} disabled={isLoading} className="btn-brand min-h-12 w-full">
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                {t('cta')}
               </button>
+              <p className="text-center text-xs text-muted-foreground">{t('instant')}</p>
             </div>
-          </motion.div>
+          </section>
         </div>
-
       </div>
     </main>
   )

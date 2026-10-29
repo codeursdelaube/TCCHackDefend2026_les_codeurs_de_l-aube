@@ -1,11 +1,11 @@
 {
-  "name": "Heritogo - Guide Touristique du Togo",
-  "short_name": "Heritogo",
+  "name": "HeriTogo — Guide Touristique du Togo",
+  "short_name": "HeriTogo",
   "description": "Le guide touristique intelligent du Togo",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FDFBF7",
-  "theme_color": "#D9A441",
+  "background_color": "#FBF6EF",
+  "theme_color": "#B5502E",
   "orientation": "portrait",
   "icons": [
     {

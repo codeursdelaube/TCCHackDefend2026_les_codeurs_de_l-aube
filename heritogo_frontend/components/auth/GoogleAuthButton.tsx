@@ -83,7 +83,7 @@ export default function GoogleAuthButton({
         type="button"
         onClick={handleClick}
         disabled={disabled || pending}
-        className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-full border border-border bg-card px-6 text-sm font-bold text-foreground shadow-sm transition-all hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-border bg-card px-6 text-sm font-bold text-foreground shadow-sm transition-all hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : <GoogleMark />}
         <span>{label}</span>

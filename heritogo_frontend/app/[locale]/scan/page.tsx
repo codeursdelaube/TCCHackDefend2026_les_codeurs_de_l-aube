@@ -28,7 +28,7 @@ import { useGeolocation } from '@/hooks/useGeolocation'
 import { usePrivacyConsent } from '@/hooks/usePrivacyConsent'
 import GeoConsentBanner from '@/components/GeoConsentBanner'
 import { toast } from 'sonner'
-import Badge from '@/components/ui/Badge'
+import PageHeader from '@/components/ui/PageHeader'
 
 interface PredictionResult {
   prediction_status: 'success' | 'unknown'
@@ -344,39 +344,23 @@ export default function ScanPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 pb-28 pt-8 text-foreground sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-background px-4 pb-32 pt-24 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
-        
-        {/* ── HEADER BANNER ── */}
-        <section className="app-card relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-card via-card to-accent/10 border-accent/30">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
-                <Sparkles className="h-4 w-4 text-accent" />
-                <span>{t('signature_tech')}</span>
-              </div>
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
-                {t('title')}
-              </h1>
-              <div className="togo-underline" />
-              <p className="text-sm sm:text-base font-medium leading-relaxed text-muted-foreground pt-1 max-w-2xl">
-                {t('subtitle')}
-              </p>
-            </div>
-
-            <div className="shrink-0 self-start sm:self-center">
-              {isPremium ? (
-                <span className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm">
-                  {t('premium_active')}
-                </span>
-              ) : (
-                <span className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-muted-foreground shadow-xs">
-                  {t('quota', { count: scanCount })}
-                </span>
-              )}
-            </div>
-          </div>
-        </section>
+        <PageHeader
+          kicker={t('signature_tech')}
+          kickerIcon={Sparkles}
+          title={t('title')}
+          subtitle={t('subtitle')}
+          actions={
+            isPremium ? (
+              <span className="unesco-badge rounded-lg px-3 py-1.5 text-xs">{t('premium_active')}</span>
+            ) : (
+              <span className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                {t('quota', { count: scanCount })}
+              </span>
+            )
+          }
+        />
 
         <GeoConsentBanner />
 
@@ -404,7 +388,7 @@ export default function ScanPage() {
                 <button
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
-                  className="sm:hidden inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer"
+                  className="sm:hidden inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer"
                   aria-label={t('open_camera')}
                 >
                   <Camera className="h-5 w-5" />
@@ -416,7 +400,7 @@ export default function ScanPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex h-13 flex-1 sm:w-full items-center justify-center gap-3 rounded-full bg-card border-2 border-dashed border-primary/40 px-6 font-bold text-primary shadow-sm hover:border-primary hover:bg-primary/5 transition-all text-sm cursor-pointer"
+                  className="inline-flex h-13 flex-1 sm:w-full items-center justify-center gap-3 rounded-lg bg-card border-2 border-dashed border-primary/40 px-6 font-bold text-primary shadow-sm hover:border-primary hover:bg-primary/5 transition-all text-sm cursor-pointer"
                 >
                   <Upload className="h-5 w-5" />
                   <span>{preview ? t('change_image') : t('open_gallery')}</span>
@@ -428,7 +412,7 @@ export default function ScanPage() {
                   type="button"
                   onClick={handleScanClick}
                   disabled={loading}
-                  className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
+                  className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-lg bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
                   <span>{loading ? t('analyzing') : t('identify')}</span>
@@ -478,21 +462,21 @@ export default function ScanPage() {
               <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
               <span>
                 {error === 'AUTH_REQUIRED'
-                  ? 'Vous devez être connecté pour utiliser le scanner de monuments.'
+                  ? t('errors.auth_required')
                   : error === 'PAYLOAD_TOO_LARGE'
-                  ? 'La photo est trop lourde (> 4,5 Mo). La compression automatique va réduire sa taille, veuillez réessayer.'
+                  ? t('errors.too_large')
                   : error === 'RATE_LIMIT'
-                  ? 'Trop de requêtes simultanées. Veuillez patienter quelques instants avant de scanner à nouveau.'
+                  ? t('errors.rate_limit')
                   : error}
               </span>
             </div>
             {error === 'AUTH_REQUIRED' && (
               <Link
                 href="/auth/login?redirect=/scan"
-                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all self-start sm:self-auto cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all self-start sm:self-auto cursor-pointer"
               >
                 <LogIn className="h-3.5 w-3.5" />
-                <span>Se connecter</span>
+                <span>{t('login')}</span>
               </Link>
             )}
           </section>
@@ -507,26 +491,26 @@ export default function ScanPage() {
                   <SearchX className="h-6 w-6" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground/70">
-                    Analyse terminée • Non répertorié
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {t('unknown.kicker')}
                   </span>
                   <h2 className="font-serif text-2xl font-bold text-foreground mt-0.5">
-                    Monument non identifié
+                    {t('unknown.title')}
                   </h2>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-card p-5 border border-border space-y-3">
+            <div className="rounded-lg bg-card p-5 border border-border space-y-3">
               <p className="text-sm font-medium leading-relaxed text-foreground">
-                {result.detail || "Ce monument n'a pas pu être identifié avec certitude parmi le patrimoine officiel du Togo."}
+                {result.detail || t('unknown.default')}
               </p>
               <div className="text-xs text-muted-foreground space-y-1.5 pt-1">
-                <p className="font-semibold text-foreground">Conseils pour réussir votre identification :</p>
+                <p className="font-semibold text-foreground">{t('unknown.tips_title')}</p>
                 <ul className="list-disc list-inside space-y-1 pl-1">
-                  <li>Assurez-vous d'être devant un monument ou site patrimonial togolais répertorié.</li>
-                  <li>Rapprochez-vous et cadrez la façade principale ou la structure caractéristique.</li>
-                  <li>Évitez le contre-jour trop prononcé, le flou de bougé ou les photos trop sombres.</li>
+                  <li>{t('unknown.tip_1')}</li>
+                  <li>{t('unknown.tip_2')}</li>
+                  <li>{t('unknown.tip_3')}</li>
                 </ul>
               </div>
             </div>
@@ -535,16 +519,16 @@ export default function ScanPage() {
               <button
                 type="button"
                 onClick={resetScanner}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
               >
                 <Camera className="h-4 w-4" />
-                <span>Prendre une autre photo</span>
+                <span>{t('unknown.retake')}</span>
               </button>
               <Link
                 href="/lieux"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-xs font-bold text-foreground hover:border-primary/50 transition-all cursor-pointer"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-card px-5 text-xs font-bold text-foreground hover:border-primary/50 transition-all cursor-pointer"
               >
-                <span>Explorer les 29 sites répertoriés</span>
+                <span>{t('unknown.explore_sites')}</span>
               </Link>
             </div>
           </section>
@@ -557,7 +541,7 @@ export default function ScanPage() {
                 <div className="h-4 w-28 rounded bg-muted" />
                 <div className="h-7 w-64 rounded bg-muted" />
               </div>
-              <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
+              <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>{scanStepMessages[scanStepIndex]}</span>
               </div>
@@ -605,7 +589,7 @@ export default function ScanPage() {
             </div>
 
             {result.data.latitude && result.data.longitude && (
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
                 <MapPin className="h-4 w-4" />
                 <span>{t('coordinates', { lat: Number(result.data.latitude).toFixed(4), lng: Number(result.data.longitude).toFixed(4) })}</span>
               </div>
@@ -616,7 +600,7 @@ export default function ScanPage() {
         {/* Paywall Modal Dialog */}
         {showPaywall && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-md space-y-6 rounded-3xl bg-card p-6 text-center shadow-2xl border border-border">
+            <div className="relative w-full max-w-md space-y-6 rounded-xl bg-card p-6 text-center shadow-2xl border border-border">
               <button
                 onClick={() => setShowPaywall(false)}
                 className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
@@ -653,7 +637,7 @@ export default function ScanPage() {
               <div className="flex flex-col gap-2.5">
                 <button
                   onClick={handleActivatePremium}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-bold text-white shadow-md hover:bg-primary-dark transition-all cursor-pointer"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-bold text-white shadow-md hover:bg-primary-dark transition-all cursor-pointer"
                 >
                   <CreditCard className="h-4 w-4" />
                   <span>{t('premium_cta')}</span>

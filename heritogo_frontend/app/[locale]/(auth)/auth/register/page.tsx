@@ -21,7 +21,7 @@ function SubmitButton({ privacyAccepted }: { privacyAccepted: boolean }) {
     <button
       type="submit"
       disabled={pending || !privacyAccepted}
-      className="inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
+      className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-primary px-6 font-bold text-white shadow-md hover:bg-primary-dark transition-all text-sm cursor-pointer disabled:opacity-50"
     >
       {pending ? (
         <span className="flex items-center justify-center gap-2">
@@ -62,9 +62,9 @@ function RegisterForm() {
   ]
 
   return (
-    <div className="app-card p-6 sm:p-8 space-y-6 shadow-xl">
+    <div className="rounded-xl border border-border bg-card p-6 sm:p-8 space-y-6">
       <div className="text-center space-y-2">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-white">
           <UserPlus className="h-7 w-7" />
         </div>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">{t('register_title')}</h1>
@@ -89,29 +89,29 @@ function RegisterForm() {
         <input type="hidden" name="privacy_accepted" value={privacyAccepted ? 'true' : 'false'} />
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('full_name')}</label>
+          <label className="field-label">{t('full_name')}</label>
           <input
             type="text"
             name="full_name"
             required
-            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field"
             autoComplete="name"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('email')}</label>
+          <label className="field-label">{t('email')}</label>
           <input
             type="email"
             name="email"
             required
-            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field"
             autoComplete="email"
           />
         </div>
 
         <div>
-          <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('role_label')}</span>
+          <span className="mb-2 block field-label">{t('role_label')}</span>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -143,7 +143,7 @@ function RegisterForm() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('password')}</label>
+          <label className="field-label">{t('password')}</label>
           <input
             type="password"
             name="password"
@@ -151,7 +151,7 @@ function RegisterForm() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-2xl border border-border bg-card p-3 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field"
             autoComplete="new-password"
           />
 

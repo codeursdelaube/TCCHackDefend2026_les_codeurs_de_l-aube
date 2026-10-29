@@ -2,7 +2,7 @@
 
 import Image, { StaticImageData } from 'next/image'
 import { Link } from '@/i18n/navigation'
-import { Utensils, ArrowRight, Flame } from 'lucide-react'
+import { ArrowRight, MapPin } from 'lucide-react'
 import Badge from './Badge'
 import { useTranslations } from 'next-intl'
 
@@ -15,60 +15,40 @@ interface DishCardProps {
   region?: string
 }
 
-export default function DishCard({
-  id,
-  nom,
-  categorie,
-  description,
-  image,
-  region,
-}: DishCardProps) {
+export default function DishCard({ id, nom, categorie, description, image, region }: DishCardProps) {
   const t = useTranslations('Cuisine')
   return (
     <Link
       href={`/cuisine/${id}`}
-      className="app-card group relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow duration-300 hover:shadow-lg"
     >
-      <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-muted">
+      <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
         <Image
           src={image}
           alt={nom}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
-
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-          <Badge variant="primary">{categorie}</Badge>
-          {region && (
-            <span className="rounded-full bg-black/40 px-2.5 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur-md">
-              {region}
-            </span>
-          )}
+        <div className="absolute inset-0 bg-linear-to-t from-black/65 via-transparent to-transparent" />
+        <div className="absolute left-3 top-3">
+          <Badge variant="neutral">{categorie}</Badge>
         </div>
-
-        <div className="absolute bottom-3 left-3 right-3 text-white">
-          <h3 className="font-serif text-lg font-bold text-white line-clamp-1 leading-snug">
-            {nom}
-          </h3>
-        </div>
+        <h3 className="absolute bottom-3 left-4 right-4 line-clamp-1 font-serif text-lg font-bold leading-snug text-white">{nom}</h3>
       </div>
 
-      <div className="flex flex-1 flex-col justify-between p-4 space-y-3">
-        <p className="line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          {description}
-        </p>
-
-        <div className="flex items-center justify-between border-t border-border pt-3">
-          <div className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
-            <Flame className="h-3.5 w-3.5" />
-            <span>{t('card_recipe')}</span>
-          </div>
-
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary group-hover:text-primary-dark transition-colors">
-            <span>{t('card_see')}</span>
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+      <div className="flex flex-1 flex-col justify-between gap-3 p-4">
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+        <div className="flex items-center justify-between border-t border-border pt-3 text-xs">
+          {region ? (
+            <span className="inline-flex items-center gap-1 font-medium text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
+              {region}
+            </span>
+          ) : <span />}
+          <span className="inline-flex items-center gap-1 font-bold text-primary">
+            {t('card_see')}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </span>
         </div>
       </div>

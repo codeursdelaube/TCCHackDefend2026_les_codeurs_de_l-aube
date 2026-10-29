@@ -1,5 +1,21 @@
 import { getTranslations } from 'next-intl/server'
+import { ShieldCheck } from 'lucide-react'
 import { PRIVACY_POLICY, type PrivacyPolicyLocale } from '@/lib/privacy-policy'
+import LegalDocument from '@/components/legal/LegalDocument'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'Legal' })
+  const policy = PRIVACY_POLICY[locale as PrivacyPolicyLocale] || PRIVACY_POLICY.fr
+  return {
+    title: policy.title,
+    description: t('privacy_meta'),
+  }
+}
 
 export default async function ConfidentialitePage({
   params,
@@ -7,24 +23,20 @@ export default async function ConfidentialitePage({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const t = await getTranslations('Privacy')
-  const policy = PRIVACY_POLICY[(locale as PrivacyPolicyLocale)] || PRIVACY_POLICY.fr
+  const t = await getTranslations({ locale, namespace: 'Legal' })
+  const tPrivacy = await getTranslations({ locale, namespace: 'Privacy' })
+  const policy = PRIVACY_POLICY[locale as PrivacyPolicyLocale] || PRIVACY_POLICY.fr
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-28 pt-28">
-      <p className="text-xs font-bold uppercase tracking-wider text-primary">{t('gdpr_kicker')}</p>
-      <h1 className="mt-2 font-serif text-3xl font-bold">{policy.title}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {policy.updatedLabel} : {policy.lastUpdated}
-      </p>
-      <div className="mt-8 space-y-6">
-        {policy.sections.map((section) => (
-          <section key={section.title}>
-            <h2 className="font-serif text-xl font-bold">{section.title}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{section.content}</p>
-          </section>
-        ))}
-      </div>
-    </main>
+    <LegalDocument
+      kicker={tPrivacy('gdpr_kicker')}
+      kickerIcon={ShieldCheck}
+      title={policy.title}
+      updatedLabel={policy.updatedLabel}
+      lastUpdated={policy.lastUpdated}
+      sections={policy.sections}
+      backLabel={t('back_home')}
+      contentsLabel={t('contents')}
+    />
   )
 }

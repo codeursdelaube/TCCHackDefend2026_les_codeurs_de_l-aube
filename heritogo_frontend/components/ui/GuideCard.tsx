@@ -1,20 +1,24 @@
 'use client'
 
-import { ShieldCheck, MapPin, Languages, ArrowRight, Heart } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import StarRating from './StarRating'
+/* eslint-disable @next/next/no-img-element */
+
+import { ShieldCheck, MapPin, Languages, Heart, Star, Briefcase } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import AuthGuardLink from '@/components/AuthGuardLink'
+import { MISSION_TYPES, formatXof, rateForMission, type GuideRates } from '@/lib/bookings/status'
 
 interface GuideCardProps {
   id: string
   name: string
-  avatarUrl?: string
+  avatarUrl?: string | null
   initials: string
-  zone: string
+  zones: string[]
   languages: string[]
-  dailyRate?: string | null
+  specialties?: string[]
+  rates: GuideRates
   rating: number
   reviewsCount: number
+  missionsCount?: number
   experienceYears?: number
   isFavorite?: boolean
   onToggleFavorite?: () => void
@@ -25,48 +29,54 @@ export default function GuideCard({
   name,
   avatarUrl,
   initials,
-  zone,
+  zones,
   languages,
-  dailyRate,
+  specialties = [],
+  rates,
   rating,
   reviewsCount,
+  missionsCount = 0,
   experienceYears,
   isFavorite,
   onToggleFavorite,
 }: GuideCardProps) {
   const t = useTranslations('GuidesPage')
+  const tp = useTranslations('GuideProfile')
+  const locale = useLocale()
+
+  const publishedRates = MISSION_TYPES.filter((m) => m !== 'hourly')
+    .map((m) => rateForMission(rates, m))
+    .filter((r): r is number => r !== null)
+  const fromRate = publishedRates.length > 0 ? Math.min(...publishedRates) : null
+
   return (
-    <article className="app-card group relative flex flex-col justify-between p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      {/* Top Header with Avatar, Certified Badge & Favorite */}
+    <article className="flex flex-col justify-between rounded-xl border border-border bg-card p-5 transition-shadow duration-300 hover:shadow-lg">
       <div>
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={avatarUrl}
-                alt={name}
-                className="h-14 w-14 rounded-2xl object-cover border border-border"
-              />
+              <img src={avatarUrl} alt={name} className="h-14 w-14 shrink-0 rounded-lg border border-border object-cover" />
             ) : (
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary text-lg font-serif font-bold text-white shadow-sm">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-primary font-serif text-lg font-bold text-primary-foreground">
                 {initials}
               </div>
             )}
-
-            <div className="min-w-0 flex-1">
-              <div className="flex min-w-0 items-center gap-1.5">
-                <h3 className="font-serif text-base sm:text-lg font-bold text-foreground line-clamp-1">
-                  {name}
-                </h3>
-                <span title={t('certified')} className="inline-flex">
-                  <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                </span>
-              </div>
-              <div className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3 shrink-0 text-primary" />
-                <span className="min-w-0 truncate">{zone}</span>
-              </div>
+            <div className="min-w-0">
+              <h3 className="flex items-center gap-1.5 font-serif text-lg font-bold">
+                <span className="truncate">{name}</span>
+                <ShieldCheck className="h-4 w-4 shrink-0 text-forest" aria-label={t('certified')} />
+              </h3>
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                {reviewsCount > 0 ? (
+                  <>
+                    <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+                    <span className="font-bold text-foreground">{rating.toFixed(1)}</span>
+                    <span>({tp('reviews_count', { count: reviewsCount })})</span>
+                  </>
+                ) : (
+                  <span className="font-semibold text-foreground">{tp('new_guide')}</span>
+                )}
+              </p>
             </div>
           </div>
 
@@ -74,62 +84,53 @@ export default function GuideCard({
             <button
               type="button"
               onClick={onToggleFavorite}
-              aria-label={t('book')}
-              className="grid h-8 w-8 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-red-500 active:scale-95"
+              aria-pressed={isFavorite}
+              aria-label={isFavorite ? tp('in_favorites') : tp('add_favorite')}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:text-primary"
             >
-              <Heart
-                className={`h-4 w-4 ${
-                  isFavorite ? 'fill-red-500 text-red-500' : ''
-                }`}
-              />
+              <Heart className={`h-4 w-4 ${isFavorite ? 'fill-primary text-primary' : ''}`} />
             </button>
           )}
         </div>
 
-        {/* Rating and Experience */}
-        <div className="flex items-center justify-between gap-2 py-2 border-y border-border text-xs">
-          <StarRating rating={rating} count={reviewsCount} className="min-w-0" />
-          {experienceYears !== undefined && (
-            <span className="shrink-0 whitespace-nowrap font-semibold text-muted-foreground">
-              {t('experience_short', { years: experienceYears })}
+        <ul className="mt-4 space-y-1.5 text-xs text-muted-foreground">
+          <li className="flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span className="truncate">{zones.length > 0 ? zones.join(', ') : tp('not_specified')}</span>
+          </li>
+          <li className="flex items-center gap-1.5">
+            <Languages className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span className="truncate">{languages.length > 0 ? languages.join(', ') : tp('not_specified')}</span>
+          </li>
+          <li className="flex items-center gap-1.5">
+            <Briefcase className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span>
+              {experienceYears !== undefined && `${tp('experience', { count: experienceYears })} · `}
+              {tp('missions', { count: missionsCount })}
             </span>
-          )}
-        </div>
+          </li>
+        </ul>
 
-        {/* Languages */}
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Languages className="h-3.5 w-3.5 shrink-0 text-primary" />
-          <span className="min-w-0 truncate font-medium">
-            {Array.isArray(languages) ? languages.join(', ') : languages}
-          </span>
-        </div>
+        {specialties.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1">
+            {specialties.slice(0, 3).map((s) => (
+              <span key={s} className="rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">{s}</span>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Pricing & CTA */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-3 border-t border-border pt-3">
-        <div className="min-w-0">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-            {t('rate_label')}
-          </span>
-          <span className="text-sm font-bold text-primary">
-            {dailyRate ? `${dailyRate} FCFA` : '20 000 FCFA'}
-            <span className="text-xs font-normal text-muted-foreground"> {t('per_day')}</span>
-          </span>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+        <div>
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('rate_from')}</span>
+          <span className="text-sm font-bold">{fromRate !== null ? formatXof(fromRate, locale) : t('on_quote')}</span>
         </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          <AuthGuardLink
-            href={`/guides/${id}`}
-            className="rounded-full border border-border px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-colors"
-          >
+        <div className="flex items-center gap-2">
+          <AuthGuardLink href={`/guides/${id}`} className="btn-outline-brand min-h-9 px-3 text-xs">
             {t('view_profile')}
           </AuthGuardLink>
-          <AuthGuardLink
-            href={`/booking/${id}`}
-            className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all"
-          >
-            <span>{t('book')}</span>
-            <ArrowRight className="h-3 w-3" />
+          <AuthGuardLink href={`/booking/${id}`} className="btn-brand min-h-9 px-3 text-xs">
+            {t('book')}
           </AuthGuardLink>
         </div>
       </div>

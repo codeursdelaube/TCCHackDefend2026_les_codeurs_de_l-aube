@@ -3,12 +3,12 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, Banknote, ChefHat, ChevronRight, Flame, MapPin, Navigation, Soup, Utensils } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
-import restaurants from '@/app/Resto/restaurants'
+import restaurants from '@/lib/data/restaurants'
 import TTSButton from '@/app/_components/TTSButton'
 import Badge from '@/components/ui/Badge'
 import StarRating from '@/components/ui/StarRating'
 import { dishLookupIds, dishMatches, findPublishedDish, getLocalDishes } from '@/lib/catalog/dishes'
-import AdSlot from '@/components/AdSlot'
+import AdSlot from '@/components/ads/AdSlot'
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>
@@ -53,9 +53,9 @@ export default async function PlatDetailPage({ params }: PageProps) {
     : plat.accompaniments || ''
 
   return (
-    <main className="min-h-screen bg-background pb-28 text-foreground">
+    <main className="min-h-screen bg-background pb-32 pt-16 text-foreground sm:pt-24">
       {/* ── HERO BANNER — plein bord sur mobile, encadré sur desktop ── */}
-      <div className="relative h-64 sm:h-80 md:h-[420px] w-full overflow-hidden sm:mx-auto sm:max-w-5xl sm:rounded-3xl sm:border sm:border-border sm:shadow-lg">
+      <div className="relative h-64 sm:h-80 md:h-[420px] w-full overflow-hidden sm:mx-auto sm:max-w-5xl sm:rounded-xl sm:border sm:border-border sm:shadow-lg">
         <Image
           src={plat.image}
           alt={platName}
@@ -64,13 +64,13 @@ export default async function PlatDetailPage({ params }: PageProps) {
           sizes="(max-width: 1024px) 100vw, 1024px"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20" />
 
         {/* Top Bar inside Hero */}
         <div className="absolute left-3 right-3 top-3 z-10 flex items-center justify-between sm:left-4 sm:right-4 sm:top-4">
           <Link
             href="/cuisine"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md transition hover:scale-105 active:scale-95 sm:gap-2 sm:px-4 sm:py-2"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-black/40 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md transition hover:scale-105 active:scale-95 sm:gap-2 sm:px-4 sm:py-2"
           >
             <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">{t('back_to_cuisine')}</span>
@@ -100,7 +100,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
               <TTSButton text={`${platName}. ${platDescription}. ${platHistory}`} />
               <a
                 href="#restaurants"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all sm:w-auto"
               >
                 <Utensils className="h-4 w-4" />
                 <span>{t('find_nearby')}</span>
@@ -144,7 +144,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                   <Utensils className="h-5 w-5 text-primary" />
                   <h2 className="font-serif text-xl font-bold text-foreground">{t('where_to_eat')}</h2>
                 </div>
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                <span className="rounded-lg bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                   {t('address_count', { count: nearbyRestaurants.length })}
                 </span>
               </div>
@@ -181,7 +181,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                         </p>
                         <p className="flex items-center gap-1.5 font-bold text-primary">
                           <Banknote className="h-3.5 w-3.5" />
-                          <span>Budget ~ {restaurant.budget_fcfa} FCFA</span>
+                          <span>{t('budget', { amount: restaurant.budget_fcfa })}</span>
                         </p>
                       </div>
 
@@ -189,7 +189,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
                         href={`https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all mt-2"
+                        className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-xs font-bold text-white shadow-sm hover:bg-primary-dark transition-all mt-2"
                       >
                         <Navigation className="h-3.5 w-3.5" />
                         <span>{t('navigate')}</span>
@@ -261,7 +261,7 @@ export default async function PlatDetailPage({ params }: PageProps) {
             {/* CTA masqué sur mobile (déjà disponible dans la barre d'action) */}
             <a
               href="#restaurants"
-              className="hidden lg:inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
+              className="hidden lg:inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 text-xs font-bold text-white shadow-md hover:bg-primary-dark transition-all"
             >
               <Utensils className="h-4 w-4" />
               <span>{t('view_restos')}</span>

@@ -9,7 +9,8 @@ export async function GET(request: Request) {
     const maxPrice = searchParams.get('price')
 
     const whereClause: Record<string, unknown> = {
-      status: 'approved'
+      status: 'approved',
+      profile: { is: { is_active: true } },
     }
 
     if (lang) {
@@ -35,7 +36,20 @@ export async function GET(request: Request) {
 
     const guides = await prisma.guideProfile.findMany({
       where: whereClause,
-      include: {
+      select: {
+        id: true,
+        experience_years: true,
+        specialties: true,
+        languages: true,
+        coverage_zones: true,
+        hourly_rate: true,
+        half_day_rate: true,
+        full_day_rate: true,
+        virtual_rate: true,
+        currency: true,
+        avg_rating: true,
+        total_reviews: true,
+        total_missions: true,
         profile: {
           select: {
             full_name: true,

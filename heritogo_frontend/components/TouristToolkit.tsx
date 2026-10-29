@@ -82,7 +82,7 @@ export default function TouristToolkit() {
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+    <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-border border-border pb-4">
         <div>
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">

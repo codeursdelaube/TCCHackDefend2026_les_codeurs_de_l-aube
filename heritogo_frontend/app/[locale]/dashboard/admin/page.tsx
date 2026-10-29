@@ -5,7 +5,7 @@
 import { useEffect, useState, startTransition } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { COLORS } from '@/lib/constants/colors'
+import { toast } from 'sonner'
 import { getInitials } from '@/lib/auth/redirect'
 import { useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/utils/http'
@@ -155,7 +155,7 @@ export default function AdminDashboardPage() {
         .single()
 
       if (profileError) {
-        alert(getUserFriendlyError(profileError))
+        toast.error(getUserFriendlyError(profileError))
         setLoading(false)
         return
       }
@@ -168,7 +168,7 @@ export default function AdminDashboardPage() {
       await loadAdminData()
     } catch (err: unknown) {
       console.error('Erreur acces admin:', err)
-      alert(getUserFriendlyError(err))
+      toast.error(getUserFriendlyError(err))
       setLoading(false)
     }
   }
@@ -190,11 +190,11 @@ export default function AdminDashboardPage() {
         setReviews(result.data.reviews || [])
         setLogs(result.data.adminLogs || [])
       } else if (result.error) {
-        alert(result.error)
+        toast.error(result.error)
       }
     } catch (err) {
       console.error('Erreur lors du chargement des données admin:', err)
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setLoading(false)
     }
@@ -208,7 +208,7 @@ export default function AdminDashboardPage() {
     })
 
     if (!result.ok) {
-      alert(result.error || fallbackError)
+      toast.error(result.error || fallbackError)
       return false
     }
 
@@ -226,7 +226,7 @@ export default function AdminDashboardPage() {
     try {
       await runAdminAction({ action: 'approve_guide', targetId: guideId }, t('admin.error_approve'))
     } catch {
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -246,7 +246,7 @@ export default function AdminDashboardPage() {
         setRejectionReason('')
       }
     } catch {
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -258,7 +258,7 @@ export default function AdminDashboardPage() {
     try {
       await runAdminAction({ action: 'suspend_guide', targetId: guideId }, t('admin.error_suspend'))
     } catch {
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -276,7 +276,7 @@ export default function AdminDashboardPage() {
         details: { resolution, note }
       }, t('admin.error_resolve'))
     } catch {
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -296,7 +296,7 @@ export default function AdminDashboardPage() {
         setHideReviewReason('')
       }
     } catch {
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -311,7 +311,7 @@ export default function AdminDashboardPage() {
         details: { reason: 'Action rapide modérateur' }
       }, t('admin.error_toggle_hidden'))
     } catch {
-      alert(t('common.error_network'))
+      toast.error(t('common.error_network'))
     } finally {
       setActionLoading(false)
     }
@@ -321,7 +321,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-base-100">
         <div className="text-center space-y-4">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" style={{ color: COLORS.forest }} />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
           <p className="text-sm font-semibold text-base-content/60">{t('common.loading_rights')}</p>
         </div>
       </div>
@@ -329,13 +329,12 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-base-content sm:px-6 lg:px-8 bg-base-100">
+    <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-foreground sm:px-6 lg:px-8">
       
       {/* Title block */}
       <div className="mb-8 border-b border-border pb-5">
         <span 
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white"
-          style={{ backgroundColor: COLORS.rust }}
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white bg-primary"
         >
           {t('admin.console_title')}
         </span>
@@ -391,7 +390,7 @@ export default function AdminDashboardPage() {
                   ? 'border-primary text-primary font-black' 
                   : 'border-transparent text-base-content/60 hover:text-base-content'
               }`}
-              style={{ borderBottomColor: activeTab === tabItem.id ? COLORS.forest : undefined, color: activeTab === tabItem.id ? COLORS.forest : undefined }}
+             
             >
               <Icon className="h-4.5 w-4.5" />
               {tabItem.label}
@@ -419,7 +418,7 @@ export default function AdminDashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {pendingGuides.map(g => (
-                    <div key={g.id} className="rounded-3xl border border-border bg-base-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div key={g.id} className="rounded-xl border border-border bg-base-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="space-y-3 flex-1">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 shrink-0 bg-neutral text-neutral-content rounded-xl flex items-center justify-center font-black">
@@ -459,8 +458,7 @@ export default function AdminDashboardPage() {
                         </button>
                         <button
                           onClick={() => handleApproveGuide(g.id)}
-                          className="btn btn-sm text-white rounded-xl border-none font-bold flex-1 md:flex-initial"
-                          style={{ backgroundColor: COLORS.forest }}
+                          className="btn btn-sm text-white rounded-lg border-none font-bold bg-forest hover:bg-forest/90 flex-1 md:flex-initial"
                         >
                           {t('common.approve')}
                         </button>
@@ -513,7 +511,7 @@ export default function AdminDashboardPage() {
                             <button 
                               onClick={() => handleApproveGuide(g.id)}
                               className="text-xs text-primary font-bold ml-auto hover:underline"
-                              style={{ color: COLORS.forest }}
+                             
                             >
                               {t('admin.reactivate')}
                             </button>
@@ -540,7 +538,7 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="space-y-4">
                 {reports.map(r => (
-                  <div key={r.id} className="rounded-3xl border border-border bg-base-200 p-5 shadow-xs flex flex-col justify-between space-y-4">
+                  <div key={r.id} className="rounded-xl border border-border bg-base-200 p-5 shadow-xs flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
@@ -604,7 +602,7 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="space-y-4">
                 {reviews.map(r => (
-                  <div key={r.id} className="rounded-3xl border border-border bg-base-200 p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start gap-4">
+                  <div key={r.id} className="rounded-xl border border-border bg-base-200 p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 text-amber-500">
@@ -726,8 +724,7 @@ export default function AdminDashboardPage() {
               <button
                 onClick={handleRejectGuide}
                 disabled={actionLoading || !rejectionReason.trim()}
-                className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
-                style={{ backgroundColor: COLORS.rust }}
+                className="btn flex-1 rounded-lg border-none text-xs font-bold text-white bg-primary hover:bg-primary-dark"
               >
                 {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('admin.reject_guide_btn')}
               </button>
@@ -764,8 +761,7 @@ export default function AdminDashboardPage() {
               <button
                 onClick={handleToggleReviewHidden}
                 disabled={actionLoading || !hideReviewReason.trim()}
-                className="btn flex-1 rounded-2xl border-none text-xs font-bold text-white"
-                style={{ backgroundColor: COLORS.rust }}
+                className="btn flex-1 rounded-lg border-none text-xs font-bold text-white bg-primary hover:bg-primary-dark"
               >
                 {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('admin.hide_review')}
               </button>

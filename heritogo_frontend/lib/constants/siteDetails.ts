@@ -12,20 +12,11 @@ export interface PracticalInfo {
   fee: string;
 }
 
-export interface TravelerReview {
-  author: string;
-  origin: string;
-  date: string;
-  rating: number;
-  comment: string;
-}
-
 export interface SiteExtraDetails {
   tags: string[];
   activities: SiteActivity[];
   practicalInfo: PracticalInfo;
   dishesIds: string[];
-  reviews: TravelerReview[];
 }
 
 export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
@@ -60,23 +51,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'Accessible en voiture 4x4 ou taxi-moto (Zem) depuis Kpalimé (~12 km)',
       fee: 'Visite extérieure gratuite, guide local bénévole conseillé (1 000 - 2 000 FCFA)'
     },
-    dishesIds: ['fufu_togolais', 'agbeli_togolais', 'vebe_togolais'],
-    reviews: [
-      {
-        author: 'Koffi A.',
-        origin: 'Lomé',
-        date: 'Il y a 2 semaines',
-        rating: 5,
-        comment: 'Une vue à couper le souffle sur les montagnes du Kloto ! L’ambiance brumeuse du matin donne au château des airs de conte de fées.'
-      },
-      {
-        author: 'Sophie D.',
-        origin: 'France',
-        date: 'Il y a 1 mois',
-        rating: 4.8,
-        comment: 'Magnifique escale lors de notre randonnée à Kpalimé. La route monte un peu mais la récompense au sommet en vaut largement la peine.'
-      }
-    ]
+    dishesIds: ['fufu_togolais', 'agbeli_togolais', 'vebe_togolais']
   },
 
   grand_marche_lome: {
@@ -110,23 +85,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'En plein centre-ville de Lomé, accessible en taxi, Zem ou à pied',
       fee: 'Accès libre, prévoir du liquide pour les achats'
     },
-    dishesIds: ['ayimolou_togolais', 'ablo_togolais', 'koliko_togolais'],
-    reviews: [
-      {
-        author: 'Amina M.',
-        origin: 'Cotonou',
-        date: 'Il y a 3 semaines',
-        rating: 4.9,
-        comment: 'Le poumon vibrant de Lomé ! Les motifs de pagnes sont infinis et l’accueil des mamans marchandes est chaleureux.'
-      },
-      {
-        author: 'Marc B.',
-        origin: 'Suisse',
-        date: 'Il y a 2 mois',
-        rating: 4.7,
-        comment: 'Une expérience sensorielle incroyable. Les couleurs, les épices, le son des négociations... Incontournable !'
-      }
-    ]
+    dishesIds: ['ayimolou_togolais', 'ablo_togolais', 'koliko_togolais']
   },
 
   koutamakou: {
@@ -160,23 +119,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'Depuis Kara via Kandé puis piste jusqu’à Nadoba (~1h30 de route)',
       fee: 'Ticket d’entrée UNESCO + honoraires du guide officiel communautaire'
     },
-    dishesIds: ['to_sorgho_togolais', 'tchoukoutou_togolais', 'djenkoume_togolais'],
-    reviews: [
-      {
-        author: 'Elena R.',
-        origin: 'Italie',
-        date: 'Il y a 1 mois',
-        rating: 5,
-        comment: 'L’un des plus beaux trésors architecturaux d’Afrique. Les Takienta en terre sont des chefs-d’œuvre d’ingénierie durable.'
-      },
-      {
-        author: 'Tidiane S.',
-        origin: 'Sénégal',
-        date: 'Il y a 3 mois',
-        rating: 5,
-        comment: 'Une immersion culturelle inoubliable. Le respect de la nature et la sagesse des Batammariba forcent l’admiration.'
-      }
-    ]
+    dishesIds: ['to_sorgho_togolais', 'tchoukoutou_togolais', 'djenkoume_togolais']
   },
 
   marche_fetiches_akodessewa: {
@@ -205,16 +148,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'Quartier Akodésséwa à Lomé, facile d’accès en taxi ou Zem',
       fee: 'Entrée touristique + droit photo (environ 5 000 FCFA avec guide)'
     },
-    dishesIds: ['gboma_dessi', 'ayimolou_togolais', 'kom_togolais'],
-    reviews: [
-      {
-        author: 'Guillaume L.',
-        origin: 'Belgique',
-        date: 'Il y a 2 semaines',
-        rating: 4.8,
-        comment: 'Visite fascinante et très instructive sur la philosophie et la médecine traditionnelle. Très loin des clichés !'
-      }
-    ]
+    dishesIds: ['gboma_dessi', 'ayimolou_togolais', 'kom_togolais']
   },
 
   cascade_kpime: {
@@ -243,16 +177,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'À 10 km de Kpalimé sur la route d’Atakpamé, accès facile',
       fee: 'Droit d’entrée modique géré par le comité villageois (500 - 1 000 FCFA)'
     },
-    dishesIds: ['fufu_togolais', 'adzeme_togolais', 'agbeli_togolais'],
-    reviews: [
-      {
-        author: 'Céline V.',
-        origin: 'Togo',
-        date: 'Il y a 1 semaine',
-        rating: 4.9,
-        comment: 'La fraîcheur absolue à quelques minutes de Kpalimé. Parfait pour une sortie en famille ou entre amis.'
-      }
-    ]
+    dishesIds: ['fufu_togolais', 'adzeme_togolais', 'agbeli_togolais']
   },
 
   parc_fazao_malfakassa: {
@@ -281,16 +206,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'Accès depuis Sokodé ou Bassar en véhicule 4x4 obligatoire',
       fee: 'Permis d’entrée au parc + accompagnement obligatoire par un écogarde'
     },
-    dishesIds: ['to_sorgho_togolais', 'wagasi_togolais', 'vebe_togolais'],
-    reviews: [
-      {
-        author: 'Ousmane D.',
-        origin: 'Mali',
-        date: 'Il y a 1 mois',
-        rating: 4.9,
-        comment: 'Une nature sauvage brute et préservée. Les paysages vallonnés sont grandioses et les écogardes sont passionnés.'
-      }
-    ]
+    dishesIds: ['to_sorgho_togolais', 'wagasi_togolais', 'vebe_togolais']
   },
 
   faille_aledjo: {
@@ -314,16 +230,7 @@ export const SITE_DETAILS: Record<string, SiteExtraDetails> = {
       access: 'Sur la route nationale 1 entre Sokodé et Kara',
       fee: 'Gratuit (route nationale)'
     },
-    dishesIds: ['djenkoume_togolais', 'tchoukoutou_togolais', 'wagasi_togolais'],
-    reviews: [
-      {
-        author: 'Pascal K.',
-        origin: 'Lomé',
-        date: 'Il y a 3 semaines',
-        rating: 4.8,
-        comment: 'Un passage mythique lors de tout voyage vers le Nord. La vue en descendant la faille est spectaculaire.'
-      }
-    ]
+    dishesIds: ['djenkoume_togolais', 'tchoukoutou_togolais', 'wagasi_togolais']
   }
 };
 
@@ -379,15 +286,6 @@ export function getSiteExtraDetails(siteId: string, region: string): SiteExtraDe
       ? ['ayimolou_togolais', 'ablo_togolais', 'soupe_poisson_togolaise']
       : isPlateaux
       ? ['fufu_togolais', 'agbeli_togolais', 'adzeme_togolais']
-      : ['to_sorgho_togolais', 'wagasi_togolais', 'tchoukoutou_togolais'],
-    reviews: [
-      {
-        author: 'Explorateur HeriTogo',
-        origin: 'Voyageur certifié',
-        date: 'Récemment',
-        rating: 4.8,
-        comment: 'Un lieu plein de charme et d’histoire. L’audioguide de l’application nous a permis de comprendre toute l’importance de ce patrimoine.'
-      }
-    ]
+      : ['to_sorgho_togolais', 'wagasi_togolais', 'tchoukoutou_togolais']
   };
 }

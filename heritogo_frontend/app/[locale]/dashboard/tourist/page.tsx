@@ -1,46 +1,25 @@
 'use client'
 
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect, react/no-unescaped-entities */
+/* eslint-disable react-hooks/set-state-in-effect */
 
-import { useEffect, useState, startTransition, useCallback } from 'react'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { getFirstName, getInitials } from '@/lib/auth/redirect'
-import { COLORS } from '@/lib/constants/colors'
-import { useTranslations } from 'next-intl'
-import { 
-  Calendar, Heart, History, User, Loader2, Star, CheckCircle, Clock, AlertCircle, ChevronRight, MessageSquare, Share2, Languages, MapPin
-} from 'lucide-react'
-import ReviewModal from '@/components/ReviewModal'
+import { useLocale, useTranslations } from 'next-intl'
+import { ClipboardList, Heart, History, User, Loader2, MapPin, ScanLine, Users, ArrowRight } from 'lucide-react'
+import TouristBookingsPanel from '@/components/bookings/TouristBookingsPanel'
+import type { TouristBooking } from '@/lib/bookings/types'
+import { formatBookingDate, isActiveBooking } from '@/lib/bookings/status'
+import GuideCard from '@/components/ui/GuideCard'
 import ShareItinerary from '@/components/ShareItinerary'
 import PrivacySettings from '@/components/PrivacySettings'
+import EmptyState from '@/components/ui/EmptyState'
 import { sanitizePhoneInput, validatePhone, validateFullName } from '@/lib/utils/validation'
 import { getUserFriendlyError } from '@/lib/utils/errors'
 import { apiFetch } from '@/lib/utils/http'
-import { safeJsonParse, safeLocalStorageGet } from '@/lib/utils/storage'
-import { toast } from 'sonner'
-
-interface BookingRow {
-  id: string
-  status: 'quote_requested' | 'quote_sent' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'disputed'
-  mission_type: 'full_day' | 'half_day' | 'hourly' | 'virtual'
-  start_date: string
-  end_date?: string
-  quote_amount?: string
-  quote_message?: string
-  guide: {
-    id: string
-    profile: {
-      full_name: string
-      avatar_url?: string
-    }
-  }
-  review?: {
-    id: string
-    rating_overall: number
-  }
-}
+import { safeJsonParse, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/utils/storage'
 
 interface UserProfile {
   id: string
@@ -50,35 +29,60 @@ interface UserProfile {
   email?: string
 }
 
+interface FavoriteGuide {
+  id: string
+  experience_years: number
+  specialties: string[]
+  languages: string[]
+  coverage_zones: string[]
+  full_day_rate: string | null
+  half_day_rate: string | null
+  hourly_rate: string | null
+  virtual_rate: string | null
+  avg_rating: string
+  total_reviews: number
+  total_missions: number
+  profile: { full_name: string; avatar_url?: string | null }
+}
+
+interface ScanEntry {
+  monument: string
+  histoire?: string
+  date?: string
+  localite?: string
+}
+
+const TABS = [
+  { id: 'bookings', icon: ClipboardList },
+  { id: 'favorites', icon: Heart },
+  { id: 'scans', icon: History },
+  { id: 'profile', icon: User },
+] as const
+type TabId = (typeof TABS)[number]['id']
+
 export default function TouristDashboardPage() {
   const params = useParams<{ locale: string }>()
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const activeTab = searchParams.get('tab') || 'profile'
+  const locale = useLocale()
   const t = useTranslations('Dashboard')
+  const tTabs = useTranslations('DashboardTourist')
+
+  const requestedTab = searchParams.get('tab')
+  const activeTab: TabId = TABS.some((tab) => tab.id === requestedTab) ? (requestedTab as TabId) : 'bookings'
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [bookings, setBookings] = useState<BookingRow[]>([])
-  
-  // LocalStorage states
-  const [favorites, setFavorites] = useState<any[]>([])
-  const [scanHistory, setScanHistory] = useState<any[]>([])
+  const [bookings, setBookings] = useState<TouristBooking[]>([])
+  const [favorites, setFavorites] = useState<FavoriteGuide[]>([])
+  const [scanHistory, setScanHistory] = useState<ScanEntry[]>([])
 
-  // Profile Form state
   const [formName, setFormName] = useState('')
   const [formPhone, setFormPhone] = useState('')
   const [formLang, setFormLang] = useState('fr')
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileSuccess, setProfileSuccess] = useState(false)
   const [profileError, setProfileError] = useState<string | null>(null)
-
-  // Booking details & review modal state
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
-  const [isReviewOpen, setIsReviewOpen] = useState(false)
-  const [bookingActionLoading, setBookingActionLoading] = useState<string | null>(null)
-  
-  // Alert for success messages (e.g., booking created)
-  const [alertMessage, setAlertMessage] = useState<string>('')
 
   const fetchData = useCallback(async () => {
     try {
@@ -89,7 +93,11 @@ export default function TouristDashboardPage() {
         return
       }
 
-      const profileResult = await apiFetch<{ profile?: UserProfile }>('/api/profile')
+      const [profileResult, bookingsResult] = await Promise.all([
+        apiFetch<{ profile?: UserProfile }>('/api/profile'),
+        apiFetch<{ bookings?: TouristBooking[] }>('/api/tourist/bookings'),
+      ])
+
       if (profileResult.ok && profileResult.data?.profile) {
         setProfile({ ...profileResult.data.profile, email: user.email })
         setFormName(profileResult.data.profile.full_name)
@@ -99,26 +107,22 @@ export default function TouristDashboardPage() {
         setProfileError(profileResult.error)
       }
 
-      const bookingsResult = await apiFetch<{ bookings?: BookingRow[] }>('/api/tourist/bookings')
       if (bookingsResult.ok && bookingsResult.data?.bookings) {
         setBookings(bookingsResult.data.bookings)
       }
 
       const favIds = safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), [])
       if (favIds.length > 0) {
-        const guidesResult = await apiFetch<{ guides?: any[] }>('/api/guides')
+        const guidesResult = await apiFetch<{ guides?: FavoriteGuide[] }>('/api/guides')
         if (guidesResult.ok && guidesResult.data?.guides) {
-          const filteredFavs = guidesResult.data.guides.filter((g: any) => favIds.includes(g.id))
-          setFavorites(filteredFavs)
+          setFavorites(guidesResult.data.guides.filter((g) => favIds.includes(g.id)))
         }
       } else {
         setFavorites([])
       }
 
-      const scans = safeJsonParse<any[]>(safeLocalStorageGet('heritogo_scans'), [])
-      setScanHistory(scans)
+      setScanHistory(safeJsonParse<ScanEntry[]>(safeLocalStorageGet('heritogo_scans'), []))
     } catch (e: unknown) {
-      console.error(e)
       setProfileError(getUserFriendlyError(e))
     } finally {
       setLoading(false)
@@ -126,641 +130,242 @@ export default function TouristDashboardPage() {
   }, [params.locale])
 
   useEffect(() => {
-    // Check search params for alerts
-    const bookingCreated = searchParams.get('booking_created')
-    if (bookingCreated) {
-      setAlertMessage(t('common.success_booking_sent'))
-    }
-  }, [searchParams, t])
-
-  useEffect(() => {
     fetchData()
   }, [fetchData])
 
+  const stats = useMemo(() => ({
+    active: bookings.filter((b) => isActiveBooking(b.status)).length,
+    awaiting: bookings.filter((b) => b.status === 'quote_sent').length,
+    completed: bookings.filter((b) => b.status === 'completed').length,
+  }), [bookings])
+
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSavingProfile(true)
     setProfileSuccess(false)
     setProfileError(null)
 
-    // Validations côté client
     const nameError = validateFullName(formName)
-    if (nameError) {
-      setProfileError(nameError)
-      setSavingProfile(false)
-      return
-    }
-
+    if (nameError) return setProfileError(nameError)
     const phoneError = validatePhone(formPhone)
-    if (phoneError) {
-      setProfileError(phoneError)
-      setSavingProfile(false)
-      return
-    }
+    if (phoneError) return setProfileError(phoneError)
 
+    setSavingProfile(true)
     try {
       const result = await apiFetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: formName,
-          phone: formPhone,
-          preferred_lang: formLang
-        })
+        body: JSON.stringify({ full_name: formName, phone: formPhone, preferred_lang: formLang }),
       })
       if (!result.ok) {
         setProfileError(result.error || t('common.error_update'))
         return
       }
-
       setProfileSuccess(true)
-      if (profile) {
-        setProfile({
-          ...profile,
-          full_name: formName,
-          phone: formPhone,
-          preferred_lang: formLang
-        })
-      }
+      setProfile((prev) => (prev ? { ...prev, full_name: formName, phone: formPhone, preferred_lang: formLang } : prev))
     } catch (err: unknown) {
-      console.error(err)
       setProfileError(getUserFriendlyError(err))
     } finally {
       setSavingProfile(false)
     }
   }
 
-  const handleOpenReview = (bookingId: string) => {
-    setSelectedBookingId(bookingId)
-    setIsReviewOpen(true)
-  }
-
-  const handleAcceptQuote = async (bookingId: string) => {
-    setBookingActionLoading(bookingId)
-    try {
-      const result = await apiFetch('/api/tourist/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId, action: 'accept_quote' }),
-      })
-      if (!result.ok) {
-        toast.error(result.error || 'Erreur lors de l’acceptation du devis')
-        return
-      }
-      toast.success(t('tourist.quote_accepted_success'))
-      setAlertMessage(t('tourist.quote_accepted_success'))
-      await fetchData()
-    } catch (err: unknown) {
-      toast.error(getUserFriendlyError(err))
-    } finally {
-      setBookingActionLoading(null)
-    }
-  }
-
-  const handleDeclineQuote = async (bookingId: string) => {
-    if (!confirm(t('tourist.decline_quote') + ' ?')) return
-    setBookingActionLoading(bookingId)
-    try {
-      const result = await apiFetch('/api/tourist/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId, action: 'decline_quote' }),
-      })
-      if (!result.ok) {
-        toast.error(result.error || 'Erreur lors du refus du devis')
-        return
-      }
-      toast.info(t('tourist.quote_declined_success'))
-      await fetchData()
-    } catch (err: unknown) {
-      toast.error(getUserFriendlyError(err))
-    } finally {
-      setBookingActionLoading(null)
-    }
-  }
-
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!confirm(t('tourist.cancel_request') + ' ?')) return
-    setBookingActionLoading(bookingId)
-    try {
-      const result = await apiFetch('/api/tourist/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId, action: 'cancel_request' }),
-      })
-      if (!result.ok) {
-        toast.error(result.error || 'Erreur lors de l’annulation')
-        return
-      }
-      toast.info(t('tourist.request_cancelled_success'))
-      await fetchData()
-    } catch (err: unknown) {
-      toast.error(getUserFriendlyError(err))
-    } finally {
-      setBookingActionLoading(null)
-    }
-  }
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'quote_requested':
-        return <span className="badge badge-warning text-xs font-bold gap-1 rounded-lg py-3 px-3"><Clock className="h-3.5 w-3.5" /> {t('tourist.status_quote_requested')}</span>
-      case 'quote_sent':
-        return <span className="badge badge-info text-xs font-bold gap-1 rounded-lg py-3 px-3"><MessageSquare className="h-3.5 w-3.5" /> {t('tourist.status_quote_sent')}</span>
-      case 'confirmed':
-        return <span className="badge badge-success text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><CheckCircle className="h-3.5 w-3.5" /> {t('tourist.status_confirmed')}</span>
-      case 'in_progress':
-        return <span className="badge badge-primary text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><Clock className="h-3.5 w-3.5" /> {t('tourist.status_in_progress')}</span>
-      case 'completed':
-        return <span className="badge bg-neutral text-neutral-content text-xs font-bold gap-1 rounded-lg py-3 px-3 border-none"><CheckCircle className="h-3.5 w-3.5" /> {t('tourist.status_completed')}</span>
-      case 'cancelled':
-        return <span className="badge badge-error text-white text-xs font-bold gap-1 rounded-lg py-3 px-3"><AlertCircle className="h-3.5 w-3.5" /> {t('tourist.status_cancelled')}</span>
-      default:
-        return <span className="badge badge-ghost text-xs font-bold gap-1 rounded-lg py-3 px-3">{status}</span>
-    }
+  const removeFavorite = (guideId: string) => {
+    const favIds = safeJsonParse<string[]>(safeLocalStorageGet('heritogo_favorites'), []).filter((id) => id !== guideId)
+    safeLocalStorageSet('heritogo_favorites', JSON.stringify(favIds))
+    setFavorites((prev) => prev.filter((g) => g.id !== guideId))
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 pt-24 bg-base-100">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background pt-24">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-base-content/60">{t('common.loading_space')}</p>
+        <p className="text-sm text-muted-foreground">{t('common.loading_space')}</p>
       </div>
     )
   }
 
-  const handleTabClick = (tabName: string) => {
-    startTransition(() => {
-      window.history.pushState(null, '', `?tab=${tabName}`)
-      window.dispatchEvent(new HashChangeEvent('hashchange'))
-    })
+  const tabCounts: Partial<Record<TabId, number>> = {
+    bookings: stats.active,
+    favorites: favorites.length,
+    scans: scanHistory.length,
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-24 text-base-content">
-      {/* Header Profile Section */}
-      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-border bg-base-200 p-6 shadow-sm">
+    <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-24 text-foreground sm:px-6 lg:px-8">
+      <header className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div 
-            className="flex h-16 w-16 items-center justify-center rounded-3xl text-xl font-black text-white"
-            style={{ backgroundColor: COLORS.forest }}
-          >
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary font-serif text-lg font-bold text-primary-foreground">
             {profile ? getInitials(profile.full_name) : '?'}
           </div>
           <div>
             <h1 className="font-serif text-2xl font-bold">
               {t('tourist.greeting', { name: profile ? getFirstName(profile.full_name) : t('common.guest_name') })}
             </h1>
-            <p className="text-xs text-base-content/50 mt-1">{t('tourist.subtitle')}</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">{tTabs('subtitle')}</p>
           </div>
         </div>
-
-        <div className="flex gap-2 self-start sm:self-center">
-          <Link
-            href="/scan"
-            className="btn btn-sm rounded-xl text-white font-bold border-none"
-            style={{ backgroundColor: COLORS.rust }}
-          >
+        <div className="flex flex-wrap gap-2">
+          <Link href="/scan" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-bold text-[#2A1E16] hover:bg-accent/85">
+            <ScanLine className="h-4 w-4" />
             {t('tourist.new_scan')}
           </Link>
-          <Link
-            href="/guides"
-            className="btn btn-sm btn-outline rounded-xl font-bold"
-          >
+          <Link href="/guides" className="btn-outline-brand min-h-10">
+            <Users className="h-4 w-4" />
             {t('tourist.find_guide')}
           </Link>
         </div>
-      </div>
+      </header>
 
-      {alertMessage && (
-        <div className="alert alert-success mb-6 rounded-2xl p-4 text-sm font-bold text-white flex items-start gap-3 border-none bg-emerald-600">
-          <CheckCircle className="h-5 w-5 shrink-0" />
-          <div>{alertMessage}</div>
-        </div>
-      )}
-
-      {/* Tabs Navigation */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-border pb-3">
+      <dl className="mt-4 grid grid-cols-3 gap-3">
         {[
-          { id: 'profile', label: t('tourist.tab_profile'), icon: User },
-          { id: 'bookings', label: t('tourist.tab_bookings'), icon: Calendar },
-          { id: 'favorites', label: t('tourist.tab_favorites'), icon: Heart },
-          { id: 'scans', label: t('tourist.tab_scans'), icon: History }
-        ].map((tab) => {
-          const Icon = tab.icon
-          const active = activeTab === tab.id
+          { label: tTabs('stat_active'), value: stats.active },
+          { label: tTabs('stat_awaiting'), value: stats.awaiting, highlight: stats.awaiting > 0 },
+          { label: tTabs('stat_completed'), value: stats.completed },
+        ].map((s) => (
+          <div key={s.label} className={`rounded-xl border bg-card p-4 ${s.highlight ? 'border-primary/40' : 'border-border'}`}>
+            <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{s.label}</dt>
+            <dd className={`mt-1 font-serif text-2xl font-bold ${s.highlight ? 'text-primary' : ''}`}>{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <nav className="mt-8 flex gap-1 overflow-x-auto border-b border-border" role="tablist">
+        {TABS.map(({ id, icon: Icon }) => {
+          const active = activeTab === id
           return (
             <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold transition-all ${
-                active 
-                  ? 'text-white' 
-                  : 'text-base-content/70 hover:bg-base-200'
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => router.push(`?tab=${id}`, { scroll: false })}
+              className={`-mb-px inline-flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                active ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
-              style={active ? { backgroundColor: COLORS.forest } : undefined}
             >
               <Icon className="h-4 w-4" />
-              {tab.label}
+              {tTabs(`tab_${id}`)}
+              {tabCounts[id] ? (
+                <span className={`rounded-md px-1.5 text-[10px] ${active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{tabCounts[id]}</span>
+              ) : null}
             </button>
           )
         })}
-      </div>
+      </nav>
 
-      {/* Tab Contents */}
-      <div>
-        {/* 1. PROFILE TAB */}
-        {activeTab === 'profile' && (
-          <div className="grid gap-6 md:grid-cols-[1fr_1.8fr]">
-            <div className="rounded-xl border border-border bg-base-200 p-6">
-              <h3 className="font-serif text-lg font-bold mb-4">{t('tourist.info_title')}</h3>
-              <div className="space-y-4 text-sm">
-                <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.full_name')}</span>
-                  <span className="font-bold text-base-content">{profile?.full_name}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.email')}</span>
-                  <span className="font-bold text-base-content">{profile?.email}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.phone')}</span>
-                  <span className="font-bold text-base-content">{profile?.phone || t('common.not_specified')}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-base-content/50 uppercase">{t('tourist.preferred_lang')}</span>
-                  <span className="font-bold text-base-content uppercase">{profile?.preferred_lang || 'fr'}</span>
-                </div>
-              </div>
-            </div>
+      <div className="mt-6">
+        {activeTab === 'bookings' && <TouristBookingsPanel bookings={bookings} onChanged={fetchData} />}
 
-            <div className="rounded-xl border border-border bg-base-200 p-6">
-              <h3 className="font-serif text-lg font-bold mb-4">{t('tourist.edit_profile')}</h3>
-              <form onSubmit={handleProfileSubmit} className="space-y-4">
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-sm font-semibold">{t('tourist.full_name')}</span>
-                  <input
-                    type="text"
-                    required
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    className="input input-bordered w-full rounded-2xl bg-base-100"
-                  />
-                </label>
-
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-sm font-semibold">{t('tourist.phone')}</span>
-                  <input
-                    type="tel"
-                    value={formPhone}
-                    onChange={(e) => setFormPhone(sanitizePhoneInput(e.target.value))}
-                    className="input input-bordered w-full rounded-2xl bg-base-100"
-                    placeholder="+228 90 00 00 00"
-                  />
-                  {formPhone && validatePhone(formPhone) && (
-                    <span className="text-xs text-error mt-1">{validatePhone(formPhone)}</span>
-                  )}
-                </label>
-
-                <label className="form-control w-full">
-                  <span className="label-text mb-1 text-sm font-semibold">{t('tourist.preferred_lang')}</span>
-                  <select
-                    value={formLang}
-                    onChange={(e) => setFormLang(e.target.value)}
-                    className="select select-bordered w-full rounded-2xl bg-base-100"
-                  >
-                    <option value="fr">{t('tourist.lang_fr')}</option>
-                    <option value="en">{t('tourist.lang_en')}</option>
-                    <option value="es">{t('tourist.lang_es')}</option>
-                    <option value="zh">{t('tourist.lang_zh')}</option>
-                  </select>
-                </label>
-
-                {profileSuccess && (
-                  <div className="rounded-xl border border-success/30 bg-success/10 px-4 py-2 text-xs font-bold text-success">
-                    {t('common.success_update')}
-                  </div>
-                )}
-
-                {profileError && (
-                  <div className="rounded-xl border border-error/30 bg-error/10 px-4 py-2 text-xs font-bold text-error">
-                    {profileError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={savingProfile}
-                  className="btn text-white rounded-2xl px-6 border-none"
-                  style={{ backgroundColor: COLORS.forest }}
-                >
-                  {savingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save')}
-                </button>
-              </form>
-            </div>
-            <PrivacySettings />
-          </div>
-        )}
-
-        {/* 2. BOOKINGS TAB */}
-        {activeTab === 'bookings' && (
-          <div className="space-y-4">
-            {bookings.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
-                <Calendar className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-                <h4 className="font-serif text-lg font-bold">{t('tourist.no_bookings')}</h4>
-                <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                  {t('tourist.no_bookings_desc')}
-                </p>
-                <Link
-                  href="/guides"
-                  className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
-                  style={{ backgroundColor: COLORS.forest }}
-                >
-                  {t('tourist.explore_guides')}
-                </Link>
-              </div>
-            ) : (
-              bookings.map((booking) => (
-                <div 
-                  key={booking.id}
-                  className="rounded-xl border border-border bg-base-200 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:border-primary/20"
-                >
-                  <div className="flex gap-4">
-                    {booking.guide?.profile?.avatar_url ? (
-                      <img
-                        src={booking.guide.profile.avatar_url}
-                        alt={booking.guide.profile.full_name}
-                        className="h-12 w-12 rounded-2xl object-cover border border-border shrink-0 shadow-xs"
-                      />
-                    ) : (
-                      <div 
-                        className="flex h-12 w-12 items-center justify-center rounded-2xl text-xs font-black text-white shrink-0"
-                        style={{ backgroundColor: COLORS.gold }}
-                      >
-                        {getInitials(booking.guide?.profile?.full_name || 'Guide')}
-                      </div>
-                    )}
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-bold text-base-content">{booking.guide?.profile?.full_name || 'Guide'}</span>
-                        {getStatusBadge(booking.status)}
-                      </div>
-                      <p className="text-xs text-base-content/60 mt-1.5 flex items-center gap-3">
-                        <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5 text-secondary" /> {new Date(booking.start_date).toLocaleDateString()}</span>
-                        <span>{t('tourist.booking_type', { type: booking.mission_type.replace('_', ' ') })}</span>
-                      </p>
-                      
-                      {booking.quote_amount && (
-                        <p className="text-xs font-bold text-base-content mt-2">
-                          {t('tourist.offer_label', { amount: Number(booking.quote_amount).toLocaleString() })}
-                        </p>
-                      )}
-
-                      {booking.quote_message && (
-                        <div className="mt-2 text-xs italic bg-base-100 p-2.5 rounded-xl border border-border max-w-md">
-                          "{booking.quote_message}"
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 self-end md:self-center shrink-0 flex-wrap items-center">
-                    <Link
-                      href={`/guides/${booking.guide.id}`}
-                      className="btn btn-sm btn-ghost rounded-xl text-xs font-bold"
-                    >
-                      {t('tourist.view_guide')}
-                    </Link>
-
-                    {booking.status === 'quote_sent' && (
-                      <>
-                        <button
-                          type="button"
-                          disabled={bookingActionLoading === booking.id}
-                          onClick={() => handleAcceptQuote(booking.id)}
-                          className="btn btn-sm text-white rounded-xl text-xs font-bold gap-1 border-none bg-emerald-600 hover:bg-emerald-700 shadow-sm"
-                        >
-                          {bookingActionLoading === booking.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <CheckCircle className="h-3.5 w-3.5" />
-                          )}
-                          <span>{t('tourist.accept_quote')}</span>
-                        </button>
-                        <button
-                          type="button"
-                          disabled={bookingActionLoading === booking.id}
-                          onClick={() => handleDeclineQuote(booking.id)}
-                          className="btn btn-sm btn-outline btn-error rounded-xl text-xs font-bold"
-                        >
-                          {t('tourist.decline_quote')}
-                        </button>
-                      </>
-                    )}
-
-                    {booking.status === 'quote_requested' && (
-                      <button
-                        type="button"
-                        disabled={bookingActionLoading === booking.id}
-                        onClick={() => handleCancelBooking(booking.id)}
-                        className="btn btn-sm btn-ghost text-error rounded-xl text-xs font-bold hover:bg-error/10"
-                      >
-                        {t('tourist.cancel_request')}
-                      </button>
-                    )}
-
-                    {['confirmed', 'in_progress'].includes(booking.status) && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const text = `Je visite le Togo avec ${booking.guide.profile.full_name} ` +
-                            `le ${new Date(booking.start_date).toLocaleDateString('fr-FR')} — Heritogo`
-                          if (navigator.share) {
-                            navigator.share({ title: 'Mon itinéraire Heritogo', text, url: window.location.origin }).catch(() => {})
-                          } else {
-                            navigator.clipboard.writeText(text)
-                          }
-                        }}
-                        className="btn btn-sm btn-outline rounded-xl text-xs font-bold gap-1"
-                      >
-                        <Share2 className="h-3.5 w-3.5" />
-                        Partager
-                      </button>
-                    )}
-
-                    {booking.status === 'completed' && !booking.review && (
-                      <button
-                        type="button"
-                        onClick={() => handleOpenReview(booking.id)}
-                        className="btn btn-sm rounded-xl text-white font-bold border-none"
-                        style={{ backgroundColor: COLORS.forest }}
-                      >
-                        {t('tourist.leave_review')}
-                      </button>
-                    )}
-
-                    {booking.status === 'completed' && booking.review && (
-                      <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/20 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-                        <Star className="h-3.5 w-3.5 fill-current" /> {t('tourist.review_left', { rating: booking.review.rating_overall })}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* 3. FAVORITES TAB */}
         {activeTab === 'favorites' && (
-          <div className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {favorites.length === 0 ? (
-                <div className="col-span-full rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
-                  <Heart className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-                  <h4 className="font-serif text-lg font-bold">{t('tourist.no_favorites')}</h4>
-                  <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                    {t('tourist.no_favorites_desc')}
-                  </p>
-                  <Link
-                    href="/guides"
-                    className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
-                    style={{ backgroundColor: COLORS.forest }}
-                  >
-                    {t('tourist.view_guides')}
-                  </Link>
-                </div>
-              ) : (
-                favorites.map((guide) => (
-                  <div 
+          favorites.length === 0 ? (
+            <EmptyState icon={Heart} title={t('tourist.no_favorites')} description={t('tourist.no_favorites_desc')} />
+          ) : (
+            <div className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {favorites.map((guide) => (
+                  <GuideCard
                     key={guide.id}
-                    className="rounded-xl border border-border bg-base-200 p-5 shadow-sm flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="flex h-10 w-10 items-center justify-center rounded-xl text-xs font-black text-white"
-                          style={{ backgroundColor: COLORS.forest }}
-                        >
-                          {getInitials(guide.profile.full_name)}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-sm text-base-content">{guide.profile.full_name}</h4>
-                          <div className="flex items-center gap-1 mt-0.5 text-xs">
-                            <Star className="h-3 w-3 fill-current text-amber-500" />
-                            <span className="font-bold">{Number(guide.avg_rating).toFixed(1)}</span>
-                            <span className="text-base-content/40">({guide.total_reviews})</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 space-y-1.5 text-xs text-base-content/70">
-                        <p className="flex items-center gap-1.5"><Languages className="h-3.5 w-3.5 text-secondary shrink-0" /> <span className="font-semibold">{t('tourist.lang_label')}</span> {guide.languages?.join(', ') || t('common.not_available')}</p>
-                        <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-secondary shrink-0" /> <span className="font-semibold">{t('tourist.zones_label')}</span> {guide.coverage_zones?.join(', ') || t('common.not_available')}</p>
-                        <p className="font-bold text-base-content mt-3">
-                          {t('tourist.rate_label')} {Number(guide.full_day_rate).toLocaleString()} XOF/jour
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-5 flex gap-2">
-                      <Link
-                        href={`/guides/${guide.id}`}
-                        className="btn btn-xs btn-outline rounded-lg flex-1"
-                      >
-                        {t('tourist.details')}
-                      </Link>
-                      <Link
-                        href={`/booking/${guide.id}`}
-                        className="btn btn-xs text-white rounded-lg flex-1 border-none"
-                        style={{ backgroundColor: COLORS.forest }}
-                      >
-                        {t('tourist.book')}
-                      </Link>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            {favorites.length > 0 && (
-              <ShareItinerary
-                items={favorites.map(g => ({
-                  name: g.profile.full_name,
-                  details: g.coverage_zones?.join(', ')
-                }))}
-              />
-            )}
-          </div>
-        )}
-
-        {/* 4. SCANS TAB */}
-        {activeTab === 'scans' && (
-          <div className="space-y-4">
-            {scanHistory.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border bg-base-200 p-8 text-center">
-                <History className="mx-auto h-12 w-12 text-base-content/30 mb-3" />
-                <h4 className="font-serif text-lg font-bold">{t('tourist.no_scans')}</h4>
-                <p className="text-sm text-base-content/60 mt-1 max-w-sm mx-auto">
-                  {t('tourist.no_scans_desc')}
-                </p>
-                <Link
-                  href="/scan"
-                  className="btn btn-sm rounded-xl text-white font-bold border-none mt-4"
-                  style={{ backgroundColor: COLORS.rust }}
-                >
-                  {t('tourist.open_scanner')}
-                </Link>
-              </div>
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {scanHistory.map((scan, i) => (
-                  <div 
-                    key={i}
-                    className="rounded-xl border border-border bg-base-200 overflow-hidden shadow-sm flex flex-col justify-between"
-                  >
-                    <div className="p-5">
-                      <span className="text-[10px] text-base-content/50 font-bold">
-                        {scan.date ? new Date(scan.date).toLocaleDateString() : t('tourist.date_unknown')}
-                      </span>
-                      <h4 className="font-serif text-lg font-bold text-base-content mt-1">{scan.monument}</h4>
-                      <p className="text-xs text-base-content/70 mt-2 line-clamp-3 leading-5">
-                        {scan.histoire}
-                      </p>
-                    </div>
-
-                    <div className="border-t border-border/60 p-4 bg-base-300/30 flex justify-between items-center">
-                      <span className="text-xs font-semibold text-base-content/60 flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5 text-secondary" /> {scan.localite || t('common.default_country')}
-                      </span>
-                      <Link 
-                        href="/scan"
-                        className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
-                        style={{ color: COLORS.forest }}
-                      >
-                        {t('tourist.scan_again')} <ChevronRight className="h-3 w-3" />
-                      </Link>
-                    </div>
-                  </div>
+                    id={guide.id}
+                    name={guide.profile.full_name}
+                    avatarUrl={guide.profile.avatar_url}
+                    initials={getInitials(guide.profile.full_name)}
+                    zones={guide.coverage_zones || []}
+                    languages={guide.languages || []}
+                    specialties={guide.specialties || []}
+                    rates={guide}
+                    rating={Number(guide.avg_rating) || 0}
+                    reviewsCount={guide.total_reviews || 0}
+                    missionsCount={guide.total_missions || 0}
+                    experienceYears={guide.experience_years}
+                    isFavorite
+                    onToggleFavorite={() => removeFavorite(guide.id)}
+                  />
                 ))}
               </div>
-            )}
+              <ShareItinerary items={favorites.map((g) => ({ name: g.profile.full_name, details: g.coverage_zones?.join(', ') }))} />
+            </div>
+          )
+        )}
+
+        {activeTab === 'scans' && (
+          scanHistory.length === 0 ? (
+            <EmptyState icon={History} title={t('tourist.no_scans')} description={t('tourist.no_scans_desc')} />
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {scanHistory.map((scan, i) => (
+                <li key={`${scan.monument}-${scan.date ?? i}`} className="flex flex-col justify-between rounded-xl border border-border bg-card">
+                  <div className="p-5">
+                    <p className="text-[11px] font-semibold text-muted-foreground">
+                      {scan.date ? formatBookingDate(scan.date, locale, { day: 'numeric', month: 'long', year: 'numeric' }) : t('tourist.date_unknown')}
+                    </p>
+                    <h3 className="mt-1 font-serif text-lg font-bold">{scan.monument}</h3>
+                    {scan.histoire && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{scan.histoire}</p>}
+                  </div>
+                  <div className="flex items-center justify-between border-t border-border px-5 py-3 text-xs">
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
+                      <MapPin className="h-3.5 w-3.5 text-primary" />
+                      {scan.localite || t('common.default_country')}
+                    </span>
+                    <Link href="/scan" className="inline-flex items-center gap-1 font-bold text-primary hover:underline">
+                      {t('tourist.scan_again')}
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )
+        )}
+
+        {activeTab === 'profile' && (
+          <div className="grid gap-6 lg:grid-cols-12">
+            <form onSubmit={handleProfileSubmit} className="space-y-4 rounded-xl border border-border bg-card p-6 lg:col-span-7">
+              <h2 className="font-serif text-lg font-bold">{t('tourist.edit_profile')}</h2>
+              <label className="block">
+                <span className="field-label">{t('tourist.full_name')}</span>
+                <input type="text" required value={formName} onChange={(e) => setFormName(e.target.value)} className="field" autoComplete="name" />
+              </label>
+              <label className="block">
+                <span className="field-label">{t('tourist.email')}</span>
+                <input type="email" value={profile?.email || ''} disabled className="field opacity-70" />
+              </label>
+              <label className="block">
+                <span className="field-label">{t('tourist.phone')}</span>
+                <input
+                  type="tel"
+                  value={formPhone}
+                  onChange={(e) => setFormPhone(sanitizePhoneInput(e.target.value))}
+                  className="field"
+                  placeholder="+228 90 00 00 00"
+                  autoComplete="tel"
+                />
+                <span className="mt-1 block text-[11px] text-muted-foreground">{tTabs('phone_hint')}</span>
+                {formPhone && validatePhone(formPhone) && <span className="mt-1 block text-xs text-red-700">{validatePhone(formPhone)}</span>}
+              </label>
+              <label className="block">
+                <span className="field-label">{t('tourist.preferred_lang')}</span>
+                <select value={formLang} onChange={(e) => setFormLang(e.target.value)} className="field">
+                  <option value="fr">{t('tourist.lang_fr')}</option>
+                  <option value="en">{t('tourist.lang_en')}</option>
+                  <option value="es">{t('tourist.lang_es')}</option>
+                  <option value="zh">{t('tourist.lang_zh')}</option>
+                </select>
+              </label>
+
+              {profileSuccess && <p className="rounded-lg border border-forest/30 bg-forest/10 px-3 py-2 text-xs font-semibold text-forest">{t('common.success_update')}</p>}
+              {profileError && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">{profileError}</p>}
+
+              <button type="submit" disabled={savingProfile} className="btn-brand">
+                {savingProfile && <Loader2 className="h-4 w-4 animate-spin" />}
+                {t('common.save')}
+              </button>
+            </form>
+            <div className="lg:col-span-5">
+              <PrivacySettings />
+            </div>
           </div>
         )}
       </div>
-
-      {/* Review Modal */}
-      {selectedBookingId && (
-        <ReviewModal
-          bookingId={selectedBookingId}
-          isOpen={isReviewOpen}
-          onClose={() => {
-            setIsReviewOpen(false)
-            setSelectedBookingId(null)
-          }}
-          onSuccess={fetchData}
-        />
-      )}
     </main>
   )
 }

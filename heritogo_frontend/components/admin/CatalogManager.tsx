@@ -443,7 +443,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white"
         >
           <Plus className="h-4 w-4" />
           {isPlaces ? 'Nouveau lieu' : 'Nouveau plat'}
@@ -477,7 +477,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                   {item.isPublished ? 'Publié' : 'Brouillon'}
                 </p>
                 <div className="mt-2 flex gap-2">
-                  <button type="button" onClick={() => openEdit(item)} className="rounded-full border border-border px-3 py-1 text-[11px] font-bold">
+                  <button type="button" onClick={() => openEdit(item)} className="rounded-lg border border-border px-3 py-1 text-[11px] font-bold">
                     <Pencil className="mr-1 inline h-3 w-3" /> Modifier
                   </button>
                   <button type="button" onClick={() => remove(item.slug)} className="rounded-full border border-red-200 px-3 py-1 text-[11px] font-bold text-red-600">
@@ -493,7 +493,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
       {showForm && (
         <div className="fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-10 pb-28">
           <form
-            className="mb-10 w-full max-w-2xl rounded-3xl bg-card p-6 shadow-2xl"
+            className="mb-10 w-full max-w-2xl rounded-xl bg-card p-6 shadow-2xl"
             onSubmit={(event) => {
               event.preventDefault()
               void save()
@@ -636,7 +636,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                         type="button"
                         onClick={() => void generateTranslations()}
                         disabled={translating || saving}
-                        className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold disabled:opacity-60"
+                        className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-[11px] font-bold disabled:opacity-60"
                       >
                         {translating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Languages className="h-3.5 w-3.5" />}
                         Générer EN / ES / ZH
@@ -718,7 +718,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                         type="button"
                         onClick={() => void generateTranslations()}
                         disabled={translating || saving}
-                        className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold disabled:opacity-60"
+                        className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-[11px] font-bold disabled:opacity-60"
                       >
                         {translating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Languages className="h-3.5 w-3.5" />}
                         Générer EN / ES / ZH
@@ -806,7 +806,7 @@ export default function CatalogManager({ kind }: { kind: Kind }) {
                     onChange={(e) => applyImageUrl(e.target.value)}
                   />
                 </label>
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-bold">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-xs font-bold">
                   {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   Téléverser une image
                   <input

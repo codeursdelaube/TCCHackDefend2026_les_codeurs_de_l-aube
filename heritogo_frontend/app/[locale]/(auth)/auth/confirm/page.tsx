@@ -108,13 +108,13 @@ export default function AuthConfirmPage() {
   }, [locale, t])
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-base-100 px-4 text-base-content">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-base-200 p-8 text-center shadow-lg">
+    <div className="flex items-center justify-center text-foreground">
+      <div className="w-full rounded-xl border border-border bg-card p-8 text-center">
         {status === 'loading' && (
           <>
             <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
             <h1 className="font-serif text-xl font-bold">{t('confirm_loading_title')}</h1>
-            <p className="mt-2 text-sm text-base-content/60">{t('confirm_loading_sub')}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('confirm_loading_sub')}</p>
           </>
         )}
 
@@ -122,7 +122,7 @@ export default function AuthConfirmPage() {
           <>
             <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-primary" />
             <h1 className="font-serif text-xl font-bold">{t('confirm_success_title')}</h1>
-            <p className="mt-2 text-sm text-base-content/60">{message}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{message}</p>
           </>
         )}
 
@@ -130,11 +130,11 @@ export default function AuthConfirmPage() {
           <>
             <XCircle className="mx-auto mb-4 h-12 w-12 text-error" />
             <h1 className="font-serif text-xl font-bold">{t('confirm_error_title')}</h1>
-            <p className="mt-2 text-sm text-base-content/60">{message}</p>
-            <p className="mt-1 text-xs text-base-content/45">{t('confirm_redirect')}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('confirm_redirect')}</p>
           </>
         )}
       </div>
-    </main>
+    </div>
   )
 }

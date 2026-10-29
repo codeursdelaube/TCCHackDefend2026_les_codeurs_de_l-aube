@@ -21,7 +21,7 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'HériTogo <onboarding@resend.dev>',
+      from: process.env.EMAIL_FROM || 'HeriTogo <onboarding@resend.dev>',
       to,
       subject,
       html

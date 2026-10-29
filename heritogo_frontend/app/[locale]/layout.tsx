@@ -263,7 +263,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
             })();
           `}
         </Script>
-        <meta name="theme-color" content="#1C2D52" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#B5502E" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171009" />
         <meta name="google-site-verification" content="7QFZxr2P9izuO8HXoYaLNfyL430UJhw1ZvdClseZQ7A" />
         <meta name="google-adsense-account" content={adsClientId} />
         <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />

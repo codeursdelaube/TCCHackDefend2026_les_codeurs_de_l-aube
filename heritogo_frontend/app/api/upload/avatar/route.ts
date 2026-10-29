@@ -38,25 +38,30 @@ function getStorageErrorMessage(errorMessage: string) {
   return "Erreur lors de l'envoi de la photo. Réessayez."
 }
 
-async function updateProfileAvatar(userId: string, avatarUrl: string) {
+/** Enregistre l'URL sur le profil ; renvoie false si aucune écriture n'a abouti. */
+async function updateProfileAvatar(userId: string, avatarUrl: string): Promise<boolean> {
   try {
     await prisma.profile.update({
       where: { id: userId },
       data: { avatar_url: avatarUrl },
     })
+    return true
   } catch (err) {
     console.error('[POST /api/upload/avatar] Prisma profile update error:', err)
   }
 
   try {
-    const supabase = await createClient()
-    await supabase
+    const supabase = createServiceClient() ?? (await createClient())
+    const { error } = await supabase
       .from('profiles')
       .update({ avatar_url: avatarUrl })
       .eq('id', userId)
+    if (!error) return true
+    console.error('[POST /api/upload/avatar] Supabase profile update error:', error.message)
   } catch (err) {
-    console.warn('[POST /api/upload/avatar] Supabase profile sync notice:', err)
+    console.error('[POST /api/upload/avatar] Supabase profile update error:', err)
   }
+  return false
 }
 
 export async function POST(request: Request) {
@@ -140,7 +145,13 @@ export async function POST(request: Request) {
       .getPublicUrl(fileName)
 
     const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
-    await updateProfileAvatar(user.id, publicUrl)
+    const saved = await updateProfileAvatar(user.id, publicUrl)
+    if (!saved) {
+      return NextResponse.json(
+        { error: "La photo a été envoyée mais n'a pas pu être associée à votre profil. Réessayez." },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({ success: true, avatar_url: publicUrl })
   } catch (error: unknown) {

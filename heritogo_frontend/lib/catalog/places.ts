@@ -1,4 +1,4 @@
-import { monuments } from '@/app/LieuxT/site'
+import { monuments } from '@/lib/data/sites'
 import { SITE_DETAILS } from '@/lib/constants/siteDetails'
 import frMessages from '@/messages/fr.json'
 import enMessages from '@/messages/en.json'

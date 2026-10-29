@@ -15,12 +15,16 @@ import {
   MapPin,
   Sparkles,
   TreePine,
+  Languages,
+  ShieldCheck,
+  FileText,
+  Star,
   Users,
   Utensils,
-  Wifi,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import AuthGuardLink from '@/components/AuthGuardLink'
+import { useDishes, usePlaces } from '@/hooks/useCatalog'
 
 type Slide = {
   image: string
@@ -36,6 +40,8 @@ type Slide = {
 
 export default function AccueilPage() {
   const t = useTranslations('Accueil')
+  const { places } = usePlaces()
+  const { dishes } = useDishes()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [paused, setPaused] = useState(false)
 
@@ -100,7 +106,7 @@ export default function AccueilPage() {
       tag: 'UNESCO',
       image: '/Sites/koutamakou.jpg',
       desc: t('featured.koutammakou_desc'),
-      href: '/lieux' as const,
+      href: '/lieux/koutamakou',
     },
     {
       title: 'Palais de Lomé',
@@ -108,7 +114,7 @@ export default function AccueilPage() {
       tag: t('regions.maritime.badge'),
       image: '/Sites/palais_de_lome.webp',
       desc: t('featured.palais_desc'),
-      href: '/lieux' as const,
+      href: '/lieux/palais_de_lome',
     },
     {
       title: 'Cascade de Kpimé',
@@ -116,7 +122,7 @@ export default function AccueilPage() {
       tag: t('regions.plateaux.badge'),
       image: '/Sites/kpime.jpg',
       desc: t('featured.kpime_desc'),
-      href: '/lieux' as const,
+      href: '/lieux/cascade_kpime',
     },
   ]
 
@@ -129,7 +135,7 @@ export default function AccueilPage() {
         ══════════════════════════════════════════════════ */}
         <section className="relative">
           <div
-            className="group relative isolate min-h-[480px] sm:min-h-[560px] lg:min-h-[600px] overflow-hidden rounded-3xl border border-border bg-[#171009] shadow-xl"
+            className="group relative isolate min-h-[480px] sm:min-h-[560px] lg:min-h-[600px] overflow-hidden rounded-xl border border-border bg-[#171009]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
           >
@@ -152,21 +158,16 @@ export default function AccueilPage() {
                   className="object-cover object-center brightness-[0.88] contrast-[1.05]"
                 />
                 {/* Warm earthy gradient scrim for contrast and atmosphere */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#171009] via-[#171009]/55 to-[#171009]/20" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#171009]/80 via-transparent to-transparent sm:max-w-3xl" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#171009] via-[#171009]/55 to-[#171009]/20" />
+                <div className="absolute inset-0 bg-linear-to-r from-[#171009]/80 via-transparent to-transparent sm:max-w-3xl" />
               </motion.div>
             </AnimatePresence>
 
-            {/* Top Bar inside Hero with Status Badge */}
-            <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3.5 py-1.5 backdrop-blur-md">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] font-semibold text-white/90">{t('live_badge')}</span>
-              </div>
-              <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-950/60 px-3.5 py-1.5 backdrop-blur-md">
-                <Sparkles className="h-3.5 w-3.5 text-accent" />
-                <span className="text-[11px] font-bold text-amber-200">{t('unesco_badge')}</span>
-              </div>
+            <div className="pointer-events-none absolute right-4 top-4 z-20 hidden sm:block">
+              <span className="unesco-badge inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-[11px] uppercase tracking-wider">
+                <Sparkles className="h-3.5 w-3.5" />
+                {t('unesco_badge')}
+              </span>
             </div>
 
             {/* Slide Content */}
@@ -183,13 +184,12 @@ export default function AccueilPage() {
                   >
                     {/* Tag / Category Badge */}
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-sm">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent">
                         <SlideIcon className="h-3.5 w-3.5" />
                         {slide.subtitle}
                       </span>
-                      <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
-                        {slide.tag}
-                      </span>
+                      <span className="text-xs text-white/60">·</span>
+                      <span className="text-xs font-medium text-white/80">{slide.tag}</span>
                     </div>
 
                     {/* Headline */}
@@ -204,21 +204,20 @@ export default function AccueilPage() {
 
                     {/* Primary CTA & Secondary Action */}
                     <div className="pt-2 flex flex-wrap items-center gap-3">
-                      <AuthGuardLink
-                        href={slide.href}
-                        className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-primary-dark hover:scale-[1.02] active:scale-[0.98]"
-                      >
+                      <AuthGuardLink href={slide.href} className="btn-brand min-h-12 px-6">
                         <span>{slide.cta}</span>
                         <ArrowRight className="h-4 w-4" />
                       </AuthGuardLink>
 
-                      <AuthGuardLink
-                        href="/scan"
-                        className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/20 px-5 py-3.5 text-sm font-bold text-amber-200 backdrop-blur-md transition-all hover:bg-accent/30 hover:border-accent"
-                      >
-                        <Camera className="h-4 w-4 text-accent" />
-                        <span>{t('cta_scan_ia')}</span>
-                      </AuthGuardLink>
+                      {slide.href !== '/scan' && (
+                        <AuthGuardLink
+                          href="/scan"
+                          className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-bold text-[#2A1E16] transition-colors hover:bg-accent/85"
+                        >
+                          <Camera className="h-4 w-4" />
+                          <span>{t('cta_scan_ia')}</span>
+                        </AuthGuardLink>
+                      )}
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -235,10 +234,10 @@ export default function AccueilPage() {
                       onClick={() => setCurrentSlide(index)}
                       aria-label={t('go_to_slide', { index: index + 1 })}
                       aria-current={index === currentSlide}
-                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                         index === currentSlide
-                          ? 'w-10 bg-primary shadow-sm'
-                          : 'w-2 bg-white/40 hover:bg-white/70'
+                          ? 'w-10 bg-accent'
+                          : 'w-4 bg-white/40 hover:bg-white/70'
                       }`}
                     />
                   ))}
@@ -271,26 +270,19 @@ export default function AccueilPage() {
         {/* ══════════════════════════════════════════════════
             STATS & ENGAGEMENT TICKER
         ══════════════════════════════════════════════════ */}
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <section className="grid grid-cols-2 divide-border overflow-hidden rounded-xl border border-border bg-card sm:grid-cols-4 sm:divide-x">
           {[
-            { value: '29', label: t('stats_landing.sites'), sub: t('stats_landing.sites_sub'), icon: Landmark },
-            { value: '5', label: t('stats_landing.regions'), sub: t('stats_landing.regions_sub'), icon: Globe2 },
-            { value: '31', label: t('stats_landing.dishes'), sub: t('stats_landing.dishes_sub'), icon: Utensils },
-            { value: '100%', label: t('stats_landing.pwa'), sub: t('stats_landing.pwa_sub'), icon: Wifi },
+            { value: places.length, label: t('stats_landing.sites'), sub: t('stats_landing.sites_sub'), icon: Landmark },
+            { value: 5, label: t('stats_landing.regions'), sub: t('stats_landing.regions_sub'), icon: Globe2 },
+            { value: dishes.length || '—', label: t('stats_landing.dishes'), sub: t('stats_landing.dishes_sub'), icon: Utensils },
+            { value: 4, label: t('stats_landing.languages'), sub: t('stats_landing.languages_sub'), icon: Languages },
           ].map(({ value, label, sub, icon: Icon }) => (
-            <div
-              key={label}
-              className="app-card flex flex-col justify-between p-4 sm:p-5"
-            >
-              <div className="flex items-center justify-between">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <span className="font-serif text-2xl font-bold text-primary sm:text-3xl">{value}</span>
-              </div>
-              <div className="mt-3">
-                <p className="font-bold text-xs sm:text-sm text-foreground">{label}</p>
-                <p className="text-[11px] text-muted-foreground">{sub}</p>
+            <div key={label} className="flex items-start gap-3 p-5">
+              <Icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="font-serif text-3xl font-bold leading-none">{value}</p>
+                <p className="mt-1.5 text-sm font-semibold">{label}</p>
+                <p className="text-xs text-muted-foreground">{sub}</p>
               </div>
             </div>
           ))}
@@ -338,7 +330,7 @@ export default function AccueilPage() {
                     <Icon className="h-5 w-5" />
                   </span>
                   {highlight && (
-                    <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
+                    <span className="rounded-lg bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
                       {t('signature_ia')}
                     </span>
                   )}
@@ -398,16 +390,16 @@ export default function AccueilPage() {
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
                   
                   {/* UNESCO or Category Badge */}
                   <div className="absolute top-3 left-3 flex items-center gap-1.5">
                     {dest.tag === 'UNESCO' ? (
                       <span className="unesco-badge rounded-full px-3 py-1 text-[11px] uppercase tracking-wider">
-                        ✦ {t('unesco_badge')}
+                        {t('unesco_badge')}
                       </span>
                     ) : (
-                      <span className="rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md">
+                      <span className="rounded-lg bg-black/50 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md">
                         {dest.tag}
                       </span>
                     )}
@@ -442,12 +434,48 @@ export default function AccueilPage() {
         </section>
 
         {/* ══════════════════════════════════════════════════
+            MISE EN RELATION — GUIDES LOCAUX VÉRIFIÉS
+        ══════════════════════════════════════════════════ */}
+        <section className="rounded-xl border border-border bg-card p-6 sm:p-10">
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-5">
+              <p className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <Users className="h-3.5 w-3.5" />
+                {t('guides_section.kicker')}
+              </p>
+              <h2 className="mt-2 font-serif text-2xl font-bold tracking-tight sm:text-3xl">{t('guides_section.title')}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{t('guides_section.desc')}</p>
+              <AuthGuardLink href="/guides" className="btn-brand mt-6">
+                {t('guides_section.cta')}
+                <ArrowRight className="h-4 w-4" />
+              </AuthGuardLink>
+            </div>
+            <ol className="grid gap-4 sm:grid-cols-3 lg:col-span-7">
+              {[
+                { icon: ShieldCheck, key: 'step_1' },
+                { icon: FileText, key: 'step_2' },
+                { icon: Star, key: 'step_3' },
+              ].map(({ icon: Icon, key }, idx) => (
+                <li key={key} className="rounded-lg border border-border bg-background p-5">
+                  <div className="flex items-center justify-between">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="font-serif text-sm font-bold text-muted-foreground">0{idx + 1}</span>
+                  </div>
+                  <p className="mt-3 text-sm font-bold">{t(`guides_section.${key}_title`)}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t(`guides_section.${key}_desc`)}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
             SIGNATURE FEATURE — SCANNER IA & AUDIO GUIDE
         ══════════════════════════════════════════════════ */}
-        <section className="app-card relative overflow-hidden p-6 sm:p-8 lg:p-10 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-accent/5">
+        <section className="app-card relative overflow-hidden p-6 sm:p-8 lg:p-10 border-primary/20 bg-linear-to-br from-primary/5 via-card to-accent/5">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center">
             <div className="space-y-4 lg:col-span-7">
-              <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-accent/20 px-3.5 py-1 text-xs font-bold text-[#8A3A20] dark:text-amber-200">
                 <Sparkles className="h-3.5 w-3.5 text-accent" />
                 <span>{t('signature_feature')}</span>
               </div>
@@ -461,7 +489,7 @@ export default function AccueilPage() {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <AuthGuardLink
                   href="/scan"
-                  className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary-dark"
+                  className="inline-flex items-center gap-2.5 rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary-dark"
                 >
                   <Camera className="h-4 w-4" />
                   <span>{t('try_scanner')}</span>
@@ -482,7 +510,7 @@ export default function AccueilPage() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600/90 px-2.5 py-1 text-[11px] font-bold">
                     <span>{t('confidence')}</span>

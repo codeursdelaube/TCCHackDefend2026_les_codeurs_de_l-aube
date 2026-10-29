@@ -1,4 +1,4 @@
-import platsTogolais from '@/app/Plats/plat'
+import platsTogolais from '@/lib/data/dishes'
 import frMessages from '@/messages/fr.json'
 import enMessages from '@/messages/en.json'
 import esMessages from '@/messages/es.json'
