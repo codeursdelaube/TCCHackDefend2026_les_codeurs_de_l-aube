@@ -14,6 +14,7 @@ import {
   translateDishSingleLocale,
 } from '@/lib/catalog/translate'
 import type { TranslatableLocale } from '@/lib/catalog/i18n'
+import { persistLater } from '@/lib/catalog/persist'
 
 async function saveDishTranslations(dishId: string, translations: Record<string, unknown>) {
   const supabase = createServiceClient()
@@ -135,7 +136,7 @@ export async function findPublishedDish(rawId: string, locale: string = 'fr'): P
               parsed[locale as TranslatableLocale] = translated
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ;(dish as any).translations = parsed
-              saveDishTranslations(dish.id, parsed as Record<string, unknown>).catch(() => {})
+              persistLater(() => saveDishTranslations(dish.id, parsed as Record<string, unknown>))
             } catch (err) {
               console.error(`[findPublishedDish auto-translate ${dish.slug}]`, err)
             }
@@ -178,7 +179,7 @@ export async function listPublishedDishes(locale: string = 'fr'): Promise<Catalo
                 parsed[locale as TranslatableLocale] = translated
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ;(dish as any).translations = parsed
-                saveDishTranslations(dish.id, parsed as Record<string, unknown>).catch(() => {})
+                persistLater(() => saveDishTranslations(dish.id, parsed as Record<string, unknown>))
               } catch (err) {
                 console.error(`[listPublishedDishes auto-translate ${dish.slug}]`, err)
               }

@@ -430,7 +430,7 @@ export default function ScanPage() {
           <div className="app-card overflow-hidden p-4 lg:col-span-6 space-y-3">
             <div className="relative flex min-h-[340px] items-center justify-center overflow-hidden rounded-2xl bg-muted/40 border border-border">
               {preview ? (
-                <Image src={preview} alt={t('select_capture')} fill className="object-contain p-2" />
+                <Image src={preview} alt={t('select_capture')} fill unoptimized sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain p-2" />
               ) : (
                 <div className="max-w-sm px-6 text-center space-y-3">
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">

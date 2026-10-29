@@ -66,9 +66,16 @@ let dishTranslationsColumnReady = false
 export async function ensurePlaceTranslationsColumn() {
   if (translationsColumnReady) return
   try {
-    await prisma.$executeRawUnsafe(
-      `alter table places add column if not exists translations jsonb not null default '{}'::jsonb`,
-    )
+    // Lecture du catalogue d'abord : évite un ALTER TABLE (verrou exclusif) à chaque démarrage à froid.
+    const existing = await prisma.$queryRaw<{ ok: number }[]>`
+      select 1 as ok from information_schema.columns
+      where table_schema = 'public' and table_name = 'places' and column_name = 'translations'
+      limit 1`
+    if (existing.length === 0) {
+      await prisma.$executeRawUnsafe(
+        `alter table places add column if not exists translations jsonb not null default '{}'::jsonb`,
+      )
+    }
     translationsColumnReady = true
   } catch (error) {
     console.error('[ensurePlaceTranslationsColumn]', error)
@@ -78,9 +85,16 @@ export async function ensurePlaceTranslationsColumn() {
 export async function ensureDishTranslationsColumn() {
   if (dishTranslationsColumnReady) return
   try {
-    await prisma.$executeRawUnsafe(
-      `alter table dishes add column if not exists translations jsonb not null default '{}'::jsonb`,
-    )
+    // Lecture du catalogue d'abord : évite un ALTER TABLE (verrou exclusif) à chaque démarrage à froid.
+    const existing = await prisma.$queryRaw<{ ok: number }[]>`
+      select 1 as ok from information_schema.columns
+      where table_schema = 'public' and table_name = 'dishes' and column_name = 'translations'
+      limit 1`
+    if (existing.length === 0) {
+      await prisma.$executeRawUnsafe(
+        `alter table dishes add column if not exists translations jsonb not null default '{}'::jsonb`,
+      )
+    }
     dishTranslationsColumnReady = true
   } catch (error) {
     console.error('[ensureDishTranslationsColumn]', error)

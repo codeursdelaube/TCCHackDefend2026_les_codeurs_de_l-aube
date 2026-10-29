@@ -2068,6 +2068,8 @@
     "doc_kyc_pending": "En verificación por el proveedor de identidad",
     "avatar_add": "Añadir una foto",
     "avatar_change": "Cambiar la foto",
-    "avatar_uploading": "Enviando…"
+    "avatar_uploading": "Enviando…",
+    "load_failed_title": "No se pudo cargar su espacio de guía",
+    "retry": "Reintentar"
   }
 }

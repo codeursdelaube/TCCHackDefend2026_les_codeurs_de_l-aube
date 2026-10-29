@@ -2120,6 +2120,8 @@
     "doc_kyc_pending": "身份验证服务商审核中",
     "avatar_add": "添加照片",
     "avatar_change": "更换照片",
-    "avatar_uploading": "上传中……"
+    "avatar_uploading": "上传中……",
+    "load_failed_title": "无法加载您的导游空间",
+    "retry": "重试"
   }
 }

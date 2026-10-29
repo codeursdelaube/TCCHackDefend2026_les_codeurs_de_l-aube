@@ -6,18 +6,30 @@ import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 
 const SPLASH_KEY = 'heritogo_splash_shown'
-const SPLASH_MS = 2800
+const SPLASH_MS = 1200
+
+function isInstalledApp() {
+  return (
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  )
+}
 
 export default function SplashScreen() {
   const t = useTranslations('Splash')
-  const [visible, setVisible] = useState(true)
+  // Masqué par défaut : sur le web, le contenu s'affiche immédiatement.
+  const [visible, setVisible] = useState(false)
   const reduceMotion = useReducedMotion()
 
   useEffect(() => {
-    if (sessionStorage.getItem(SPLASH_KEY)) {
-      setVisible(false)
-      return
-    }
+    let alreadyShown = true
+    try {
+      alreadyShown = Boolean(sessionStorage.getItem(SPLASH_KEY))
+    } catch {}
+    // L'écran de démarrage n'est montré qu'au lancement de l'application installée (PWA).
+    if (alreadyShown || !isInstalledApp()) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVisible(true)
 
     const id = window.setTimeout(() => {
       sessionStorage.setItem(SPLASH_KEY, '1')

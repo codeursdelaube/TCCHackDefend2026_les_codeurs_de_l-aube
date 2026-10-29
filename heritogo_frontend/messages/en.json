@@ -2068,6 +2068,8 @@
     "doc_kyc_pending": "Being verified by the identity provider",
     "avatar_add": "Add a photo",
     "avatar_change": "Change photo",
-    "avatar_uploading": "Uploading…"
+    "avatar_uploading": "Uploading…",
+    "load_failed_title": "Your guide space could not be loaded",
+    "retry": "Try again"
   }
 }

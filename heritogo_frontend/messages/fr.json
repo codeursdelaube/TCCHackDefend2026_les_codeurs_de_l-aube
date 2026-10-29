@@ -2067,6 +2067,8 @@
     "doc_kyc_pending": "Vérification en cours par le prestataire d'identité",
     "avatar_add": "Ajouter une photo",
     "avatar_change": "Changer la photo",
-    "avatar_uploading": "Envoi en cours…"
+    "avatar_uploading": "Envoi en cours…",
+    "load_failed_title": "Impossible de charger votre espace guide",
+    "retry": "Réessayer"
   }
 }

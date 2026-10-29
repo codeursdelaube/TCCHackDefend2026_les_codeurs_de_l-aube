@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { DocumentType } from '@prisma/client'
+import { asStringArray, clipString } from '@/lib/security/input'
+
+const MAX_RATE = 10_000_000
+
+/** Tarif optionnel : '' ou null → null, nombre positif borné sinon ; false si invalide. */
+function parseRate(value: unknown): number | null | false {
+  if (value === undefined) return false
+  if (value === null || value === '') return null
+  const n = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(n) && n >= 0 && n <= MAX_RATE ? Math.round(n) : false
+}
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +31,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Profil guide introuvable' }, { status: 404 })
     }
 
-    const body = await request.json()
+    const body = await request.json().catch(() => null)
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Données invalides.' }, { status: 400 })
+    }
     const {
       bio,
       phone,
@@ -38,8 +52,8 @@ export async function POST(request: Request) {
     // 1. Mettre à jour la table Profile (bio, phone)
     if (bio !== undefined || phone !== undefined) {
       const profileData: Record<string, unknown> = {}
-      if (bio !== undefined) profileData.bio = bio
-      if (phone !== undefined) profileData.phone = phone
+      if (bio !== undefined) profileData.bio = clipString(bio, 2000)
+      if (phone !== undefined) profileData.phone = clipString(phone, 30)
 
       await prisma.profile.update({
         where: { id: user.id },
@@ -49,16 +63,27 @@ export async function POST(request: Request) {
 
     // 2. Mettre à jour la table GuideProfile
     const guideData: Record<string, unknown> = {}
-    if (languages !== undefined) guideData.languages = languages
-    if (coverage_zones !== undefined) guideData.coverage_zones = coverage_zones
-    if (specialties !== undefined) guideData.specialties = specialties
-    if (experience_years !== undefined) guideData.experience_years = parseInt(experience_years, 10) || 0
-    if (hourly_rate !== undefined) guideData.hourly_rate = hourly_rate ? parseFloat(hourly_rate) : null
-    if (half_day_rate !== undefined) guideData.half_day_rate = half_day_rate ? parseFloat(half_day_rate) : null
-    if (full_day_rate !== undefined) guideData.full_day_rate = full_day_rate ? parseFloat(full_day_rate) : null
-    if (virtual_rate !== undefined) guideData.virtual_rate = virtual_rate ? parseFloat(virtual_rate) : null
+    if (languages !== undefined) guideData.languages = asStringArray(languages, 15, 40) ?? []
+    if (coverage_zones !== undefined) guideData.coverage_zones = asStringArray(coverage_zones, 20, 60) ?? []
+    if (specialties !== undefined) guideData.specialties = asStringArray(specialties, 15, 60) ?? []
+    if (experience_years !== undefined) {
+      const years = parseInt(String(experience_years), 10)
+      guideData.experience_years = Number.isFinite(years) ? Math.min(Math.max(years, 0), 60) : 0
+    }
+    const rates = { hourly_rate, half_day_rate, full_day_rate, virtual_rate }
+    for (const [key, value] of Object.entries(rates)) {
+      if (value === undefined) continue
+      const parsed = parseRate(value)
+      if (parsed === false) {
+        return NextResponse.json({ error: 'Un des tarifs est invalide (nombre positif en XOF).' }, { status: 400 })
+      }
+      guideData[key] = parsed
+    }
 
     // 3. Ajouter un document de vérification — jamais de pièce d'identité en clair chez nous
+    if (document !== undefined && (typeof document !== 'object' || document === null)) {
+      return NextResponse.json({ error: 'Vérification KYC invalide.' }, { status: 400 })
+    }
     if (document !== undefined) {
       const validTypes = Object.values(DocumentType)
       const kycRef = typeof document.kyc_session_id === 'string' ? document.kyc_session_id.trim() : ''

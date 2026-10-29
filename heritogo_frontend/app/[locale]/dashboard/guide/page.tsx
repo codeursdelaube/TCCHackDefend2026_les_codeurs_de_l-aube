@@ -109,13 +109,13 @@ export default function GuideDashboard() {
 
   const loadData = useCallback(async () => {
     setLoading(true)
-    setError(null)
     try {
       const result = await apiFetch<{ bookings?: GuideBooking[]; guideProfile?: GuideProfileData }>('/api/guide/bookings')
       if (!result.ok || !result.data) {
         setError(result.error || t('guide.error_load_data'))
         return
       }
+      setError(null)
       setBookings(result.data.bookings || [])
       setGuide(result.data.guideProfile || null)
 
@@ -201,6 +201,8 @@ export default function GuideDashboard() {
         return
       }
       if (result.data.guide) setGuide(result.data.guide)
+      clearClientCache('public-guide')
+      clearClientCache('public-guides')
       toast.success(t('common.success_update'))
     } catch (err: unknown) {
       setError(getUserFriendlyError(err))
@@ -365,7 +367,25 @@ export default function GuideDashboard() {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 pb-32 pt-24 text-foreground sm:px-6 lg:px-8">
-      {error && (
+      {/* Champ fichier unique (en-tête + onglet profil), toujours monté */}
+      <input
+        id="avatar-upload"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        onChange={handleAvatarChange}
+        disabled={avatarUploading}
+      />
+
+      {!guide && !loading && (
+        <div className="flex flex-col items-center rounded-xl border border-border bg-card px-6 py-14 text-center">
+          <p className="font-serif text-xl font-bold">{tg('load_failed_title')}</p>
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">{error || t('guide.error_load_data')}</p>
+          <button type="button" onClick={() => loadData()} className="btn-brand mt-5">{tg('retry')}</button>
+        </div>
+      )}
+
+      {error && guide && (
         <div role="alert" className="mb-4 flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
           <span>{error}</span>
           <button type="button" onClick={() => setError(null)} aria-label={tg('dismiss')}><X className="h-4 w-4" /></button>
@@ -392,15 +412,6 @@ export default function GuideDashboard() {
                 </span>
               )}
             </label>
-            {/* Champ fichier unique, partagé par l'en-tête et l'onglet profil */}
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="sr-only"
-              onChange={handleAvatarChange}
-              disabled={avatarUploading}
-            />
             <div>
               <h1 className="font-serif text-2xl font-bold">{t('guide.greeting', { name: guide.profile.full_name })}</h1>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
@@ -437,6 +448,7 @@ export default function GuideDashboard() {
         </header>
       )}
 
+      {guide && (<>
       <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-border" role="tablist">
         {([
           { id: 'bookings', label: tg('tab_bookings'), icon: Briefcase },
@@ -835,6 +847,7 @@ export default function GuideDashboard() {
 
       </div>
 
+      </>)}
     </main>
   )
 }

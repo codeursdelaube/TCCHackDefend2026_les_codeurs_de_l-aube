@@ -508,6 +508,7 @@ export default function AccueilPage() {
                   src="/deuxlions.png"
                   alt={t('scan_preview_alt')}
                   fill
+                  sizes="(max-width: 1024px) 100vw, 400px"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />

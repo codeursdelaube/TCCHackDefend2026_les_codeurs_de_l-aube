@@ -6,6 +6,7 @@ import { ensurePlaceTranslationsColumn } from '@/lib/catalog/store'
 import { parsePlaceTranslations, placeCopyFromFrench, translatePlaceSingleLocale } from '@/lib/catalog/translate'
 import type { TranslatableLocale } from '@/lib/catalog/i18n'
 import { getLocalPlaces } from '@/lib/catalog/places'
+import { persistLater } from '@/lib/catalog/persist'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,7 +59,7 @@ export async function GET(request: Request) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ;(place as any).translations = parsed
               // Persist asynchronously
-              saveTranslations(place.id, parsed as Record<string, unknown>).catch(() => {})
+              persistLater(() => saveTranslations(place.id, parsed as Record<string, unknown>))
             } catch (err) {
               console.error(`[GET /api/places auto-translate ${place.slug}]`, err)
             }
