@@ -5,6 +5,11 @@ import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
+// Routes servies directement sans i18n (pages standalone hors locale)
+const STANDALONE_PREFIXES = [
+  '/presentation',
+]
+
 // Routes publiques → pas d'appel Supabase nécessaire
 const PUBLIC_PREFIXES = [
   '/cuisine',
@@ -39,6 +44,12 @@ function extractLocaleAndPath(pathname: string): { locale: string; pathWithoutLo
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const { locale: currentLocale, pathWithoutLocale } = extractLocaleAndPath(pathname)
+
+  // ── Fast path : pages standalone (sans locale i18n) → next directement ───────
+  const isStandalone = STANDALONE_PREFIXES.some((p) => pathname.startsWith(p))
+  if (isStandalone) {
+    return NextResponse.next({ request })
+  }
 
   // ── Fast path : routes publiques → i18n directement, sans appel Supabase ──────
   // Cela évite les timeouts Edge qui causent des 404 intermittents en production
