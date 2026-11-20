@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 
 export default function PitchDeckPage() {
   const pdfUrl = '/HeriTogo_Pitch_Deck.pdf'
+  const demoUrl = '/presentation/pitch/demo'
 
   return (
     <>
@@ -25,6 +26,7 @@ export default function PitchDeckPage() {
           --terracotta: #B5502E;
           --terracotta-hover: #983e20;
           --gold: #D9A441;
+          --gold-hover: #e5b352;
           --ink: #1f1510;
           --ivory: #FBF6EF;
           --border: #E8DCCF;
@@ -45,6 +47,7 @@ export default function PitchDeckPage() {
           height: 100vh;
           width: 100vw;
           background: #17120e;
+          position: relative;
         }
 
         /* ── HEADER ── */
@@ -109,6 +112,18 @@ export default function PitchDeckPage() {
           white-space: nowrap;
         }
 
+        .btn-demo-header {
+          background: rgba(217, 164, 65, 0.15);
+          color: var(--gold);
+          border: 1px solid rgba(217, 164, 65, 0.35);
+        }
+
+        .btn-demo-header:hover {
+          background: rgba(217, 164, 65, 0.25);
+          border-color: var(--gold);
+          transform: translateY(-1px);
+        }
+
         .btn-download {
           background: var(--terracotta);
           color: #ffffff;
@@ -130,6 +145,46 @@ export default function PitchDeckPage() {
         .btn-ghost:hover {
           background: rgba(255, 255, 255, 0.16);
           border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ── BOUTON FLOTTANT AU MILIEU DE LA PAGE ── */
+        .btn-demo-center {
+          position: fixed;
+          bottom: 2rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 50;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.65rem;
+          background: linear-gradient(135deg, #B5502E 0%, #D9A441 100%);
+          color: #ffffff;
+          font-family: 'Manrope', system-ui, sans-serif;
+          font-size: 1rem;
+          font-weight: 700;
+          padding: 0.85rem 1.85rem;
+          border-radius: 9999px;
+          text-decoration: none;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(217, 164, 65, 0.35);
+          border: 1.5px solid rgba(255, 255, 255, 0.25);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          backdrop-filter: blur(10px);
+        }
+
+        .btn-demo-center:hover {
+          transform: translateX(-50%) translateY(-3px) scale(1.03);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 28px rgba(217, 164, 65, 0.55);
+          border-color: rgba(255, 255, 255, 0.45);
+        }
+
+        .play-icon-circle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          background: rgba(255, 255, 255, 0.25);
+          border-radius: 50%;
         }
 
         /* ── PDF VIEWER ── */
@@ -175,6 +230,13 @@ export default function PitchDeckPage() {
           line-height: 1.5;
         }
 
+        .fallback-actions {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
         @media (max-width: 640px) {
           .pitch-header {
             padding: 0.65rem 1rem;
@@ -182,12 +244,17 @@ export default function PitchDeckPage() {
           .pitch-badge {
             display: none;
           }
-          .btn-ghost span {
+          .btn-ghost span, .btn-demo-header span {
             display: none;
           }
           .btn {
-            padding: 0.5rem 0.9rem;
+            padding: 0.5rem 0.8rem;
             font-size: 0.8rem;
+          }
+          .btn-demo-center {
+            bottom: 1.25rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
           }
         }
       `}</style>
@@ -200,6 +267,17 @@ export default function PitchDeckPage() {
           </a>
 
           <div className="pitch-actions">
+            <a
+              href={demoUrl}
+              className="btn btn-demo-header"
+              title="Regarder la démonstration vidéo"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              <span>Voir la démo</span>
+            </a>
+
             <a
               href="https://heritogo.codorah.com"
               className="btn btn-ghost"
@@ -229,6 +307,16 @@ export default function PitchDeckPage() {
           </div>
         </header>
 
+        {/* Bouton au milieu de la page : Voir la démo */}
+        <a href={demoUrl} className="btn-demo-center" title="Voir la démonstration vidéo de HeriTogo">
+          <span className="play-icon-circle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6 3 20 12 6 21 6 3" />
+            </svg>
+          </span>
+          <span>Voir la démo</span>
+        </a>
+
         <main className="pdf-viewer-wrap">
           <object
             data={`${pdfUrl}#toolbar=1&navpanes=1`}
@@ -245,13 +333,21 @@ export default function PitchDeckPage() {
                 <p>
                   Votre navigateur n&apos;affiche pas directement l&apos;aperçu PDF. Cliquez ci-dessous pour télécharger ou ouvrir la présentation.
                 </p>
-                <a
-                  href={pdfUrl}
-                  download="HeriTogo_Pitch_Deck.pdf"
-                  className="btn btn-download"
-                >
-                  Télécharger le Pitch Deck (PDF)
-                </a>
+                <div className="fallback-actions">
+                  <a
+                    href={pdfUrl}
+                    download="HeriTogo_Pitch_Deck.pdf"
+                    className="btn btn-download"
+                  >
+                    Télécharger le Pitch Deck (PDF)
+                  </a>
+                  <a
+                    href={demoUrl}
+                    className="btn btn-demo-header"
+                  >
+                    Voir la démo
+                  </a>
+                </div>
               </div>
             </iframe>
           </object>
